@@ -5,21 +5,21 @@ export const curriculum: Module[] = [
     id: 'python-basics',
     title: 'Python Základy',
     description: 'Nauč sa základy programovania od nuly',
-    color: '#534AB7',
-    icon: '🐍',
+
+
     units: [
       {
         id: 'variables',
         moduleId: 'python-basics',
         title: 'Premenné a typy',
         description: 'Ako ukladať a pracovať s dátami',
-        icon: '📦',
+
         lessons: [
           {
             id: 'what-is-variable',
             unitId: 'variables',
             title: 'Čo je premenná?',
-            icon: '💡',
+
             exercises: [
               {
                 id: 'explain-var-1',
@@ -76,7 +76,7 @@ export const curriculum: Module[] = [
             id: 'data-types',
             unitId: 'variables',
             title: 'Typy dát',
-            icon: '🔢',
+
             exercises: [
               {
                 id: 'explain-types-1',
@@ -145,7 +145,7 @@ export const curriculum: Module[] = [
             id: 'strings',
             unitId: 'variables',
             title: 'Reťazce (Strings)',
-            icon: '📝',
+
             exercises: [
               {
                 id: 'explain-str-1',
@@ -212,13 +212,13 @@ export const curriculum: Module[] = [
         moduleId: 'python-basics',
         title: 'Operátory',
         description: 'Počítaj a porovnávaj hodnoty',
-        icon: '🔣',
+
         lessons: [
           {
             id: 'math-operators',
             unitId: 'operators',
             title: 'Matematika v Pythone',
-            icon: '➕',
+
             exercises: [
               {
                 id: 'explain-math-1',
@@ -275,7 +275,7 @@ export const curriculum: Module[] = [
             id: 'comparison-operators',
             unitId: 'operators',
             title: 'Porovnávacie operátory',
-            icon: '⚖️',
+
             exercises: [
               {
                 id: 'explain-cmp-1',
@@ -324,14 +324,14 @@ export const curriculum: Module[] = [
         moduleId: 'python-basics',
         title: 'Podmienky',
         description: 'Nauč program rozhodovať',
-        icon: '🔀',
+
         isCheckpoint: true,
         lessons: [
           {
             id: 'if-else',
             unitId: 'conditions',
             title: 'if a else',
-            icon: '❓',
+
             exercises: [
               {
                 id: 'explain-if-1',
@@ -381,7 +381,7 @@ export const curriculum: Module[] = [
             id: 'elif',
             unitId: 'conditions',
             title: 'elif — viac možností',
-            icon: '🔱',
+
             exercises: [
               {
                 id: 'explain-elif-1',
@@ -431,13 +431,13 @@ export const curriculum: Module[] = [
         moduleId: 'python-basics',
         title: 'Cykly',
         description: 'Opakuj kód inteligentne',
-        icon: '🔄',
+
         lessons: [
           {
             id: 'for-loop',
             unitId: 'loops',
             title: 'for cyklus',
-            icon: '🔁',
+
             exercises: [
               {
                 id: 'explain-for-1',
@@ -488,21 +488,21 @@ export const curriculum: Module[] = [
     id: 'my-projects',
     title: 'Moje Projekty',
     description: 'Koncepty z reálnych projektov — React Native, TypeScript, Supabase',
-    color: '#1D9E75',
-    icon: '🚀',
+
+
     units: [
       {
         id: 'js-fundamentals',
         moduleId: 'my-projects',
         title: 'JavaScript Základy',
         description: 'Async/await, destructuring, optional chaining',
-        icon: '⚡',
+
         lessons: [
           {
             id: 'async-await',
             unitId: 'js-fundamentals',
             title: 'Async / Await',
-            icon: '⏳',
+
             exercises: [
               {
                 id: 'explain-async-1',
@@ -555,7 +555,7 @@ export const curriculum: Module[] = [
             id: 'destructuring',
             unitId: 'js-fundamentals',
             title: 'Destructuring a Spread',
-            icon: '📦',
+
             exercises: [
               {
                 id: 'explain-dest-1',
@@ -598,13 +598,13 @@ export const curriculum: Module[] = [
         moduleId: 'my-projects',
         title: 'TypeScript',
         description: 'Typy, interfaces, generics — bezpečnejší JavaScript',
-        icon: '🔷',
+
         lessons: [
           {
             id: 'ts-types',
             unitId: 'typescript',
             title: 'Typy a Type Aliases',
-            icon: '🏷️',
+
             exercises: [
               {
                 id: 'explain-ts-1',
@@ -662,14 +662,14 @@ export const curriculum: Module[] = [
         moduleId: 'my-projects',
         title: 'React Patterny',
         description: 'useState, useEffect, podmienené renderovanie',
-        icon: '⚛️',
+
         isCheckpoint: true,
         lessons: [
           {
             id: 'react-hooks',
             unitId: 'react-patterns',
             title: 'React Hooks',
-            icon: '🪝',
+
             exercises: [
               {
                 id: 'explain-usestate-1',
@@ -741,13 +741,13 @@ export const curriculum: Module[] = [
         moduleId: 'my-projects',
         title: 'Supabase',
         description: 'Databáza, auth, RLS — backend pre tvoje projekty',
-        icon: '🟢',
+
         lessons: [
           {
             id: 'supabase-queries',
             unitId: 'supabase-basics',
             title: 'Supabase Queries',
-            icon: '🗄️',
+
             exercises: [
               {
                 id: 'explain-supabase-1',

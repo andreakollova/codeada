@@ -1,24 +1,24 @@
+'use client';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { UserState, ByteMood } from '@/types';
+import { UserState, ByteMood, ByteEquipment } from '@/types';
 import { supabase } from '@/lib/supabase';
+import { pickReward } from '@/data/cosmetics';
 
 const today = () => new Date().toISOString().split('T')[0];
 
 interface UserActions {
   addXp: (amount: number) => void;
-  addGems: (amount: number) => void;
-  spendGems: (amount: number) => boolean;
   loseHeart: () => void;
   gainHeart: () => void;
-  completeLesson: (lessonId: string, xpEarned: number) => void;
+  completeLesson: (lessonId: string, xpEarned: number) => string | null;
   checkStreak: () => void;
   setByteMood: (mood: ByteMood) => void;
   unlockBadge: (badgeId: string) => void;
+  addItem: (itemId: string) => void;
+  equip: (slot: keyof ByteEquipment, itemId: string | undefined) => void;
   syncToSupabase: () => Promise<void>;
-  loadFromSupabase: (userId: string) => Promise<void>;
   setUserId: (id: string | null) => void;
-  resetHearts: () => void;
 }
 
 const initialState: UserState = {
@@ -35,6 +35,8 @@ const initialState: UserState = {
   badges: [],
   weeklyXp: 0,
   weekStartDate: null,
+  ownedItems: [],
+  equipment: {},
 };
 
 export const useUserStore = create<UserState & UserActions>()(
@@ -44,81 +46,64 @@ export const useUserStore = create<UserState & UserActions>()(
 
       setUserId: (id) => set({ userId: id }),
 
-      addXp: (amount) => {
-        set((s) => ({ xp: s.xp + amount, weeklyXp: s.weeklyXp + amount }));
-      },
+      addXp: (amount) => set((s) => ({ xp: s.xp + amount, weeklyXp: s.weeklyXp + amount })),
 
-      addGems: (amount) => set((s) => ({ gems: s.gems + amount })),
+      loseHeart: () => set((s) => {
+        const hearts = Math.max(0, s.hearts - 1);
+        return { hearts, byteMood: hearts === 0 ? 'low_battery' : hearts <= 2 ? 'worried' : s.byteMood };
+      }),
 
-      spendGems: (amount) => {
-        const { gems } = get();
-        if (gems < amount) return false;
-        set((s) => ({ gems: s.gems - amount }));
-        return true;
-      },
-
-      loseHeart: () => {
-        set((s) => {
-          const hearts = Math.max(0, s.hearts - 1);
-          const mood = hearts === 0 ? 'low_battery' : s.hearts <= 2 ? 'worried' : s.byteMood;
-          return { hearts, byteMood: mood };
-        });
-      },
-
-      gainHeart: () => {
-        set((s) => ({ hearts: Math.min(s.hearts + 1, s.maxHearts) }));
-      },
-
-      resetHearts: () => set({ hearts: 5 }),
+      gainHeart: () => set((s) => ({ hearts: Math.min(s.hearts + 1, s.maxHearts) })),
 
       completeLesson: (lessonId, xpEarned) => {
-        const { completedLessons } = get();
-        if (completedLessons.includes(lessonId)) return;
+        const { completedLessons, ownedItems } = get();
+        if (completedLessons.includes(lessonId)) return null;
 
-        const todayStr = today();
+        const reward = pickReward(completedLessons.length, ownedItems);
+        const newOwned = reward ? [...ownedItems, reward] : ownedItems;
+
         set((s) => ({
           completedLessons: [...s.completedLessons, lessonId],
           xp: s.xp + xpEarned,
           weeklyXp: s.weeklyXp + xpEarned,
           gems: s.gems + Math.floor(xpEarned / 10),
-          lastActiveDate: todayStr,
+          lastActiveDate: today(),
           byteMood: 'celebrating',
           byteBattery: Math.min(100, s.byteBattery + 20),
+          ownedItems: newOwned,
         }));
 
         get().checkStreak();
-        setTimeout(() => get().syncToSupabase(), 500);
+        setTimeout(() => get().syncToSupabase(), 300);
+        return reward;
       },
 
       checkStreak: () => {
-        const { lastActiveDate } = get();
         const todayStr = today();
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
-
+        const yStr = yesterday.toISOString().split('T')[0];
         set((s) => {
-          if (s.lastActiveDate === todayStr) {
-            return {};
-          } else if (s.lastActiveDate === yesterdayStr || !s.lastActiveDate) {
-            const newStreak = s.streak + 1;
-            const battery = Math.min(100, newStreak * 15);
-            const mood: ByteMood = newStreak >= 7 ? 'proud' : 'happy';
-            return { streak: newStreak, byteBattery: battery, byteMood: mood };
-          } else {
-            // Streak broken
-            return { streak: 0, byteBattery: 10, byteMood: 'low_battery' };
+          if (s.lastActiveDate === todayStr) return {};
+          if (s.lastActiveDate === yStr || !s.lastActiveDate) {
+            const streak = s.streak + 1;
+            return { streak, byteBattery: Math.min(100, streak * 15), byteMood: streak >= 7 ? 'proud' : 'happy' };
           }
+          return { streak: 0, byteBattery: 10, byteMood: 'low_battery' };
         });
       },
 
       setByteMood: (mood) => set({ byteMood: mood }),
 
-      unlockBadge: (badgeId) => {
-        const { badges } = get();
-        if (badges.includes(badgeId)) return;
-        set((s) => ({ badges: [...s.badges, badgeId] }));
-      },
+      unlockBadge: (id) => set((s) => s.badges.includes(id) ? {} : { badges: [...s.badges, id] }),
+
+      addItem: (itemId) => set((s) =>
+        s.ownedItems.includes(itemId) ? {} : { ownedItems: [...s.ownedItems, itemId] }
+      ),
+
+      equip: (slot, itemId) => set((s) => ({
+        equipment: { ...s.equipment, [slot]: itemId },
+      })),
 
       syncToSupabase: async () => {
         const s = get();
@@ -126,67 +111,22 @@ export const useUserStore = create<UserState & UserActions>()(
         try {
           await supabase.from('user_state').upsert({
             user_id: s.userId,
-            xp: s.xp,
-            gems: s.gems,
-            hearts: s.hearts,
-            streak: s.streak,
-            last_active_date: s.lastActiveDate,
-            byte_mood: s.byteMood,
-            byte_battery: s.byteBattery,
-            completed_lessons: s.completedLessons,
-            badges: s.badges,
-            weekly_xp: s.weeklyXp,
-            week_start_date: s.weekStartDate,
+            xp: s.xp, gems: s.gems, hearts: s.hearts, streak: s.streak,
+            last_active_date: s.lastActiveDate, byte_mood: s.byteMood,
+            byte_battery: s.byteBattery, completed_lessons: s.completedLessons,
+            badges: s.badges, weekly_xp: s.weeklyXp, week_start_date: s.weekStartDate,
           });
-        } catch {
-          // Silent fail — local state is source of truth
-        }
-      },
-
-      loadFromSupabase: async (userId) => {
-        try {
-          const { data } = await supabase
-            .from('user_state')
-            .select('*')
-            .eq('user_id', userId)
-            .maybeSingle();
-          if (data) {
-            set({
-              userId,
-              xp: data.xp,
-              gems: data.gems,
-              hearts: data.hearts,
-              streak: data.streak,
-              lastActiveDate: data.last_active_date,
-              byteMood: data.byte_mood as ByteMood,
-              byteBattery: data.byte_battery,
-              completedLessons: data.completed_lessons ?? [],
-              badges: data.badges ?? [],
-              weeklyXp: data.weekly_xp,
-              weekStartDate: data.week_start_date,
-            });
-          } else {
-            set({ userId });
-          }
-        } catch {
-          set({ userId });
-        }
+        } catch {}
       },
     }),
     {
-      name: 'codebyte-user',
+      name: 'codebyte-user-v2',
       partialize: (s) => ({
-        xp: s.xp,
-        gems: s.gems,
-        hearts: s.hearts,
-        streak: s.streak,
-        lastActiveDate: s.lastActiveDate,
-        byteMood: s.byteMood,
-        byteBattery: s.byteBattery,
-        completedLessons: s.completedLessons,
-        badges: s.badges,
-        weeklyXp: s.weeklyXp,
-        weekStartDate: s.weekStartDate,
+        xp: s.xp, gems: s.gems, hearts: s.hearts, streak: s.streak,
+        lastActiveDate: s.lastActiveDate, byteMood: s.byteMood,
+        byteBattery: s.byteBattery, completedLessons: s.completedLessons,
+        badges: s.badges, weeklyXp: s.weeklyXp, weekStartDate: s.weekStartDate,
+        ownedItems: s.ownedItems, equipment: s.equipment,
       }),
     }
   )

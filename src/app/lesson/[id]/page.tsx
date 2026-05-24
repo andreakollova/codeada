@@ -17,145 +17,93 @@ export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const lesson = getLessonById(id);
-  const { hearts, loseHeart, completeLesson, setByteMood, byteMood } = useUserStore();
-
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment } = useUserStore();
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [showHeartLost, setShowHeartLost] = useState(false);
 
-  useEffect(() => {
-    setByteMood('happy');
-  }, []);
+  useEffect(() => { setByteMood('happy'); }, []);
 
-  if (!lesson) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p style={{ color: '#888780' }}>Lekcia nenájdená</p>
-      </div>
-    );
-  }
+  if (!lesson) return (
+    <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#555' }}>Lekcia nenájdená</p>
+    </div>
+  );
 
   const exercises = lesson.exercises;
   const current = exercises[exerciseIndex];
-  const progress = ((exerciseIndex) / exercises.length) * 100;
-
-  const goNext = (xp: number = 0) => {
-    setXpEarned((e) => e + xp);
-    setDirection(1);
-    if (exerciseIndex + 1 >= exercises.length) {
-      // Lesson complete
-      const totalXp = xpEarned + xp;
-      completeLesson(lesson.id, totalXp);
-      router.replace(`/result?lessonId=${lesson.id}&xp=${totalXp}`);
-    } else {
-      setExerciseIndex((i) => i + 1);
-    }
-  };
+  const progress = (exerciseIndex / exercises.length) * 100;
 
   const handleCorrect = () => {
     setByteMood('celebrating');
-    setTimeout(() => setByteMood('happy'), 2000);
-    goNext(current.xp);
+    const newXp = xpEarned + current.xp;
+    setTimeout(() => setByteMood('happy'), 1800);
+    if (exerciseIndex + 1 >= exercises.length) {
+      const reward = completeLesson(lesson.id, newXp);
+      const params = new URLSearchParams({ lessonId: lesson.id, xp: String(newXp) });
+      if (reward) params.set('reward', reward);
+      router.replace(`/result?${params.toString()}`);
+    } else {
+      setXpEarned(newXp);
+      setExerciseIndex(i => i + 1);
+    }
   };
 
   const handleWrong = () => {
     setByteMood('worried');
     loseHeart();
     setShowHeartLost(true);
-    setTimeout(() => {
-      setShowHeartLost(false);
-      setByteMood('happy');
-    }, 1500);
+    setTimeout(() => { setShowHeartLost(false); setByteMood('happy'); }, 1500);
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0A0A0A' }}>
+    <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div className="sticky top-0 z-50 px-4 pt-4 pb-3"
-        style={{ background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(12px)' }}>
-        <div className="max-w-lg mx-auto flex items-center gap-3">
-          {/* Close */}
-          <button onClick={() => router.push('/')} className="p-1 rounded-lg" style={{ color: '#888780' }}>
-            <X size={22} />
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 20px', background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #0f0f0f' }}>
+        <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={() => router.push('/')} style={{ color: '#444', cursor: 'pointer', padding: 4 }}>
+            <X size={20} />
           </button>
-
-          {/* Progress bar */}
-          <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: '#1E1E1E' }}>
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: '#DEFF4A' }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4 }}
-            />
+          {/* Progress */}
+          <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#111', overflow: 'hidden' }}>
+            <motion.div style={{ height: '100%', background: '#fff', borderRadius: 2 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
           </div>
-
           {/* Hearts */}
-          <div className="flex items-center gap-1">
+          <div style={{ display: 'flex', gap: 3 }}>
             {Array.from({ length: 5 }).map((_, i) => (
-              <Heart key={i} size={16} fill={i < hearts ? '#ef4444' : 'none'}
-                className={i < hearts ? 'text-red-500' : 'text-gray-700'} />
+              <Heart key={i} size={14} fill={i < hearts ? '#fff' : 'none'} color={i < hearts ? '#fff' : '#2a2a2a'} />
             ))}
           </div>
         </div>
       </div>
 
-      {/* Heart lost animation */}
+      {/* Heart lost toast */}
       <AnimatePresence>
         {showHeartLost && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -30 }}
-            className="fixed top-16 left-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-full"
-            style={{ transform: 'translateX(-50%)', background: '#D85A30', color: 'white' }}
-          >
-            <Heart size={16} fill="white" />
-            <span className="text-sm font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>−1 srdce</span>
+          <motion.div initial={{ opacity: 0, y: -16, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20 }}
+            style={{ position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 100, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#111', border: '1px solid #2a2a2a', borderRadius: 40, color: '#fff' }}>
+            <Heart size={14} fill="#fff" color="#fff" />
+            <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13 }}>−1 srdce</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Byte companion */}
-      <div className="flex justify-center pt-4 pb-2">
-        <Byte mood={byteMood} size={80} />
+      {/* Byte */}
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 24, paddingBottom: 8 }}>
+        <Byte mood={byteMood} size={80} equipment={equipment} />
       </div>
 
       {/* Exercise */}
-      <div className="flex-1 max-w-lg mx-auto w-full px-4 pb-8">
+      <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 40px' }}>
         <AnimatePresence mode="wait">
-          <motion.div
-            key={exerciseIndex}
-            initial={{ opacity: 0, x: direction * 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -40 }}
-            transition={{ duration: 0.25 }}
-          >
-            <ExerciseRenderer
-              exercise={current}
-              onCorrect={handleCorrect}
-              onWrong={handleWrong}
-            />
+          <motion.div key={exerciseIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.2 }}>
+            {current.type === 'explain' && <ExplainCard exercise={current} onNext={handleCorrect} />}
+            {current.type === 'mcq'     && <McqExercise exercise={current} onCorrect={handleCorrect} onWrong={handleWrong} />}
+            {current.type === 'fill'    && <FillExercise exercise={current} onCorrect={handleCorrect} onWrong={handleWrong} />}
+            {current.type === 'write'   && <WriteExercise exercise={current} onCorrect={handleCorrect} onWrong={handleWrong} />}
           </motion.div>
         </AnimatePresence>
       </div>
     </div>
   );
-}
-
-function ExerciseRenderer({ exercise, onCorrect, onWrong }: {
-  exercise: Exercise;
-  onCorrect: () => void;
-  onWrong: () => void;
-}) {
-  switch (exercise.type) {
-    case 'explain':
-      return <ExplainCard exercise={exercise} onNext={() => onCorrect()} />;
-    case 'mcq':
-      return <McqExercise exercise={exercise} onCorrect={onCorrect} onWrong={onWrong} />;
-    case 'fill':
-      return <FillExercise exercise={exercise} onCorrect={onCorrect} onWrong={onWrong} />;
-    case 'write':
-      return <WriteExercise exercise={exercise} onCorrect={onCorrect} onWrong={onWrong} />;
-  }
 }

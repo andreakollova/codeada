@@ -6,7 +6,28 @@ import { curriculum } from '@/data/curriculum';
 import { Module, Unit, Lesson } from '@/types';
 import Byte from './Byte';
 import { useRouter } from 'next/navigation';
-import { Lock, CheckCircle, Flag } from 'lucide-react';
+import { Lock, Check, Flag, BookOpen, Code, Hash, GitBranch, Repeat, Layers, Zap, Database } from 'lucide-react';
+
+const moduleIcons: Record<string, any> = {
+  'python-basics': Code,
+  'my-projects': Zap,
+};
+
+const lessonIcons: Record<string, any> = {
+  'what-is-variable': Hash,
+  'data-types': Layers,
+  'strings': BookOpen,
+  'math-operators': Hash,
+  'comparison-operators': GitBranch,
+  'if-else': GitBranch,
+  'elif': GitBranch,
+  'for-loop': Repeat,
+  'async-await': Zap,
+  'destructuring': Layers,
+  'ts-types': Code,
+  'react-hooks': Repeat,
+  'supabase-queries': Database,
+};
 
 interface PathNode {
   type: 'lesson' | 'checkpoint';
@@ -14,105 +35,78 @@ interface PathNode {
   unit?: Unit;
   module: Module;
   status: 'locked' | 'active' | 'completed';
-  side: 'left' | 'center' | 'right';
+  side: 'left' | 'right';
 }
 
 export default function LessonPath() {
-  const { completedLessons } = useUserStore();
+  const { completedLessons, byteMood, equipment } = useUserStore();
   const router = useRouter();
-  const { byteMood } = useUserStore();
-
-  // Build flat list of nodes from curriculum
   const nodes: PathNode[] = [];
   let sideIndex = 0;
-  const sides: Array<'left' | 'right'> = ['left', 'right'];
 
   for (const module of curriculum) {
     for (const unit of module.units) {
       for (const lesson of unit.lessons) {
-        const side = sides[sideIndex % 2] as 'left' | 'right';
+        const side = (sideIndex % 2 === 0 ? 'left' : 'right') as 'left' | 'right';
         sideIndex++;
-
-        // Determine status — all unlocked for testing
         const isCompleted = completedLessons.includes(lesson.id);
-        const status = isCompleted ? 'completed' : 'active';
-
-        nodes.push({ type: 'lesson', lesson, unit, module, status, side });
+        nodes.push({ type: 'lesson', lesson, unit, module, status: isCompleted ? 'completed' : 'active', side });
       }
-
       if (unit.isCheckpoint) {
-        nodes.push({ type: 'checkpoint', unit, module, status: 'completed', side: 'center' });
+        nodes.push({ type: 'checkpoint', unit, module, status: 'completed', side: 'left' });
       }
     }
   }
 
-  const handleLessonClick = (node: PathNode) => {
-    if (node.status === 'locked' || !node.lesson) return;
-    router.push(`/lesson/${node.lesson.id}`);
-  };
-
   return (
-    <div className="max-w-lg mx-auto px-4 pb-24 pt-6" style={{ position: 'relative', minHeight: '100vh' }}>
-      {/* Module headers tracked inline */}
-      {curriculum.map((module) => (
-        <div key={module.id}>
-          {/* Module header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8 mt-4"
-          >
-            <div className="rounded-2xl p-4 flex items-center gap-3"
-              style={{ background: module.color + '22', border: `1.5px solid ${module.color}44` }}>
-              <span className="text-2xl">{module.icon}</span>
-              <div>
-                <div className="font-bold text-base" style={{ fontFamily: 'Syne, sans-serif' }}>{module.title}</div>
-                <div className="text-xs" style={{ color: '#888780' }}>{module.description}</div>
+    <div style={{ maxWidth: 520, margin: '0 auto', padding: '24px 20px 120px', position: 'relative' }}>
+      {curriculum.map((module) => {
+        const ModuleIcon = moduleIcons[module.id] ?? Code;
+        return (
+          <div key={module.id}>
+            {/* Module header */}
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              style={{ marginBottom: 32, marginTop: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', background: '#0d0d0d', border: '1px solid #1f1f1f', borderRadius: 16 }}>
+                <div style={{ width: 36, height: 36, background: '#111', border: '1px solid #2a2a2a', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ModuleIcon size={18} color="#888" />
+                </div>
+                <div>
+                  <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, color: '#fff' }}>{module.title}</div>
+                  <div style={{ fontSize: 12, color: '#555', marginTop: 1 }}>{module.description}</div>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
 
-          {/* Nodes for this module */}
-          {nodes
-            .filter(n => n.module.id === module.id)
-            .map((node, idx) => (
-              <PathNodeItem
+            {/* Nodes */}
+            {nodes.filter(n => n.module.id === module.id).map((node, idx) => (
+              <NodeItem
                 key={node.lesson?.id ?? `ckpt-${idx}`}
                 node={node}
                 index={idx}
                 byteMood={byteMood}
-                onClick={() => handleLessonClick(node)}
+                equipment={equipment}
+                onClick={() => node.lesson && router.push(`/lesson/${node.lesson.id}`)}
               />
             ))}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-function PathNodeItem({ node, index, byteMood, onClick }: {
-  node: PathNode;
-  index: number;
-  byteMood: any;
-  onClick: () => void;
-}) {
+function NodeItem({ node, index, byteMood, equipment, onClick }: any) {
   if (node.type === 'checkpoint') {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: index * 0.05 }}
-        className="flex justify-center my-6"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center glow-purple"
-            style={{ background: '#534AB7', border: '3px solid #7c6fd0' }}
-          >
-            <Flag size={24} className="text-white" />
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: index * 0.04 }}
+        style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#0d0d0d', border: '1.5px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Flag size={22} color="#555" />
           </div>
-          <span className="text-xs font-semibold" style={{ color: '#534AB7', fontFamily: 'Syne, sans-serif' }}>
-            CHECKPOINT
+          <span style={{ fontSize: 10, fontFamily: 'Syne, sans-serif', fontWeight: 700, letterSpacing: '0.12em', color: '#444', textTransform: 'uppercase' }}>
+            Checkpoint
           </span>
         </div>
       </motion.div>
@@ -121,73 +115,51 @@ function PathNodeItem({ node, index, byteMood, onClick }: {
 
   const lesson = node.lesson!;
   const isLeft = node.side === 'left';
-  const isActive = node.status === 'active';
   const isCompleted = node.status === 'completed';
-  const isLocked = node.status === 'locked';
+  const LessonIcon = lessonIcons[lesson.id] ?? BookOpen;
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
+      initial={{ opacity: 0, x: isLeft ? -24 : 24 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.06, type: 'spring', stiffness: 200 }}
-      className={`flex mb-4 ${isLeft ? 'justify-start' : 'justify-end'}`}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 220 }}
+      style={{ display: 'flex', justifyContent: isLeft ? 'flex-start' : 'flex-end', marginBottom: 20 }}
     >
       <motion.button
         onClick={onClick}
-        disabled={isLocked}
-        whileHover={!isLocked ? { scale: 1.05 } : {}}
-        whileTap={!isLocked ? { scale: 0.95 } : {}}
-        className="flex flex-col items-center gap-1 relative"
-        style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.95 }}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', position: 'relative', background: 'none', border: 'none' }}
       >
-        {/* Byte sits on active node */}
-        {isActive && (
-          <motion.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -top-14"
-          >
-            <Byte mood={byteMood} size={52} />
+        {/* Byte on active node */}
+        {!isCompleted && (
+          <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ position: 'absolute', top: -64 }}>
+            <Byte mood={byteMood} size={52} equipment={equipment} />
           </motion.div>
         )}
 
-        {/* Node circle */}
-        <div
-          className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl relative
-            ${isActive ? 'glow-acid' : isCompleted ? 'glow-teal' : ''}`}
-          style={{
-            background: isActive
-              ? '#DEFF4A'
-              : isCompleted
-              ? '#1D9E75'
-              : '#1E1E1E',
-            border: isActive
-              ? '3px solid #c8e800'
-              : isCompleted
-              ? '3px solid #15805e'
-              : '2px solid #2a2a2a',
-            transition: 'all 0.3s',
-          }}
-        >
-          {isLocked ? (
-            <Lock size={22} style={{ color: '#888780' }} />
-          ) : isCompleted ? (
-            <CheckCircle size={26} style={{ color: 'white' }} />
-          ) : (
-            <span style={{ filter: isActive ? 'none' : 'grayscale(0.3)' }}>{lesson.icon}</span>
-          )}
+        {/* Node */}
+        <div style={{
+          width: 76, height: 76, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: isCompleted ? '#fff' : '#0d0d0d',
+          border: isCompleted ? 'none' : '1.5px solid #2a2a2a',
+          boxShadow: isCompleted ? '0 0 0 1px #fff, 0 0 20px rgba(255,255,255,0.1)' : 'none',
+        }}>
+          {isCompleted
+            ? <Check size={28} color="#000" strokeWidth={2.5} />
+            : <LessonIcon size={24} color="#555" />
+          }
         </div>
 
         {/* Label */}
-        <div
-          className="text-xs font-semibold text-center max-w-24"
-          style={{
-            fontFamily: 'Syne, sans-serif',
-            color: isActive ? '#DEFF4A' : isCompleted ? '#1D9E75' : '#888780',
-          }}
-        >
-          {isActive ? 'ŠTART' : lesson.title}
-        </div>
+        <span style={{
+          fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 11,
+          textAlign: 'center', maxWidth: 90, lineHeight: 1.3,
+          color: isCompleted ? '#fff' : '#555',
+        }}>
+          {lesson.title}
+        </span>
       </motion.button>
     </motion.div>
   );

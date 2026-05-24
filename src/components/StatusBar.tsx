@@ -1,65 +1,47 @@
 'use client';
 
 import { useUserStore } from '@/store/userStore';
-import { Flame, Gem, Heart, Trophy } from 'lucide-react';
+import { Flame, Zap, Heart, Wrench } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function StatusBar() {
-  const { streak, gems, hearts, maxHearts, xp } = useUserStore();
+  const { streak, xp, hearts, maxHearts } = useUserStore();
 
   return (
-    <div className="sticky top-0 z-50 w-full" style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #1E1E1E' }}>
-      <div className="max-w-lg mx-auto flex items-center justify-between px-4 py-3">
+    <div style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid #1a1a1a', background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(16px)' }}>
+      <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px' }}>
+
         {/* Streak */}
-        <motion.div
-          className="flex items-center gap-1.5"
-          whileTap={{ scale: 0.9 }}
-        >
-          <Flame size={20} className={streak > 0 ? 'text-orange-400' : 'text-gray-600'} fill={streak > 0 ? 'currentColor' : 'none'} />
-          <span className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: streak > 0 ? '#fb923c' : '#888780' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Flame size={17} color={streak > 0 ? '#fff' : '#444'} fill={streak > 0 ? '#fff' : 'none'} />
+          <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: streak > 0 ? '#fff' : '#444' }}>
             {streak}
           </span>
-        </motion.div>
+        </div>
 
         {/* XP */}
-        <motion.div
-          className="flex items-center gap-1.5"
-          whileTap={{ scale: 0.9 }}
-        >
-          <Trophy size={18} style={{ color: '#DEFF4A' }} />
-          <span className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: '#DEFF4A' }}>
-            {xp.toLocaleString()}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Zap size={16} color="#fff" fill="#fff" />
+          <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, color: '#fff' }}>
+            {xp.toLocaleString()} XP
           </span>
-        </motion.div>
-
-        {/* Gems */}
-        <motion.div
-          className="flex items-center gap-1.5"
-          whileTap={{ scale: 0.9 }}
-        >
-          <Gem size={18} style={{ color: '#60a5fa' }} />
-          <span className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: '#60a5fa' }}>
-            {gems}
-          </span>
-        </motion.div>
+        </div>
 
         {/* Hearts */}
-        <div className="flex items-center gap-1">
+        <div style={{ display: 'flex', gap: 3 }}>
           {Array.from({ length: maxHearts }).map((_, i) => (
-            <motion.div
-              key={i}
-              initial={false}
-              animate={i < hearts ? { scale: [1, 1.2, 1] } : { scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Heart
-                size={17}
-                fill={i < hearts ? '#ef4444' : 'none'}
-                className={i < hearts ? 'text-red-500' : 'text-gray-700'}
-              />
-            </motion.div>
+            <Heart key={i} size={15} fill={i < hearts ? '#fff' : 'none'} color={i < hearts ? '#fff' : '#333'} />
           ))}
         </div>
+
+        {/* Workshop link */}
+        <Link href="/workshop">
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+            style={{ width: 32, height: 32, borderRadius: 8, background: '#111', border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <Wrench size={15} color="#888" />
+          </motion.div>
+        </Link>
       </div>
     </div>
   );

@@ -7,26 +7,20 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
-  const { checkStreak, byteMood } = useUserStore();
-
-  useEffect(() => {
-    checkStreak();
-  }, []);
+  const { checkStreak } = useUserStore();
+  useEffect(() => { checkStreak(); }, []);
 
   return (
-    <main style={{ background: '#0A0A0A', minHeight: '100vh' }}>
+    <main style={{ background: '#000', minHeight: '100vh' }}>
       <StatusBar />
-      {/* App title */}
-      <div className="max-w-lg mx-auto px-4 pt-6 pb-2">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-baseline gap-2"
-        >
-          <h1 className="text-2xl font-black" style={{ fontFamily: 'Syne, sans-serif', color: '#DEFF4A' }}>
+      <div style={{ maxWidth: 520, margin: '0 auto', padding: '28px 20px 8px' }}>
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 26, letterSpacing: '-0.03em', margin: 0 }}>
             CodeByte
           </h1>
-          <span className="text-sm" style={{ color: '#888780' }}>— nauč sa programovať</span>
+          <p style={{ fontSize: 13, color: '#555', marginTop: 4, fontFamily: 'DM Sans, sans-serif' }}>
+            Nauč sa programovať. Krok za krokom.
+          </p>
         </motion.div>
       </div>
       <LessonPath />

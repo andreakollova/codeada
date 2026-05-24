@@ -2,6 +2,24 @@ export type ByteMood = 'happy' | 'celebrating' | 'sleepy' | 'worried' | 'proud' 
 
 export type ExerciseType = 'explain' | 'mcq' | 'fill' | 'write';
 
+export type ItemType = 'hat' | 'glasses' | 'accessory' | 'antenna';
+export type ItemRarity = 'common' | 'rare' | 'legendary';
+
+export interface CosmeticItem {
+  id: string;
+  name: string;
+  description: string;
+  type: ItemType;
+  rarity: ItemRarity;
+}
+
+export interface ByteEquipment {
+  hat?: string;
+  glasses?: string;
+  accessory?: string;
+  antenna?: string;
+}
+
 export interface TestCase {
   input?: string;
   expected: string;
@@ -26,7 +44,6 @@ export interface Lesson {
   id: string;
   unitId: string;
   title: string;
-  icon: string;
   exercises: Exercise[];
   status?: 'locked' | 'active' | 'completed';
 }
@@ -36,7 +53,6 @@ export interface Unit {
   moduleId: string;
   title: string;
   description: string;
-  icon: string;
   lessons: Lesson[];
   isCheckpoint?: boolean;
 }
@@ -45,17 +61,8 @@ export interface Module {
   id: string;
   title: string;
   description: string;
-  color: string;
-  icon: string;
+  lessons?: Lesson[];
   units: Unit[];
-}
-
-export interface Badge {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  unlockedAt?: string;
 }
 
 export interface UserState {
@@ -72,4 +79,6 @@ export interface UserState {
   badges: string[];
   weeklyXp: number;
   weekStartDate: string | null;
+  ownedItems: string[];
+  equipment: ByteEquipment;
 }

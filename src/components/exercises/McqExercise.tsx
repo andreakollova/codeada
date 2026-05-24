@@ -3,137 +3,107 @@
 import { useState } from 'react';
 import { Exercise } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
-interface Props {
-  exercise: Exercise;
-  onCorrect: () => void;
-  onWrong: () => void;
-}
+type State = 'idle' | 'correct' | 'wrong';
 
-type AnswerState = 'idle' | 'correct' | 'wrong';
-
-export default function McqExercise({ exercise, onCorrect, onWrong }: Props) {
+export default function McqExercise({ exercise, onCorrect, onWrong }: { exercise: Exercise; onCorrect: () => void; onWrong: () => void }) {
   const [selected, setSelected] = useState<string | null>(null);
-  const [state, setState] = useState<AnswerState>('idle');
+  const [state, setState] = useState<State>('idle');
 
-  const handleSelect = (option: string) => {
+  const pick = (opt: string) => {
     if (state !== 'idle') return;
-    setSelected(option);
-    if (option === exercise.correctAnswer) {
+    setSelected(opt);
+    if (opt === exercise.correctAnswer) {
       setState('correct');
-      setTimeout(onCorrect, 1200);
+      setTimeout(onCorrect, 1100);
     } else {
       setState('wrong');
       onWrong();
     }
   };
 
-  const handleContinue = () => {
-    if (state === 'wrong') onCorrect(); // Allow continue after seeing correct
-  };
-
-  const isCode = (s: string) => s.includes('\n') || s.startsWith('const ') || s.startsWith('let ') || s.startsWith('def ') || s.includes('(') || s.startsWith('<');
+  const isCode = (s: string) => s.includes('\n') || /^(const|let|def|async|import|<)/.test(s.trim());
 
   return (
-    <div className="flex flex-col gap-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Prompt */}
-      <div>
-        {exercise.prompt.includes('\n') ? (
-          <>
-            <h2 className="text-lg font-bold mb-3" style={{ fontFamily: 'Syne, sans-serif' }}>
-              {exercise.prompt.split('\n')[0]}
-            </h2>
-            <pre className="p-4 rounded-xl text-sm overflow-x-auto" style={{
-              background: '#0D1117', color: '#E6EDF3',
-              fontFamily: 'JetBrains Mono, monospace', border: '1px solid #30363D'
-            }}>
-              {exercise.prompt.split('\n').slice(1).join('\n').trim()}
-            </pre>
-          </>
-        ) : (
-          <h2 className="text-lg font-bold leading-snug" style={{ fontFamily: 'Syne, sans-serif' }}>
-            {exercise.prompt}
+      {exercise.prompt.includes('\n') ? (
+        <div>
+          <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 800, color: '#EDEDED', marginBottom: 12 }}>
+            {exercise.prompt.split('\n')[0]}
           </h2>
-        )}
-      </div>
+          <pre style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '14px 16px', fontSize: 13, color: '#EDEDED', overflow: 'auto', lineHeight: 1.7 }}>
+            {exercise.prompt.split('\n').slice(1).join('\n').trim()}
+          </pre>
+        </div>
+      ) : (
+        <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 800, color: '#EDEDED', lineHeight: 1.3 }}>
+          {exercise.prompt}
+        </h2>
+      )}
 
       {/* Options */}
-      <div className="flex flex-col gap-2">
-        {exercise.options?.map((opt) => {
-          const isSelected = selected === opt;
-          const isCorrect = opt === exercise.correctAnswer;
-          let bg = '#1E1E1E';
-          let border = '#2a2a2a';
-          let textColor = '#F1EFE8';
-
-          if (state !== 'idle' && isSelected && state === 'correct') {
-            bg = '#1D9E7522'; border = '#1D9E75'; textColor = '#4ade80';
-          } else if (state !== 'idle' && isSelected && state === 'wrong') {
-            bg = '#D85A3022'; border = '#D85A30'; textColor = '#fb923c';
-          } else if (state !== 'idle' && isCorrect) {
-            bg = '#1D9E7511'; border = '#1D9E7566'; textColor = '#4ade80';
-          }
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {exercise.options?.map(opt => {
+          const sel = selected === opt;
+          const correct = opt === exercise.correctAnswer;
+          const showCorrect = state !== 'idle' && correct;
+          const showWrong = state === 'wrong' && sel;
 
           return (
             <motion.button
               key={opt}
-              onClick={() => handleSelect(opt)}
-              whileHover={state === 'idle' ? { scale: 1.01, borderColor: '#534AB7' } : {}}
-              whileTap={state === 'idle' ? { scale: 0.98 } : {}}
-              animate={state === 'wrong' && isSelected ? {
-                x: [-6, 6, -4, 4, -2, 2, 0]
-              } : {}}
-              transition={{ duration: 0.4 }}
-              className="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3"
+              onClick={() => pick(opt)}
+              animate={showWrong ? { x: [-5, 5, -4, 4, -2, 2, 0] } : {}}
+              transition={{ duration: 0.35 }}
+              whileHover={state === 'idle' ? { borderColor: 'rgba(255,255,255,0.18)' } : {}}
               style={{
-                background: bg,
-                border: `1.5px solid ${border}`,
-                color: textColor,
+                width: '100%', padding: '13px 16px', borderRadius: 12, textAlign: 'left',
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: showCorrect ? 'rgba(255,255,255,0.05)' : showWrong ? 'rgba(255,80,80,0.06)' : '#161616',
+                border: `1px solid ${showCorrect ? 'rgba(255,255,255,0.3)' : showWrong ? 'rgba(255,80,80,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                color: showCorrect ? '#EDEDED' : showWrong ? '#ff9090' : '#A0A0A0',
                 fontFamily: isCode(opt) ? 'JetBrains Mono, monospace' : 'DM Sans, sans-serif',
-                fontSize: isCode(opt) ? '13px' : '15px',
+                fontSize: isCode(opt) ? 13 : 14,
                 cursor: state !== 'idle' ? 'default' : 'pointer',
-                transition: 'all 0.2s',
+                transition: 'border-color 0.15s, background 0.15s',
               }}
             >
-              {state !== 'idle' && isSelected && state === 'correct' && <CheckCircle size={18} style={{ color: '#1D9E75', flexShrink: 0 }} />}
-              {state !== 'idle' && isSelected && state === 'wrong' && <XCircle size={18} style={{ color: '#D85A30', flexShrink: 0 }} />}
-              {state !== 'idle' && !isSelected && isCorrect && <CheckCircle size={18} style={{ color: '#1D9E7566', flexShrink: 0 }} />}
-              <span>{opt}</span>
+              <div style={{
+                width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                border: `1.5px solid ${showCorrect ? '#EDEDED' : showWrong ? '#ff6060' : 'rgba(255,255,255,0.12)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: showCorrect ? '#EDEDED' : showWrong ? 'rgba(255,80,80,0.15)' : 'transparent',
+              }}>
+                {showCorrect && <Check size={12} color="#0F0F0F" />}
+                {showWrong && <X size={12} color="#ff6060" />}
+              </div>
+              {opt}
             </motion.button>
           );
         })}
       </div>
 
-      {/* Feedback panel */}
+      {/* Feedback */}
       <AnimatePresence>
         {state !== 'idle' && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="rounded-2xl p-4"
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             style={{
-              background: state === 'correct' ? '#1D9E7515' : '#D85A3015',
-              border: `1.5px solid ${state === 'correct' ? '#1D9E75' : '#D85A30'}`,
+              padding: '14px 16px', borderRadius: 12,
+              background: state === 'correct' ? 'rgba(255,255,255,0.04)' : 'rgba(255,80,80,0.05)',
+              border: `1px solid ${state === 'correct' ? 'rgba(255,255,255,0.12)' : 'rgba(255,80,80,0.15)'}`,
             }}
           >
-            <p className="font-bold text-sm mb-1" style={{
-              fontFamily: 'Syne, sans-serif',
-              color: state === 'correct' ? '#1D9E75' : '#D85A30',
-            }}>
-              {state === 'correct' ? '✓ Správne!' : '✗ Skoro!'}
+            <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, color: state === 'correct' ? '#EDEDED' : '#ff8080', marginBottom: exercise.explanation ? 4 : 0 }}>
+              {state === 'correct' ? 'Správne' : 'Nie celkom'}
             </p>
-            {exercise.explanation && (
-              <p className="text-sm" style={{ color: '#c9c7be' }}>{exercise.explanation}</p>
-            )}
+            {exercise.explanation && <p style={{ fontSize: 13, color: '#6E6E6E', lineHeight: 1.6, margin: 0 }}>{exercise.explanation}</p>}
             {state === 'wrong' && (
               <motion.button
-                onClick={handleContinue}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                className="mt-3 w-full py-2.5 rounded-xl font-bold text-sm"
-                style={{ background: '#D85A30', color: 'white', fontFamily: 'Syne, sans-serif' }}
+                onClick={onCorrect} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                style={{ marginTop: 12, width: '100%', padding: '11px', borderRadius: 10, background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)', color: '#A0A0A0', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13 }}
               >
                 Pokračovať
               </motion.button>

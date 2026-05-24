@@ -19,6 +19,7 @@ interface UserActions {
   equip: (slot: keyof ByteEquipment, itemId: string | undefined) => void;
   syncToSupabase: () => Promise<void>;
   setUserId: (id: string | null) => void;
+  setName: (name: string) => void;
 }
 
 const initialState: UserState = {
@@ -37,6 +38,7 @@ const initialState: UserState = {
   weekStartDate: null,
   ownedItems: [],
   equipment: {},
+  name: null,
 };
 
 export const useUserStore = create<UserState & UserActions>()(
@@ -105,6 +107,8 @@ export const useUserStore = create<UserState & UserActions>()(
         equipment: { ...s.equipment, [slot]: itemId },
       })),
 
+      setName: (name) => set({ name }),
+
       syncToSupabase: async () => {
         const s = get();
         if (!s.userId) return;
@@ -126,7 +130,7 @@ export const useUserStore = create<UserState & UserActions>()(
         lastActiveDate: s.lastActiveDate, byteMood: s.byteMood,
         byteBattery: s.byteBattery, completedLessons: s.completedLessons,
         badges: s.badges, weeklyXp: s.weeklyXp, weekStartDate: s.weekStartDate,
-        ownedItems: s.ownedItems, equipment: s.equipment,
+        ownedItems: s.ownedItems, equipment: s.equipment, name: s.name,
       }),
     }
   )

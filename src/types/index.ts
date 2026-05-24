@@ -67,6 +67,7 @@ export interface Module {
 
 export interface UserState {
   userId: string | null;
+  name: string | null;
   xp: number;
   gems: number;
   hearts: number;

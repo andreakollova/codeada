@@ -3,158 +3,96 @@
 import { useState } from 'react';
 import { Exercise } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-interface Props {
-  exercise: Exercise;
-  onCorrect: () => void;
-  onWrong: () => void;
-}
-
-export default function FillExercise({ exercise, onCorrect, onWrong }: Props) {
+export default function FillExercise({ exercise, onCorrect, onWrong }: { exercise: Exercise; onCorrect: () => void; onWrong: () => void }) {
   const blanks = exercise.blanks ?? [];
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
   const [allCorrect, setAllCorrect] = useState(false);
 
-  const handleSelect = (blankId: string, value: string) => {
-    if (checked) return;
-    setSelections((s) => ({ ...s, [blankId]: value }));
+  const pick = (id: string, val: string) => { if (!checked) setSelections(s => ({ ...s, [id]: val })); };
+  const allFilled = blanks.every(b => selections[b.id]);
+
+  const check = () => {
+    const ok = blanks.every(b => selections[b.id] === b.correct);
+    setChecked(true); setAllCorrect(ok);
+    if (ok) setTimeout(onCorrect, 1100); else onWrong();
   };
 
-  const allFilled = blanks.every((b) => selections[b.id]);
-
-  const handleCheck = () => {
-    const correct = blanks.every((b) => selections[b.id] === b.correct);
-    setChecked(true);
-    setAllCorrect(correct);
-    if (correct) {
-      setTimeout(onCorrect, 1200);
-    } else {
-      onWrong();
-    }
-  };
-
-  const handleRetry = () => {
-    setSelections({});
-    setChecked(false);
-  };
-
-  // Render code with blanks replaced by interactive selectors
-  const renderCode = () => {
-    const parts = (exercise.codeSnippet ?? '').split(/(___)/ );
-    let blankIdx = 0;
-    return parts.map((part, i) => {
-      if (part === '___') {
-        const blank = blanks[blankIdx++];
-        if (!blank) return null;
-        const val = selections[blank.id];
-        const isCorrect = checked && val === blank.correct;
-        const isWrong = checked && val !== blank.correct;
-        return (
-          <span
-            key={`blank-${blank.id}`}
-            className="inline-flex items-center mx-1"
-            style={{
-              background: isCorrect ? '#1D9E7522' : isWrong ? '#D85A3022' : val ? '#534AB722' : '#2a2a2a',
-              border: `1.5px solid ${isCorrect ? '#1D9E75' : isWrong ? '#D85A30' : val ? '#534AB7' : '#404040'}`,
-              borderRadius: '8px',
-              padding: '2px 10px',
-              color: isCorrect ? '#4ade80' : isWrong ? '#fb923c' : val ? '#DEFF4A' : '#888780',
-              fontFamily: 'JetBrains Mono, monospace',
-              minWidth: '80px',
-              textAlign: 'center',
-              fontSize: '13px',
-            }}
-          >
-            {val || '?'}
-          </span>
-        );
-      }
-      return <span key={i}>{part}</span>;
-    });
-  };
-
-  let blankSelectorIdx = 0;
+  let bi = 0;
+  const renderCode = () => (exercise.codeSnippet ?? '').split(/(___)/).map((part, i) => {
+    if (part !== '___') return <span key={i}>{part}</span>;
+    const blank = blanks[bi++];
+    if (!blank) return null;
+    const val = selections[blank.id];
+    const ok = checked && val === blank.correct;
+    const bad = checked && val !== blank.correct;
+    return (
+      <span key={`b-${blank.id}`} style={{
+        display: 'inline-flex', alignItems: 'center', margin: '0 3px',
+        padding: '1px 10px', borderRadius: 6,
+        background: ok ? 'rgba(255,255,255,0.08)' : bad ? 'rgba(255,80,80,0.08)' : val ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
+        border: `1px solid ${ok ? 'rgba(255,255,255,0.25)' : bad ? 'rgba(255,80,80,0.25)' : val ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)'}`,
+        color: ok ? '#EDEDED' : bad ? '#ff9090' : val ? '#EDEDED' : '#6E6E6E',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: 13, minWidth: 70, justifyContent: 'center',
+      }}>{val || '?'}</span>
+    );
+  });
 
   return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>
-        {exercise.prompt}
-      </h2>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 800, color: '#EDEDED' }}>{exercise.prompt}</h2>
 
-      {/* Code with blanks */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#0D1117', border: '1px solid #30363D' }}>
-        <div className="flex items-center gap-2 px-4 py-2" style={{ background: '#161B22', borderBottom: '1px solid #30363D' }}>
-          <div className="w-3 h-3 rounded-full bg-red-500/60" />
-          <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-          <div className="w-3 h-3 rounded-full bg-green-500/60" />
+      <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ background: '#111', padding: '10px 16px', display: 'flex', gap: 6, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          {['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} style={{ width: 11, height: 11, borderRadius: '50%', background: c, opacity: 0.7 }} />)}
         </div>
-        <pre className="p-4 text-sm leading-relaxed overflow-x-auto whitespace-pre-wrap" style={{ color: '#E6EDF3', fontFamily: 'JetBrains Mono, monospace' }}>
+        <pre style={{ background: '#0A0A0A', padding: '16px', fontSize: 13, lineHeight: 2, color: '#EDEDED', overflow: 'auto', margin: 0, whiteSpace: 'pre-wrap' }}>
           {renderCode()}
         </pre>
       </div>
 
-      {/* Option banks for each blank */}
-      <div className="flex flex-col gap-3">
-        {blanks.map((blank) => (
-          <div key={blank.id}>
-            <div className="text-xs mb-2" style={{ color: '#888780', fontFamily: 'Syne, sans-serif' }}>
-              Vyber správnu odpoveď:
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {blank.options.map((opt) => {
-                const isSelected = selections[blank.id] === opt;
-                const isCorrect = checked && opt === blank.correct;
-                const isWrong = checked && isSelected && opt !== blank.correct;
-                return (
-                  <motion.button
-                    key={opt}
-                    onClick={() => handleSelect(blank.id, opt)}
-                    whileHover={!checked ? { scale: 1.05 } : {}}
-                    whileTap={!checked ? { scale: 0.95 } : {}}
-                    animate={isWrong ? { x: [-4, 4, -3, 3, 0] } : {}}
-                    className="px-4 py-2 rounded-xl text-sm font-semibold"
-                    style={{
-                      background: isCorrect ? '#1D9E7522' : isWrong ? '#D85A3022' : isSelected ? '#534AB722' : '#1E1E1E',
-                      border: `1.5px solid ${isCorrect ? '#1D9E75' : isWrong ? '#D85A30' : isSelected ? '#534AB7' : '#2a2a2a'}`,
-                      color: isCorrect ? '#4ade80' : isWrong ? '#fb923c' : isSelected ? '#DEFF4A' : '#c9c7be',
-                      fontFamily: 'JetBrains Mono, monospace',
-                      cursor: checked ? 'default' : 'pointer',
-                    }}
-                  >
-                    {opt}
-                  </motion.button>
-                );
-              })}
-            </div>
+      {blanks.map(blank => (
+        <div key={blank.id}>
+          <p style={{ fontSize: 12, color: '#6E6E6E', marginBottom: 8, fontFamily: 'Syne, sans-serif' }}>Vyber správnu odpoveď:</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {blank.options.map(opt => {
+              const sel = selections[blank.id] === opt;
+              const ok = checked && opt === blank.correct;
+              const bad = checked && sel && opt !== blank.correct;
+              return (
+                <motion.button key={opt} onClick={() => pick(blank.id, opt)}
+                  animate={bad ? { x: [-4, 4, -3, 3, 0] } : {}}
+                  whileHover={!checked ? { borderColor: 'rgba(255,255,255,0.2)' } : {}}
+                  style={{
+                    padding: '8px 16px', borderRadius: 10,
+                    background: ok ? 'rgba(255,255,255,0.06)' : bad ? 'rgba(255,80,80,0.06)' : sel ? 'rgba(255,255,255,0.05)' : '#161616',
+                    border: `1px solid ${ok ? 'rgba(255,255,255,0.25)' : bad ? 'rgba(255,80,80,0.25)' : sel ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'}`,
+                    color: ok ? '#EDEDED' : bad ? '#ff9090' : sel ? '#EDEDED' : '#A0A0A0',
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: 13,
+                    cursor: checked ? 'default' : 'pointer', transition: 'all 0.12s',
+                  }}>
+                  {opt}
+                </motion.button>
+              );
+            })}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
 
-      {/* Feedback */}
       <AnimatePresence>
         {checked && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl p-4"
-            style={{
-              background: allCorrect ? '#1D9E7515' : '#D85A3015',
-              border: `1.5px solid ${allCorrect ? '#1D9E75' : '#D85A30'}`,
-            }}
-          >
-            <p className="font-bold text-sm" style={{ color: allCorrect ? '#1D9E75' : '#D85A30', fontFamily: 'Syne, sans-serif' }}>
-              {allCorrect ? '✓ Výborne!' : '✗ Nie celkom správne'}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            style={{ padding: '14px 16px', borderRadius: 12,
+              background: allCorrect ? 'rgba(255,255,255,0.04)' : 'rgba(255,80,80,0.05)',
+              border: `1px solid ${allCorrect ? 'rgba(255,255,255,0.12)' : 'rgba(255,80,80,0.15)'}` }}>
+            <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, color: allCorrect ? '#EDEDED' : '#ff8080', margin: 0 }}>
+              {allCorrect ? 'Správne' : 'Nie celkom'}
             </p>
             {!allCorrect && (
-              <motion.button
-                onClick={handleRetry}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                className="mt-3 w-full py-2.5 rounded-xl font-bold text-sm"
-                style={{ background: '#D85A30', color: 'white', fontFamily: 'Syne, sans-serif' }}
-              >
+              <motion.button onClick={() => { setSelections({}); setChecked(false); }} whileHover={{ scale: 1.01 }}
+                style={{ marginTop: 10, width: '100%', padding: '11px', borderRadius: 10, background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)', color: '#A0A0A0', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13 }}>
                 Skúsiť znova
               </motion.button>
             )}
@@ -162,22 +100,9 @@ export default function FillExercise({ exercise, onCorrect, onWrong }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Check button */}
       {!checked && (
-        <motion.button
-          onClick={handleCheck}
-          disabled={!allFilled}
-          whileHover={allFilled ? { scale: 1.02 } : {}}
-          whileTap={allFilled ? { scale: 0.97 } : {}}
-          className="w-full py-4 rounded-2xl font-bold text-base"
-          style={{
-            background: allFilled ? '#DEFF4A' : '#1E1E1E',
-            color: allFilled ? '#0A0A0A' : '#888780',
-            fontFamily: 'Syne, sans-serif',
-            transition: 'all 0.2s',
-            cursor: allFilled ? 'pointer' : 'not-allowed',
-          }}
-        >
+        <motion.button onClick={check} disabled={!allFilled} whileHover={allFilled ? { scale: 1.01 } : {}} whileTap={allFilled ? { scale: 0.98 } : {}}
+          style={{ padding: '14px', borderRadius: 12, background: allFilled ? '#EDEDED' : '#1C1C1C', color: allFilled ? '#0F0F0F' : '#3A3A3A', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, transition: 'all 0.15s', cursor: allFilled ? 'pointer' : 'not-allowed' }}>
           Skontrolovať
         </motion.button>
       )}

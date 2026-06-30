@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Byte from '@/components/Byte';
 import { useUserStore } from '@/store/userStore';
 import { getLessonById } from '@/data/curriculum';
-import { getItemById, rarityLabel } from '@/data/cosmetics';
+import { getItemById, rarityConfig } from '@/data/cosmetics';
 import { Zap, Flame, ArrowRight, Gift } from 'lucide-react';
 import { Suspense, useState } from 'react';
 
@@ -20,7 +20,7 @@ const byteMessages = [
 function ResultContent() {
   const params = useSearchParams();
   const router = useRouter();
-  const { xp, streak, equipment, byteMood } = useUserStore();
+  const { xp, streak, equipment } = useUserStore();
   const lessonId = params.get('lessonId') ?? '';
   const xpEarned = parseInt(params.get('xp') ?? '0');
   const rewardId = params.get('reward') ?? '';
@@ -29,6 +29,7 @@ function ResultContent() {
   const [itemRevealed, setItemRevealed] = useState(!reward);
 
   const message = byteMessages[Math.floor(Math.random() * byteMessages.length)];
+  const rc = reward ? rarityConfig[reward.rarity] : null;
 
   return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
@@ -44,16 +45,16 @@ function ResultContent() {
           <h1 style={{ fontWeight: 800, fontSize: 32, margin: 0, letterSpacing: '-0.03em' }}>
             Lesson Complete
           </h1>
-          {lesson && <p style={{ color: '#888', fontSize: 14, marginTop: 6, fontFamily: 'DM Sans, sans-serif' }}>{lesson.title}</p>}
+          {lesson && <p style={{ color: '#888', fontSize: 14, marginTop: 6 }}>{lesson.title}</p>}
         </motion.div>
 
         {/* Quote */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
           style={{ padding: '14px 18px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 16, width: '100%' }}>
-          <p style={{ fontSize: 13, color: '#888', fontStyle: 'italic', margin: 0, lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif' }}>
-            "{message}"
+          <p style={{ fontSize: 13, color: '#888', fontStyle: 'italic', margin: 0, lineHeight: 1.6 }}>
+            &ldquo;{message}&rdquo;
           </p>
-          <p style={{ fontSize: 11, color: '#777', marginTop: 6, margin: '6px 0 0', fontFamily: 'Syne, sans-serif' }}>— Byte</p>
+          <p style={{ fontSize: 11, color: '#777', margin: '6px 0 0' }}>&mdash; Byte</p>
         </motion.div>
 
         {/* Stats */}
@@ -74,7 +75,7 @@ function ResultContent() {
         </motion.div>
 
         {/* Item reward */}
-        {reward && (
+        {reward && rc && (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7 }} style={{ width: '100%' }}>
             <AnimatePresence>
               {!itemRevealed ? (
@@ -82,7 +83,12 @@ function ResultContent() {
                   key="reveal"
                   onClick={() => setItemRevealed(true)}
                   whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                  style={{ width: '100%', padding: '18px', borderRadius: 16, background: '#0a0a0a', border: '1.5px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer' }}
+                  style={{
+                    width: '100%', padding: '18px', borderRadius: 16,
+                    background: '#0a0a0a', border: '1.5px solid #2a2a2a',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    cursor: 'pointer',
+                  }}
                 >
                   <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 0.8, repeat: Infinity }}>
                     <Gift size={22} color="#fff" />
@@ -92,26 +98,118 @@ function ResultContent() {
               ) : (
                 <motion.div
                   key="revealed"
-                  initial={{ opacity: 0, scale: 0.8, rotateY: 90 }}
+                  initial={{ opacity: 0, scale: 0.7, rotateY: 90 }}
                   animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                   style={{
-                    padding: '20px', borderRadius: 16, textAlign: 'center',
-                    background: reward.rarity === 'legendary' ? '#0f0f0f' : '#0a0a0a',
-                    border: `1.5px solid ${reward.rarity === 'legendary' ? '#fff' : reward.rarity === 'rare' ? '#444' : '#222'}`,
-                    boxShadow: reward.rarity === 'legendary' ? '0 0 40px rgba(255,255,255,0.08)' : 'none',
+                    padding: '24px 20px', borderRadius: 16, textAlign: 'center',
+                    background: '#0a0a0a',
+                    border: `2px solid ${rc.border}`,
+                    boxShadow: rc.glow !== 'none' ? rc.glow : undefined,
+                    position: 'relative', overflow: 'hidden',
                   }}
                 >
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#888', textTransform: 'uppercase', marginBottom: 12 }}>
-                    New Item
+                  {/* Animated glow background for epic+ */}
+                  {(reward.rarity === 'epic' || reward.rarity === 'legendary' || reward.rarity === 'mythic') && (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: reward.rarity === 'mythic' ? 4 : 6, repeat: Infinity, ease: 'linear' }}
+                      style={{
+                        position: 'absolute', inset: -40, borderRadius: '50%',
+                        background: `conic-gradient(from 0deg, ${rc.color}22, transparent, ${rc.color}22, transparent)`,
+                        filter: 'blur(20px)', zIndex: 0,
+                      }}
+                    />
+                  )}
+
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    {/* Rarity label */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      style={{
+                        fontSize: 11, fontWeight: 700, letterSpacing: '0.15em',
+                        color: rc.color, textTransform: 'uppercase', marginBottom: 16,
+                      }}
+                    >
+                      {rc.label}
+                    </motion.div>
+
+                    {/* Byte preview with item */}
+                    <motion.div
+                      initial={{ scale: 0.5 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                    >
+                      <Byte mood="proud" size={120} animate={true} equipment={{ [reward.type]: reward.id } as any} />
+                    </motion.div>
+
+                    {/* Item info */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      style={{ marginTop: 16 }}
+                    >
+                      <div style={{ fontWeight: 800, fontSize: 20, color: '#fff' }}>{reward.name}</div>
+                      <div style={{ fontSize: 13, color: '#888', marginTop: 6 }}>{reward.description}</div>
+                      {reward.element && (
+                        <div style={{
+                          display: 'inline-block', marginTop: 10,
+                          fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                          padding: '4px 12px', borderRadius: 20,
+                          background: `${rc.color}15`, border: `1px solid ${rc.color}33`, color: rc.color,
+                        }}>
+                          {reward.element}
+                        </div>
+                      )}
+                    </motion.div>
                   </div>
-                  <Byte mood="proud" size={100} animate={true} equipment={{ [reward.type]: reward.id } as any} />
-                  <div style={{ marginTop: 12 }}>
-                    <div style={{ fontWeight: 800, fontSize: 18 }}>{reward.name}</div>
-                    <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{reward.description}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: reward.rarity === 'legendary' ? '#fff' : '#666', marginTop: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                      {rarityLabel[reward.rarity]}
-                    </div>
-                  </div>
+
+                  {/* Mythic particles */}
+                  {reward.rarity === 'mythic' && (
+                    <>
+                      {[0, 1, 2, 3, 4, 5, 6, 7].map(i => (
+                        <motion.div
+                          key={i}
+                          animate={{ opacity: [0, 1, 0], scale: [0, 1, 0], y: [0, -60 - i * 10] }}
+                          transition={{ duration: 1.5 + i * 0.2, repeat: Infinity, delay: i * 0.3 }}
+                          style={{
+                            position: 'absolute',
+                            bottom: '30%',
+                            left: `${15 + i * 10}%`,
+                            width: 3, height: 3, borderRadius: '50%',
+                            background: i % 2 === 0 ? rc.color : '#a855f7',
+                            boxShadow: `0 0 6px ${rc.color}`,
+                            zIndex: 0,
+                          }}
+                        />
+                      ))}
+                    </>
+                  )}
+
+                  {/* Legendary sparkles */}
+                  {reward.rarity === 'legendary' && (
+                    <>
+                      {[0, 1, 2, 3, 4].map(i => (
+                        <motion.div
+                          key={i}
+                          animate={{ opacity: [0, 0.8, 0], scale: [0.3, 1, 0.3] }}
+                          transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.4 }}
+                          style={{
+                            position: 'absolute',
+                            top: `${15 + i * 16}%`,
+                            left: i % 2 === 0 ? '8%' : '85%',
+                            width: 4, height: 4, borderRadius: '50%',
+                            background: rc.color,
+                            boxShadow: `0 0 8px ${rc.color}`,
+                            zIndex: 0,
+                          }}
+                        />
+                      ))}
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

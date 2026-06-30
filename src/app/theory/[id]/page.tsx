@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchLesson, fetchQuizForLesson, DbLesson, DbQuizQuestion } from '@/lib/curriculum-api';
 import { useUserStore } from '@/store/userStore';
+import { useLocaleStore, t, tArray } from '@/store/localeStore';
 import Byte from '@/components/Byte';
 import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check } from 'lucide-react';
 
@@ -22,6 +23,7 @@ export default function TheoryLessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment } = useUserStore();
+  const { locale } = useLocaleStore();
 
   const [lesson, setLesson] = useState<DbLesson | null>(null);
   const [quiz, setQuiz] = useState<DbQuizQuestion[]>([]);
@@ -126,8 +128,12 @@ export default function TheoryLessonPage() {
   const renderTheorySection = () => {
     const sec = sections[sectionIndex];
     if (!sec) return null;
-    const content = lesson[sec.key];
     const Icon = sec.icon;
+
+    // Pick localized content
+    const content = sec.key === 'key_takeaways'
+      ? tArray(lesson, sec.key, locale)
+      : t(lesson, sec.key as string, locale);
 
     return (
       <motion.div
@@ -149,12 +155,12 @@ export default function TheoryLessonPage() {
         {/* Content */}
         {sec.key === 'key_takeaways' && Array.isArray(content) ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {(content as string[]).map((t, i) => (
+            {(content as string[]).map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12 }}>
                 <div style={{ width: 22, height: 22, borderRadius: 7, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                   <Check size={12} color="#000" strokeWidth={3} />
                 </div>
-                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{t}</p>
+                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{item}</p>
               </div>
             ))}
           </div>
@@ -193,7 +199,7 @@ export default function TheoryLessonPage() {
     } else {
       options = q.options
         .sort((a, b) => a.option_label.localeCompare(b.option_label))
-        .map(o => ({ label: o.option_label, text: o.option_text }));
+        .map(o => ({ label: o.option_label, text: t(o, 'option_text', locale) }));
     }
 
     const correctLabel = q.question_type === 'true_false'
@@ -216,7 +222,7 @@ export default function TheoryLessonPage() {
         </div>
 
         <h2 style={{ fontSize: 17, fontWeight: 700, color: '#EDEDED', lineHeight: 1.4 }}>
-          {q.question_text}
+          {t(q, 'question_text', locale)}
         </h2>
 
         {q.code_snippet && (
@@ -302,7 +308,7 @@ export default function TheoryLessonPage() {
           Lesson Complete!
         </h1>
         <p style={{ color: '#888', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
-          {lesson.title}
+          {t(lesson, 'title', locale)}
         </p>
         <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
           <div style={{ textAlign: 'center' }}>
@@ -348,7 +354,7 @@ export default function TheoryLessonPage() {
       {/* Lesson title */}
       <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '16px 20px 4px' }}>
         <p style={{ fontSize: 11, color: '#777', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
-          {lesson.title}
+          {t(lesson, 'title', locale)}
         </p>
       </div>
 

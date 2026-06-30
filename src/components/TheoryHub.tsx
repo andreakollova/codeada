@@ -6,9 +6,11 @@ import { useUserStore } from '@/store/userStore';
 import { fetchModulesWithLessons, ModuleWithLessons, DbLessonSummary } from '@/lib/curriculum-api';
 import { useRouter } from 'next/navigation';
 import { BookOpen, ChevronRight, Check, ArrowRight, Library } from 'lucide-react';
+import { useLocaleStore, t } from '@/store/localeStore';
 
 export default function TheoryHub() {
   const { completedLessons } = useUserStore();
+  const { locale } = useLocaleStore();
   const router = useRouter();
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
   const [showAll, setShowAll] = useState(false);
@@ -21,7 +23,7 @@ export default function TheoryHub() {
 
   // Find next unread lessons across all modules
   const allTheoryLessons = dbModules.flatMap(m =>
-    m.lessons.map(l => ({ ...l, moduleTitle: m.title, moduleId: m.id }))
+    m.lessons.map(l => ({ ...l, moduleTitle: m.title, moduleTitle_sk: m.title_sk, moduleId: m.id }))
   );
   const unread = allTheoryLessons.filter(l => !completedLessons.includes(`theory-${l.id}`));
   const readCount = allTheoryLessons.length - unread.length;
@@ -77,7 +79,7 @@ export default function TheoryHub() {
           {/* Today's reads — cards */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {todaysReads.map((lesson, i) => (
-              <ReadCard key={lesson.id} lesson={lesson} index={i} router={router} />
+              <ReadCard key={lesson.id} lesson={lesson} index={i} router={router} locale={locale} />
             ))}
           </div>
 
@@ -101,7 +103,7 @@ export default function TheoryHub() {
         /* Browse all — module list */
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {dbModules.map((mod) => (
-            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} />
+            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} />
           ))}
         </div>
       )}
@@ -109,7 +111,7 @@ export default function TheoryHub() {
   );
 }
 
-function ReadCard({ lesson, index, router }: { lesson: DbLessonSummary & { moduleTitle: string }; index: number; router: any }) {
+function ReadCard({ lesson, index, router, locale }: { lesson: DbLessonSummary & { moduleTitle: string; moduleTitle_sk?: string }; index: number; router: any; locale: 'en' | 'sk' }) {
   return (
     <motion.button
       initial={{ opacity: 0, y: 10 }}
@@ -140,10 +142,10 @@ function ReadCard({ lesson, index, router }: { lesson: DbLessonSummary & { modul
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 600, fontSize: 14, color: index === 0 ? '#fff' : '#ccc', marginBottom: 3 }}>
-          {lesson.title}
+          {t(lesson, 'title', locale)}
         </div>
         <div style={{ fontSize: 12, color: '#777' }}>
-          {lesson.moduleTitle} · Lesson {lesson.lesson_number}
+          {lesson.moduleTitle_sk && locale === 'sk' ? lesson.moduleTitle_sk : lesson.moduleTitle} · Lesson {lesson.lesson_number}
         </div>
       </div>
       <ChevronRight size={16} color="#555" />
@@ -151,7 +153,7 @@ function ReadCard({ lesson, index, router }: { lesson: DbLessonSummary & { modul
   );
 }
 
-function ModuleRow({ mod, completedLessons, router }: { mod: ModuleWithLessons; completedLessons: string[]; router: any }) {
+function ModuleRow({ mod, completedLessons, router, locale }: { mod: ModuleWithLessons; completedLessons: string[]; router: any; locale: 'en' | 'sk' }) {
   const [open, setOpen] = useState(false);
   const doneCount = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
   const allDone = doneCount === mod.lessons.length;
@@ -174,7 +176,7 @@ function ModuleRow({ mod, completedLessons, router }: { mod: ModuleWithLessons; 
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600, fontSize: 14, color: '#ddd' }}>{mod.title}</div>
+          <div style={{ fontWeight: 600, fontSize: 14, color: '#ddd' }}>{t(mod, 'title', locale)}</div>
           <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>{doneCount}/{mod.lessons.length} lessons</div>
         </div>
         <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.15 }}>
@@ -205,7 +207,7 @@ function ModuleRow({ mod, completedLessons, router }: { mod: ModuleWithLessons; 
                   {done && <Check size={12} color="#000" strokeWidth={3} />}
                 </div>
                 <span style={{ fontSize: 13, color: done ? '#aaa' : '#ccc', fontWeight: 500 }}>
-                  {lesson.title}
+                  {t(lesson, 'title', locale)}
                 </span>
               </button>
             );

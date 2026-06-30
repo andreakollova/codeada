@@ -4,6 +4,7 @@ export interface DbModule {
   id: number;
   module_number: number;
   title: string;
+  title_sk?: string;
 }
 
 export interface DbLesson {
@@ -46,6 +47,7 @@ export interface DbLessonSummary {
   module_id: number;
   lesson_number: number;
   title: string;
+  title_sk?: string;
   lesson_type: string;
 }
 
@@ -64,7 +66,7 @@ export async function fetchModulesWithLessons(): Promise<ModuleWithLessons[]> {
 
   const [modRes, lesRes] = await Promise.all([
     sb.from('cb_modules').select('*').order('module_number'),
-    sb.from('cb_lessons').select('id,module_id,lesson_number,title,lesson_type').order('module_id').order('lesson_number'),
+    sb.from('cb_lessons').select('id,module_id,lesson_number,title,title_sk,lesson_type').order('module_id').order('lesson_number'),
   ]);
 
   if (modRes.error || lesRes.error) return [];

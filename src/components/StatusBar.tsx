@@ -1,11 +1,13 @@
 'use client';
 
 import { useUserStore } from '@/store/userStore';
-import { Flame, Zap, Heart, Wrench } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { Flame, Zap, Heart, Wrench, Globe } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StatusBar() {
   const { streak, xp, hearts, maxHearts } = useUserStore();
+  const { locale, toggle } = useLocaleStore();
 
   return (
     <div style={{
@@ -33,13 +35,30 @@ export default function StatusBar() {
           </span>
         </div>
 
-        {/* Hearts + workshop */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, justifyContent: 'flex-end' }}>
+        {/* Hearts + locale + workshop */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' }}>
           <div style={{ display: 'flex', gap: 3 }}>
             {Array.from({ length: maxHearts }).map((_, i) => (
               <Heart key={i} size={13} fill={i < hearts ? '#EDEDED' : 'none'} color={i < hearts ? '#EDEDED' : '#3A3A3A'} />
             ))}
           </div>
+
+          {/* Language toggle */}
+          <button
+            onClick={toggle}
+            style={{
+              width: 30, height: 30, borderRadius: 8,
+              background: '#1C1C1C',
+              border: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#aaa',
+              letterSpacing: '0.02em',
+            }}
+            title={locale === 'en' ? 'Switch to Slovak' : 'Prepnúť na angličtinu'}
+          >
+            {locale === 'en' ? 'SK' : 'EN'}
+          </button>
+
           <Link href="/workshop">
             <div style={{
               width: 30, height: 30, borderRadius: 8,

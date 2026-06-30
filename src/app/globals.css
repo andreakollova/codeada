@@ -1,30 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Rule 1: Never pure black — warm near-black base */
   --color-base:    #0F0F0F;
   --color-surface: #161616;
   --color-lift:    #1C1C1C;
   --color-raised:  #222222;
 
-  /* Rule 2: Layered grays — never full white on text */
   --color-text-primary:   #EDEDED;
   --color-text-secondary: #A0A0A0;
   --color-text-hint:      #6E6E6E;
   --color-text-disabled:  #3A3A3A;
 
-  /* Rule 3: Hairline borders at low opacity */
   --color-border:       rgba(255,255,255,0.08);
   --color-border-hover: rgba(255,255,255,0.14);
   --color-border-focus: rgba(255,255,255,0.28);
 
-  /* Rule 4: One accent — pure white, used sparingly */
   --color-accent: #FFFFFF;
 
-  --font-display: 'Syne', sans-serif;
-  --font-body:    'DM Sans', sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
+  --font-display: -apple-system, 'SF Pro Display', 'SF Pro', system-ui, sans-serif;
+  --font-body:    -apple-system, 'SF Pro Text', 'SF Pro', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', monospace;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,16 +28,15 @@
 html, body {
   background-color: #0F0F0F;
   color: #EDEDED;
-  font-family: 'DM Sans', sans-serif;
+  font-family: -apple-system, 'SF Pro Text', 'SF Pro', system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Rule 8: Tight headings */
 h1, h2, h3, h4 {
-  font-family: 'Syne', sans-serif;
+  font-family: -apple-system, 'SF Pro Display', 'SF Pro', system-ui, sans-serif;
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -76,3 +71,166 @@ code, pre, kbd { font-family: 'JetBrains Mono', monospace; }
 
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 a { color: inherit; text-decoration: none; }
+
+/* ========== Desktop sidebar nav ========== */
+.desktop-nav {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .desktop-nav {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background: #0a0a0a;
+    border-right: 1px solid #1a1a1a;
+    z-index: 200;
+    padding: 24px 16px;
+    gap: 8px;
+  }
+  .desktop-nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 12px 20px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .desktop-nav-logo-text {
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.04em;
+    color: #fff;
+  }
+  .desktop-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .desktop-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .desktop-nav-item:hover {
+    color: #bbb;
+    background: #111;
+  }
+  .desktop-nav-item.active {
+    color: #fff;
+    background: #161616;
+  }
+  .mobile-nav { display: none !important; }
+
+  /* Push main content to the right */
+  .page-shell {
+    margin-left: 240px;
+  }
+}
+
+/* Mobile bottom nav */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(8,8,8,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid #1a1a1a;
+  display: flex;
+  align-items: stretch;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (min-width: 900px) {
+  .mobile-nav { display: none !important; }
+}
+
+/* ========== Dashboard grid ========== */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+@media (min-width: 900px) {
+  .dashboard {
+    padding-bottom: 0;
+  }
+  .dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    min-height: calc(100vh - 72px);
+  }
+  .dashboard-main {
+    padding: 40px 40px 60px;
+    border-right: 1px solid #1a1a1a;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .dashboard-sidebar {
+    padding: 40px 28px;
+    position: sticky;
+    top: 72px;
+    height: calc(100vh - 72px);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 899px) {
+  .dashboard-sidebar {
+    display: none;
+  }
+  .dashboard-main {
+    padding: 24px 16px 100px;
+  }
+}
+
+/* ========== Stat card ========== */
+.stat-card {
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.stat-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stat-card-value {
+  font-weight: 700;
+  font-size: 20px;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.stat-card-label {
+  font-size: 12px;
+  color: #555;
+  margin-top: 1px;
+}

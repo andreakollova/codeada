@@ -20,6 +20,7 @@ interface UserActions {
   syncToSupabase: () => Promise<void>;
   setUserId: (id: string | null) => void;
   setName: (name: string) => void;
+  toggleTopic: (topicId: string) => void;
 }
 
 const initialState: UserState = {
@@ -39,6 +40,7 @@ const initialState: UserState = {
   ownedItems: [],
   equipment: {},
   name: null,
+  selectedTopics: [],
 };
 
 export const useUserStore = create<UserState & UserActions>()(
@@ -87,11 +89,17 @@ export const useUserStore = create<UserState & UserActions>()(
         const yStr = yesterday.toISOString().split('T')[0];
         set((s) => {
           if (s.lastActiveDate === todayStr) return {};
-          if (s.lastActiveDate === yStr || !s.lastActiveDate) {
+          if (s.lastActiveDate === yStr) {
+            // Active yesterday → increment streak
             const streak = s.streak + 1;
-            return { streak, byteBattery: Math.min(100, streak * 15), byteMood: streak >= 7 ? 'proud' : 'happy' };
+            return { streak, byteBattery: Math.min(100, streak * 15), byteMood: streak >= 7 ? 'proud' : 'happy', lastActiveDate: todayStr };
           }
-          return { streak: 0, byteBattery: 10, byteMood: 'low_battery' };
+          if (!s.lastActiveDate) {
+            // First time ever — don't increment yet, just note today
+            return { lastActiveDate: todayStr };
+          }
+          // Missed days → reset
+          return { streak: 0, byteBattery: 20, byteMood: 'happy', lastActiveDate: todayStr };
         });
       },
 
@@ -108,6 +116,12 @@ export const useUserStore = create<UserState & UserActions>()(
       })),
 
       setName: (name) => set({ name }),
+
+      toggleTopic: (topicId) => set((s) => ({
+        selectedTopics: s.selectedTopics.includes(topicId)
+          ? s.selectedTopics.filter(id => id !== topicId)
+          : [...s.selectedTopics, topicId],
+      })),
 
       syncToSupabase: async () => {
         const s = get();
@@ -131,6 +145,7 @@ export const useUserStore = create<UserState & UserActions>()(
         byteBattery: s.byteBattery, completedLessons: s.completedLessons,
         badges: s.badges, weeklyXp: s.weeklyXp, weekStartDate: s.weekStartDate,
         ownedItems: s.ownedItems, equipment: s.equipment, name: s.name,
+        selectedTopics: s.selectedTopics,
       }),
     }
   )

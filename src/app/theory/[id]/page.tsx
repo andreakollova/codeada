@@ -1,0 +1,388 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fetchLesson, fetchQuizForLesson, DbLesson, DbQuizQuestion } from '@/lib/curriculum-api';
+import { useUserStore } from '@/store/userStore';
+import Byte from '@/components/Byte';
+import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check } from 'lucide-react';
+
+type Phase = 'loading' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
+
+const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: string }[] = [
+  { key: 'introduction', phase: 'intro', icon: BookOpen, label: 'Introduction' },
+  { key: 'learning_content', phase: 'learning', icon: Lightbulb, label: 'Learning' },
+  { key: 'interesting_facts', phase: 'facts', icon: Sparkles, label: 'Fun Facts' },
+  { key: 'real_world', phase: 'real_world', icon: Globe, label: 'Real World' },
+  { key: 'key_takeaways', phase: 'takeaways', icon: ListChecks, label: 'Key Takeaways' },
+];
+
+export default function TheoryLessonPage() {
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment } = useUserStore();
+
+  const [lesson, setLesson] = useState<DbLesson | null>(null);
+  const [quiz, setQuiz] = useState<DbQuizQuestion[]>([]);
+  const [phase, setPhase] = useState<Phase>('loading');
+  const [sectionIndex, setSectionIndex] = useState(0);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
+
+  useEffect(() => {
+    const numId = parseInt(id);
+    if (isNaN(numId)) return;
+    Promise.all([fetchLesson(numId), fetchQuizForLesson(numId)]).then(([l, q]) => {
+      if (l) {
+        setLesson(l);
+        setQuiz(q);
+        setPhase('intro');
+        setByteMood('happy');
+      }
+    });
+  }, [id]);
+
+  if (phase === 'loading' || !lesson) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+          <p style={{ color: '#333', fontWeight: 700 }}>Loading...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Build list of sections that have content
+  const sections = THEORY_SECTIONS.filter(s => {
+    const val = lesson[s.key];
+    if (Array.isArray(val)) return val.length > 0;
+    return val && String(val).trim().length > 0;
+  });
+
+  const totalSteps = sections.length + quiz.length;
+  const currentStep = phase === 'quiz' || phase === 'done'
+    ? sections.length + quizIndex
+    : sectionIndex;
+  const progress = totalSteps > 0 ? (currentStep / totalSteps) * 100 : 0;
+
+  const handleNextSection = () => {
+    if (sectionIndex + 1 < sections.length) {
+      setSectionIndex(i => i + 1);
+      setPhase(sections[sectionIndex + 1].phase);
+    } else {
+      // Move to quiz
+      if (quiz.length > 0) {
+        setQuizIndex(0);
+        setPhase('quiz');
+      } else {
+        finishLesson();
+      }
+    }
+  };
+
+  const handleQuizAnswer = (answer: string) => {
+    if (answerState !== 'idle') return;
+    setSelectedAnswer(answer);
+    const q = quiz[quizIndex];
+    if (answer === q.correct_answer) {
+      setAnswerState('correct');
+      setScore(s => s + 1);
+      setByteMood('celebrating');
+      setTimeout(() => setByteMood('happy'), 1500);
+    } else {
+      setAnswerState('wrong');
+      setByteMood('worried');
+      loseHeart();
+      setTimeout(() => setByteMood('happy'), 1500);
+    }
+  };
+
+  const handleQuizNext = () => {
+    setSelectedAnswer(null);
+    setAnswerState('idle');
+    if (quizIndex + 1 < quiz.length) {
+      setQuizIndex(i => i + 1);
+    } else {
+      finishLesson();
+    }
+  };
+
+  const finishLesson = () => {
+    const lessonKey = `theory-${lesson.id}`;
+    const xp = score * 10 + sections.length * 5;
+    completeLesson(lessonKey, xp);
+    setPhase('done');
+  };
+
+  // Render current section content
+  const renderTheorySection = () => {
+    const sec = sections[sectionIndex];
+    if (!sec) return null;
+    const content = lesson[sec.key];
+    const Icon = sec.icon;
+
+    return (
+      <motion.div
+        key={sec.phase}
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -30 }}
+        transition={{ duration: 0.25 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+      >
+        {/* Section label */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Icon size={14} color="#555" />
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            {sec.label}
+          </span>
+        </div>
+
+        {/* Content */}
+        {sec.key === 'key_takeaways' && Array.isArray(content) ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {(content as string[]).map((t, i) => (
+              <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12 }}>
+                <div style={{ width: 22, height: 22, borderRadius: 7, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                  <Check size={12} color="#000" strokeWidth={3} />
+                </div>
+                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{t}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ fontSize: 14, color: '#b0b0b0', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
+            {formatContent(String(content))}
+          </div>
+        )}
+
+        {/* Next button */}
+        <motion.button
+          onClick={handleNextSection}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8, border: 'none', cursor: 'pointer' }}
+        >
+          {sectionIndex + 1 < sections.length ? 'Continue' : quiz.length > 0 ? 'Start Quiz' : 'Finish'}
+          <ArrowRight size={16} />
+        </motion.button>
+      </motion.div>
+    );
+  };
+
+  // Render quiz question
+  const renderQuiz = () => {
+    const q = quiz[quizIndex];
+    if (!q) return null;
+
+    // Build options list
+    let options: { label: string; text: string }[];
+    if (q.question_type === 'true_false') {
+      options = [
+        { label: 'T', text: 'True' },
+        { label: 'F', text: 'False' },
+      ];
+    } else {
+      options = q.options
+        .sort((a, b) => a.option_label.localeCompare(b.option_label))
+        .map(o => ({ label: o.option_label, text: o.option_text }));
+    }
+
+    const correctLabel = q.question_type === 'true_false'
+      ? (q.correct_answer === 'True' ? 'T' : 'F')
+      : q.correct_answer;
+
+    return (
+      <motion.div
+        key={`quiz-${quizIndex}`}
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -30 }}
+        transition={{ duration: 0.25 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            Question {quizIndex + 1} of {quiz.length}
+          </span>
+        </div>
+
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#EDEDED', lineHeight: 1.4 }}>
+          {q.question_text}
+        </h2>
+
+        {q.code_snippet && (
+          <pre style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '14px 16px', fontSize: 13, color: '#EDEDED', overflow: 'auto', lineHeight: 1.7 }}>
+            {q.code_snippet}
+          </pre>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {options.map(opt => {
+            const sel = selectedAnswer === opt.label;
+            const isCorrect = opt.label === correctLabel;
+            const showCorrect = answerState !== 'idle' && isCorrect;
+            const showWrong = answerState === 'wrong' && sel;
+
+            return (
+              <motion.button
+                key={opt.label}
+                onClick={() => handleQuizAnswer(opt.label)}
+                animate={showWrong ? { x: [-5, 5, -4, 4, -2, 2, 0] } : {}}
+                transition={{ duration: 0.35 }}
+                style={{
+                  width: '100%', padding: '13px 16px', borderRadius: 12, textAlign: 'left',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  background: showCorrect ? 'rgba(74,222,128,0.08)' : showWrong ? 'rgba(255,80,80,0.06)' : '#161616',
+                  border: `1px solid ${showCorrect ? 'rgba(74,222,128,0.5)' : showWrong ? 'rgba(255,80,80,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                  color: showCorrect ? '#4ade80' : showWrong ? '#ff9090' : '#A0A0A0',
+                  fontSize: 14, fontFamily: 'inherit',
+                  cursor: answerState !== 'idle' ? 'default' : 'pointer',
+                }}
+              >
+                <div style={{
+                  width: 24, height: 24, borderRadius: 7, flexShrink: 0,
+                  border: `1.5px solid ${showCorrect ? '#4ade80' : showWrong ? '#ff6060' : 'rgba(255,255,255,0.12)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: showCorrect ? '#4ade80' : showWrong ? 'rgba(255,80,80,0.15)' : 'transparent',
+                  fontWeight: 700, fontSize: 11,
+                  color: showCorrect ? '#052e16' : showWrong ? '#ff6060' : '#555',
+                }}>
+                  {showCorrect ? <Check size={12} color="#052e16" /> : showWrong ? <X size={12} color="#ff6060" /> : opt.label}
+                </div>
+                {opt.text}
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* Continue after answer */}
+        <AnimatePresence>
+          {answerState !== 'idle' && (
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+              <div style={{
+                padding: '12px 16px', borderRadius: 12, marginBottom: 8,
+                background: answerState === 'correct' ? 'rgba(74,222,128,0.06)' : 'rgba(255,80,80,0.05)',
+                border: `1px solid ${answerState === 'correct' ? 'rgba(74,222,128,0.25)' : 'rgba(255,80,80,0.15)'}`,
+              }}>
+                <p style={{ fontWeight: 700, fontSize: 13, color: answerState === 'correct' ? '#4ade80' : '#ff8080', margin: 0 }}>
+                  {answerState === 'correct' ? 'Correct!' : 'Not quite'}
+                </p>
+              </div>
+              <motion.button
+                onClick={handleQuizNext}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+              >
+                {quizIndex + 1 < quiz.length ? 'Next Question' : 'Finish'}
+                <ArrowRight size={16} />
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  };
+
+  // Done screen
+  if (phase === 'done') {
+    return (
+      <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <Byte mood="celebrating" size={100} equipment={equipment} />
+        <h1 style={{ fontWeight: 800, fontSize: 28, color: '#fff', marginTop: 24, textAlign: 'center' }}>
+          Lesson Complete!
+        </h1>
+        <p style={{ color: '#666', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
+          {lesson.title}
+        </p>
+        <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score}/{quiz.length}</p>
+            <p style={{ fontSize: 12, color: '#555', margin: 0 }}>Quiz Score</p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score * 10 + sections.length * 5}</p>
+            <p style={{ fontSize: 12, color: '#555', margin: 0 }}>XP Earned</p>
+          </div>
+        </div>
+        <motion.button
+          onClick={() => router.push('/')}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          style={{ marginTop: 32, padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
+        >
+          Back to Home
+        </motion.button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 20px', background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #0f0f0f' }}>
+        <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={() => router.push('/')} style={{ color: '#444', cursor: 'pointer', padding: 4, background: 'none', border: 'none' }}>
+            <X size={20} />
+          </button>
+          <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#111', overflow: 'hidden' }}>
+            <motion.div style={{ height: '100%', background: '#fff', borderRadius: 2 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
+          </div>
+          <div style={{ display: 'flex', gap: 3 }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Heart key={i} size={14} fill={i < hearts ? '#fff' : 'none'} color={i < hearts ? '#fff' : '#2a2a2a'} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Lesson title */}
+      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '16px 20px 4px' }}>
+        <p style={{ fontSize: 11, color: '#444', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+          {lesson.title}
+        </p>
+      </div>
+
+      {/* Byte */}
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
+        <Byte mood={byteMood} size={64} equipment={equipment} />
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 40px' }}>
+        <AnimatePresence mode="wait">
+          {phase === 'quiz' ? renderQuiz() : renderTheorySection()}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/** Split content into paragraphs with basic formatting */
+function formatContent(text: string) {
+  if (!text) return null;
+  return text.split('\n\n').map((para, i) => {
+    const trimmed = para.trim();
+    if (!trimmed) return null;
+
+    // Check if it looks like a heading (short line, no period at end)
+    const lines = trimmed.split('\n');
+    if (lines.length === 1 && trimmed.length < 60 && !trimmed.endsWith('.') && !trimmed.startsWith('-') && !trimmed.startsWith('•') && !trimmed.match(/^\d/)) {
+      return (
+        <h3 key={i} style={{ fontWeight: 700, fontSize: 16, color: '#EDEDED', marginTop: i > 0 ? 20 : 0, marginBottom: 8 }}>
+          {trimmed}
+        </h3>
+      );
+    }
+
+    return (
+      <p key={i} style={{ margin: 0, marginBottom: 12 }}>
+        {trimmed}
+      </p>
+    );
+  });
+}

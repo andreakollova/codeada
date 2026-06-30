@@ -44,7 +44,7 @@ export default function WorkshopPage() {
           </motion.div>
         </Link>
         <div>
-          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 800, margin: 0 }}>Workshop</h1>
+          <h1 style={{ fontWeight: 700, fontSize: 18, margin: 0 }}>Workshop</h1>
           <p style={{ fontSize: 12, color: '#555', margin: 0 }}>{ownedItems.length} predmetov odomknutých</p>
         </div>
       </div>
@@ -82,7 +82,7 @@ export default function WorkshopPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
-                flex: 1, padding: '8px 4px', borderRadius: 10, fontSize: 12, fontFamily: 'Syne, sans-serif', fontWeight: 700,
+                flex: 1, padding: '8px 4px', borderRadius: 10, fontSize: 12, fontWeight: 700,
                 background: activeTab === tab.id ? '#fff' : 'transparent',
                 color: activeTab === tab.id ? '#000' : '#555',
                 cursor: 'pointer', border: 'none', transition: 'all 0.15s',
@@ -138,7 +138,7 @@ export default function WorkshopPage() {
                   </div>
 
                   <div>
-                    <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 11, color: equipped ? '#000' : owned ? '#fff' : '#333', lineHeight: 1.2 }}>
+                    <div style={{ fontWeight: 700, fontSize: 11, color: equipped ? '#000' : owned ? '#fff' : '#333', lineHeight: 1.2 }}>
                       {item.name}
                     </div>
                     <div style={{ fontSize: 10, color: equipped ? '#555' : item.rarity === 'legendary' ? '#666' : item.rarity === 'rare' ? '#444' : '#333', marginTop: 2 }}>
@@ -147,7 +147,7 @@ export default function WorkshopPage() {
                   </div>
 
                   {equipped && (
-                    <div style={{ fontSize: 10, fontFamily: 'Syne, sans-serif', fontWeight: 800, color: 'rgba(0,0,0,0.5)', background: '#ddd', padding: '2px 8px', borderRadius: 20 }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(0,0,0,0.5)', background: '#ddd', padding: '2px 8px', borderRadius: 20 }}>
                       OBLEČENÉ
                     </div>
                   )}

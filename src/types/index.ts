@@ -82,4 +82,22 @@ export interface UserState {
   weekStartDate: string | null;
   ownedItems: string[];
   equipment: ByteEquipment;
+  selectedTopics: string[];
+}
+
+export interface GlossaryEntry {
+  id: string;
+  term: string;
+  category: 'skratka' | 'symbol' | 'koncept' | 'nastroj';
+  short: string;
+  explanation: string;
+  example?: string;
+}
+
+export interface ProjectTopic {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  lessons: Lesson[];
 }

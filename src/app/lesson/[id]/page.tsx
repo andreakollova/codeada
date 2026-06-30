@@ -83,7 +83,7 @@ export default function LessonPage() {
           <motion.div initial={{ opacity: 0, y: -16, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20 }}
             style={{ position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 100, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#111', border: '1px solid #2a2a2a', borderRadius: 40, color: '#fff' }}>
             <Heart size={14} fill="#fff" color="#fff" />
-            <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13 }}>−1 srdce</span>
+            <span style={{ fontWeight: 700, fontSize: 13 }}>−1 srdce</span>
           </motion.div>
         )}
       </AnimatePresence>

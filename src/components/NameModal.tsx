@@ -56,7 +56,7 @@ export default function NameModal() {
             </div>
 
             {/* Text */}
-            <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 22, fontWeight: 800, color: '#EDEDED', marginBottom: 8 }}>
+            <h2 style={{ fontWeight: 700, fontSize: 22, color: '#EDEDED', marginBottom: 8 }}>
               Ahoj, som Byte
             </h2>
             <p style={{ fontSize: 14, color: '#6E6E6E', marginBottom: 32, lineHeight: 1.6 }}>
@@ -98,7 +98,7 @@ export default function NameModal() {
                 width: '100%', padding: '14px', borderRadius: 12,
                 background: value.trim() ? '#EDEDED' : '#1C1C1C',
                 color: value.trim() ? '#0F0F0F' : '#3A3A3A',
-                fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15,
+                fontWeight: 700, fontSize: 15,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 cursor: value.trim() ? 'pointer' : 'not-allowed',
                 transition: 'all 0.15s',

@@ -47,7 +47,7 @@ export default function WriteExercise({ exercise, onCorrect, onWrong }: { exerci
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 800, color: '#EDEDED', lineHeight: 1.3 }}>{exercise.prompt}</h2>
+      <h2 style={{ fontWeight: 700, fontSize: 18, color: '#EDEDED', lineHeight: 1.3 }}>{exercise.prompt}</h2>
 
       {exercise.testCases?.map((tc, i) => (
         <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -88,7 +88,7 @@ export default function WriteExercise({ exercise, onCorrect, onWrong }: { exerci
         onClick={handleRun} disabled={run === 'running' || !code.trim()}
         whileHover={run !== 'running' && code.trim() ? { scale: 1.01 } : {}}
         whileTap={run !== 'running' && code.trim() ? { scale: 0.98 } : {}}
-        style={{ padding: '14px', borderRadius: 12, background: btnBg, color: btnColor, fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: run === 'running' || !code.trim() ? 'not-allowed' : 'pointer', transition: 'all 0.15s' }}
+        style={{ padding: '14px', borderRadius: 12, background: btnBg, color: btnColor, fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: run === 'running' || !code.trim() ? 'not-allowed' : 'pointer', transition: 'all 0.15s' }}
       >
         {run === 'running' ? <><Loader2 size={16} className="animate-spin" />Spúšťam...</>
          : run === 'passed'  ? <><Check size={16} />Hotovo</>

@@ -1,0 +1,241 @@
+import { Module } from '@/types';
+
+export const pythonModule: Module = {
+  id: 'python',
+  title: 'Python Základy',
+  description: 'Programovanie od nuly — premenné, podmienky, funkcie',
+  units: [
+    {
+      id: 'py-variables', moduleId: 'python', title: 'Premenné a typy', description: 'Ukladanie dát',
+      lessons: [
+        {
+          id: 'py-what-is-var', unitId: 'py-variables', title: 'Čo je premenná?',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'var', prompt: 'Čo je premenná?',
+              codeSnippet: `meno = "Zuzka"\nvek = 20\nprint(meno)  # Zuzka`,
+              explanation: 'Premenná je pomenovaný priestor v pamäti. Priradíš jej hodnotu cez = a neskôr ju podľa mena nájdeš.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'var', prompt: 'Ako vytvoríš premennú v Pythone?',
+              options: ['var x = 5', 'x = 5', 'let x = 5', 'int x = 5'], correctAnswer: 'x = 5',
+              explanation: 'Python nepotrebuje kľúčové slovo. Stačí meno = hodnota.', xp: 10 },
+            { id: 'e3', type: 'mcq', conceptId: 'var', prompt: 'Čo vypíše tento kód?\n\nx = 10\nx = 20\nprint(x)',
+              options: ['10', '20', '10 20', 'chyba'], correctAnswer: '20', xp: 10 },
+            { id: 'e4', type: 'fill', conceptId: 'var', prompt: 'Doplň priradenie premennej:', codeSnippet: 'mesto ___ "Bratislava"',
+              blanks: [{ id: 'b1', options: ['=', '==', ':=', '->'], correct: '=' }], xp: 15 },
+            { id: 'e5', type: 'write', conceptId: 'var', prompt: 'Vytvor premennú meno s tvojim menom a vypíš ju pomocou print().',
+              codeSnippet: '# Napíš kód tu\n', testCases: [{ expected: 'contains:print', description: 'Použij print()' }], xp: 20 },
+          ],
+        },
+        {
+          id: 'py-types', unitId: 'py-variables', title: 'Typy dát',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'types', prompt: 'Štyri základné typy',
+              codeSnippet: `cislo   = 42        # int\ndesatin = 3.14      # float\ntext    = "ahoj"    # str\npravda  = True      # bool`,
+              explanation: 'Python sám uhádne typ — nemusíš ho písať. Celé čísla sú int, desatinné float, text str, pravda/nepravda bool.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'types', prompt: 'Aký typ má hodnota 3.14?',
+              options: ['int', 'float', 'str', 'bool'], correctAnswer: 'float', xp: 10 },
+            { id: 'e3', type: 'mcq', conceptId: 'types', prompt: 'Aký typ vráti type("Ahoj")?',
+              options: ["<class 'int'>", "<class 'float'>", "<class 'str'>", "<class 'bool'>"], correctAnswer: "<class 'str'>", xp: 10 },
+            { id: 'e4', type: 'fill', conceptId: 'types', prompt: 'Doplň správny typ v komentári:',
+              codeSnippet: 'aktívny = True   # ___', blanks: [{ id: 'b1', options: ['bool', 'int', 'str', 'float'], correct: 'bool' }], xp: 15 },
+            { id: 'e5', type: 'mcq', conceptId: 'type-conversion', prompt: 'Čo robí int("42")?',
+              options: ['Konvertuje string "42" na číslo 42', 'Vypíše 42', 'Hodí chybu', 'Vráti True'], correctAnswer: 'Konvertuje string "42" na číslo 42',
+              explanation: 'int(), float(), str() sú konverzné funkcie — zmenia typ hodnoty.', xp: 10 },
+          ],
+        },
+        {
+          id: 'py-strings', unitId: 'py-variables', title: 'Reťazce (Strings)',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'strings', prompt: 'Práca s textom',
+              codeSnippet: `meno = "Byte"\nprint(len(meno))          # 4\nprint(meno.upper())       # BYTE\nprint(meno.lower())       # byte\nprint("Ahoj " + meno)     # Ahoj Byte\nprint(f"Som {meno}!")     # Som Byte!`,
+              explanation: 'Reťazce majú zabudované metódy. f-stringy (prefix f) umožňujú vkladať premenné priamo do textu pomocou {}.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'strings', prompt: 'Čo vráti len("Python")?',
+              options: ['5', '6', '7', 'chyba'], correctAnswer: '6', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'f-strings', prompt: 'Doplň f-string:', codeSnippet: 'vek = 18\nprint(___"Mám {vek} rokov.")',
+              blanks: [{ id: 'b1', options: ['f', 'b', 'r', 's'], correct: 'f' }], xp: 15 },
+            { id: 'e4', type: 'mcq', conceptId: 'strings', prompt: 'Čo vypíše: print("abc"[0])?',
+              options: ['a', 'b', 'c', 'abc'], correctAnswer: 'a', explanation: 'Indexovanie začína od 0. [0] = prvý znak.', xp: 10 },
+            { id: 'e5', type: 'write', conceptId: 'f-strings', prompt: 'Vytvor premenné meno a mesto. Pomocou f-stringu vypíš: "Volám sa X a som z Y."',
+              codeSnippet: 'meno = "Byte"\nmesto = "Bratislava"\n# Dopíš\n', testCases: [{ expected: 'contains:f"', description: 'Použi f-string' }], xp: 25 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'py-operators', moduleId: 'python', title: 'Operátory', description: 'Matematika a porovnávanie',
+      lessons: [
+        {
+          id: 'py-math', unitId: 'py-operators', title: 'Matematické operátory',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'math-ops', prompt: 'Operátory v Pythone',
+              codeSnippet: `print(10 + 3)   # 13\nprint(10 - 3)   # 7\nprint(10 * 3)   # 30\nprint(10 / 3)   # 3.333\nprint(10 // 3)  # 3  — celočíselné\nprint(10 % 3)   # 1  — zvyšok\nprint(2 ** 8)   # 256 — umocnenie`, xp: 5, explanation: '// je celé delenie, % je modulo (zvyšok), ** je umocnenie.' },
+            { id: 'e2', type: 'mcq', conceptId: 'modulo', prompt: 'Čo vráti 17 % 5?',
+              options: ['2', '3', '3.4', '12'], correctAnswer: '2', explanation: '17 = 3×5 + 2, zvyšok je 2.', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'math-ops', prompt: 'Doplň operátor umocnenia:',
+              codeSnippet: 'vysledok = 2 ___ 10  # 1024', blanks: [{ id: 'b1', options: ['**', '*', '^', '^^'], correct: '**' }], xp: 15 },
+            { id: 'e4', type: 'write', conceptId: 'math-ops', prompt: 'Vypočítaj a vypíš obsah obdĺžnika (šírka=8, výška=5).',
+              codeSnippet: 'sirka = 8\nvyska = 5\n# obsah = ...\n', testCases: [{ expected: 'contains:40', description: 'Výsledok je 40' }], xp: 20 },
+          ],
+        },
+        {
+          id: 'py-comparison', unitId: 'py-operators', title: 'Porovnávacie operátory',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'comparison', prompt: 'Porovnávanie — vždy vracia True alebo False',
+              codeSnippet: `x = 10\nprint(x > 5)    # True\nprint(x < 5)    # False\nprint(x == 10)  # True  — rovná sa\nprint(x != 10)  # False — nerovná sa\nprint(x >= 10)  # True\nprint(x <= 9)   # False`,
+              explanation: 'Dôležité: == (porovnanie) vs = (priradenie). Zámenáš ich a Python ti to vyčíta.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'comparison', prompt: 'Aký operátor porovnáva rovnosť?',
+              options: ['=', '==', '===', ':='], correctAnswer: '==', xp: 10 },
+            { id: 'e3', type: 'mcq', conceptId: 'logical', prompt: 'Čo vráti: 5 > 3 and 10 < 20?',
+              options: ['True', 'False', 'chyba', '1'], correctAnswer: 'True', explanation: 'and = obe podmienky musia byť True. or = aspoň jedna.', xp: 10 },
+            { id: 'e4', type: 'fill', conceptId: 'comparison', prompt: 'Doplň operátor "nerovná sa":',
+              codeSnippet: 'print(5 ___ 10)  # True', blanks: [{ id: 'b1', options: ['!=', '!==', '<>', '=/='], correct: '!=' }], xp: 15 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'py-conditions', moduleId: 'python', title: 'Podmienky', description: 'Nauč program rozhodovať', isCheckpoint: false,
+      lessons: [
+        {
+          id: 'py-if-else', unitId: 'py-conditions', title: 'if / else',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'if-else', prompt: 'Podmienka if / else',
+              codeSnippet: `vek = 18\nif vek >= 18:\n    print("Dospelý")\nelse:\n    print("Mladistvý")`,
+              explanation: 'if spustí blok ak je podmienka True, else ak nie. Kód vnútri MUSÍ byť odsadený (4 medzery alebo Tab) — Python to vyžaduje.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'if-else', prompt: 'Čo vypíše kód pre skore = 45?\n\nif skore >= 50:\n    print("Pass")\nelse:\n    print("Fail")',
+              options: ['Pass', 'Fail', 'Nič', 'chyba'], correctAnswer: 'Fail', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'if-else', prompt: 'Doplň kľúčové slová:',
+              codeSnippet: '___ temp > 30:\n    print("Horúco")\n___:\n    print("Chladno")',
+              blanks: [{ id: 'b1', options: ['if', 'when', 'for', 'while'], correct: 'if' }, { id: 'b2', options: ['else', 'elif', 'then', 'other'], correct: 'else' }], xp: 15 },
+            { id: 'e4', type: 'write', conceptId: 'if-else', prompt: 'Napíš podmienku: ak je číslo 7 párne, vypíš "párne", inak "nepárne". (Hint: párne % 2 == 0)',
+              codeSnippet: 'cislo = 7\n', testCases: [{ expected: 'contains:nepárne', description: 'Správny výstup pre 7' }], xp: 25 },
+          ],
+        },
+        {
+          id: 'py-elif', unitId: 'py-conditions', title: 'elif — viac vetiev',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'elif', prompt: 'elif — keď máš viac možností',
+              codeSnippet: `skore = 75\nif skore >= 90:\n    print("Výborný")\nelif skore >= 70:\n    print("Dobrý")\nelif skore >= 50:\n    print("Dostatočný")\nelse:\n    print("Nedostatočný")`,
+              explanation: 'elif (else if) kontroluje ďalšiu podmienku. Python ide zhora nadol a zastaví pri prvej True.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'elif', prompt: 'Čo vypíše kód pre skore = 75?',
+              options: ['Výborný', 'Dobrý', 'Dostatočný', 'Nedostatočný'], correctAnswer: 'Dobrý', xp: 10 },
+            { id: 'e3', type: 'write', conceptId: 'elif', prompt: 'Napíš hodnotenie veku: < 13 → "dieťa", 13–17 → "teenager", 18+ → "dospelý". Otestuj pre vek = 15.',
+              codeSnippet: 'vek = 15\n', testCases: [{ expected: 'contains:teenager', description: 'Pre 15 vypíše "teenager"' }], xp: 30 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'py-loops', moduleId: 'python', title: 'Cykly', description: 'Opakuj kód inteligentne',
+      lessons: [
+        {
+          id: 'py-for', unitId: 'py-loops', title: 'for cyklus',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'for-loop', prompt: 'for — prejdi každý prvok',
+              codeSnippet: `# Cez zoznam:\nfarby = ["červená", "modrá", "zelená"]\nfor farba in farby:\n    print(farba)\n\n# N-krát pomocou range:\nfor i in range(5):  # 0,1,2,3,4\n    print(i)`,
+              explanation: 'for prejde každý prvok zoznamu (alebo range) a vykoná kód. range(5) vytvorí čísla 0 až 4.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'for-loop', prompt: 'Koľkokrát prebehne cyklus?\nfor i in range(3):\n    print("ahoj")',
+              options: ['2×', '3×', '4×', '0×'], correctAnswer: '3×', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'range', prompt: 'Doplň funkciu pre rozsah čísel:',
+              codeSnippet: 'for i in ___(1, 6):\n    print(i)  # 1,2,3,4,5',
+              blanks: [{ id: 'b1', options: ['range', 'list', 'loop', 'seq'], correct: 'range' }], xp: 15 },
+            { id: 'e4', type: 'write', conceptId: 'for-loop', prompt: 'Vypočítaj súčet čísel 1 až 10 pomocou for cyklu a vypíš ho.',
+              codeSnippet: 'sucet = 0\n# Napíš cyklus\n', testCases: [{ expected: 'contains:55', description: 'Súčet 1..10 = 55' }], xp: 25 },
+          ],
+        },
+        {
+          id: 'py-while', unitId: 'py-loops', title: 'while cyklus',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'while', prompt: 'while — opakuj kým platí podmienka',
+              codeSnippet: `pocitadlo = 0\nwhile pocitadlo < 5:\n    print(pocitadlo)\n    pocitadlo += 1  # bez toho = nekonečná slučka!`,
+              explanation: 'while beží kým je podmienka True. Musíš zaručiť, že podmienka sa niekedy stane False — inak program nikdy neskončí.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'while', prompt: 'Čo sa stane ak zabudneš aktualizovať podmienku v while?',
+              options: ['Python to opraví', 'Program skončí automaticky', 'Nekonečná slučka — program zamrzne', 'SyntaxError'], correctAnswer: 'Nekonečná slučka — program zamrzne', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'while', prompt: 'Doplň kľúčové slovo:',
+              codeSnippet: 'x = 10\n___ x > 0:\n    x -= 1\nprint("Hotovo")',
+              blanks: [{ id: 'b1', options: ['while', 'for', 'if', 'do'], correct: 'while' }], xp: 15 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'py-functions', moduleId: 'python', title: 'Funkcie', description: 'Opakovane použiteľný kód', isCheckpoint: true,
+      lessons: [
+        {
+          id: 'py-def', unitId: 'py-functions', title: 'Definícia funkcie',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'functions', prompt: 'Funkcia — kód s názvom',
+              codeSnippet: `def pozdrav(meno):\n    return f"Ahoj, {meno}!"\n\nvysledok = pozdrav("Zuzka")\nprint(vysledok)  # Ahoj, Zuzka!`,
+              explanation: 'def definuje funkciu. V zátvorkách sú parametre (vstupy). return vracia výsledok. Funkciu zavoláš menom + zátvorkách.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'functions', prompt: 'Čo robí kľúčové slovo return?',
+              options: ['Ukončí program', 'Vypíše hodnotu', 'Vráti hodnotu z funkcie', 'Definuje premennú'], correctAnswer: 'Vráti hodnotu z funkcie', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'functions', prompt: 'Doplň kľúčové slovo pre definíciu:',
+              codeSnippet: '___ sucet(a, b):\n    return a + b',
+              blanks: [{ id: 'b1', options: ['def', 'func', 'fn', 'function'], correct: 'def' }], xp: 15 },
+            { id: 'e4', type: 'write', conceptId: 'functions', prompt: 'Napíš funkciu mocnina(x) ktorá vráti x na druhú. Zavolaj ju pre x=5 a vypíš výsledok.',
+              codeSnippet: '# Definuj funkciu\n\n# Zavolaj a vypíš\n', testCases: [{ expected: 'contains:25', description: 'mocnina(5) = 25' }], xp: 30 },
+          ],
+        },
+        {
+          id: 'py-default-params', unitId: 'py-functions', title: 'Parametre a predvolené hodnoty',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'default-params', prompt: 'Predvolené hodnoty parametrov',
+              codeSnippet: `def pozdrav(meno, jazyk="sk"):\n    if jazyk == "sk":\n        return f"Ahoj, {meno}!"\n    return f"Hello, {meno}!"\n\npozdrav("Zuzka")        # Ahoj, Zuzka!\npozdrav("John", "en")  # Hello, John!`,
+              explanation: 'Parameter môže mať predvolenú hodnotu (= hodnota). Ak ho nezadáš, použije sa predvolená.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'default-params', prompt: 'Čo sa stane keď zavoláš pozdrav("Zuzka") z príkladu vyššie?',
+              options: ['Chyba — chýba jazyk', 'Ahoj, Zuzka! (použije predvolenú sk)', 'Hello, Zuzka!', 'Nič nevypíše'], correctAnswer: 'Ahoj, Zuzka! (použije predvolenú sk)', xp: 10 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'py-collections', moduleId: 'python', title: 'Zoznamy a slovníky', description: 'Práca s kolekciami dát',
+      lessons: [
+        {
+          id: 'py-lists', unitId: 'py-collections', title: 'Zoznamy (Lists)',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'lists', prompt: 'Zoznam — usporiadaná kolekcia',
+              codeSnippet: `ovocie = ["jablko", "hruška", "slivka"]\nprint(ovocie[0])      # jablko\nprint(len(ovocie))    # 3\novocie.append("čerešňa")  # pridaj na koniec\novocie.remove("hruška")   # odober\nprint(ovocie)         # ['jablko', 'slivka', 'čerešňa']`,
+              explanation: 'Zoznam uchováva viac hodnôt v jednej premennej. Indexovanie začína od 0. append() pridá, remove() odoberie prvok.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'lists', prompt: 'Čo vráti ovocie[1] kde ovocie = ["jablko","hruška","slivka"]?',
+              options: ['jablko', 'hruška', 'slivka', 'chyba'], correctAnswer: 'hruška', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'lists', prompt: 'Doplň metódu na pridanie prvku:',
+              codeSnippet: 'cisla = [1, 2, 3]\ncisla.___(4)\nprint(cisla)  # [1,2,3,4]',
+              blanks: [{ id: 'b1', options: ['append', 'add', 'push', 'insert'], correct: 'append' }], xp: 15 },
+            { id: 'e4', type: 'write', conceptId: 'list-comprehension', prompt: 'Vytvor zoznam druhých mocnín čísel 1–5 pomocou list comprehension.',
+              codeSnippet: '# [x**2 for x in range(1, 6)]\nmocniny = ___\nprint(mocniny)\n', testCases: [{ expected: 'contains:[1, 4, 9, 16, 25]', description: 'Výsledok: [1, 4, 9, 16, 25]' }], xp: 30 },
+          ],
+        },
+        {
+          id: 'py-dicts', unitId: 'py-collections', title: 'Slovníky (Dictionaries)',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'dicts', prompt: 'Slovník — kľúč: hodnota',
+              codeSnippet: `uzivatel = {\n    "meno": "Zuzka",\n    "vek": 20,\n    "aktívny": True\n}\nprint(uzivatel["meno"])  # Zuzka\nuzivatel["email"] = "z@example.com"  # pridaj\nprint(uzivatel.keys())   # všetky kľúče`,
+              explanation: 'Slovník ukladá páry kľúč:hodnota. Pristúpiš k hodnote cez slovnik["kluč"]. Kľúče musia byť unikátne.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'dicts', prompt: 'Ako pristúpiš k hodnote kľúča "vek" zo slovníka uzivatel?',
+              options: ['uzivatel.vek', 'uzivatel["vek"]', 'uzivatel->vek', 'uzivatel[1]'], correctAnswer: 'uzivatel["vek"]', xp: 10 },
+            { id: 'e3', type: 'mcq', conceptId: 'dicts', prompt: 'Čo vráti uzivatel.get("email", "neznámy") ak email neexistuje?',
+              options: ['None', 'chyba', '"neznámy"', '""'], correctAnswer: '"neznámy"', explanation: '.get() vracia predvolenú hodnotu ak kľúč neexistuje — bezpečnejšie ako priamy prístup.', xp: 10 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'py-errors', moduleId: 'python', title: 'Error handling', description: 'Spracovanie chýb', isCheckpoint: true,
+      lessons: [
+        {
+          id: 'py-try-except', unitId: 'py-errors', title: 'try / except',
+          exercises: [
+            { id: 'e1', type: 'explain', conceptId: 'try-except', prompt: 'Spracovanie chýb — try / except',
+              codeSnippet: `try:\n    cislo = int("abc")  # hodí ValueError\nexcept ValueError:\n    print("Toto nie je číslo!")\nexcept Exception as e:\n    print(f"Nejaká chyba: {e}")\nfinally:\n    print("Toto sa spustí vždy")`,
+              explanation: 'try obsahuje kód, ktorý môže zlyhať. except zachytí konkrétnu chybu. finally sa spustí vždy — napr. na zatvorenie súboru.', xp: 5 },
+            { id: 'e2', type: 'mcq', conceptId: 'try-except', prompt: 'Kedy sa spustí blok finally?',
+              options: ['Len keď nastane chyba', 'Len keď nenastane chyba', 'Vždy — či nastala chyba alebo nie', 'Nikdy automaticky'], correctAnswer: 'Vždy — či nastala chyba alebo nie', xp: 10 },
+            { id: 'e3', type: 'fill', conceptId: 'try-except', prompt: 'Doplň kľúčové slovo:',
+              codeSnippet: 'try:\n    x = 1 / 0\n___ ZeroDivisionError:\n    print("Delenie nulou!")',
+              blanks: [{ id: 'b1', options: ['except', 'catch', 'error', 'handle'], correct: 'except' }], xp: 15 },
+          ],
+        },
+      ],
+    },
+  ],
+};

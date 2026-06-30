@@ -9,12 +9,12 @@ export default function ExplainCard({ exercise, onNext }: { exercise: Exercise; 
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EDEDED' }} />
-        <span style={{ fontSize: 11, fontFamily: 'Syne, sans-serif', fontWeight: 700, color: '#6E6E6E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 11, fontFamily: 'inherit', fontWeight: 700, color: '#6E6E6E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Nový koncept
         </span>
       </div>
 
-      <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 20, fontWeight: 800, color: '#EDEDED' }}>
+      <h2 style={{ fontFamily: 'inherit', fontSize: 20, fontWeight: 800, color: '#EDEDED' }}>
         {exercise.prompt}
       </h2>
 
@@ -39,7 +39,7 @@ export default function ExplainCard({ exercise, onNext }: { exercise: Exercise; 
 
       <motion.button
         onClick={onNext} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-        style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+        style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontFamily: 'inherit', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
       >
         Rozumiem <ArrowRight size={16} />
       </motion.button>

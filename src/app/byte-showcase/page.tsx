@@ -29,7 +29,7 @@ export default function ByteShowcase() {
   return (
     <div className="min-h-screen px-4 py-12" style={{ background: '#0A0A0A' }}>
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-black mb-2" style={{ fontFamily: 'Syne, sans-serif', color: '#DEFF4A' }}>
+        <h1 className="text-3xl font-black mb-2" style={{ fontWeight: 600, fontFamily: 'inherit', color: '#DEFF4A' }}>
           Byte — všetky stavy
         </h1>
         <p className="mb-10 text-sm" style={{ color: '#888780' }}>
@@ -41,7 +41,7 @@ export default function ByteShowcase() {
         >
           <Byte mood={selected} size={180} />
           <div className="text-center">
-            <div className="text-lg font-bold mb-1" style={{ fontFamily: 'Syne, sans-serif', color: '#DEFF4A' }}>
+            <div className="text-lg font-bold mb-1" style={{ fontWeight: 600, fontFamily: 'inherit', color: '#DEFF4A' }}>
               {moods.find(m => m.mood === selected)?.label}
             </div>
             <p className="text-sm italic" style={{ color: '#888780', maxWidth: '300px' }}>
@@ -65,7 +65,7 @@ export default function ByteShowcase() {
             >
               <Byte mood={mood} size={72} animate={selected === mood} />
               <div>
-                <div className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: selected === mood ? '#DEFF4A' : '#F1EFE8' }}>
+                <div className="font-bold text-sm" style={{ fontWeight: 600, fontFamily: 'inherit', color: selected === mood ? '#DEFF4A' : '#F1EFE8' }}>
                   {label}
                 </div>
                 <div className="text-xs mt-0.5" style={{ color: '#888780' }}>{description}</div>

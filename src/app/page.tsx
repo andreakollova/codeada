@@ -44,7 +44,7 @@ export default function HomePage() {
               <Byte mood={byteMood} size={72} equipment={equipment} />
               <div>
                 <h1 style={{ fontWeight: 700, fontSize: 24, color: '#EDEDED', marginBottom: 4, letterSpacing: '-0.03em' }}>
-                  {name ? greetings(name, streak) : 'CodeByte'}
+                  {name ? greetings(name, streak) : 'Coduy'}
                 </h1>
                 <p style={{ fontSize: 14, color: '#999', lineHeight: 1.5 }}>
                   {completedLessons.length === 0

@@ -74,7 +74,7 @@ export default function ByteShowcase() {
           ))}
         </div>
         <div className="mt-10 text-center">
-          <a href="/" className="text-sm" style={{ color: '#534AB7' }}>spadť na CodeByte</a>
+          <a href="/" className="text-sm" style={{ color: '#534AB7' }}>back to Coduy</a>
         </div>
       </div>
     </div>

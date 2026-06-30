@@ -138,7 +138,7 @@ export const useUserStore = create<UserState & UserActions>()(
       },
     }),
     {
-      name: 'codebyte-user-v2',
+      name: 'coduy-user-v1',
       partialize: (s) => ({
         xp: s.xp, gems: s.gems, hearts: s.hearts, streak: s.streak,
         lastActiveDate: s.lastActiveDate, byteMood: s.byteMood,

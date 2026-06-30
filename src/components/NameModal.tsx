@@ -57,16 +57,16 @@ export default function NameModal() {
 
             {/* Text */}
             <h2 style={{ fontWeight: 700, fontSize: 22, color: '#EDEDED', marginBottom: 8 }}>
-              Ahoj, som Byte
+              Hey, I'm Byte
             </h2>
             <p style={{ fontSize: 14, color: '#999', marginBottom: 32, lineHeight: 1.6 }}>
-              Budem ťa učiť programovanie. Ale najprv — ako sa voláš?
+              I'll teach you how to code. But first — what's your name?
             </p>
 
             {/* Input */}
             <input
               type="text"
-              placeholder="Tvoje meno..."
+              placeholder="Your name..."
               value={value}
               onChange={e => setValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
@@ -104,7 +104,7 @@ export default function NameModal() {
                 transition: 'all 0.15s',
               }}
             >
-              Začíname
+              Let's go
               <ArrowRight size={16} />
             </motion.button>
           </motion.div>

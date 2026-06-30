@@ -10,11 +10,11 @@ import { Zap, Flame, ArrowRight, Gift } from 'lucide-react';
 import { Suspense, useState } from 'react';
 
 const byteMessages = [
-  'Tvoja prvá funkcia! Skoro som sa z radosti skratoval.',
-  'Výborne! Každá lekcia ťa posúva bližšie k expertke.',
-  'To bolo rýchle. Vidím v tebe budúcu programátorku.',
-  'Perfektné! Byte je hrdý. A to nie je ľahké.',
-  'Skoro som zabudol dýchať. Wow.',
+  'Your first function! I almost short-circuited from joy.',
+  'Excellent! Every lesson gets you closer to mastery.',
+  'That was fast. I see a future developer in you.',
+  "Perfect! Byte is proud. And that's not easy.",
+  'I almost forgot to breathe. Wow.',
 ];
 
 function ResultContent() {
@@ -42,7 +42,7 @@ function ResultContent() {
         {/* Title */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} style={{ textAlign: 'center' }}>
           <h1 style={{ fontWeight: 800, fontSize: 32, margin: 0, letterSpacing: '-0.03em' }}>
-            Lekcia splnená
+            Lesson Complete
           </h1>
           {lesson && <p style={{ color: '#888', fontSize: 14, marginTop: 6, fontFamily: 'DM Sans, sans-serif' }}>{lesson.title}</p>}
         </motion.div>
@@ -60,8 +60,8 @@ function ResultContent() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%' }}>
           {[
-            { icon: Zap, label: 'XP získané', value: `+${xpEarned}` },
-            { icon: Flame, label: 'Séria', value: `${streak} dní` },
+            { icon: Zap, label: 'XP Earned', value: `+${xpEarned}` },
+            { icon: Flame, label: 'Streak', value: `${streak} days` },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} style={{ padding: '14px 16px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
               <Icon size={18} color="#fff" />
@@ -87,7 +87,7 @@ function ResultContent() {
                   <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 0.8, repeat: Infinity }}>
                     <Gift size={22} color="#fff" />
                   </motion.div>
-                  <span style={{ fontWeight: 700, fontSize: 15 }}>Otvoriť odmenu</span>
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>Open Reward</span>
                 </motion.button>
               ) : (
                 <motion.div
@@ -102,7 +102,7 @@ function ResultContent() {
                   }}
                 >
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#888', textTransform: 'uppercase', marginBottom: 12 }}>
-                    Nový predmet
+                    New Item
                   </div>
                   <Byte mood="proud" size={100} animate={true} equipment={{ [reward.type]: reward.id } as any} />
                   <div style={{ marginTop: 12 }}>
@@ -128,7 +128,7 @@ function ResultContent() {
           whileTap={{ scale: 0.97 }}
           style={{ width: '100%', padding: '16px', borderRadius: 16, background: '#fff', color: '#000', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', border: 'none' }}
         >
-          Ďalšia lekcia
+          Next Lesson
           <ArrowRight size={18} />
         </motion.button>
       </div>

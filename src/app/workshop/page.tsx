@@ -3,17 +3,18 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
-import { cosmeticItems, rarityLabel } from '@/data/cosmetics';
+import { cosmeticItems, rarityConfig } from '@/data/cosmetics';
 import Byte from '@/components/Byte';
 import { ByteEquipment, ItemType } from '@/types';
 import { ArrowLeft, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 const tabs: { id: ItemType; label: string }[] = [
-  { id: 'hat',       label: 'Čiapky' },
-  { id: 'glasses',   label: 'Okuliare' },
-  { id: 'accessory', label: 'Doplnky' },
-  { id: 'antenna',   label: 'Anténa' },
+  { id: 'hat',       label: 'Hats' },
+  { id: 'glasses',   label: 'Glasses' },
+  { id: 'accessory', label: 'Acc' },
+  { id: 'antenna',   label: 'Antenna' },
+  { id: 'aura',      label: 'Aura' },
 ];
 
 export default function WorkshopPage() {
@@ -45,7 +46,7 @@ export default function WorkshopPage() {
         </Link>
         <div>
           <h1 style={{ fontWeight: 700, fontSize: 18, margin: 0 }}>Workshop</h1>
-          <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{ownedItems.length} predmetov odomknutých</p>
+          <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{ownedItems.length} items unlocked</p>
         </div>
       </div>
 
@@ -70,7 +71,7 @@ export default function WorkshopPage() {
                 ) : null;
               })}
             {Object.values(equipment).every(v => !v) && (
-              <span style={{ fontSize: 12, color: '#777', fontFamily: 'DM Sans, sans-serif' }}>Žiadne vybavenie — vyber niečo nižšie</span>
+              <span style={{ fontSize: 12, color: '#777', fontFamily: 'DM Sans, sans-serif' }}>No equipment — pick something below</span>
             )}
           </div>
         </motion.div>
@@ -118,8 +119,8 @@ export default function WorkshopPage() {
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                     padding: '16px 8px', borderRadius: 16, textAlign: 'center', cursor: owned ? 'pointer' : 'default',
                     background: equipped ? '#fff' : owned ? '#0d0d0d' : '#070707',
-                    border: `1.5px solid ${equipped ? '#fff' : item.rarity === 'legendary' ? '#333' : item.rarity === 'rare' ? '#222' : '#151515'}`,
-                    boxShadow: equipped ? '0 0 24px rgba(255,255,255,0.15)' : item.rarity === 'legendary' && owned ? '0 0 16px rgba(255,255,255,0.05)' : 'none',
+                    border: `1.5px solid ${equipped ? '#fff' : owned ? rarityConfig[item.rarity].border + '44' : '#151515'}`,
+                    boxShadow: equipped ? '0 0 24px rgba(255,255,255,0.15)' : owned && (item.rarity === 'mythic' || item.rarity === 'legendary' || item.rarity === 'epic') ? rarityConfig[item.rarity].glow : 'none',
                   }}
                 >
                   {/* Mini Byte preview with just this item */}
@@ -141,14 +142,14 @@ export default function WorkshopPage() {
                     <div style={{ fontWeight: 700, fontSize: 11, color: equipped ? '#000' : owned ? '#fff' : '#333', lineHeight: 1.2 }}>
                       {item.name}
                     </div>
-                    <div style={{ fontSize: 10, color: equipped ? '#555' : item.rarity === 'legendary' ? '#666' : item.rarity === 'rare' ? '#444' : '#333', marginTop: 2 }}>
-                      {rarityLabel[item.rarity]}
+                    <div style={{ fontSize: 10, color: equipped ? '#555' : owned ? rarityConfig[item.rarity].color : '#444', marginTop: 2, fontWeight: item.rarity === 'mythic' || item.rarity === 'legendary' ? 700 : 500 }}>
+                      {rarityConfig[item.rarity].label}
                     </div>
                   </div>
 
                   {equipped && (
                     <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(0,0,0,0.5)', background: '#ddd', padding: '2px 8px', borderRadius: 20 }}>
-                      OBLEČENÉ
+                      EQUIPPED
                     </div>
                   )}
                 </motion.button>
@@ -158,7 +159,7 @@ export default function WorkshopPage() {
         </AnimatePresence>
 
         <p style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 24, fontFamily: 'DM Sans, sans-serif' }}>
-          Dokonči lekcie a odomkni nové predmety
+          Complete lessons to unlock new items
         </p>
       </div>
     </div>

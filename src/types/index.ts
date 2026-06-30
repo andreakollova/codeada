@@ -2,8 +2,8 @@ export type ByteMood = 'happy' | 'celebrating' | 'sleepy' | 'worried' | 'proud' 
 
 export type ExerciseType = 'explain' | 'mcq' | 'fill' | 'write';
 
-export type ItemType = 'hat' | 'glasses' | 'accessory' | 'antenna';
-export type ItemRarity = 'common' | 'rare' | 'legendary';
+export type ItemType = 'hat' | 'glasses' | 'accessory' | 'antenna' | 'aura';
+export type ItemRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
 export interface CosmeticItem {
   id: string;
@@ -11,6 +11,7 @@ export interface CosmeticItem {
   description: string;
   type: ItemType;
   rarity: ItemRarity;
+  element?: string; // fire, water, earth, air, galaxy, golden, void
 }
 
 export interface ByteEquipment {
@@ -18,6 +19,7 @@ export interface ByteEquipment {
   glasses?: string;
   accessory?: string;
   antenna?: string;
+  aura?: string;
 }
 
 export interface TestCase {

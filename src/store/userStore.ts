@@ -138,7 +138,17 @@ export const useUserStore = create<UserState & UserActions>()(
       },
     }),
     {
-      name: 'coduy-user-v1',
+      name: 'coduy-user',
+      // Migrate from old storage key
+      onRehydrateStorage: () => {
+        if (typeof window === 'undefined') return;
+        const oldKey = 'codebyte-user-v2';
+        const oldData = localStorage.getItem(oldKey);
+        if (oldData && !localStorage.getItem('coduy-user')) {
+          localStorage.setItem('coduy-user', oldData);
+          localStorage.removeItem(oldKey);
+        }
+      },
       partialize: (s) => ({
         xp: s.xp, gems: s.gems, hearts: s.hearts, streak: s.streak,
         lastActiveDate: s.lastActiveDate, byteMood: s.byteMood,

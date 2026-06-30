@@ -87,7 +87,12 @@ export default function TheoryLessonPage() {
     if (answerState !== 'idle') return;
     setSelectedAnswer(answer);
     const q = quiz[quizIndex];
-    if (answer === q.correct_answer) {
+    // For true_false: answer is "T"/"F", correct_answer is "True"/"False"
+    // For mcq: answer is "A"/"B"/"C"/"D", correct_answer is the same
+    const isCorrect = q.question_type === 'true_false'
+      ? (answer === 'T' && q.correct_answer === 'True') || (answer === 'F' && q.correct_answer === 'False')
+      : answer === q.correct_answer;
+    if (isCorrect) {
       setAnswerState('correct');
       setScore(s => s + 1);
       setByteMood('celebrating');

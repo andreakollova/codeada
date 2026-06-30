@@ -45,7 +45,7 @@ export default function HomePage() {
                 <h1 style={{ fontWeight: 700, fontSize: 24, color: '#EDEDED', marginBottom: 4, letterSpacing: '-0.03em' }}>
                   {name ? greetings(name, streak) : 'CodeByte'}
                 </h1>
-                <p style={{ fontSize: 14, color: '#6E6E6E', lineHeight: 1.5 }}>
+                <p style={{ fontSize: 14, color: '#999', lineHeight: 1.5 }}>
                   {completedLessons.length === 0
                     ? 'Pick a lesson and start learning.'
                     : `${completedLessons.length} lesson${completedLessons.length === 1 ? '' : 's'} completed.`
@@ -59,7 +59,7 @@ export default function HomePage() {
 
           {/* Right sidebar — stats (desktop only) */}
           <div className="dashboard-sidebar">
-            <h3 style={{ fontWeight: 700, fontSize: 13, color: '#555', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
+            <h3 style={{ fontWeight: 700, fontSize: 13, color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
               Your Stats
             </h3>
 
@@ -118,7 +118,7 @@ export default function HomePage() {
             {/* Byte character on desktop */}
             <div style={{ marginTop: 32, padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
               <Byte mood={byteMood} size={100} equipment={equipment} />
-              <p style={{ fontSize: 13, color: '#555', marginTop: 12 }}>
+              <p style={{ fontSize: 13, color: '#888', marginTop: 12 }}>
                 {byteMood === 'celebrating' ? 'Great job!' : byteMood === 'worried' ? 'Keep trying!' : byteMood === 'proud' ? 'On fire!' : 'Ready to learn?'}
               </p>
             </div>

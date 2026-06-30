@@ -72,7 +72,7 @@ export default function LessonPath() {
                   <div style={{ flex: 1, height: 3, borderRadius: 2, background: '#1a1a1a', overflow: 'hidden' }}>
                     <div style={{ width: `${pct}%`, height: '100%', background: '#fff', borderRadius: 2, transition: 'width 0.4s' }} />
                   </div>
-                  <span style={{ fontSize: 11, color: '#555', fontWeight: 600, flexShrink: 0 }}>
+                  <span style={{ fontSize: 11, color: '#888', fontWeight: 600, flexShrink: 0 }}>
                     {doneCount}/{mod.lessons.length}
                   </span>
                 </div>
@@ -121,7 +121,7 @@ export default function LessonPath() {
                             <div style={{ fontWeight: 500, fontSize: 14, color: done ? '#fff' : '#ccc', marginBottom: 2 }}>
                               {lesson.title}
                             </div>
-                            <div style={{ fontSize: 11, color: '#444' }}>
+                            <div style={{ fontSize: 11, color: '#777' }}>
                               Lesson {lesson.lesson_number} · Theory + Quiz
                             </div>
                           </div>
@@ -151,7 +151,7 @@ export default function LessonPath() {
       {dbModules.length > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 0 8px' }}>
           <div style={{ height: 1, flex: 1, background: '#1a1a1a' }} />
-          <span style={{ fontSize: 10, fontWeight: 600, color: '#333', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 10, fontWeight: 600, color: '#888', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
             Practice
           </span>
           <div style={{ height: 1, flex: 1, background: '#1a1a1a' }} />
@@ -190,7 +190,7 @@ export default function LessonPath() {
                   <div style={{ flex: 1, height: 3, borderRadius: 2, background: '#1a1a1a', overflow: 'hidden' }}>
                     <div style={{ width: `${pct}%`, height: '100%', background: '#fff', borderRadius: 2, transition: 'width 0.4s' }} />
                   </div>
-                  <span style={{ fontSize: 11, color: '#555', fontWeight: 600, flexShrink: 0 }}>
+                  <span style={{ fontSize: 11, color: '#888', fontWeight: 600, flexShrink: 0 }}>
                     {doneCount}/{allLessons.length}
                   </span>
                 </div>
@@ -216,7 +216,7 @@ export default function LessonPath() {
                         {/* Unit label */}
                         <div style={{ padding: '10px 20px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div style={{ height: 1, flex: 1, background: '#111' }} />
-                          <span style={{ fontSize: 10, color: '#333', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                          <span style={{ fontSize: 10, color: '#888', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                             {unit.title}
                           </span>
                           <div style={{ height: 1, flex: 1, background: '#111' }} />
@@ -259,7 +259,7 @@ export default function LessonPath() {
                                 <div style={{ fontWeight: 500, fontSize: 14, color: done ? '#fff' : '#ccc', marginBottom: 2 }}>
                                   {lesson.title}
                                 </div>
-                                <div style={{ fontSize: 11, color: '#444' }}>
+                                <div style={{ fontSize: 11, color: '#777' }}>
                                   {lesson.exercises.length} cvičení · {totalXp} XP
                                 </div>
                               </div>

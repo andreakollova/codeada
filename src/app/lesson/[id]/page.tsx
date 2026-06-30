@@ -26,7 +26,7 @@ export default function LessonPage() {
 
   if (!lesson) return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#555' }}>Lekcia nenájdená</p>
+      <p style={{ color: '#888' }}>Lekcia nenájdená</p>
     </div>
   );
 
@@ -61,7 +61,7 @@ export default function LessonPage() {
       {/* Header */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 20px', background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #0f0f0f' }}>
         <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.push('/')} style={{ color: '#444', cursor: 'pointer', padding: 4 }}>
+          <button onClick={() => router.push('/')} style={{ color: '#777', cursor: 'pointer', padding: 4 }}>
             <X size={20} />
           </button>
           {/* Progress */}

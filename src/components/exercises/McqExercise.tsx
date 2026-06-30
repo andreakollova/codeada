@@ -99,7 +99,7 @@ export default function McqExercise({ exercise, onCorrect, onWrong }: { exercise
             <p style={{ fontFamily: 'inherit', fontWeight: 700, fontSize: 13, color: state === 'correct' ? '#4ade80' : '#ff8080', marginBottom: exercise.explanation ? 4 : 0 }}>
               {state === 'correct' ? 'Správne' : 'Nie celkom'}
             </p>
-            {exercise.explanation && <p style={{ fontSize: 13, color: '#6E6E6E', lineHeight: 1.6, margin: 0 }}>{exercise.explanation}</p>}
+            {exercise.explanation && <p style={{ fontSize: 13, color: '#999', lineHeight: 1.6, margin: 0 }}>{exercise.explanation}</p>}
             {state === 'wrong' && (
               <motion.button
                 onClick={onCorrect} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}

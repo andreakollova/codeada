@@ -55,7 +55,7 @@ export default function FillExercise({ exercise, onCorrect, onWrong }: { exercis
 
       {blanks.map(blank => (
         <div key={blank.id}>
-          <p style={{ fontSize: 12, color: '#6E6E6E', marginBottom: 8, fontFamily: 'Syne, sans-serif' }}>Vyber správnu odpoveď:</p>
+          <p style={{ fontSize: 12, color: '#999', marginBottom: 8, fontFamily: 'Syne, sans-serif' }}>Vyber správnu odpoveď:</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {blank.options.map(opt => {
               const sel = selections[blank.id] === opt;

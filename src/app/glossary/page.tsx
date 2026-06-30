@@ -35,7 +35,7 @@ export default function GlossaryPage() {
           <h1 style={{ fontWeight: 800, fontSize: 22, color: '#EDEDED', marginBottom: 6 }}>
             Slovník
           </h1>
-          <p style={{ fontSize: 13, color: '#555', marginBottom: 20 }}>
+          <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>
             Skratky, symboly, koncepty a nástroje — vysvetlené po ľudsky.
           </p>
         </motion.div>
@@ -83,7 +83,7 @@ export default function GlossaryPage() {
 
       {/* Results */}
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '0 20px' }}>
-        <p style={{ fontSize: 11, color: '#333', marginBottom: 12, fontFamily: 'Syne, sans-serif' }}>
+        <p style={{ fontSize: 11, color: '#888', marginBottom: 12, fontFamily: 'Syne, sans-serif' }}>
           {results.length} výsledkov
         </p>
 
@@ -119,7 +119,7 @@ export default function GlossaryPage() {
                     <div style={{ fontWeight: 800, fontSize: 14, color: '#fff', marginBottom: 1 }}>
                       {entry.term}
                     </div>
-                    <div style={{ fontSize: 11, color: '#444', fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ fontSize: 11, color: '#777', fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {entry.short}
                     </div>
                   </div>
@@ -144,7 +144,7 @@ export default function GlossaryPage() {
                         </p>
                         {entry.example && (
                           <div style={{ background: '#060606', border: '1px solid #1a1a1a', borderRadius: 10, padding: '10px 14px' }}>
-                            <pre style={{ fontSize: 11, color: '#666', fontFamily: 'monospace', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                            <pre style={{ fontSize: 11, color: '#888', fontFamily: 'monospace', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                               {entry.example}
                             </pre>
                           </div>
@@ -159,7 +159,7 @@ export default function GlossaryPage() {
         </div>
 
         {results.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#333', fontSize: 13 }}>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontSize: 13 }}>
             Žiadne výsledky pre "{query}"
           </div>
         )}

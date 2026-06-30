@@ -9,7 +9,7 @@ export default function ExplainCard({ exercise, onNext }: { exercise: Exercise; 
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EDEDED' }} />
-        <span style={{ fontSize: 11, fontFamily: 'inherit', fontWeight: 700, color: '#6E6E6E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 11, fontFamily: 'inherit', fontWeight: 700, color: '#999', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Nový koncept
         </span>
       </div>

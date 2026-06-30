@@ -52,7 +52,7 @@ export default function WriteExercise({ exercise, onCorrect, onWrong }: { exerci
       {exercise.testCases?.map((tc, i) => (
         <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#3A3A3A', flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: '#6E6E6E' }}>{tc.description ?? tc.expected}</span>
+          <span style={{ fontSize: 12, color: '#999' }}>{tc.description ?? tc.expected}</span>
         </div>
       ))}
 

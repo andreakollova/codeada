@@ -44,7 +44,7 @@ function ResultContent() {
           <h1 style={{ fontWeight: 800, fontSize: 32, margin: 0, letterSpacing: '-0.03em' }}>
             Lekcia splnená
           </h1>
-          {lesson && <p style={{ color: '#555', fontSize: 14, marginTop: 6, fontFamily: 'DM Sans, sans-serif' }}>{lesson.title}</p>}
+          {lesson && <p style={{ color: '#888', fontSize: 14, marginTop: 6, fontFamily: 'DM Sans, sans-serif' }}>{lesson.title}</p>}
         </motion.div>
 
         {/* Quote */}
@@ -53,7 +53,7 @@ function ResultContent() {
           <p style={{ fontSize: 13, color: '#888', fontStyle: 'italic', margin: 0, lineHeight: 1.6, fontFamily: 'DM Sans, sans-serif' }}>
             "{message}"
           </p>
-          <p style={{ fontSize: 11, color: '#444', marginTop: 6, margin: '6px 0 0', fontFamily: 'Syne, sans-serif' }}>— Byte</p>
+          <p style={{ fontSize: 11, color: '#777', marginTop: 6, margin: '6px 0 0', fontFamily: 'Syne, sans-serif' }}>— Byte</p>
         </motion.div>
 
         {/* Stats */}
@@ -67,7 +67,7 @@ function ResultContent() {
               <Icon size={18} color="#fff" />
               <div>
                 <div style={{ fontWeight: 800, fontSize: 16 }}>{value}</div>
-                <div style={{ fontSize: 11, color: '#555' }}>{label}</div>
+                <div style={{ fontSize: 11, color: '#888' }}>{label}</div>
               </div>
             </div>
           ))}
@@ -101,13 +101,13 @@ function ResultContent() {
                     boxShadow: reward.rarity === 'legendary' ? '0 0 40px rgba(255,255,255,0.08)' : 'none',
                   }}
                 >
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#555', textTransform: 'uppercase', marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#888', textTransform: 'uppercase', marginBottom: 12 }}>
                     Nový predmet
                   </div>
                   <Byte mood="proud" size={100} animate={true} equipment={{ [reward.type]: reward.id } as any} />
                   <div style={{ marginTop: 12 }}>
                     <div style={{ fontWeight: 800, fontSize: 18 }}>{reward.name}</div>
-                    <div style={{ fontSize: 12, color: '#555', marginTop: 4 }}>{reward.description}</div>
+                    <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{reward.description}</div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: reward.rarity === 'legendary' ? '#fff' : '#666', marginTop: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                       {rarityLabel[reward.rarity]}
                     </div>

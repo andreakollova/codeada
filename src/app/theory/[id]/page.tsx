@@ -49,7 +49,7 @@ export default function TheoryLessonPage() {
     return (
       <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-          <p style={{ color: '#333', fontWeight: 700 }}>Loading...</p>
+          <p style={{ color: '#888', fontWeight: 700 }}>Loading...</p>
         </motion.div>
       </div>
     );
@@ -136,7 +136,7 @@ export default function TheoryLessonPage() {
         {/* Section label */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Icon size={14} color="#555" />
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {sec.label}
           </span>
         </div>
@@ -205,7 +205,7 @@ export default function TheoryLessonPage() {
         style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Question {quizIndex + 1} of {quiz.length}
           </span>
         </div>
@@ -296,17 +296,17 @@ export default function TheoryLessonPage() {
         <h1 style={{ fontWeight: 800, fontSize: 28, color: '#fff', marginTop: 24, textAlign: 'center' }}>
           Lesson Complete!
         </h1>
-        <p style={{ color: '#666', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
+        <p style={{ color: '#888', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
           {lesson.title}
         </p>
         <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score}/{quiz.length}</p>
-            <p style={{ fontSize: 12, color: '#555', margin: 0 }}>Quiz Score</p>
+            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>Quiz Score</p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score * 10 + sections.length * 5}</p>
-            <p style={{ fontSize: 12, color: '#555', margin: 0 }}>XP Earned</p>
+            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>XP Earned</p>
           </div>
         </div>
         <motion.button
@@ -326,7 +326,7 @@ export default function TheoryLessonPage() {
       {/* Header */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 20px', background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #0f0f0f' }}>
         <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.push('/')} style={{ color: '#444', cursor: 'pointer', padding: 4, background: 'none', border: 'none' }}>
+          <button onClick={() => router.push('/')} style={{ color: '#777', cursor: 'pointer', padding: 4, background: 'none', border: 'none' }}>
             <X size={20} />
           </button>
           <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#111', overflow: 'hidden' }}>
@@ -342,7 +342,7 @@ export default function TheoryLessonPage() {
 
       {/* Lesson title */}
       <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '16px 20px 4px' }}>
-        <p style={{ fontSize: 11, color: '#444', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+        <p style={{ fontSize: 11, color: '#777', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
           {lesson.title}
         </p>
       </div>

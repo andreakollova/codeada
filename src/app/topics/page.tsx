@@ -38,7 +38,7 @@ export default function TopicsPage() {
           <h1 style={{ fontWeight: 800, fontSize: 22, color: '#EDEDED', marginBottom: 6 }}>
             Moje Projekty
           </h1>
-          <p style={{ fontSize: 13, color: '#555', lineHeight: 1.6, marginBottom: 24 }}>
+          <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6, marginBottom: 24 }}>
             Vyber témy z reálnych projektov, ktoré chceš ovládať. Dostaneš lekcie priamo z praxe.
           </p>
         </motion.div>
@@ -85,11 +85,11 @@ export default function TopicsPage() {
                 <div style={{ fontWeight: 700, fontSize: 13, color: selected ? '#fff' : '#888', marginBottom: 4 }}>
                   {topic.title}
                 </div>
-                <div style={{ fontSize: 11, color: '#444', lineHeight: 1.4, marginBottom: 10 }}>
+                <div style={{ fontSize: 11, color: '#777', lineHeight: 1.4, marginBottom: 10 }}>
                   {topic.description}
                 </div>
 
-                <div style={{ fontSize: 10, color: '#333', fontFamily: 'Syne, sans-serif' }}>
+                <div style={{ fontSize: 10, color: '#888', fontFamily: 'Syne, sans-serif' }}>
                   {topic.lessons.length} lekcií · {total} cvičení
                 </div>
               </motion.button>
@@ -118,7 +118,7 @@ export default function TopicsPage() {
         )}
 
         {selectedTopics.length === 0 && (
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#333', marginTop: 24 }}>
+          <p style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 24 }}>
             Vyber aspoň jednu tému a začni sa učiť z praxe.
           </p>
         )}

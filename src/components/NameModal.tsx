@@ -59,7 +59,7 @@ export default function NameModal() {
             <h2 style={{ fontWeight: 700, fontSize: 22, color: '#EDEDED', marginBottom: 8 }}>
               Ahoj, som Byte
             </h2>
-            <p style={{ fontSize: 14, color: '#6E6E6E', marginBottom: 32, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 14, color: '#999', marginBottom: 32, lineHeight: 1.6 }}>
               Budem ťa učiť programovanie. Ale najprv — ako sa voláš?
             </p>
 

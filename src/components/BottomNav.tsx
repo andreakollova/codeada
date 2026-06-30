@@ -19,7 +19,7 @@ export default function BottomNav() {
       {/* Desktop sidebar */}
       <nav className="desktop-nav">
         <div className="desktop-nav-logo">
-          <span className="desktop-nav-logo-text">Coduy</span>
+          <img src="/logocoduy.png" alt="Coduy" style={{ height: 24, opacity: 0.9 }} />
         </div>
         <div className="desktop-nav-links">
           {tabs.map(({ href, label, Icon }) => {

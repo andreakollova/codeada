@@ -1,7 +1,8 @@
 'use client';
 
 import StatusBar from '@/components/StatusBar';
-import LessonPath from '@/components/LessonPath';
+import TheoryHub from '@/components/TheoryHub';
+import CodingPath from '@/components/CodingPath';
 import NameModal from '@/components/NameModal';
 import Byte from '@/components/Byte';
 import BottomNav from '@/components/BottomNav';
@@ -31,14 +32,14 @@ export default function HomePage() {
         <StatusBar />
 
         <div className="dashboard-content">
-          {/* Main column — lesson path */}
+          {/* Main column */}
           <div className="dashboard-main">
             {/* Hero */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 32 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 40 }}
             >
               <Byte mood={byteMood} size={72} equipment={equipment} />
               <div>
@@ -54,7 +55,11 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            <LessonPath />
+            {/* Theory Hub — reading section */}
+            <TheoryHub />
+
+            {/* Coding — hands-on exercises */}
+            <CodingPath />
           </div>
 
           {/* Right sidebar — stats (desktop only) */}
@@ -66,7 +71,7 @@ export default function HomePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div className="stat-card">
                 <div className="stat-card-icon">
-                  <Flame size={18} color={streak > 0 ? '#fff' : '#444'} />
+                  <Flame size={18} color={streak > 0 ? '#fff' : '#555'} />
                 </div>
                 <div>
                   <div className="stat-card-value">{streak}</div>
@@ -96,7 +101,7 @@ export default function HomePage() {
 
               <div className="stat-card">
                 <div className="stat-card-icon">
-                  <Heart size={18} color={hearts > 2 ? '#fff' : '#666'} />
+                  <Heart size={18} color={hearts > 2 ? '#fff' : '#888'} />
                 </div>
                 <div>
                   <div className="stat-card-value">{hearts}/{maxHearts}</div>

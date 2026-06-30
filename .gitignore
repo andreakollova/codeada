@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+translate_curriculum.py
+insert_*.py
+sb_insert.py
+*.sh
+add-sk-columns.sql
+supabase-arena-schema.sql
+__pycache__/

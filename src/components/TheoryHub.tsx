@@ -145,7 +145,7 @@ function ReadCard({ lesson, index, router, locale }: { lesson: DbLessonSummary &
           {t(lesson, 'title', locale)}
         </div>
         <div style={{ fontSize: 12, color: '#777' }}>
-          {lesson.moduleTitle_sk && locale === 'sk' ? lesson.moduleTitle_sk : lesson.moduleTitle} · Lesson {lesson.lesson_number}
+          {lesson.moduleTitle_sk && locale === 'sk' ? lesson.moduleTitle_sk : lesson.moduleTitle} · {locale === 'sk' ? 'Lekcia' : 'Lesson'} {lesson.lesson_number}
         </div>
       </div>
       <ChevronRight size={16} color="#555" />

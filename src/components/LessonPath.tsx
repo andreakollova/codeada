@@ -6,6 +6,7 @@ import { useUserStore } from '@/store/userStore';
 import { curriculum } from '@/data/curriculum';
 import { fetchModulesWithLessons, ModuleWithLessons } from '@/lib/curriculum-api';
 import { useRouter } from 'next/navigation';
+import { useLocaleStore } from '@/store/localeStore';
 import {
   BookOpen, Code, Hash, GitBranch, Repeat, Layers, Zap, Database,
   ChevronDown, Check, Play, Lock, GraduationCap,
@@ -30,6 +31,7 @@ const lessonIcons: Record<string, any> = {
 export default function LessonPath() {
   const { completedLessons } = useUserStore();
   const router = useRouter();
+  const { locale } = useLocaleStore();
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({ 'python-basics': true });
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
 
@@ -122,7 +124,7 @@ export default function LessonPath() {
                               {lesson.title}
                             </div>
                             <div style={{ fontSize: 11, color: '#777' }}>
-                              Lesson {lesson.lesson_number} · Theory + Quiz
+                              {locale === 'sk' ? 'Lekcia' : 'Lesson'} {lesson.lesson_number} · {locale === 'sk' ? 'Teória + Kvíz' : 'Theory + Quiz'}
                             </div>
                           </div>
                           <div style={{

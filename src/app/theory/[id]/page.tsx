@@ -11,12 +11,12 @@ import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles,
 
 type Phase = 'loading' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
 
-const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: string }[] = [
-  { key: 'introduction', phase: 'intro', icon: BookOpen, label: 'Introduction' },
-  { key: 'learning_content', phase: 'learning', icon: Lightbulb, label: 'Learning' },
-  { key: 'interesting_facts', phase: 'facts', icon: Sparkles, label: 'Fun Facts' },
-  { key: 'real_world', phase: 'real_world', icon: Globe, label: 'Real World' },
-  { key: 'key_takeaways', phase: 'takeaways', icon: ListChecks, label: 'Key Takeaways' },
+const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: string; labelSk: string }[] = [
+  { key: 'introduction', phase: 'intro', icon: BookOpen, label: 'Introduction', labelSk: 'Úvod' },
+  { key: 'learning_content', phase: 'learning', icon: Lightbulb, label: 'Learning', labelSk: 'Učivo' },
+  { key: 'interesting_facts', phase: 'facts', icon: Sparkles, label: 'Fun Facts', labelSk: 'Zaujímavosti' },
+  { key: 'real_world', phase: 'real_world', icon: Globe, label: 'Real World', labelSk: 'Reálny svet' },
+  { key: 'key_takeaways', phase: 'takeaways', icon: ListChecks, label: 'Key Takeaways', labelSk: 'Zhrnutie' },
 ];
 
 export default function TheoryLessonPage() {
@@ -148,7 +148,7 @@ export default function TheoryLessonPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Icon size={14} color="#555" />
           <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            {sec.label}
+            {locale === 'sk' ? sec.labelSk : sec.label}
           </span>
         </div>
 
@@ -177,7 +177,11 @@ export default function TheoryLessonPage() {
           whileTap={{ scale: 0.98 }}
           style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8, border: 'none', cursor: 'pointer' }}
         >
-          {sectionIndex + 1 < sections.length ? 'Continue' : quiz.length > 0 ? 'Start Quiz' : 'Finish'}
+          {sectionIndex + 1 < sections.length
+            ? (locale === 'sk' ? 'Pokračovať' : 'Continue')
+            : quiz.length > 0
+              ? (locale === 'sk' ? 'Spustiť kvíz' : 'Start Quiz')
+              : (locale === 'sk' ? 'Dokončiť' : 'Finish')}
           <ArrowRight size={16} />
         </motion.button>
       </motion.div>
@@ -193,8 +197,8 @@ export default function TheoryLessonPage() {
     let options: { label: string; text: string }[];
     if (q.question_type === 'true_false') {
       options = [
-        { label: 'T', text: 'True' },
-        { label: 'F', text: 'False' },
+        { label: 'T', text: locale === 'sk' ? 'Pravda' : 'True' },
+        { label: 'F', text: locale === 'sk' ? 'Nepravda' : 'False' },
       ];
     } else {
       options = q.options
@@ -217,7 +221,7 @@ export default function TheoryLessonPage() {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            Question {quizIndex + 1} of {quiz.length}
+            {locale === 'sk' ? `Otázka ${quizIndex + 1} z ${quiz.length}` : `Question ${quizIndex + 1} of ${quiz.length}`}
           </span>
         </div>
 
@@ -280,7 +284,9 @@ export default function TheoryLessonPage() {
                 border: `1px solid ${answerState === 'correct' ? 'rgba(74,222,128,0.25)' : 'rgba(255,80,80,0.15)'}`,
               }}>
                 <p style={{ fontWeight: 700, fontSize: 13, color: answerState === 'correct' ? '#4ade80' : '#ff8080', margin: 0 }}>
-                  {answerState === 'correct' ? 'Correct!' : 'Not quite'}
+                  {answerState === 'correct'
+                    ? (locale === 'sk' ? 'Správne!' : 'Correct!')
+                    : (locale === 'sk' ? 'Skúste znova' : 'Not quite')}
                 </p>
               </div>
               <motion.button
@@ -289,7 +295,9 @@ export default function TheoryLessonPage() {
                 whileTap={{ scale: 0.98 }}
                 style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
               >
-                {quizIndex + 1 < quiz.length ? 'Next Question' : 'Finish'}
+                {quizIndex + 1 < quiz.length
+                  ? (locale === 'sk' ? 'Ďalšia otázka' : 'Next Question')
+                  : (locale === 'sk' ? 'Dokončiť' : 'Finish')}
                 <ArrowRight size={16} />
               </motion.button>
             </motion.div>
@@ -305,7 +313,7 @@ export default function TheoryLessonPage() {
       <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <Byte mood="celebrating" size={100} equipment={equipment} />
         <h1 style={{ fontWeight: 800, fontSize: 28, color: '#fff', marginTop: 24, textAlign: 'center' }}>
-          Lesson Complete!
+          {locale === 'sk' ? 'Lekcia dokončená!' : 'Lesson Complete!'}
         </h1>
         <p style={{ color: '#888', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
           {t(lesson, 'title', locale)}
@@ -313,11 +321,11 @@ export default function TheoryLessonPage() {
         <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score}/{quiz.length}</p>
-            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>Quiz Score</p>
+            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{locale === 'sk' ? 'Skóre kvízu' : 'Quiz Score'}</p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score * 10 + sections.length * 5}</p>
-            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>XP Earned</p>
+            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{locale === 'sk' ? 'Získané XP' : 'XP Earned'}</p>
           </div>
         </div>
         <motion.button
@@ -326,7 +334,7 @@ export default function TheoryLessonPage() {
           whileTap={{ scale: 0.98 }}
           style={{ marginTop: 32, padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
         >
-          Back to Home
+          {locale === 'sk' ? 'Späť domov' : 'Back to Home'}
         </motion.button>
       </div>
     );

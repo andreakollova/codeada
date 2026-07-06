@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, FolderCode, BookMarked, Wrench } from 'lucide-react';
+import { BookOpen, FolderCode, BookMarked, Wrench, Play } from 'lucide-react';
 
 const tabs = [
   { href: '/',          label: 'Courses',   Icon: BookOpen },
+  { href: '/reels',    label: 'Reels',     Icon: Play },
   { href: '/topics',   label: 'Projects',  Icon: FolderCode },
   { href: '/glossary', label: 'Glossary',  Icon: BookMarked },
   { href: '/workshop', label: 'Workshop',  Icon: Wrench },

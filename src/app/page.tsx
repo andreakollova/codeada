@@ -7,7 +7,7 @@ import NameModal from '@/components/NameModal';
 import Byte from '@/components/Byte';
 import BottomNav from '@/components/BottomNav';
 import { useUserStore } from '@/store/userStore';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Zap, Heart, Trophy, BookOpen } from 'lucide-react';
 
@@ -18,10 +18,64 @@ const greetings = (name: string, streak: number) => {
   return `Hey ${name}. ${streak} day streak — impressive.`;
 };
 
+const COUNTDOWN_ENABLED = true;
+const COUNTDOWN_TARGET = new Date('2026-07-08T09:00:00+02:00'); // 48h from now
+
+function CountdownOverlay() {
+  const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    const tick = () => {
+      const diff = Math.max(0, COUNTDOWN_TARGET.getTime() - Date.now());
+      setTimeLeft({
+        h: Math.floor(diff / 3600000),
+        m: Math.floor((diff % 3600000) / 60000),
+        s: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999, background: '#000',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32,
+    }}>
+      <img src="/logocoduy.png" alt="Coduy" style={{ height: 40, objectFit: 'contain' }} />
+      <div style={{ display: 'flex', gap: 16 }}>
+        {[
+          { val: timeLeft.h, label: 'hours' },
+          { val: timeLeft.m, label: 'min' },
+          { val: timeLeft.s, label: 'sec' },
+        ].map(({ val, label }) => (
+          <div key={label} style={{ textAlign: 'center' }}>
+            <div style={{
+              fontSize: 64, fontWeight: 800, color: '#fff', lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              minWidth: 80,
+            }}>
+              {String(val).padStart(2, '0')}
+            </div>
+            <div style={{ fontSize: 13, color: '#555', fontWeight: 600, marginTop: 6, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              {label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { checkStreak, name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems } = useUserStore();
 
   useEffect(() => { checkStreak(); }, []);
+
+  if (COUNTDOWN_ENABLED && Date.now() < COUNTDOWN_TARGET.getTime()) {
+    return <CountdownOverlay />;
+  }
 
   return (
     <div className="page-shell">

@@ -8,6 +8,7 @@ import { useUserStore } from '@/store/userStore';
 import { useLocaleStore, t, tArray } from '@/store/localeStore';
 import { s } from '@/data/strings';
 import Byte from '@/components/Byte';
+import { cosmeticItems } from '@/data/cosmetics';
 import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check } from 'lucide-react';
 
 type Phase = 'loading' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
@@ -118,10 +119,13 @@ export default function TheoryLessonPage() {
     }
   };
 
+  const [reward, setReward] = useState<string | null>(null);
+
   const finishLesson = () => {
     const lessonKey = `theory-${lesson.id}`;
     const xp = score * 10 + sections.length * 5;
-    completeLesson(lessonKey, xp);
+    const earned = completeLesson(lessonKey, xp);
+    setReward(earned);
     setPhase('done');
   };
 
@@ -329,11 +333,26 @@ export default function TheoryLessonPage() {
             <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{s('xpEarned', locale)}</p>
           </div>
         </div>
+        {reward && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, type: 'spring' }}
+            style={{ marginTop: 24, padding: '16px 32px', borderRadius: 14, background: '#1a1a1a', border: '1px solid #333', textAlign: 'center' }}
+          >
+            <p style={{ fontSize: 12, color: '#888', margin: '0 0 4px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {locale === 'sk' ? 'Nová vec do šatníka!' : 'New wardrobe item!'}
+            </p>
+            <p style={{ fontSize: 16, color: '#fff', fontWeight: 700, margin: 0 }}>
+              {cosmeticItems.find(c => c.id === reward)?.name || reward}
+            </p>
+          </motion.div>
+        )}
         <motion.button
           onClick={() => router.push('/')}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          style={{ marginTop: 32, padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
+          style={{ marginTop: 24, padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
         >
           {s('backHome', locale)}
         </motion.button>

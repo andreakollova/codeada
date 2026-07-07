@@ -17,7 +17,10 @@ export default function TheoryHub() {
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    fetchModulesWithLessons().then(setDbModules);
+    fetchModulesWithLessons().then(mods => {
+      // Theory Hub shows only theory modules (1-18), not Python coding modules
+      setDbModules(mods.filter(m => m.module_number <= 18));
+    });
   }, []);
 
   if (dbModules.length === 0) return null;

@@ -11,8 +11,22 @@ import {
   BookOpen, Code, ChevronDown, Check, Play, Terminal,
 } from 'lucide-react';
 
-// Python modules 19-47
-const CODING_MODULE_RANGE = { min: 19, max: 47 };
+// Python coding modules grouped by syllabus sections
+// Maps syllabus group name to module_numbers in correct order
+const SYLLABUS = [
+  { titleEn: 'Python Fundamentals', titleSk: 'Základy Pythonu',
+    modules: [30, 31, 32] }, // Python Basics, Strings, Error Handling
+  { titleEn: 'Python Data Structures', titleSk: 'Dátové štruktúry',
+    modules: [11, 14, 20, 21, 23] }, // Lists, Tuples, Sets, Dictionaries, Collections
+  { titleEn: 'Python Programming', titleSk: 'Python Programovanie',
+    modules: [24, 25, 26, 27, 28, 29] }, // Modules, Files, OOP, Special Methods, Iterators, FP
+  { titleEn: 'Advanced Python', titleSk: 'Pokročilý Python',
+    modules: [33, 34, 35, 36, 37, 38, 39, 40] }, // Decorators, Context Mgrs, Types, Dataclasses, Enums, Regex, Logging, Venvs
+  { titleEn: 'Professional Python', titleSk: 'Profesionálny Python',
+    modules: [41, 42, 43, 44, 45, 46, 47] }, // Testing, Debugging, Performance, Concurrency, Packaging, Internals, Best Practices
+];
+
+const ALL_CODING_MODULES = SYLLABUS.flatMap(s => s.modules);
 
 export default function CodingPath() {
   const { completedLessons } = useUserStore();
@@ -23,13 +37,8 @@ export default function CodingPath() {
 
   useEffect(() => {
     fetchModulesWithLessons().then(mods => {
-      const codingMods = mods.filter(m =>
-        m.module_number >= CODING_MODULE_RANGE.min && m.module_number <= CODING_MODULE_RANGE.max
-      );
+      const codingMods = mods.filter(m => ALL_CODING_MODULES.includes(m.module_number));
       setDbModules(codingMods);
-      if (codingMods.length > 0) {
-        setOpenModules({ [codingMods[0].id]: true });
-      }
     });
   }, []);
 
@@ -57,8 +66,26 @@ export default function CodingPath() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {dbModules.map((mod, mi) => {
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {SYLLABUS.map((group, gi) => {
+          const groupMods = group.modules.map(mn => dbModules.find(m => m.module_number === mn)).filter(Boolean) as ModuleWithLessons[];
+          if (groupMods.length === 0) return null;
+          const groupLessons = groupMods.flatMap(m => m.lessons);
+          const groupDone = groupLessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+          const groupPct = groupLessons.length ? Math.round((groupDone / groupLessons.length) * 100) : 0;
+          const groupTitle = locale === 'sk' ? group.titleSk : group.titleEn;
+
+          return (
+            <div key={gi}>
+              {/* Syllabus group header */}
+              <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#888', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{groupTitle}</span>
+                <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
+                <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>{groupDone}/{groupLessons.length}</span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {groupMods.map((mod, mi) => {
           const isOpen = !!openModules[mod.id];
           const modDone = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
           const pct = mod.lessons.length ? Math.round((modDone / mod.lessons.length) * 100) : 0;
@@ -162,6 +189,10 @@ export default function CodingPath() {
                 )}
               </AnimatePresence>
             </motion.div>
+          );
+        })}
+              </div>
+            </div>
           );
         })}
       </div>

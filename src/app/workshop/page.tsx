@@ -8,20 +8,28 @@ import Byte from '@/components/Byte';
 import { ByteEquipment, ItemType, CosmeticItem } from '@/types';
 import { ArrowLeft, Lock, Shuffle, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
-const tabs: { id: ItemType | 'all'; label: string }[] = [
-  { id: 'all',       label: 'All' },
-  { id: 'hat',       label: 'Hats' },
-  { id: 'glasses',   label: 'Glasses' },
-  { id: 'accessory', label: 'Acc' },
-  { id: 'antenna',   label: 'Antenna' },
-  { id: 'aura',      label: 'Aura' },
-];
+const getTabLabel = (id: ItemType | 'all', locale: 'en' | 'sk') => {
+  const map: Record<string, () => string> = {
+    all: () => s('allItems', locale),
+    hat: () => s('hats', locale),
+    glasses: () => s('glasses', locale),
+    accessory: () => s('accessories', locale),
+    antenna: () => s('antennas', locale),
+    aura: () => s('auras', locale),
+  };
+  return map[id]();
+};
+
+const tabIds: (ItemType | 'all')[] = ['all', 'hat', 'glasses', 'accessory', 'antenna', 'aura'];
 
 const rarityOrder = ['mythic', 'legendary', 'epic', 'rare', 'common'] as const;
 
 export default function WorkshopPage() {
   const { ownedItems, equipment, equip, byteMood } = useUserStore();
+  const { locale } = useLocaleStore();
   const [activeTab, setActiveTab] = useState<ItemType | 'all'>('all');
   const [previewEquipment, setPreviewEquipment] = useState<ByteEquipment | null>(null);
   const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
@@ -84,8 +92,8 @@ export default function WorkshopPage() {
           </motion.div>
         </Link>
         <div style={{ flex: 1 }}>
-          <h1 style={{ fontWeight: 700, fontSize: 18, margin: 0 }}>Locker</h1>
-          <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{ownedItems.length} / {cosmeticItems.length} items unlocked</p>
+          <h1 style={{ fontWeight: 700, fontSize: 18, margin: 0 }}>{s('locker', locale)}</h1>
+          <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{ownedItems.length} / {cosmeticItems.length} {s('itemsUnlocked', locale)}</p>
         </div>
         {/* Random button */}
         <motion.button
@@ -100,7 +108,7 @@ export default function WorkshopPage() {
           }}
         >
           <Shuffle size={14} />
-          Random
+          {s('random', locale)}
         </motion.button>
       </div>
 
@@ -139,7 +147,7 @@ export default function WorkshopPage() {
                 );
               })}
             {Object.values(displayEquipment).every(v => !v) && (
-              <span style={{ fontSize: 12, color: '#777' }}>No equipment — pick something below</span>
+              <span style={{ fontSize: 12, color: '#777' }}>{s('noEquipment', locale)}</span>
             )}
           </div>
 
@@ -151,13 +159,13 @@ export default function WorkshopPage() {
               style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10 }}
             >
               <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                Preview Mode
+                {s('previewMode', locale)}
               </span>
               <button
                 onClick={clearPreview}
                 style={{ fontSize: 11, color: '#888', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
               >
-                Back to equipped
+                {s('backToEquipped', locale)}
               </button>
             </motion.div>
           )}
@@ -200,19 +208,19 @@ export default function WorkshopPage() {
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: '#0a0a0a', padding: 4, borderRadius: 14, border: '1px solid #1a1a1a', overflowX: 'auto' }}>
-          {tabs.map(tab => (
+          {tabIds.map(id => (
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              key={id}
+              onClick={() => setActiveTab(id)}
               style={{
                 flex: 1, padding: '8px 4px', borderRadius: 10, fontSize: 12, fontWeight: 700,
-                background: activeTab === tab.id ? '#fff' : 'transparent',
-                color: activeTab === tab.id ? '#000' : '#888',
+                background: activeTab === id ? '#fff' : 'transparent',
+                color: activeTab === id ? '#000' : '#888',
                 cursor: 'pointer', border: 'none', transition: 'all 0.15s',
                 whiteSpace: 'nowrap',
               }}
             >
-              {tab.label}
+              {getTabLabel(id, locale)}
             </button>
           ))}
         </div>
@@ -309,7 +317,7 @@ export default function WorkshopPage() {
         </AnimatePresence>
 
         <p style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 24 }}>
-          Complete lessons to unlock new items
+          {s('completeLessonsToUnlock', locale)}
         </p>
       </div>
     </div>

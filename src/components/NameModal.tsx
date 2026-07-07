@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 import Byte from './Byte';
 import { ArrowRight } from 'lucide-react';
 
 export default function NameModal() {
   const { name, setName } = useUserStore();
+  const { locale } = useLocaleStore();
   const [value, setValue] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
@@ -57,16 +60,16 @@ export default function NameModal() {
 
             {/* Text */}
             <h2 style={{ fontWeight: 700, fontSize: 22, color: '#EDEDED', marginBottom: 8 }}>
-              Hey, I'm Byte
+              {s('heyImByte', locale)}
             </h2>
             <p style={{ fontSize: 14, color: '#999', marginBottom: 32, lineHeight: 1.6 }}>
-              I'll teach you how to code. But first — what's your name?
+              {s('illTeachYou', locale)}
             </p>
 
             {/* Input */}
             <input
               type="text"
-              placeholder="Your name..."
+              placeholder={s('yourName', locale)}
               value={value}
               onChange={e => setValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
@@ -104,7 +107,7 @@ export default function NameModal() {
                 transition: 'all 0.15s',
               }}
             >
-              Let's go
+              {s('letsGo', locale)}
               <ArrowRight size={16} />
             </motion.button>
           </motion.div>

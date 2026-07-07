@@ -7,6 +7,7 @@ import { fetchModulesWithLessons, ModuleWithLessons, DbLessonSummary } from '@/l
 import { useRouter } from 'next/navigation';
 import { BookOpen, ChevronRight, Check, ArrowRight, Library } from 'lucide-react';
 import { useLocaleStore, t } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 export default function TheoryHub() {
   const { completedLessons } = useUserStore();
@@ -46,10 +47,10 @@ export default function TheoryHub() {
           </div>
           <div>
             <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
-              Theory Hub
+              {s('theoryHub', locale)}
             </h2>
             <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
-              {readCount} of {allTheoryLessons.length} reads completed
+              {readCount} / {allTheoryLessons.length} {s('readsCompleted', locale)}
             </p>
           </div>
         </div>
@@ -58,7 +59,7 @@ export default function TheoryHub() {
           style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, background: '#161616', border: '1px solid #222', color: '#aaa', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
         >
           <Library size={14} />
-          {showAll ? 'Show less' : 'Browse all'}
+          {showAll ? s('showLess', locale) : s('browseAll', locale)}
         </button>
       </div>
 
@@ -72,7 +73,7 @@ export default function TheoryHub() {
           {/* Current module label */}
           {currentModule && (
             <p style={{ fontSize: 12, color: '#888', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
-              Now reading · {currentModule.title}
+              {s('nowReading', locale)} · {t(currentModule, 'title', locale)}
             </p>
           )}
 
@@ -88,14 +89,14 @@ export default function TheoryHub() {
               onClick={() => setShowAll(true)}
               style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, color: '#888', fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: '8px 0' }}
             >
-              {unread.length - 3} more lessons ahead
+              {unread.length - 3} {s('moreLessonsAhead', locale)}
               <ChevronRight size={14} />
             </button>
           )}
 
           {todaysReads.length === 0 && (
             <div style={{ padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
-              <p style={{ color: '#888', fontSize: 14 }}>All theory lessons completed. Nice work.</p>
+              <p style={{ color: '#888', fontSize: 14 }}>{s('allTheoryDone', locale)}</p>
             </div>
           )}
         </>
@@ -145,7 +146,7 @@ function ReadCard({ lesson, index, router, locale }: { lesson: DbLessonSummary &
           {t(lesson, 'title', locale)}
         </div>
         <div style={{ fontSize: 12, color: '#777' }}>
-          {lesson.moduleTitle_sk && locale === 'sk' ? lesson.moduleTitle_sk : lesson.moduleTitle} · {locale === 'sk' ? 'Lekcia' : 'Lesson'} {lesson.lesson_number}
+          {lesson.moduleTitle_sk && locale === 'sk' ? lesson.moduleTitle_sk : lesson.moduleTitle} · {s('lesson', locale)} {lesson.lesson_number}
         </div>
       </div>
       <ChevronRight size={16} color="#555" />
@@ -177,7 +178,7 @@ function ModuleRow({ mod, completedLessons, router, locale }: { mod: ModuleWithL
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 600, fontSize: 14, color: '#ddd' }}>{t(mod, 'title', locale)}</div>
-          <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>{doneCount}/{mod.lessons.length} lessons</div>
+          <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>{doneCount}/{mod.lessons.length} {s('lessons', locale)}</div>
         </div>
         <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.15 }}>
           <ChevronRight size={16} color="#555" />

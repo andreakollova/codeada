@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 import { ArrowLeft, Play, Clock, BookOpen } from 'lucide-react';
 
 const sb = createClient(
@@ -74,7 +75,7 @@ export default function ReelsPage() {
           {locale === 'sk' ? 'Reels' : 'Reels'}
         </h1>
         <span style={{ fontSize: 13, color: '#555' }}>
-          {reels.length} {locale === 'sk' ? 'videí' : 'videos'}
+          {reels.length} {s('videos', locale)}
         </span>
       </div>
 
@@ -82,7 +83,7 @@ export default function ReelsPage() {
       <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
         {reels.length === 0 && (
           <p style={{ color: '#555', textAlign: 'center', marginTop: 40 }}>
-            {locale === 'sk' ? 'Zatiaľ žiadne reels.' : 'No reels yet.'}
+            {s('noReels', locale)}
           </p>
         )}
 
@@ -149,7 +150,7 @@ export default function ReelsPage() {
                   }}
                 >
                   <BookOpen size={12} />
-                  {locale === 'sk' ? 'Celá lekcia' : 'Full lesson'}
+                  {s('fullLesson', locale)}
                 </button>
               </div>
             </div>

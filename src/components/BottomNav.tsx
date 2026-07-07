@@ -8,10 +8,10 @@ import { s } from '@/data/strings';
 
 const tabDefs = [
   { href: '/',          labelKey: 'courses' as const,  Icon: BookOpen },
-  { href: '/reels',    labelKey: 'reels' as const,    Icon: Play },
   { href: '/topics',   labelKey: 'projects' as const, Icon: FolderCode },
   { href: '/glossary', labelKey: 'glossary' as const,  Icon: BookMarked },
   { href: '/workshop', labelKey: 'workshop' as const,  Icon: Wrench },
+  { href: '/reels',    labelKey: 'reels' as const,    Icon: Play },
 ];
 
 export default function BottomNav() {

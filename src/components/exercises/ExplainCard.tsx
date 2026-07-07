@@ -3,14 +3,17 @@
 import { Exercise } from '@/types';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 export default function ExplainCard({ exercise, onNext }: { exercise: Exercise; onNext: () => void }) {
+  const { locale } = useLocaleStore();
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EDEDED' }} />
         <span style={{ fontSize: 11, fontFamily: 'inherit', fontWeight: 700, color: '#999', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-          Nový koncept
+          {s('newConcept', locale)}
         </span>
       </div>
 
@@ -41,7 +44,7 @@ export default function ExplainCard({ exercise, onNext }: { exercise: Exercise; 
         onClick={onNext} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
         style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontFamily: 'inherit', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
       >
-        Rozumiem <ArrowRight size={16} />
+        {s('understand', locale)} <ArrowRight size={16} />
       </motion.button>
     </motion.div>
   );

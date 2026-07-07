@@ -7,11 +7,14 @@ import BottomNav from '@/components/BottomNav';
 import StatusBar from '@/components/StatusBar';
 import { GlossaryEntry } from '@/types';
 import { ChevronDown, Search, X } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 const categories = ['všetko', 'skratka', 'symbol', 'koncept', 'nastroj'] as const;
 type Filter = typeof categories[number];
 
 export default function GlossaryPage() {
+  const { locale } = useLocaleStore();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('všetko');
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -33,7 +36,7 @@ export default function GlossaryPage() {
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '24px 20px 0' }}>
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <h1 style={{ fontWeight: 800, fontSize: 22, color: '#EDEDED', marginBottom: 6 }}>
-            Slovník
+            {s('glossary', locale)}
           </h1>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>
             Skratky, symboly, koncepty a nástroje — vysvetlené po ľudsky.
@@ -46,7 +49,7 @@ export default function GlossaryPage() {
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Hľadaj pojem..."
+            placeholder={s('searchGlossary', locale)}
             style={{
               width: '100%', padding: '11px 40px 11px 40px',
               background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12,
@@ -84,7 +87,7 @@ export default function GlossaryPage() {
       {/* Results */}
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '0 20px' }}>
         <p style={{ fontSize: 11, color: '#888', marginBottom: 12, fontFamily: 'Syne, sans-serif' }}>
-          {results.length} výsledkov
+          {results.length} {s('results', locale)}
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -160,7 +163,7 @@ export default function GlossaryPage() {
 
         {results.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontSize: 13 }}>
-            Žiadne výsledky pre "{query}"
+            {s('noResults', locale)} &ldquo;{query}&rdquo;
           </div>
         )}
       </div>

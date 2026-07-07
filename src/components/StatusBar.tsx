@@ -56,7 +56,7 @@ export default function StatusBar() {
             }}
             title={locale === 'en' ? 'Switch to Slovak' : 'Prepnúť na angličtinu'}
           >
-            {locale === 'en' ? 'SK' : 'EN'}
+            {locale === 'en' ? 'EN' : 'SK'}
           </button>
 
           <Link href="/workshop">

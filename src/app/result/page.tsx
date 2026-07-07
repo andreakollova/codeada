@@ -8,19 +8,31 @@ import { getLessonById } from '@/data/curriculum';
 import { getItemById, rarityConfig } from '@/data/cosmetics';
 import { Zap, Flame, ArrowRight, Gift } from 'lucide-react';
 import { Suspense, useState } from 'react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
-const byteMessages = [
-  'Your first function! I almost short-circuited from joy.',
-  'Excellent! Every lesson gets you closer to mastery.',
-  'That was fast. I see a future developer in you.',
-  "Perfect! Byte is proud. And that's not easy.",
-  'I almost forgot to breathe. Wow.',
-];
+const byteMessages = {
+  en: [
+    'Your first function! I almost short-circuited from joy.',
+    'Excellent! Every lesson gets you closer to mastery.',
+    'That was fast. I see a future developer in you.',
+    "Perfect! Byte is proud. And that's not easy.",
+    'I almost forgot to breathe. Wow.',
+  ],
+  sk: [
+    'Tvoja prvá funkcia! Skoro som sa skratoval od radosti.',
+    'Výborne! Každá lekcia ťa posúva bližšie k majstrovstvu.',
+    'To bolo rýchle. Vidím v tebe budúceho vývojára.',
+    'Perfektné! Byte je hrdý. A to nie je jednoduché.',
+    'Skoro som zabudol dýchať. Wow.',
+  ],
+};
 
 function ResultContent() {
   const params = useSearchParams();
   const router = useRouter();
   const { xp, streak, equipment } = useUserStore();
+  const { locale } = useLocaleStore();
   const lessonId = params.get('lessonId') ?? '';
   const xpEarned = parseInt(params.get('xp') ?? '0');
   const rewardId = params.get('reward') ?? '';
@@ -28,7 +40,8 @@ function ResultContent() {
   const reward = rewardId ? getItemById(rewardId) : null;
   const [itemRevealed, setItemRevealed] = useState(!reward);
 
-  const message = byteMessages[Math.floor(Math.random() * byteMessages.length)];
+  const msgs = byteMessages[locale];
+  const message = msgs[Math.floor(Math.random() * msgs.length)];
   const rc = reward ? rarityConfig[reward.rarity] : null;
 
   return (
@@ -43,7 +56,7 @@ function ResultContent() {
         {/* Title */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} style={{ textAlign: 'center' }}>
           <h1 style={{ fontWeight: 800, fontSize: 32, margin: 0, letterSpacing: '-0.03em' }}>
-            Lesson Complete
+            {s('lessonComplete', locale)}
           </h1>
           {lesson && <p style={{ color: '#888', fontSize: 14, marginTop: 6 }}>{lesson.title}</p>}
         </motion.div>
@@ -61,8 +74,8 @@ function ResultContent() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%' }}>
           {[
-            { icon: Zap, label: 'XP Earned', value: `+${xpEarned}` },
-            { icon: Flame, label: 'Streak', value: `${streak} days` },
+            { icon: Zap, label: s('xpEarned', locale), value: `+${xpEarned}` },
+            { icon: Flame, label: s('streak', locale), value: `${streak} ${s('days', locale)}` },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} style={{ padding: '14px 16px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
               <Icon size={18} color="#fff" />
@@ -93,7 +106,7 @@ function ResultContent() {
                   <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 0.8, repeat: Infinity }}>
                     <Gift size={22} color="#fff" />
                   </motion.div>
-                  <span style={{ fontWeight: 700, fontSize: 15 }}>Open Reward</span>
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>{s('openReward', locale)}</span>
                 </motion.button>
               ) : (
                 <motion.div
@@ -226,7 +239,7 @@ function ResultContent() {
           whileTap={{ scale: 0.97 }}
           style={{ width: '100%', padding: '16px', borderRadius: 16, background: '#fff', color: '#000', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', border: 'none' }}
         >
-          Next Lesson
+          {s('nextLesson', locale)}
           <ArrowRight size={18} />
         </motion.button>
       </div>

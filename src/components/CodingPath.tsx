@@ -152,7 +152,7 @@ export default function CodingPath() {
                                     {lesson.title}
                                   </div>
                                   <div style={{ fontSize: 11, color: '#777' }}>
-                                    {lesson.exercises.length} exercises · {totalXp} XP
+                                    {lesson.exercises.length} {s('exercises', locale)} · {totalXp} XP
                                   </div>
                                 </div>
                                 <div style={{
@@ -174,7 +174,7 @@ export default function CodingPath() {
                             <div style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 8 }}>
                               <div style={{ height: 1, flex: 1, background: '#111' }} />
                               <span style={{ fontSize: 10, color: '#555', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                                Checkpoint
+                                {s('checkpoint', locale)}
                               </span>
                               <div style={{ height: 1, flex: 1, background: '#111' }} />
                             </div>

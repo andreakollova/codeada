@@ -3,17 +3,20 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BookOpen, FolderCode, BookMarked, Wrench, Play } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
-const tabs = [
-  { href: '/',          label: 'Courses',   Icon: BookOpen },
-  { href: '/reels',    label: 'Reels',     Icon: Play },
-  { href: '/topics',   label: 'Projects',  Icon: FolderCode },
-  { href: '/glossary', label: 'Glossary',  Icon: BookMarked },
-  { href: '/workshop', label: 'Workshop',  Icon: Wrench },
+const tabDefs = [
+  { href: '/',          labelKey: 'courses' as const,  Icon: BookOpen },
+  { href: '/reels',    labelKey: 'reels' as const,    Icon: Play },
+  { href: '/topics',   labelKey: 'projects' as const, Icon: FolderCode },
+  { href: '/glossary', labelKey: 'glossary' as const,  Icon: BookMarked },
+  { href: '/workshop', labelKey: 'workshop' as const,  Icon: Wrench },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { locale } = useLocaleStore();
 
   return (
     <>
@@ -23,12 +26,12 @@ export default function BottomNav() {
           <img src="/logocoduy.png" alt="Coduy" style={{ height: 24, opacity: 0.9 }} />
         </div>
         <div className="desktop-nav-links">
-          {tabs.map(({ href, label, Icon }) => {
+          {tabDefs.map(({ href, labelKey, Icon }) => {
             const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
             return (
               <Link key={href} href={href} className={`desktop-nav-item ${active ? 'active' : ''}`}>
                 <Icon size={20} strokeWidth={active ? 2.2 : 1.6} />
-                <span>{label}</span>
+                <span>{s(labelKey, locale)}</span>
               </Link>
             );
           })}
@@ -37,7 +40,7 @@ export default function BottomNav() {
 
       {/* Mobile bottom bar */}
       <div className="mobile-nav">
-        {tabs.map(({ href, label, Icon }) => {
+        {tabDefs.map(({ href, labelKey, Icon }) => {
           const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
           return (
             <Link
@@ -52,7 +55,7 @@ export default function BottomNav() {
             >
               <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
               <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.02em' }}>
-                {label}
+                {s(labelKey, locale)}
               </span>
             </Link>
           );

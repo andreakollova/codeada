@@ -5,13 +5,20 @@ import TheoryHub from '@/components/TheoryHub';
 import CodingPath from '@/components/CodingPath';
 import NameModal from '@/components/NameModal';
 import Byte from '@/components/Byte';
-import BottomNav from '@/components/BottomNav';
 import { useUserStore } from '@/store/userStore';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Zap, Heart, Trophy, BookOpen } from 'lucide-react';
 
-const greetings = (name: string, streak: number) => {
+const greetings = (name: string, streak: number, locale: 'en' | 'sk') => {
+  if (locale === 'sk') {
+    if (streak === 0) return `Vitaj späť, ${name}.`;
+    if (streak === 1) return `Ahoj ${name}. Prvý deň.`;
+    if (streak < 7) return `Ahoj ${name}. ${streak} dní v rade.`;
+    return `Ahoj ${name}. ${streak} dňový streak — super.`;
+  }
   if (streak === 0) return `Welcome back, ${name}.`;
   if (streak === 1) return `Hey ${name}. Day one.`;
   if (streak < 7) return `Hey ${name}. ${streak} days in a row.`;
@@ -70,6 +77,7 @@ function CountdownOverlay() {
 
 export default function HomePage() {
   const { checkStreak, name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems } = useUserStore();
+  const { locale } = useLocaleStore();
 
   useEffect(() => { checkStreak(); }, []);
 
@@ -97,12 +105,12 @@ export default function HomePage() {
               <Byte mood={byteMood} size={72} equipment={equipment} />
               <div>
                 <h1 style={{ fontWeight: 700, fontSize: 24, color: '#EDEDED', marginBottom: 4, letterSpacing: '-0.03em' }}>
-                  {name ? greetings(name, streak) : 'Coduy'}
+                  {name ? greetings(name, streak, locale) : 'Coduy'}
                 </h1>
                 <p style={{ fontSize: 14, color: '#999', lineHeight: 1.5 }}>
                   {completedLessons.length === 0
-                    ? 'Pick a lesson and start learning.'
-                    : `${completedLessons.length} lesson${completedLessons.length === 1 ? '' : 's'} completed.`
+                    ? s('pickLesson', locale)
+                    : `${completedLessons.length} ${completedLessons.length === 1 ? s('lessonCompleted', locale) : s('lessonsCompleted', locale)}.`
                   }
                 </p>
               </div>
@@ -118,7 +126,7 @@ export default function HomePage() {
           {/* Right sidebar — stats (desktop only) */}
           <div className="dashboard-sidebar">
             <h3 style={{ fontWeight: 700, fontSize: 13, color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
-              Your Stats
+              {s('yourStats', locale)}
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -128,7 +136,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="stat-card-value">{streak}</div>
-                  <div className="stat-card-label">Day Streak</div>
+                  <div className="stat-card-label">{s('dayStreakLabel', locale)}</div>
                 </div>
               </div>
 
@@ -138,7 +146,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="stat-card-value">{xp.toLocaleString()}</div>
-                  <div className="stat-card-label">Total XP</div>
+                  <div className="stat-card-label">{s('totalXp', locale)}</div>
                 </div>
               </div>
 
@@ -148,7 +156,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="stat-card-value">{completedLessons.length}</div>
-                  <div className="stat-card-label">Lessons Done</div>
+                  <div className="stat-card-label">{s('lessonsDone', locale)}</div>
                 </div>
               </div>
 
@@ -158,7 +166,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="stat-card-value">{hearts}/{maxHearts}</div>
-                  <div className="stat-card-label">Hearts</div>
+                  <div className="stat-card-label">{s('hearts', locale)}</div>
                 </div>
               </div>
 
@@ -168,7 +176,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="stat-card-value">{gems}</div>
-                  <div className="stat-card-label">Gems</div>
+                  <div className="stat-card-label">{s('gems', locale)}</div>
                 </div>
               </div>
             </div>
@@ -177,7 +185,7 @@ export default function HomePage() {
             <div style={{ marginTop: 32, padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
               <Byte mood={byteMood} size={100} equipment={equipment} />
               <p style={{ fontSize: 13, color: '#888', marginTop: 12 }}>
-                {byteMood === 'celebrating' ? 'Great job!' : byteMood === 'worried' ? 'Keep trying!' : byteMood === 'proud' ? 'On fire!' : 'Ready to learn?'}
+                {byteMood === 'celebrating' ? s('greatJob', locale) : byteMood === 'worried' ? s('keepTrying', locale) : byteMood === 'proud' ? s('onFire', locale) : s('readyToLearn', locale)}
               </p>
             </div>
           </div>

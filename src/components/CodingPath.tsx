@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 import { curriculum } from '@/data/curriculum';
 import { useRouter } from 'next/navigation';
 import {
@@ -28,6 +30,7 @@ const lessonIcons: Record<string, any> = {
 
 export default function CodingPath() {
   const { completedLessons } = useUserStore();
+  const { locale } = useLocaleStore();
   const router = useRouter();
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({ 'python-basics': true });
 
@@ -46,10 +49,10 @@ export default function CodingPath() {
         </div>
         <div>
           <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
-            Coding
+            {s('coding', locale)}
           </h2>
           <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
-            {doneCount} of {allLessons.length} exercises completed
+            {doneCount} / {allLessons.length} {s('exercisesCompleted', locale)}
           </p>
         </div>
       </div>

@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { Exercise } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Check, Loader2, X } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 type Run = 'idle' | 'running' | 'passed' | 'failed';
 
@@ -19,6 +21,7 @@ function evaluate(code: string, testCases: Exercise['testCases']): { ok: boolean
 }
 
 export default function WriteExercise({ exercise, onCorrect, onWrong }: { exercise: Exercise; onCorrect: () => void; onWrong: () => void }) {
+  const { locale } = useLocaleStore();
   const [code, setCode] = useState(exercise.codeSnippet ?? '');
   const [run, setRun] = useState<Run>('idle');
   const [msg, setMsg] = useState('');
@@ -90,9 +93,9 @@ export default function WriteExercise({ exercise, onCorrect, onWrong }: { exerci
         whileTap={run !== 'running' && code.trim() ? { scale: 0.98 } : {}}
         style={{ padding: '14px', borderRadius: 12, background: btnBg, color: btnColor, fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: run === 'running' || !code.trim() ? 'not-allowed' : 'pointer', transition: 'all 0.15s' }}
       >
-        {run === 'running' ? <><Loader2 size={16} className="animate-spin" />Spúšťam...</>
-         : run === 'passed'  ? <><Check size={16} />Hotovo</>
-         : <><Play size={16} />Spustiť</>}
+        {run === 'running' ? <><Loader2 size={16} className="animate-spin" />{s('running', locale)}</>
+         : run === 'passed'  ? <><Check size={16} />{s('done', locale)}</>
+         : <><Play size={16} />{s('runCode', locale)}</>}
       </motion.button>
     </div>
   );

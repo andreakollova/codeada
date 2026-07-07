@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { Exercise } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 export default function FillExercise({ exercise, onCorrect, onWrong }: { exercise: Exercise; onCorrect: () => void; onWrong: () => void }) {
+  const { locale } = useLocaleStore();
   const blanks = exercise.blanks ?? [];
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
@@ -55,7 +58,7 @@ export default function FillExercise({ exercise, onCorrect, onWrong }: { exercis
 
       {blanks.map(blank => (
         <div key={blank.id}>
-          <p style={{ fontSize: 12, color: '#999', marginBottom: 8, fontFamily: 'Syne, sans-serif' }}>Vyber správnu odpoveď:</p>
+          <p style={{ fontSize: 12, color: '#999', marginBottom: 8, fontFamily: 'Syne, sans-serif' }}>{s('selectAnswer', locale)}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {blank.options.map(opt => {
               const sel = selections[blank.id] === opt;
@@ -88,12 +91,12 @@ export default function FillExercise({ exercise, onCorrect, onWrong }: { exercis
               background: allCorrect ? 'rgba(74,222,128,0.06)' : 'rgba(255,80,80,0.05)',
               border: `1px solid ${allCorrect ? 'rgba(74,222,128,0.25)' : 'rgba(255,80,80,0.15)'}` }}>
             <p style={{ fontWeight: 700, fontSize: 13, color: allCorrect ? '#4ade80' : '#ff8080', margin: 0 }}>
-              {allCorrect ? 'Správne' : 'Nie celkom'}
+              {allCorrect ? s('correct', locale) : s('incorrect', locale)}
             </p>
             {!allCorrect && (
               <motion.button onClick={() => { setSelections({}); setChecked(false); }} whileHover={{ scale: 1.01 }}
                 style={{ marginTop: 10, width: '100%', padding: '11px', borderRadius: 10, background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)', color: '#A0A0A0', fontWeight: 700, fontSize: 13 }}>
-                Skúsiť znova
+                {s('tryAgain', locale)}
               </motion.button>
             )}
           </motion.div>
@@ -103,7 +106,7 @@ export default function FillExercise({ exercise, onCorrect, onWrong }: { exercis
       {!checked && (
         <motion.button onClick={check} disabled={!allFilled} whileHover={allFilled ? { scale: 1.01 } : {}} whileTap={allFilled ? { scale: 0.98 } : {}}
           style={{ padding: '14px', borderRadius: 12, background: allFilled ? '#EDEDED' : '#1C1C1C', color: allFilled ? '#0F0F0F' : '#3A3A3A', fontWeight: 700, fontSize: 15, transition: 'all 0.15s', cursor: allFilled ? 'pointer' : 'not-allowed' }}>
-          Skontrolovať
+          {s('check', locale)}
         </motion.button>
       )}
     </div>

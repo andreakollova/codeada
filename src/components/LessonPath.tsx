@@ -41,7 +41,7 @@ export default function LessonPath() {
   }, []);
 
   const toggleModule = (id: string) =>
-    setOpenModules(s => ({ ...s, [id]: !s[id] }));
+    setOpenModules(prev => ({ ...prev, [id]: !prev[id] }));
 
   return (
     <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 0 40px', display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
@@ -229,7 +229,7 @@ export default function LessonPath() {
                         {unit.lessons.map((lesson, li) => {
                           const done = completedLessons.includes(lesson.id);
                           const Icon = lessonIcons[lesson.id] ?? BookOpen;
-                          const totalXp = lesson.exercises.reduce((s, e) => s + e.xp, 0);
+                          const totalXp = lesson.exercises.reduce((acc, e) => acc + e.xp, 0);
 
                           return (
                             <motion.button

@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { Exercise } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 type State = 'idle' | 'correct' | 'wrong';
 
 export default function McqExercise({ exercise, onCorrect, onWrong }: { exercise: Exercise; onCorrect: () => void; onWrong: () => void }) {
+  const { locale } = useLocaleStore();
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<State>('idle');
 
@@ -97,7 +100,7 @@ export default function McqExercise({ exercise, onCorrect, onWrong }: { exercise
             }}
           >
             <p style={{ fontFamily: 'inherit', fontWeight: 700, fontSize: 13, color: state === 'correct' ? '#4ade80' : '#ff8080', marginBottom: exercise.explanation ? 4 : 0 }}>
-              {state === 'correct' ? 'Správne' : 'Nie celkom'}
+              {state === 'correct' ? s('correct', locale) : s('incorrect', locale)}
             </p>
             {exercise.explanation && <p style={{ fontSize: 13, color: '#999', lineHeight: 1.6, margin: 0 }}>{exercise.explanation}</p>}
             {state === 'wrong' && (
@@ -105,7 +108,7 @@ export default function McqExercise({ exercise, onCorrect, onWrong }: { exercise
                 onClick={onCorrect} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                 style={{ marginTop: 12, width: '100%', padding: '11px', borderRadius: 10, background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)', color: '#A0A0A0', fontFamily: 'inherit', fontWeight: 700, fontSize: 13 }}
               >
-                Pokračovať
+                {s('continueBtn', locale)}
               </motion.button>
             )}
           </motion.div>

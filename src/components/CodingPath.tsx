@@ -35,7 +35,7 @@ export default function CodingPath() {
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({ 'python-basics': true });
 
   const toggleModule = (id: string) =>
-    setOpenModules(s => ({ ...s, [id]: !s[id] }));
+    setOpenModules(prev => ({ ...prev, [id]: !prev[id] }));
 
   const allLessons = curriculum.flatMap(m => m.units.flatMap(u => u.lessons));
   const doneCount = allLessons.filter(l => completedLessons.includes(l.id)).length;
@@ -121,7 +121,7 @@ export default function CodingPath() {
                           {unit.lessons.map((lesson, li) => {
                             const done = completedLessons.includes(lesson.id);
                             const Icon = lessonIcons[lesson.id] ?? BookOpen;
-                            const totalXp = lesson.exercises.reduce((s, e) => s + e.xp, 0);
+                            const totalXp = lesson.exercises.reduce((acc, e) => acc + e.xp, 0);
 
                             return (
                               <motion.button

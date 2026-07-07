@@ -12,12 +12,15 @@ import FillExercise from '@/components/exercises/FillExercise';
 import WriteExercise from '@/components/exercises/WriteExercise';
 import Byte from '@/components/Byte';
 import { X, Heart } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const lesson = getLessonById(id);
   const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment } = useUserStore();
+  const { locale } = useLocaleStore();
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [showHeartLost, setShowHeartLost] = useState(false);
@@ -26,7 +29,7 @@ export default function LessonPage() {
 
   if (!lesson) return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#888' }}>Lekcia nenájdená</p>
+      <p style={{ color: '#888' }}>{s('lessonNotFound', locale)}</p>
     </div>
   );
 
@@ -83,7 +86,7 @@ export default function LessonPage() {
           <motion.div initial={{ opacity: 0, y: -16, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20 }}
             style={{ position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 100, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#111', border: '1px solid #2a2a2a', borderRadius: 40, color: '#fff' }}>
             <Heart size={14} fill="#fff" color="#fff" />
-            <span style={{ fontWeight: 700, fontSize: 13 }}>−1 srdce</span>
+            <span style={{ fontWeight: 700, fontSize: 13 }}>{s('minusHeart', locale)}</span>
           </motion.div>
         )}
       </AnimatePresence>

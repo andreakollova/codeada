@@ -25,7 +25,7 @@ const getTabLabel = (id: ItemType | 'all', locale: 'en' | 'sk') => {
 
 const tabIds: (ItemType | 'all')[] = ['all', 'hat', 'glasses', 'accessory', 'antenna', 'aura'];
 
-const rarityOrder = ['mythic', 'legendary', 'epic', 'rare', 'common'] as const;
+const rarityOrder = ['common', 'rare', 'epic', 'legendary', 'mythic'] as const;
 
 export default function WorkshopPage() {
   const { ownedItems, equipment, equip, byteMood } = useUserStore();
@@ -34,9 +34,17 @@ export default function WorkshopPage() {
   const [previewEquipment, setPreviewEquipment] = useState<ByteEquipment | null>(null);
   const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
 
-  const tabItems = activeTab === 'all'
-    ? [...cosmeticItems].sort((a, b) => rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity))
+  const filtered = activeTab === 'all'
+    ? [...cosmeticItems]
     : cosmeticItems.filter(i => i.type === activeTab);
+
+  // Owned items first, then by rarity (common → mythic)
+  const tabItems = filtered.sort((a, b) => {
+    const aOwned = ownedItems.includes(a.id) ? 0 : 1;
+    const bOwned = ownedItems.includes(b.id) ? 0 : 1;
+    if (aOwned !== bOwned) return aOwned - bOwned;
+    return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
+  });
 
   const displayEquipment = previewEquipment || equipment;
 

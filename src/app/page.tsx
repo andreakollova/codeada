@@ -160,7 +160,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="stat-card" title={locale === 'sk' ? 'Životy — stratíš jeden za každú zlú odpoveď.' : 'Hearts — you lose one for each wrong answer.'}>
+              <div className="stat-card" title={locale === 'sk' ? 'Zdravie — rastie keď si aktívny, klesá keď vynecháš deň.' : 'Health — grows when you are active, drops when you miss a day.'}>
                 <div className="stat-card-icon">
                   <Heart size={18} color={hearts > 2 ? '#fff' : '#888'} />
                 </div>

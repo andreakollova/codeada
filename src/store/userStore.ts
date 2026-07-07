@@ -52,10 +52,8 @@ export const useUserStore = create<UserState & UserActions>()(
 
       addXp: (amount) => set((s) => ({ xp: s.xp + amount, weeklyXp: s.weeklyXp + amount })),
 
-      loseHeart: () => set((s) => {
-        const hearts = Math.max(0, s.hearts - 1);
-        return { hearts, byteMood: hearts === 0 ? 'low_battery' : hearts <= 2 ? 'worried' : s.byteMood };
-      }),
+      // Hearts = health indicator based on activity, NOT lost on wrong answers
+      loseHeart: () => {}, // no-op — hearts are not lost on mistakes
 
       gainHeart: () => set((s) => ({ hearts: Math.min(s.hearts + 1, s.maxHearts) })),
 
@@ -90,16 +88,20 @@ export const useUserStore = create<UserState & UserActions>()(
         set((s) => {
           if (s.lastActiveDate === todayStr) return {};
           if (s.lastActiveDate === yStr) {
-            // Active yesterday → increment streak
+            // Active yesterday → increment streak, gain heart
             const streak = s.streak + 1;
-            return { streak, byteBattery: Math.min(100, streak * 15), byteMood: streak >= 7 ? 'proud' : 'happy', lastActiveDate: todayStr };
+            const hearts = Math.min(s.maxHearts, s.hearts + 1);
+            return { streak, hearts, byteBattery: Math.min(100, streak * 15), byteMood: streak >= 7 ? 'proud' : 'happy', lastActiveDate: todayStr };
           }
           if (!s.lastActiveDate) {
-            // First time ever — don't increment yet, just note today
             return { lastActiveDate: todayStr };
           }
-          // Missed days → reset
-          return { streak: 0, byteBattery: 20, byteMood: 'happy', lastActiveDate: todayStr };
+          // Missed days → reset streak, lose hearts based on days missed
+          const lastDate = new Date(s.lastActiveDate);
+          const daysMissed = Math.floor((Date.now() - lastDate.getTime()) / 86400000) - 1;
+          const heartsLost = Math.min(daysMissed, s.hearts);
+          const hearts = Math.max(0, s.hearts - heartsLost);
+          return { streak: 0, hearts, byteBattery: 20, byteMood: hearts === 0 ? 'low_battery' : hearts <= 2 ? 'worried' : 'happy', lastActiveDate: todayStr };
         });
       },
 

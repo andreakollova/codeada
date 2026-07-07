@@ -61,7 +61,10 @@ export const useUserStore = create<UserState & UserActions>()(
         const { completedLessons, ownedItems } = get();
         if (completedLessons.includes(lessonId)) return null;
 
-        const reward = pickReward(completedLessons.length, ownedItems);
+        // Reward every 5th lesson (not every lesson — 50 items for 293 lessons)
+        const newCount = completedLessons.length + 1;
+        const getsReward = newCount % 5 === 0 || newCount === 1 || newCount === 3;
+        const reward = getsReward ? pickReward(newCount, ownedItems) : null;
         const newOwned = reward ? [...ownedItems, reward] : ownedItems;
 
         set((s) => ({

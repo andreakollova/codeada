@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { fetchLesson, fetchQuizForLesson, DbLesson, DbQuizQuestion } from '@/lib/curriculum-api';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore, t, tArray } from '@/store/localeStore';
+import { s } from '@/data/strings';
 import Byte from '@/components/Byte';
 import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check } from 'lucide-react';
 
@@ -51,7 +52,7 @@ export default function TheoryLessonPage() {
     return (
       <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-          <p style={{ color: '#888', fontWeight: 700 }}>Loading...</p>
+          <p style={{ color: '#888', fontWeight: 700 }}>{s('loading', locale)}</p>
         </motion.div>
       </div>
     );
@@ -178,10 +179,10 @@ export default function TheoryLessonPage() {
           style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8, border: 'none', cursor: 'pointer' }}
         >
           {sectionIndex + 1 < sections.length
-            ? (locale === 'sk' ? 'Pokračovať' : 'Continue')
+            ? s('continueBtn', locale)
             : quiz.length > 0
-              ? (locale === 'sk' ? 'Spustiť kvíz' : 'Start Quiz')
-              : (locale === 'sk' ? 'Dokončiť' : 'Finish')}
+              ? s('startQuiz', locale)
+              : s('finish', locale)}
           <ArrowRight size={16} />
         </motion.button>
       </motion.div>
@@ -197,8 +198,8 @@ export default function TheoryLessonPage() {
     let options: { label: string; text: string }[];
     if (q.question_type === 'true_false') {
       options = [
-        { label: 'T', text: locale === 'sk' ? 'Pravda' : 'True' },
-        { label: 'F', text: locale === 'sk' ? 'Nepravda' : 'False' },
+        { label: 'T', text: s('trueLbl', locale) },
+        { label: 'F', text: s('falseLbl', locale) },
       ];
     } else {
       options = q.options
@@ -221,7 +222,7 @@ export default function TheoryLessonPage() {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            {locale === 'sk' ? `Otázka ${quizIndex + 1} z ${quiz.length}` : `Question ${quizIndex + 1} of ${quiz.length}`}
+            {`${s('questionOf', locale)} ${quizIndex + 1} ${s('of', locale)} ${quiz.length}`}
           </span>
         </div>
 
@@ -285,8 +286,8 @@ export default function TheoryLessonPage() {
               }}>
                 <p style={{ fontWeight: 700, fontSize: 13, color: answerState === 'correct' ? '#4ade80' : '#ff8080', margin: 0 }}>
                   {answerState === 'correct'
-                    ? (locale === 'sk' ? 'Správne!' : 'Correct!')
-                    : (locale === 'sk' ? 'Skúste znova' : 'Not quite')}
+                    ? s('correct', locale)
+                    : s('notQuite', locale)}
                 </p>
               </div>
               <motion.button
@@ -296,8 +297,8 @@ export default function TheoryLessonPage() {
                 style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
               >
                 {quizIndex + 1 < quiz.length
-                  ? (locale === 'sk' ? 'Ďalšia otázka' : 'Next Question')
-                  : (locale === 'sk' ? 'Dokončiť' : 'Finish')}
+                  ? s('nextQuestion', locale)
+                  : s('finish', locale)}
                 <ArrowRight size={16} />
               </motion.button>
             </motion.div>
@@ -313,7 +314,7 @@ export default function TheoryLessonPage() {
       <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <Byte mood="celebrating" size={100} equipment={equipment} />
         <h1 style={{ fontWeight: 800, fontSize: 28, color: '#fff', marginTop: 24, textAlign: 'center' }}>
-          {locale === 'sk' ? 'Lekcia dokončená!' : 'Lesson Complete!'}
+          {s('lessonComplete', locale)}
         </h1>
         <p style={{ color: '#888', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
           {t(lesson, 'title', locale)}
@@ -321,11 +322,11 @@ export default function TheoryLessonPage() {
         <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score}/{quiz.length}</p>
-            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{locale === 'sk' ? 'Skóre kvízu' : 'Quiz Score'}</p>
+            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{s('quizScore', locale)}</p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score * 10 + sections.length * 5}</p>
-            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{locale === 'sk' ? 'Získané XP' : 'XP Earned'}</p>
+            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{s('xpEarned', locale)}</p>
           </div>
         </div>
         <motion.button
@@ -334,7 +335,7 @@ export default function TheoryLessonPage() {
           whileTap={{ scale: 0.98 }}
           style={{ marginTop: 32, padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
         >
-          {locale === 'sk' ? 'Späť domov' : 'Back to Home'}
+          {s('backHome', locale)}
         </motion.button>
       </div>
     );

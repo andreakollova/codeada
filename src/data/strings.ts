@@ -122,6 +122,21 @@ const strings = {
   runCode: { en: 'Run', sk: 'Spustiť' },
   running: { en: 'Running...', sk: 'Spúšťam...' },
   done: { en: 'Done', sk: 'Hotovo' },
+
+  // Topics page
+  myProjects: { en: 'My Projects', sk: 'Moje Projekty' },
+  myProjectsDesc: { en: 'Pick topics from real projects you want to master.', sk: 'Vyber témy z reálnych projektov, ktoré chceš ovládať.' },
+  startLessons: { en: 'Start lessons', sk: 'Začať lekcie' },
+  topics: { en: 'topics', sk: 'tém' },
+  selectOneTopic: { en: 'Select at least one topic to start learning.', sk: 'Vyber aspoň jednu tému a začni sa učiť z praxe.' },
+
+  // Glossary
+  glossarySubtitle: { en: 'Abbreviations, concepts and tools — explained simply.', sk: 'Skratky, koncepty a nástroje — vysvetlené jednoducho.' },
+
+  // Write exercise
+  testsPassed: { en: 'Tests passed', sk: 'Testy prešli' },
+  testFailed: { en: 'Test failed', sk: 'Test neprešiel' },
+  codeShouldContain: { en: 'Code should contain', sk: 'Kód by mal obsahovať' },
 } as const;
 
 export type StringKey = keyof typeof strings;

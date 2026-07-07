@@ -39,7 +39,7 @@ export default function GlossaryPage() {
             {s('glossary', locale)}
           </h1>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>
-            {locale === 'sk' ? 'Skratky, symboly, koncepty a nástroje — vysvetlené po ľudsky.' : 'Abbreviations, symbols, concepts and tools — explained simply.'}
+            {s('glossarySubtitle', locale)}
           </p>
         </motion.div>
 

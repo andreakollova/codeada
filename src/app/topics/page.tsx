@@ -7,6 +7,8 @@ import BottomNav from '@/components/BottomNav';
 import StatusBar from '@/components/StatusBar';
 import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
+import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 
 const iconMap: Record<string, string> = {
   smartphone: '📱',
@@ -28,6 +30,7 @@ const iconMap: Record<string, string> = {
 export default function TopicsPage() {
   const { selectedTopics, toggleTopic, completedLessons } = useUserStore();
   const router = useRouter();
+  const { locale } = useLocaleStore();
 
   return (
     <div style={{ minHeight: '100vh', background: '#0F0F0F', paddingBottom: 80 }}>
@@ -36,10 +39,10 @@ export default function TopicsPage() {
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '24px 20px' }}>
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <h1 style={{ fontWeight: 800, fontSize: 22, color: '#EDEDED', marginBottom: 6 }}>
-            Moje Projekty
+            {s('myProjects', locale)}
           </h1>
           <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6, marginBottom: 24 }}>
-            Vyber témy z reálnych projektov, ktoré chceš ovládať. Dostaneš lekcie priamo z praxe.
+            {s('myProjectsDesc', locale)}
           </p>
         </motion.div>
 
@@ -90,7 +93,7 @@ export default function TopicsPage() {
                 </div>
 
                 <div style={{ fontSize: 10, color: '#888', fontFamily: 'Syne, sans-serif' }}>
-                  {topic.lessons.length} lekcií · {total} cvičení
+                  {topic.lessons.length} {s('lessons', locale)} · {total} {s('exercises', locale)}
                 </div>
               </motion.button>
             );
@@ -112,14 +115,14 @@ export default function TopicsPage() {
                 cursor: 'pointer',
               }}
             >
-              Začať lekcie ({selectedTopics.length} tém)
+              {s('startLessons', locale)} ({selectedTopics.length} {s('topics', locale)})
             </button>
           </motion.div>
         )}
 
         {selectedTopics.length === 0 && (
           <p style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 24 }}>
-            Vyber aspoň jednu tému a začni sa učiť z praxe.
+            {s('selectOneTopic', locale)}
           </p>
         )}
       </div>

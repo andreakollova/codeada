@@ -9,12 +9,12 @@ import { s } from '@/data/strings';
 
 type Run = 'idle' | 'running' | 'passed' | 'failed';
 
-function evaluate(code: string, testCases: Exercise['testCases']): { ok: boolean; msg?: string } {
+function evaluate(code: string, testCases: Exercise['testCases']): { ok: boolean; needle?: string } {
   if (!testCases?.length) return { ok: true };
   for (const tc of testCases) {
     if (tc.expected.startsWith('contains:')) {
       const needle = tc.expected.replace('contains:', '').trim();
-      if (!code.includes(needle)) return { ok: false, msg: `Kód by mal obsahovať: ${needle}` };
+      if (!code.includes(needle)) return { ok: false, needle };
     }
   }
   return { ok: true };
@@ -32,8 +32,8 @@ export default function WriteExercise({ exercise, onCorrect, onWrong }: { exerci
     setRun('running'); setMsg('');
     await new Promise(r => setTimeout(r, 700));
     const res = evaluate(code, exercise.testCases);
-    if (res.ok) { setRun('passed'); setMsg('Testy prešli'); setTimeout(onCorrect, 1200); }
-    else { setRun('failed'); setMsg(res.msg ?? 'Test neprešiel'); onWrong(); }
+    if (res.ok) { setRun('passed'); setMsg(s('testsPassed', locale)); setTimeout(onCorrect, 1200); }
+    else { setRun('failed'); setMsg(res.needle ? `${s('codeShouldContain', locale)}: ${res.needle}` : s('testFailed', locale)); onWrong(); }
   };
 
   const handleTab = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

@@ -165,7 +165,6 @@ export default function GlossaryPage() {
         )}
       </div>
 
-      <BottomNav />
     </div>
   );
 }

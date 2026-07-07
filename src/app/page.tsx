@@ -80,7 +80,6 @@ export default function HomePage() {
   return (
     <div className="page-shell">
       <NameModal />
-      <BottomNav />
 
       <div className="dashboard">
         <StatusBar />

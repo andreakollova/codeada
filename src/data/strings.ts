@@ -137,6 +137,21 @@ const strings = {
   testsPassed: { en: 'Tests passed', sk: 'Testy prešli' },
   testFailed: { en: 'Test failed', sk: 'Test neprešiel' },
   codeShouldContain: { en: 'Code should contain', sk: 'Kód by mal obsahovať' },
+
+  // Workshop status badges
+  equippedBadge: { en: 'EQUIPPED', sk: 'NASADENÉ' },
+  lockedBadge: { en: 'LOCKED', sk: 'ZAMKNUTÉ' },
+
+  // Tooltips
+  switchLang: { en: 'Switch to Slovak', sk: 'Prepnúť na angličtinu' },
+  streakTooltip: { en: 'Number of consecutive days you studied.', sk: 'Počet dní za sebou, kedy si sa učil.' },
+  xpTooltip: { en: 'Experience points earned from lessons and exercises.', sk: 'Skúsenostné body za dokončené lekcie a cvičenia.' },
+  lessonsTooltip: { en: 'Number of completed lessons.', sk: 'Počet dokončených lekcií.' },
+  heartsTooltip: { en: 'Health — grows when you are active, drops when you miss a day.', sk: 'Zdravie — rastie keď si aktívny, klesá keď vynecháš deň.' },
+  gemsTooltip: { en: 'Gems — virtual currency for rewards and purchases.', sk: 'Gemy — virtuálna mena za odmeny a nákupy.' },
+
+  // Reward
+  newWardrobeItem: { en: 'New wardrobe item!', sk: 'Nová vec do šatníka!' },
 } as const;
 
 export type StringKey = keyof typeof strings;

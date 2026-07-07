@@ -2,6 +2,7 @@
 
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
+import { s } from '@/data/strings';
 import { Flame, Zap, Heart, Wrench, Globe } from 'lucide-react';
 import Link from 'next/link';
 
@@ -54,7 +55,7 @@ export default function StatusBar() {
               cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#aaa',
               letterSpacing: '0.02em',
             }}
-            title={locale === 'en' ? 'Switch to Slovak' : 'Prepnúť na angličtinu'}
+            title={s('switchLang', locale)}
           >
             {locale === 'en' ? 'EN' : 'SK'}
           </button>

@@ -310,12 +310,12 @@ export default function WorkshopPage() {
                   {/* Status badge */}
                   {equipped ? (
                     <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(0,0,0,0.5)', background: '#ddd', padding: '2px 8px', borderRadius: 20 }}>
-                      EQUIPPED
+                      {s('equippedBadge', locale)}
                     </div>
                   ) : !owned ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#555', fontWeight: 600 }}>
                       <Lock size={9} />
-                      LOCKED
+                      {s('lockedBadge', locale)}
                     </div>
                   ) : null}
                 </motion.button>

@@ -341,7 +341,7 @@ export default function TheoryLessonPage() {
             style={{ marginTop: 24, padding: '16px 32px', borderRadius: 14, background: '#1a1a1a', border: '1px solid #333', textAlign: 'center' }}
           >
             <p style={{ fontSize: 12, color: '#888', margin: '0 0 4px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              {locale === 'sk' ? 'Nová vec do šatníka!' : 'New wardrobe item!'}
+              {s('newWardrobeItem', locale)}
             </p>
             <p style={{ fontSize: 16, color: '#fff', fontWeight: 700, margin: 0 }}>
               {cosmeticItems.find(c => c.id === reward)?.name || reward}

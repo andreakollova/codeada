@@ -130,7 +130,7 @@ export default function HomePage() {
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div className="stat-card" title={locale === 'sk' ? 'Počet dní za sebou, kedy si sa učil.' : 'Number of consecutive days you studied.'}>
+              <div className="stat-card" title={s('streakTooltip', locale)}>
                 <div className="stat-card-icon">
                   <Flame size={18} color={streak > 0 ? '#fff' : '#555'} />
                 </div>
@@ -140,7 +140,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="stat-card" title={locale === 'sk' ? 'Skúsenostné body za dokončené lekcie a cvičenia.' : 'Experience points earned from lessons and exercises.'}>
+              <div className="stat-card" title={s('xpTooltip', locale)}>
                 <div className="stat-card-icon">
                   <Zap size={18} color="#fff" />
                 </div>
@@ -150,7 +150,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="stat-card" title={locale === 'sk' ? 'Počet dokončených lekcií.' : 'Number of completed lessons.'}>
+              <div className="stat-card" title={s('lessonsTooltip', locale)}>
                 <div className="stat-card-icon">
                   <BookOpen size={18} color="#fff" />
                 </div>
@@ -160,7 +160,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="stat-card" title={locale === 'sk' ? 'Zdravie — rastie keď si aktívny, klesá keď vynecháš deň.' : 'Health — grows when you are active, drops when you miss a day.'}>
+              <div className="stat-card" title={s('heartsTooltip', locale)}>
                 <div className="stat-card-icon">
                   <Heart size={18} color={hearts > 2 ? '#fff' : '#888'} />
                 </div>
@@ -170,7 +170,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="stat-card" title={locale === 'sk' ? 'Gemy — virtuálna mena za odmeny a nákupy.' : 'Gems — virtual currency for rewards and purchases.'}>
+              <div className="stat-card" title={s('gemsTooltip', locale)}>
                 <div className="stat-card-icon">
                   <Trophy size={18} color="#fff" />
                 </div>

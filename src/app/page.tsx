@@ -18,7 +18,7 @@ const greetings = (name: string, streak: number) => {
   return `Hey ${name}. ${streak} day streak — impressive.`;
 };
 
-const COUNTDOWN_ENABLED = true;
+const COUNTDOWN_ENABLED = false;
 const COUNTDOWN_TARGET = new Date('2026-07-08T09:00:00+02:00'); // 48h from now
 
 function CountdownOverlay() {

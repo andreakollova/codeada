@@ -22,9 +22,9 @@ export default function BottomNav() {
     <>
       {/* Desktop sidebar */}
       <nav className="desktop-nav">
-        <div className="desktop-nav-logo">
+        <Link href="/" className="desktop-nav-logo" style={{ textDecoration: 'none' }}>
           <img src="/logocoduy.png" alt="Coduy" style={{ height: 24, opacity: 0.9 }} />
-        </div>
+        </Link>
         <div className="desktop-nav-links">
           {tabDefs.map(({ href, labelKey, Icon }) => {
             const active = href === '/' ? pathname === '/' : pathname.startsWith(href);

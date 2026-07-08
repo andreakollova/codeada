@@ -65,7 +65,7 @@ export default function ReelsPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#000', padding: '20px 16px 80px' }}>
+    <div className="page-shell" style={{ minHeight: '100vh', background: '#000', padding: '20px 16px 80px' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28, maxWidth: 520, margin: '0 auto 28px' }}>
         <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: 4 }}>

@@ -33,7 +33,7 @@ export default function TopicsPage() {
   const { locale } = useLocaleStore();
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0F0F0F', paddingBottom: 80 }}>
+    <div className="page-shell" style={{ minHeight: '100vh', background: '#0F0F0F', paddingBottom: 80 }}>
       <StatusBar />
 
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '24px 20px' }}>

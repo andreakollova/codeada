@@ -29,7 +29,7 @@ export default function GlossaryPage() {
   }, [query, filter]);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0F0F0F', paddingBottom: 80 }}>
+    <div className="page-shell" style={{ minHeight: '100vh', background: '#0F0F0F', paddingBottom: 80 }}>
       <StatusBar />
 
       {/* Header */}

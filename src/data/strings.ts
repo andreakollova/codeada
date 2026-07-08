@@ -108,7 +108,7 @@ const strings = {
 
   // NameModal
   heyImByte: { en: "Hi, I'm Coduy", sk: 'Čauko, ja som Coduy' },
-  illTeachYou: { en: "I'm the small cute little code guy. I'll teach you how to code. But first — what's your name?", sk: 'Som malý, milý sprievodca svetom programovania. Naučím ťa programovať. Ale najprv — ako sa voláš?' },
+  illTeachYou: { en: "I'm the small cute little code guy. I'll teach you how to code. But first — what's your name?", sk: 'Som malý, milý sprievodca svetom kódu. Naučím ťa programovať. Ale najprv — ako sa voláš?' },
   yourName: { en: 'Your name...', sk: 'Tvoje meno...' },
   letsGo: { en: "Let's go", sk: 'Poďme' },
 

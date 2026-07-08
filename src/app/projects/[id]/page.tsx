@@ -76,6 +76,22 @@ export default function ProjectWorkspace() {
   const { locale } = useLocaleStore();
   const { addXp } = useUserStore();
 
+  // Hide nav on workspace — fullscreen experience
+  useEffect(() => {
+    document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => {
+      (el as HTMLElement).style.display = 'none';
+    });
+    // Also remove the margin/padding the nav adds
+    const dashboard = document.querySelector('.dashboard') as HTMLElement;
+    if (dashboard) dashboard.style.marginLeft = '0';
+    return () => {
+      document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => {
+        (el as HTMLElement).style.display = '';
+      });
+      if (dashboard) dashboard.style.marginLeft = '';
+    };
+  }, []);
+
   const found = getProjectLesson(id);
   const topic = found?.topic;
   const lesson = found?.lesson;
@@ -154,7 +170,7 @@ export default function ProjectWorkspace() {
     return (
       <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex' }}>
         {/* Left: intro text */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '40px 60px', maxWidth: 600 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '30px 40px', maxWidth: 560, overflow: 'auto' }}>
           <Link href="/topics" style={{ color: '#555', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
             <ArrowLeft size={16} /> {locale === 'sk' ? 'Späť' : 'Back'}
           </Link>

@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocaleStore } from '@/store/localeStore';
 import { useUserStore } from '@/store/userStore';
 import { getProjectLesson, ProjectStep } from '@/data/projects';
-import Editor from '@monaco-editor/react';
+import dynamic from 'next/dynamic';
+const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 import {
   Play, RotateCcw, ChevronRight, Check, X, Lightbulb, Eye, Code2, ArrowLeft, Sparkles,
 } from 'lucide-react';

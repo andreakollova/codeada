@@ -61,9 +61,12 @@ export default function TheoryLessonPage() {
 
   // Build list of sections that have content
   const sections = THEORY_SECTIONS.filter(sec => {
-    const val = lesson[sec.key];
-    if (Array.isArray(val)) return val.length > 0;
-    return val && String(val).trim().length > 0;
+    try {
+      const val = lesson[sec.key as keyof typeof lesson];
+      if (val == null) return false;
+      if (Array.isArray(val)) return val.length > 0;
+      return String(val).trim().length > 0;
+    } catch { return false; }
   });
 
   const totalSteps = sections.length + quiz.length;

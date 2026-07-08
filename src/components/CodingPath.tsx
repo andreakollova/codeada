@@ -124,7 +124,8 @@ export default function CodingPath() {
 
   if (dbModules.length === 0) return null;
 
-  const activePath = PATHS.find(p => p.id === selectedPath);
+  const isAllMode = selectedPath === 'all';
+  const activePath = isAllMode ? null : PATHS.find(p => p.id === selectedPath);
   const activeModuleNumbers = activePath ? activePath.modules : ALL_CODING_MODULES;
 
   const filteredGroups = SYLLABUS.map(group => ({
@@ -209,7 +210,7 @@ export default function CodingPath() {
 
         {/* Browse all */}
         <motion.button
-          onClick={() => selectPath('master')}
+          onClick={() => selectPath('all')}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
           style={{
@@ -235,7 +236,7 @@ export default function CodingPath() {
         </div>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
-            {activePath ? `${activePath.emoji} ${locale === 'sk' ? activePath.titleSk : activePath.titleEn}` : s('coding', locale)}
+            {activePath ? `${activePath.emoji} ${locale === 'sk' ? activePath.titleSk : activePath.titleEn}` : (isAllMode ? (locale === 'sk' ? 'Všetky moduly' : 'All modules') : s('coding', locale))}
           </h2>
           <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
             {doneCount} / {allLessons.length} {s('lessonsCompleted', locale)}

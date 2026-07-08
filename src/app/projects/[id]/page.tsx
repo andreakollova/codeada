@@ -5,132 +5,117 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocaleStore } from '@/store/localeStore';
 import { useUserStore } from '@/store/userStore';
-import { projects, ProjectLesson, ProjectStep } from '@/data/projects';
+import { getProjectLesson, ProjectStep } from '@/data/projects';
 import Editor from '@monaco-editor/react';
 import {
-  Play, RotateCcw, ChevronRight, ChevronLeft, Check, X, Lightbulb,
-  Eye, Code2, BookOpen, Sparkles, ArrowLeft,
+  Play, RotateCcw, ChevronRight, Check, X, Lightbulb, Eye, Code2, ArrowLeft, Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Phone preview frame
-function PhonePreview({ html, highlight }: { html: string; highlight: boolean }) {
+// === PHONE PREVIEW ===
+function PhonePreview({ elements, highlight }: { elements: string[]; highlight: string | null }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: 20 }}>
+    <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
       <div style={{
-        width: 280, height: 560, borderRadius: 36, overflow: 'hidden',
+        width: 290, minHeight: 580, borderRadius: 40, overflow: 'hidden',
         border: '3px solid #333', background: '#000', position: 'relative',
-        boxShadow: highlight ? '0 0 30px rgba(74, 222, 128, 0.3)' : 'none',
-        transition: 'box-shadow 0.5s',
+        boxShadow: highlight ? '0 0 40px rgba(74, 222, 128, 0.2)' : 'none',
+        transition: 'box-shadow 0.6s',
       }}>
         {/* Notch */}
-        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 120, height: 28, background: '#000', borderRadius: '0 0 16px 16px', zIndex: 10 }} />
-        <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// Terminal preview
-function TerminalPreview({ output }: { output: string }) {
-  return (
-    <div style={{ padding: 20 }}>
-      <div style={{ background: '#111', borderRadius: 12, border: '1px solid #222', overflow: 'hidden' }}>
-        <div style={{ padding: '8px 14px', background: '#1a1a1a', display: 'flex', gap: 6 }}>
-          <div style={{ width: 10, height: 10, borderRadius: 5, background: '#ff5f57' }} />
-          <div style={{ width: 10, height: 10, borderRadius: 5, background: '#febc2e' }} />
-          <div style={{ width: 10, height: 10, borderRadius: 5, background: '#28c840' }} />
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 100, height: 26, background: '#000', borderRadius: '0 0 14px 14px', zIndex: 10 }} />
+        {/* Screen content */}
+        <div style={{ padding: '60px 20px 30px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {elements.map((el, i) => {
+            const isNew = el === highlight;
+            return (
+              <motion.div
+                key={`${el}-${i}`}
+                initial={isNew ? { opacity: 0, x: -20 } : false}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: isNew ? 0.1 : 0 }}
+                style={isNew ? { borderRadius: 8, boxShadow: '0 0 20px rgba(74, 222, 128, 0.15)' } : {}}
+              >
+                {renderPreviewElement(el, isNew)}
+              </motion.div>
+            );
+          })}
         </div>
-        <pre style={{ padding: 16, margin: 0, fontSize: 13, color: '#4ade80', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-          {output || '$ waiting for code...'}
-        </pre>
       </div>
     </div>
   );
 }
 
-// Database preview
-function DatabasePreview({ data }: { data: any[] }) {
-  if (!data.length) return <TerminalPreview output="No data yet. Write a query to see results." />;
-  const keys = Object.keys(data[0]);
-  return (
-    <div style={{ padding: 20, overflow: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>
-        <thead>
-          <tr>{keys.map(k => <th key={k} style={{ padding: '8px 12px', borderBottom: '1px solid #333', color: '#888', textAlign: 'left', fontWeight: 600 }}>{k}</th>)}</tr>
-        </thead>
-        <tbody>
-          {data.map((row, i) => (
-            <tr key={i}>{keys.map(k => <td key={k} style={{ padding: '8px 12px', borderBottom: '1px solid #1a1a1a', color: '#ccc' }}>{String(row[k])}</td>)}</tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// Generate preview HTML from React Native code
-function generatePreview(code: string, step: ProjectStep): string {
-  if (step.previewType === 'react-native') {
-    // Parse the code to generate a visual preview
-    const hasTitle = code.includes('<Text') && code.includes('style');
-    const hasInput = code.includes('<TextInput');
-    const hasPassword = code.includes('secureTextEntry');
-    const hasButton = code.includes('TouchableOpacity');
-    const titleMatch = code.match(/<Text[^>]*>([^<]*)<\/Text>/);
-    const titleText = titleMatch?.[1] || '';
-
-    return `<div style="display:flex;flex-direction:column;justify-content:center;height:100%;background:#0A0A0A;padding:24px;font-family:-apple-system,sans-serif;">
-      ${hasTitle ? `<div style="font-size:28px;font-weight:700;color:#fff;margin-bottom:28px;animation:fadeIn 0.3s">${titleText}</div>` : ''}
-      ${hasInput ? `<div style="background:#1a1a1a;border-radius:12px;padding:14px;margin-bottom:10px;color:#666;font-size:14px;border:1px solid #333;animation:slideIn 0.4s">Email</div>` : ''}
-      ${hasPassword ? `<div style="background:#1a1a1a;border-radius:12px;padding:14px;margin-bottom:10px;color:#666;font-size:14px;border:1px solid #333;animation:slideIn 0.5s">••••••••</div>` : ''}
-      ${hasButton ? `<div style="background:#fff;border-radius:12px;padding:14px;text-align:center;font-size:15px;font-weight:700;color:#000;margin-top:6px;animation:slideIn 0.6s;cursor:pointer">Sign In</div>` : ''}
-      <style>
-        @keyframes fadeIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes slideIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
-      </style>
-    </div>`;
+function renderPreviewElement(el: string, isNew: boolean) {
+  const glow = isNew ? { outline: '2px solid rgba(74, 222, 128, 0.4)', outlineOffset: 2 } : {};
+  switch (el) {
+    case 'title':
+      return <div style={{ fontSize: 24, fontWeight: 700, color: '#fff', marginBottom: 16, ...glow, borderRadius: 4, padding: 2 }}>Welcome Back 👋</div>;
+    case 'input-empty':
+      return <div style={{ background: '#1a1a1a', borderRadius: 10, padding: 13, color: '#444', fontSize: 13, border: '1px solid #333', ...glow }}>...</div>;
+    case 'input-email':
+      return <div style={{ background: '#1a1a1a', borderRadius: 10, padding: 13, color: '#666', fontSize: 13, border: '1px solid #333', ...glow }}>Email</div>;
+    case 'input-password':
+      return <div style={{ background: '#1a1a1a', borderRadius: 10, padding: 13, color: '#666', fontSize: 13, border: '1px solid #333', ...glow }}>Password</div>;
+    case 'button-login':
+      return <div style={{ background: '#fff', borderRadius: 10, padding: 13, textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#000', marginTop: 4, ...glow }}>Login</div>;
+    case 'forgot-password':
+      return <div style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 6, ...glow, borderRadius: 4, padding: 2 }}>Forgot Password?</div>;
+    case 'button-google':
+      return <div style={{ background: '#1a1a1a', borderRadius: 10, padding: 13, textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#ccc', border: '1px solid #333', marginTop: 4, ...glow }}>Continue with Google</div>;
+    default:
+      return null;
   }
-  return '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:14px">Preview</div>';
 }
 
+// === MAIN WORKSPACE ===
 export default function ProjectWorkspace() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { locale } = useLocaleStore();
   const { addXp } = useUserStore();
 
-  // Find project and first lesson
-  const topic = projects.find(p => p.lessons.some(l => l.id === id));
-  const lesson = topic?.lessons.find(l => l.id === id);
+  const found = getProjectLesson(id);
+  const topic = found?.topic;
+  const lesson = found?.lesson;
 
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(-1); // -1 = intro
   const [code, setCode] = useState('');
   const [feedback, setFeedback] = useState<'idle' | 'correct' | 'wrong'>('idle');
-  const [showHint, setShowHint] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [previewHighlight, setPreviewHighlight] = useState(false);
+  const [lastHighlight, setLastHighlight] = useState<string | null>(null);
 
-  const step = lesson?.steps[stepIndex];
+  const step = lesson && stepIndex >= 0 ? lesson.steps[stepIndex] : null;
+
+  // Build preview elements from completed steps
+  const previewElements: string[] = [];
+  if (lesson) {
+    for (let i = 0; i < lesson.steps.length; i++) {
+      if (completedSteps.has(i) && lesson.steps[i].previewAddition) {
+        previewElements.push(lesson.steps[i].previewAddition);
+      }
+    }
+  }
 
   useEffect(() => {
-    if (step) setCode(step.starterCode);
-    setFeedback('idle');
-    setShowHint(false);
-  }, [stepIndex, step?.id]);
+    if (step) {
+      setCode(step.starterCode);
+      setFeedback('idle');
+      setHintLevel(0);
+    }
+  }, [stepIndex]);
 
   const handleRun = useCallback(() => {
     if (!step) return;
     try {
-      const isCorrect = new Function('code', `return ${step.testFn}`)(code);
+      const isCorrect = new Function('code', `return ${step.validateFn}`)(code);
       if (isCorrect) {
         setFeedback('correct');
         setCompletedSteps(prev => new Set([...prev, stepIndex]));
-        setPreviewHighlight(true);
+        if (step.previewAddition) setLastHighlight(step.previewAddition);
         addXp(10);
-        setTimeout(() => setPreviewHighlight(false), 2000);
+        setTimeout(() => setLastHighlight(null), 2500);
       } else {
         setFeedback('wrong');
       }
@@ -148,206 +133,250 @@ export default function ProjectWorkspace() {
   const handleReset = () => {
     if (step) setCode(step.starterCode);
     setFeedback('idle');
+    setHintLevel(0);
   };
 
-  if (!lesson || !step || !topic) {
+  const showHint = () => {
+    const hints = locale === 'sk' ? step?.errorHintsSk : step?.errorHints;
+    if (hints && hintLevel < hints.length) setHintLevel(hintLevel + 1);
+  };
+
+  if (!lesson || !topic) {
+    return <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>Lesson not found</div>;
+  }
+
+  const progress = lesson.steps.length > 0 ? (completedSteps.size / lesson.steps.length) * 100 : 0;
+  const isComplete = completedSteps.size === lesson.steps.length;
+
+  // === INTRO SCREEN ===
+  if (stepIndex === -1) {
     return (
-      <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-        Lesson not found
+      <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex' }}>
+        {/* Left: intro text */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '40px 60px', maxWidth: 600 }}>
+          <Link href="/topics" style={{ color: '#555', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+            <ArrowLeft size={16} /> {locale === 'sk' ? 'Späť' : 'Back'}
+          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+            <span style={{ fontSize: 28 }}>{lesson.icon}</span>
+            <span style={{ fontSize: 12, color: '#888', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {locale === 'sk' ? topic.titleSk : topic.title}
+            </span>
+          </div>
+          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 8, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
+            {locale === 'sk' ? lesson.titleSk : lesson.title}
+          </h1>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+            <span style={{ fontSize: 12, color: '#888', background: '#111', padding: '4px 10px', borderRadius: 6 }}>⏱ {lesson.duration}</span>
+            <span style={{ fontSize: 12, color: '#888', background: '#111', padding: '4px 10px', borderRadius: 6 }}>🟢 {locale === 'sk' ? lesson.levelSk : lesson.level}</span>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 8 }}>🎯 {locale === 'sk' ? 'Cieľ' : 'Goal'}</h3>
+            <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.7 }}>{locale === 'sk' ? lesson.goalSk : lesson.goal}</p>
+          </div>
+
+          <div style={{ background: '#111', borderRadius: 12, padding: 16, marginBottom: 32, border: '1px solid #1a1a1a' }}>
+            <p style={{ fontSize: 13, color: '#888', lineHeight: 1.8, margin: 0 }}>{locale === 'sk' ? lesson.preIntroSk : lesson.preIntro}</p>
+          </div>
+
+          <motion.button
+            onClick={() => setStepIndex(0)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{ padding: '16px 32px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 800, fontSize: 16, border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}
+          >
+            {locale === 'sk' ? 'Začať programovať' : 'Start coding'} →
+          </motion.button>
+        </div>
+
+        {/* Right: final preview */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050505' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: 12, color: '#555', marginBottom: 16, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {locale === 'sk' ? 'Čo dnes vytvoríš' : 'What you\'ll build today'}
+            </p>
+            <PhonePreview
+              elements={['title', 'input-email', 'input-password', 'button-login', 'forgot-password', 'button-google']}
+              highlight={null}
+            />
+          </div>
+        </div>
       </div>
     );
   }
 
-  const progress = ((completedSteps.size) / lesson.steps.length) * 100;
-  const previewHtml = generatePreview(feedback === 'correct' ? code : (stepIndex > 0 ? lesson.steps[stepIndex - 1]?.solution || '' : ''), step);
+  // === WORKSPACE ===
+  const hints = locale === 'sk' ? step?.errorHintsSk : step?.errorHints;
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#0A0A0A' }}>
       {/* Top bar */}
-      <div style={{
-        height: 48, borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12,
-        background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(10px)',
-      }}>
-        <Link href="/topics" style={{ display: 'flex', alignItems: 'center', color: '#555' }}>
-          <ArrowLeft size={18} />
-        </Link>
-        <span style={{ fontSize: 13, color: '#888', fontWeight: 600 }}>{topic.icon} {locale === 'sk' ? topic.titleSk : topic.title}</span>
-        <span style={{ color: '#333' }}>·</span>
-        <span style={{ fontSize: 13, color: '#ccc', fontWeight: 600 }}>{locale === 'sk' ? lesson.titleSk : lesson.title}</span>
+      <div style={{ height: 44, borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12 }}>
+        <Link href="/topics" style={{ display: 'flex', alignItems: 'center', color: '#555' }}><ArrowLeft size={16} /></Link>
+        <span style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>{topic.icon} {locale === 'sk' ? lesson.titleSk : lesson.title}</span>
         <div style={{ flex: 1 }} />
-        {/* Progress */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: 200 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: 180 }}>
           <div style={{ flex: 1, height: 3, borderRadius: 2, background: '#1a1a1a', overflow: 'hidden' }}>
             <motion.div animate={{ width: `${progress}%` }} style={{ height: '100%', background: '#4ade80', borderRadius: 2 }} />
           </div>
-          <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>{completedSteps.size}/{lesson.steps.length}</span>
+          <span style={{ fontSize: 10, color: '#555', fontWeight: 600 }}>{completedSteps.size}/{lesson.steps.length}</span>
         </div>
       </div>
 
-      {/* 3-panel workspace */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* LEFT: Lesson guide */}
-        <div style={{ width: '28%', borderRight: '1px solid #1a1a1a', overflow: 'auto', padding: 24 }}>
-          {/* Step indicator */}
-          <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
+        {/* LEFT: Guide */}
+        <div style={{ width: '26%', borderRight: '1px solid #1a1a1a', overflow: 'auto', padding: '20px 20px' }}>
+          {/* Step dots */}
+          <div style={{ display: 'flex', gap: 3, marginBottom: 20 }}>
             {lesson.steps.map((_, i) => (
-              <div key={i} style={{
-                flex: 1, height: 3, borderRadius: 2,
+              <div key={i} onClick={() => completedSteps.has(i) || i <= stepIndex ? setStepIndex(i) : null} style={{
+                flex: 1, height: 3, borderRadius: 2, cursor: completedSteps.has(i) ? 'pointer' : 'default',
                 background: completedSteps.has(i) ? '#4ade80' : i === stepIndex ? '#fff' : '#222',
-                cursor: 'pointer',
-              }} onClick={() => setStepIndex(i)} />
+              }} />
             ))}
           </div>
 
-          {/* Step title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          {/* Step number + title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <div style={{
-              width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 24, height: 24, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: completedSteps.has(stepIndex) ? '#4ade80' : '#222',
-              fontSize: 12, fontWeight: 700, color: completedSteps.has(stepIndex) ? '#000' : '#888',
+              fontSize: 11, fontWeight: 700, color: completedSteps.has(stepIndex) ? '#000' : '#888',
             }}>
-              {completedSteps.has(stepIndex) ? <Check size={14} /> : stepIndex + 1}
+              {completedSteps.has(stepIndex) ? <Check size={12} /> : stepIndex + 1}
             </div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', margin: 0 }}>
-              {locale === 'sk' ? step.titleSk : step.title}
-            </h2>
+            <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>
+              {locale === 'sk' ? 'Krok' : 'Step'} {stepIndex + 1} / {lesson.steps.length}
+            </span>
           </div>
 
-          {/* Explanation */}
-          <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.7, marginBottom: 20 }}>
-            {locale === 'sk' ? step.explanationSk : step.explanation}
-          </p>
+          {step && (
+            <>
+              {/* Instruction */}
+              <p style={{ fontSize: 15, color: '#eee', lineHeight: 1.6, marginBottom: 12, fontWeight: 500 }}>
+                {locale === 'sk' ? step.instructionSk : step.instruction}
+              </p>
 
-          {/* Goal */}
-          <div style={{ background: '#111', borderRadius: 10, padding: 14, marginBottom: 16, border: '1px solid #1a1a1a' }}>
-            <div style={{ fontSize: 11, color: '#888', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
-              {locale === 'sk' ? 'Cieľ' : 'Goal'}
-            </div>
-            <p style={{ fontSize: 13, color: '#ccc', margin: 0, lineHeight: 1.5 }}>
-              {locale === 'sk' ? lesson.goalSk : lesson.goal}
-            </p>
-          </div>
+              {/* Context (if any) */}
+              {(step.context || step.contextSk) && (
+                <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 16, fontStyle: 'italic' }}>
+                  {locale === 'sk' ? step.contextSk : step.context}
+                </p>
+              )}
 
-          {/* Hint */}
-          {(step.hint || step.hintSk) && (
-            <button
-              onClick={() => setShowHint(!showHint)}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#f59e0b', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 12 }}
-            >
-              <Lightbulb size={14} />
-              {showHint ? (locale === 'sk' ? step.hintSk : step.hint) : (locale === 'sk' ? 'Ukáž hint' : 'Show hint')}
-            </button>
+              {/* Hints (progressive) */}
+              {feedback === 'wrong' && hints && (
+                <div style={{ marginBottom: 16 }}>
+                  {Array.from({ length: hintLevel }, (_, i) => (
+                    <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                      style={{ background: '#1a1200', border: '1px solid #422006', borderRadius: 8, padding: 10, marginBottom: 6 }}>
+                      <div style={{ fontSize: 10, color: '#f59e0b', fontWeight: 600, marginBottom: 3 }}>💡 Hint {i + 1}</div>
+                      <pre style={{ fontSize: 12, color: '#fbbf24', margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'JetBrains Mono, monospace' }}>
+                        {hints[i]}
+                      </pre>
+                    </motion.div>
+                  ))}
+                  {hintLevel < hints.length && (
+                    <button onClick={showHint} style={{ fontSize: 11, color: '#f59e0b', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Lightbulb size={12} /> {locale === 'sk' ? 'Ďalší hint' : 'Next hint'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Feedback */}
+              <AnimatePresence>
+                {feedback === 'correct' && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    style={{ background: '#052e16', border: '1px solid #166534', borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                      <Check size={14} color="#4ade80" />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#4ade80' }}>✓</span>
+                    </div>
+                    <p style={{ fontSize: 13, color: '#86efac', margin: 0, lineHeight: 1.6 }}>
+                      {locale === 'sk' ? step.successMsgSk : step.successMsg}
+                    </p>
+                    {stepIndex < lesson.steps.length - 1 && (
+                      <button onClick={handleNext} style={{
+                        marginTop: 10, padding: '8px 14px', borderRadius: 8, background: '#4ade80', color: '#000',
+                        fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+                      }}>
+                        {locale === 'sk' ? 'Ďalší krok' : 'Next step'} <ChevronRight size={12} />
+                      </button>
+                    )}
+                  </motion.div>
+                )}
+                {feedback === 'wrong' && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    style={{ background: '#1a0000', border: '1px solid #7f1d1d', borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                      <X size={14} color="#ef4444" />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444' }}>
+                        {locale === 'sk' ? 'Ešte nie. Skús znova.' : 'Not yet. Try again.'}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: 12, color: '#fca5a5', margin: 0 }}>
+                      {locale === 'sk' ? 'Použi hint ak potrebuješ pomoc.' : 'Use a hint if you need help.'}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Completion */}
+              {isComplete && (
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                  style={{ background: '#052e16', border: '1px solid #166534', borderRadius: 14, padding: 20, textAlign: 'center' }}>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>🎉</div>
+                  <h3 style={{ fontSize: 16, fontWeight: 800, color: '#4ade80', marginBottom: 8 }}>
+                    {locale === 'sk' ? 'Lekcia dokončená!' : 'Lesson complete!'}
+                  </h3>
+                  <p style={{ fontSize: 12, color: '#86efac', lineHeight: 1.6 }}>
+                    {locale === 'sk' ? step.successMsgSk : step.successMsg}
+                  </p>
+                </motion.div>
+              )}
+            </>
           )}
-
-          {/* Feedback */}
-          <AnimatePresence>
-            {feedback === 'correct' && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                style={{ background: '#052e16', border: '1px solid #166534', borderRadius: 10, padding: 14, marginBottom: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <Check size={16} color="#4ade80" />
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#4ade80' }}>
-                    {locale === 'sk' ? 'Správne!' : 'Correct!'}
-                  </span>
-                </div>
-                <p style={{ fontSize: 13, color: '#86efac', margin: 0 }}>
-                  {locale === 'sk' ? 'Výborne! Preview sa aktualizoval.' : 'Great job! Preview has been updated.'}
-                </p>
-                {stepIndex < lesson.steps.length - 1 && (
-                  <button onClick={handleNext} style={{
-                    marginTop: 10, padding: '8px 16px', borderRadius: 8, background: '#4ade80', color: '#000',
-                    fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
-                  }}>
-                    {locale === 'sk' ? 'Ďalší krok' : 'Next step'} <ChevronRight size={14} />
-                  </button>
-                )}
-                {stepIndex === lesson.steps.length - 1 && (
-                  <div style={{ marginTop: 10, fontSize: 14, fontWeight: 700, color: '#4ade80' }}>
-                    🎉 {locale === 'sk' ? 'Lekcia dokončená!' : 'Lesson complete!'}
-                  </div>
-                )}
-              </motion.div>
-            )}
-            {feedback === 'wrong' && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                style={{ background: '#1a0000', border: '1px solid #7f1d1d', borderRadius: 10, padding: 14, marginBottom: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <X size={16} color="#ef4444" />
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#ef4444' }}>
-                    {locale === 'sk' ? 'Skús znova' : 'Not quite'}
-                  </span>
-                </div>
-                <p style={{ fontSize: 13, color: '#fca5a5', margin: 0 }}>
-                  {locale === 'sk' ? 'Skontroluj kód a skús to znova. Použi hint ak potrebuješ pomoc.' : 'Check your code and try again. Use the hint if you need help.'}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
-        {/* CENTER: Code editor */}
+        {/* CENTER: Editor */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid #1a1a1a' }}>
-          {/* Editor toolbar */}
-          <div style={{ height: 40, borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', padding: '0 12px', gap: 8 }}>
-            <Code2 size={14} color="#888" />
-            <span style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>
-              {lesson.language === 'typescript' ? 'TypeScript' : 'Python'}
-            </span>
+          <div style={{ height: 36, borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', padding: '0 12px', gap: 8 }}>
+            <Code2 size={12} color="#888" />
+            <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>LoginScreen.tsx</span>
             <div style={{ flex: 1 }} />
-            <button onClick={handleReset} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, background: '#1a1a1a', border: '1px solid #333', cursor: 'pointer', color: '#888', fontSize: 11, fontWeight: 600 }}>
-              <RotateCcw size={12} /> Reset
+            <button onClick={handleReset} style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 5, background: '#1a1a1a', border: '1px solid #222', cursor: 'pointer', color: '#666', fontSize: 10, fontWeight: 600 }}>
+              <RotateCcw size={10} /> Reset
             </button>
-            <button onClick={handleRun} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 14px', borderRadius: 6, background: '#4ade80', border: 'none', cursor: 'pointer', color: '#000', fontSize: 11, fontWeight: 700 }}>
-              <Play size={12} fill="#000" /> Run
+            <button onClick={handleRun} style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 12px', borderRadius: 5, background: '#4ade80', border: 'none', cursor: 'pointer', color: '#000', fontSize: 10, fontWeight: 700 }}>
+              <Play size={10} fill="#000" /> Run
             </button>
           </div>
-
-          {/* Monaco Editor */}
           <div style={{ flex: 1 }}>
             <Editor
               height="100%"
-              language={lesson.language === 'typescript' ? 'typescript' : 'python'}
+              language="typescript"
               theme="vs-dark"
               value={code}
-              onChange={(v) => { setCode(v || ''); setFeedback('idle'); }}
+              onChange={(v) => { setCode(v || ''); setFeedback('idle'); setHintLevel(0); }}
               options={{
-                fontSize: 14,
-                fontFamily: 'JetBrains Mono, Fira Code, monospace',
-                minimap: { enabled: false },
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                wordWrap: 'on',
-                padding: { top: 12 },
-                renderLineHighlight: 'line',
-                bracketPairColorization: { enabled: true },
-                tabSize: 2,
+                fontSize: 14, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                minimap: { enabled: false }, lineNumbers: 'on', scrollBeyondLastLine: false,
+                wordWrap: 'on', padding: { top: 12 }, renderLineHighlight: 'line',
+                bracketPairColorization: { enabled: true }, tabSize: 2,
               }}
             />
           </div>
         </div>
 
-        {/* RIGHT: Live preview */}
+        {/* RIGHT: Preview */}
         <div style={{ width: '30%', overflow: 'auto', background: '#050505' }}>
-          <div style={{ height: 40, borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', padding: '0 12px', gap: 6 }}>
-            <Eye size={14} color="#888" />
-            <span style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>Live Preview</span>
+          <div style={{ height: 36, borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', padding: '0 12px', gap: 6 }}>
+            <Eye size={12} color="#888" />
+            <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>Live Preview</span>
           </div>
-
-          {step.previewType === 'react-native' && (
-            <PhonePreview html={previewHtml} highlight={previewHighlight} />
-          )}
-          {step.previewType === 'terminal' && (
-            <TerminalPreview output="" />
-          )}
-          {step.previewType === 'database' && (
-            <DatabasePreview data={feedback === 'correct' ? [
-              { id: 1, name: 'Alice', email: 'alice@example.com' },
-              { id: 2, name: 'Bob', email: 'bob@example.com' },
-            ] : []} />
-          )}
-          {!['react-native', 'terminal', 'database'].includes(step.previewType) && (
-            <TerminalPreview output="Preview will appear here after running code." />
-          )}
+          <PhonePreview elements={previewElements} highlight={lastHighlight} />
         </div>
       </div>
     </div>

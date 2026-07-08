@@ -2,27 +2,34 @@ export interface ProjectStep {
   id: string;
   title: string;
   titleSk: string;
-  explanation: string;
-  explanationSk: string;
-  hint?: string;
-  hintSk?: string;
-  starterCode: string;
-  solution: string;
-  testFn: string; // JS code that returns true/false
-  previewType: 'react-native' | 'browser' | 'terminal' | 'database' | 'api' | 'discord';
-  highlightLines?: number[]; // lines to highlight in preview after success
+  instruction: string;       // Short — what to do
+  instructionSk: string;
+  context?: string;          // Short — why (optional, 1-2 sentences max)
+  contextSk?: string;
+  starterCode: string;       // Code with ___ blanks or empty spots
+  validateFn: string;        // JS: (code) => true/false
+  successMsg: string;        // AI says after success
+  successMsgSk: string;
+  errorHints: string[];      // Progressive hints for errors
+  errorHintsSk: string[];
+  previewAddition: string;   // What appears in preview after this step
 }
 
 export interface ProjectLesson {
   id: string;
   title: string;
   titleSk: string;
-  description: string;
-  descriptionSk: string;
+  subtitle: string;
+  subtitleSk: string;
+  duration: string;
+  level: string;
+  levelSk: string;
   goal: string;
   goalSk: string;
+  preIntro: string;          // "Before we start" text
+  preIntroSk: string;
   icon: string;
-  previewType: 'react-native' | 'browser' | 'terminal' | 'database' | 'api' | 'discord';
+  previewType: 'react-native' | 'browser' | 'terminal' | 'database';
   language: string;
   steps: ProjectStep[];
 }
@@ -40,330 +47,289 @@ export interface ProjectTopic {
 
 export const projects: ProjectTopic[] = [
   {
-    id: 'react-native',
-    title: 'React Native',
-    titleSk: 'React Native',
-    description: 'Build mobile apps for iOS and Android',
-    descriptionSk: 'Tvorba mobilných aplikácií pre iOS a Android',
-    icon: '📱',
-    color: '#61dafb',
+    id: 'auth',
+    title: 'Authentication',
+    titleSk: 'Autentifikácia',
+    description: 'Login screens, OAuth, session management',
+    descriptionSk: 'Prihlasovacie obrazovky, OAuth, správa sessions',
+    icon: '🔐',
+    color: '#f59e0b',
     lessons: [
       {
-        id: 'rn-login',
-        title: 'Build a Login Screen',
-        titleSk: 'Vytvor prihlasovací screen',
-        description: 'Create a beautiful login screen with email and password fields.',
-        descriptionSk: 'Vytvor pekný prihlasovací screen s poliami pre email a heslo.',
-        goal: 'Today we will build a complete login screen with input fields, a button, and styling.',
-        goalSk: 'Dnes vytvoríme kompletný prihlasovací screen so vstupnými poliami, tlačidlom a štýlovaním.',
+        id: 'login-screen',
+        title: 'Build your first Login Screen',
+        titleSk: 'Vytvor svoju prvú Login obrazovku',
+        subtitle: 'From empty screen to working login — step by step.',
+        subtitleSk: 'Od prázdneho screenu po funkčný login — krok po kroku.',
+        duration: '25 min',
+        level: 'Beginner',
+        levelSk: 'Začiatočník',
+        goal: 'At the end you will have your own Login screen similar to what thousands of apps use.',
+        goalSk: 'Na konci budeš mať vlastnú Login obrazovku podobnú tej, ktorú používajú tisíce aplikácií.',
+        preIntro: "Maybe you've never seen React Native. That's perfectly fine. You won't need to know anything. We'll explain every line. Every step has hints. When you make a mistake, AI will explain why. Not just that it's wrong.",
+        preIntroSk: 'Možno si nikdy nevidel React Native. To je úplne v poriadku. Nebudeš potrebovať nič vedieť. Každý riadok si vysvetlíme. Každý krok bude mať nápovedy. Keď spravíš chybu, AI ti vysvetlí prečo. Nie iba že je zle.',
         icon: '🔐',
         previewType: 'react-native',
         language: 'typescript',
         steps: [
+          // Step 1: Add View
           {
-            id: 'rn-login-1',
-            title: 'Create the container',
-            titleSk: 'Vytvor kontajner',
-            explanation: 'Every screen starts with a View component. This is like a div in HTML — it wraps everything inside.',
-            explanationSk: 'Každý screen začína komponentom View. Je to ako div v HTML — obalí všetko vnútri.',
-            starterCode: `import { View, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
+            id: 's1',
+            title: 'Add a View',
+            titleSk: 'Pridaj View',
+            instruction: 'Inside return, add a <View> component. Write it yourself.',
+            instructionSk: 'Do return pridaj komponent <View>. Napíš ho sám.',
+            context: 'Every React Native screen returns what should be displayed. Right now it returns nothing — that\'s why the preview is empty.',
+            contextSk: 'Každá React Native obrazovka vracia to, čo sa má zobraziť. Momentálne nevracia nič — preto je preview prázdne.',
+            starterCode: `export default function LoginScreen() {
   return (
-    // Add a View with styles.container
-    ___
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0A0A0A',
-    justifyContent: 'center',
-    padding: 24,
-  },
-});`,
-            solution: `import { View, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
-  return (
-    <View style={styles.container}>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0A0A0A',
-    justifyContent: 'center',
-    padding: 24,
-  },
-});`,
-            testFn: `code.includes('<View') && code.includes('styles.container')`,
-            previewType: 'react-native',
-            hint: 'Use <View style={styles.container}> to create the container.',
-            hintSk: 'Použi <View style={styles.container}> na vytvorenie kontajnera.',
+  )
+}`,
+            validateFn: `code.includes('<View>') || code.includes('<View ')`,
+            successMsg: 'View is like an empty room. It doesn\'t show anything yet — but everything will go inside it.',
+            successMsgSk: 'View je ako prázdna miestnosť. Zatiaľ nič nezobrazuje — ale všetko pôjde dovnútra.',
+            errorHints: [
+              'The component is called View.',
+              'View needs opening and closing tags.',
+              '<View>\n\n</View>',
+            ],
+            errorHintsSk: [
+              'Komponent sa volá View.',
+              'View potrebuje otvárací aj zatvárací tag.',
+              '<View>\n\n</View>',
+            ],
+            previewAddition: '',
           },
+          // Step 2: Add Text (empty)
           {
-            id: 'rn-login-2',
-            title: 'Add a title',
-            titleSk: 'Pridaj nadpis',
-            explanation: 'Now add a Text component inside the View to show "Welcome back" as the screen title.',
-            explanationSk: 'Teraz pridaj komponent Text vnútri View, ktorý zobrazí "Vitaj späť" ako nadpis screenu.',
-            starterCode: `import { View, Text, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
+            id: 's2',
+            title: 'Add Text',
+            titleSk: 'Pridaj Text',
+            instruction: 'Inside the View, add a <Text> component.',
+            instructionSk: 'Vnútri View pridaj komponent <Text>.',
+            starterCode: `export default function LoginScreen() {
   return (
-    <View style={styles.container}>
-      {/* Add a Text component with styles.title */}
-      ___
+    <View>
+
     </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0A0A0A',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 32,
-  },
-});`,
-            solution: `import { View, Text, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0A0A0A',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 32,
-  },
-});`,
-            testFn: `code.includes('<Text') && code.includes('styles.title')`,
-            previewType: 'react-native',
-            hint: 'Use <Text style={styles.title}>Welcome back</Text>',
-            hintSk: 'Použi <Text style={styles.title}>Vitaj späť</Text>',
+  )
+}`,
+            validateFn: `code.includes('<Text>') || code.includes('<Text ')`,
+            successMsg: 'Text is empty for now. Nothing appears because there\'s no content between the tags.',
+            successMsgSk: 'Text je zatiaľ prázdny. Nič sa nezobrazuje, pretože medzi značkami nie je žiadny obsah.',
+            errorHints: [
+              'The component is called Text.',
+              'Every Text needs opening and closing tags.',
+              '<Text>\n</Text>',
+            ],
+            errorHintsSk: [
+              'Komponent sa volá Text.',
+              'Každý Text potrebuje otvárací aj zatvárací tag.',
+              '<Text>\n</Text>',
+            ],
+            previewAddition: '',
           },
+          // Step 3: Write "Welcome Back 👋"
           {
-            id: 'rn-login-3',
+            id: 's3',
+            title: 'Write the title',
+            titleSk: 'Napíš nadpis',
+            instruction: 'Write "Welcome Back 👋" between the Text tags.',
+            instructionSk: 'Napíš "Welcome Back 👋" medzi značky Text.',
+            starterCode: `export default function LoginScreen() {
+  return (
+    <View>
+      <Text>
+
+      </Text>
+    </View>
+  )
+}`,
+            validateFn: `code.includes('Welcome Back') || code.includes('Vitaj späť')`,
+            successMsg: 'You just created your first component! Click on "Text" in the code to learn more.',
+            successMsgSk: 'Práve si vytvoril svoj prvý komponent!',
+            errorHints: [
+              'Write the text between <Text> and </Text>.',
+              '<Text>Welcome Back 👋</Text>',
+            ],
+            errorHintsSk: [
+              'Napíš text medzi <Text> a </Text>.',
+              '<Text>Welcome Back 👋</Text>',
+            ],
+            previewAddition: 'title',
+          },
+          // Step 4: Add TextInput for email
+          {
+            id: 's4',
             title: 'Add email input',
             titleSk: 'Pridaj email input',
-            explanation: 'Add a TextInput for the email address. TextInput is like an <input> in HTML.',
-            explanationSk: 'Pridaj TextInput pre emailovú adresu. TextInput je ako <input> v HTML.',
-            starterCode: `import { View, Text, TextInput, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
+            instruction: 'Below the Text, add a <TextInput /> component. Don\'t look at the hint.',
+            instructionSk: 'Pod Text pridaj komponent <TextInput />. Nepozeraj hint.',
+            context: 'TextInput is like an <input> in HTML. In React Native, it\'s a self-closing component.',
+            contextSk: 'TextInput je ako <input> v HTML. V React Native sa zapisuje ako samouzatvárací komponent.',
+            starterCode: `export default function LoginScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
-      {/* Add TextInput for email */}
-      ___
+    <View>
+      <Text>Welcome Back 👋</Text>
+
     </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', padding: 24 },
-  title: { fontSize: 32, fontWeight: '700', color: '#fff', marginBottom: 32 },
-  input: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#fff',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-});`,
-            solution: `import { View, Text, TextInput, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#666"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', padding: 24 },
-  title: { fontSize: 32, fontWeight: '700', color: '#fff', marginBottom: 32 },
-  input: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#fff',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-});`,
-            testFn: `code.includes('<TextInput') && code.includes('styles.input')`,
-            previewType: 'react-native',
+  )
+}`,
+            validateFn: `code.includes('<TextInput') && code.includes('/')`,
+            successMsg: 'An input field appeared! But we don\'t know what it\'s for yet.',
+            successMsgSk: 'Objavilo sa vstupné pole! Ale ešte nevieme na čo je.',
+            errorHints: [
+              'The component is called TextInput.',
+              'TextInput is self-closing: <TextInput />',
+              'Add it below the </Text> line.',
+            ],
+            errorHintsSk: [
+              'Komponent sa volá TextInput.',
+              'TextInput je samouzatvárací: <TextInput />',
+              'Pridaj ho pod riadok </Text>.',
+            ],
+            previewAddition: 'input-empty',
           },
+          // Step 5: Add placeholder
           {
-            id: 'rn-login-4',
-            title: 'Add password input and button',
-            titleSk: 'Pridaj heslo a tlačidlo',
-            explanation: 'Now add a password TextInput (with secureTextEntry) and a TouchableOpacity button to complete the form.',
-            explanationSk: 'Teraz pridaj TextInput pre heslo (s secureTextEntry) a tlačidlo TouchableOpacity na dokončenie formulára.',
-            starterCode: `import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
+            id: 's5',
+            title: 'Add placeholder',
+            titleSk: 'Pridaj placeholder',
+            instruction: 'Add placeholder="Email" to the TextInput.',
+            instructionSk: 'Pridaj placeholder="Email" do TextInput.',
+            context: 'Placeholder is the gray text that shows what to type.',
+            contextSk: 'Placeholder je sivý text, ktorý ukazuje čo treba napísať.',
+            starterCode: `export default function LoginScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
-      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#666" />
-      {/* Add password TextInput with secureTextEntry */}
-      ___
-      {/* Add login button */}
-      ___
+    <View>
+      <Text>Welcome Back 👋</Text>
+      <TextInput />
     </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', padding: 24 },
-  title: { fontSize: 32, fontWeight: '700', color: '#fff', marginBottom: 32 },
-  input: { backgroundColor: '#1a1a1a', borderRadius: 12, padding: 16, fontSize: 16, color: '#fff', marginBottom: 12, borderWidth: 1, borderColor: '#333' },
-  button: { backgroundColor: '#fff', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 8 },
-  buttonText: { fontSize: 16, fontWeight: '700', color: '#000' },
-});`,
-            solution: `import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-
-export default function LoginScreen() {
+  )
+}`,
+            validateFn: `code.includes('placeholder') && code.includes('Email')`,
+            successMsg: 'Now the user knows this field is for email.',
+            successMsgSk: 'Teraz používateľ vie, že toto pole je pre email.',
+            errorHints: [
+              'Add it inside the <TextInput /> tag.',
+              '<TextInput placeholder="Email" />',
+            ],
+            errorHintsSk: [
+              'Pridaj to vnútri <TextInput /> tagu.',
+              '<TextInput placeholder="Email" />',
+            ],
+            previewAddition: 'input-email',
+          },
+          // Step 6: Add password input (on your own)
+          {
+            id: 's6',
+            title: 'Add password input',
+            titleSk: 'Pridaj heslo input',
+            instruction: 'Now create a second TextInput for Password. On your own — no hints this time.',
+            instructionSk: 'Teraz vytvor druhý TextInput pre heslo. Sám — tentokrát bez hintov.',
+            starterCode: `export default function LoginScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
-      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#666" />
-      <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#666" secureTextEntry />
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Sign In</Text>
-      </TouchableOpacity>
+    <View>
+      <Text>Welcome Back 👋</Text>
+      <TextInput placeholder="Email" />
+
     </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', padding: 24 },
-  title: { fontSize: 32, fontWeight: '700', color: '#fff', marginBottom: 32 },
-  input: { backgroundColor: '#1a1a1a', borderRadius: 12, padding: 16, fontSize: 16, color: '#fff', marginBottom: 12, borderWidth: 1, borderColor: '#333' },
-  button: { backgroundColor: '#fff', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 8 },
-  buttonText: { fontSize: 16, fontWeight: '700', color: '#000' },
-});`,
-            testFn: `code.includes('secureTextEntry') && code.includes('TouchableOpacity') && code.includes('Sign In')`,
-            previewType: 'react-native',
+  )
+}`,
+            validateFn: `code.includes('Password') && (code.match(/<TextInput/g) || []).length >= 2`,
+            successMsg: 'Two inputs! The form is taking shape.',
+            successMsgSk: 'Dva inputy! Formulár dostáva tvar.',
+            errorHints: [
+              'Same as email, but with placeholder="Password".',
+            ],
+            errorHintsSk: [
+              'Rovnako ako email, ale s placeholder="Password".',
+            ],
+            previewAddition: 'input-password',
           },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'supabase',
-    title: 'Supabase',
-    titleSk: 'Supabase',
-    description: 'Backend with database, auth and storage',
-    descriptionSk: 'Backend s databázou, autentifikáciou a úložiskom',
-    icon: '🗄',
-    color: '#3ecf8e',
-    lessons: [
-      {
-        id: 'sb-query',
-        title: 'Your First Query',
-        titleSk: 'Tvoj prvý dotaz',
-        description: 'Learn to read data from a Supabase database.',
-        descriptionSk: 'Nauč sa čítať dáta zo Supabase databázy.',
-        goal: 'Today we will fetch users from a database and display them.',
-        goalSk: 'Dnes načítame používateľov z databázy a zobrazíme ich.',
-        icon: '📊',
-        previewType: 'database',
-        language: 'typescript',
-        steps: [
+          // Step 7: Add login button
           {
-            id: 'sb-query-1',
-            title: 'Import Supabase client',
-            titleSk: 'Importuj Supabase klienta',
-            explanation: 'First, import the Supabase client. This is your connection to the database.',
-            explanationSk: 'Najprv importuj Supabase klienta. Toto je tvoje spojenie s databázou.',
-            starterCode: `// Import the supabase client
-___
+            id: 's7',
+            title: 'Add Login button',
+            titleSk: 'Pridaj Login tlačidlo',
+            instruction: 'Add a Button component with title="Login".',
+            instructionSk: 'Pridaj komponent Button s title="Login".',
+            starterCode: `export default function LoginScreen() {
+  return (
+    <View>
+      <Text>Welcome Back 👋</Text>
+      <TextInput placeholder="Email" />
+      <TextInput placeholder="Password" />
 
-async function getUsers() {
-  // We'll add the query here
+    </View>
+  )
 }`,
-            solution: `import { supabase } from './lib/supabase';
-
-async function getUsers() {
-  // We'll add the query here
-}`,
-            testFn: `code.includes('import') && code.includes('supabase')`,
-            previewType: 'database',
+            validateFn: `code.includes('Button') && code.includes('Login')`,
+            successMsg: 'Login button appeared! The screen is almost complete.',
+            successMsgSk: 'Objavilo sa Login tlačidlo! Screen je skoro hotový.',
+            errorHints: [
+              'The component is called Button.',
+              'Button uses a property called title.',
+              '<Button title="Login" />',
+            ],
+            errorHintsSk: [
+              'Komponent sa volá Button.',
+              'Button používa property title.',
+              '<Button title="Login" />',
+            ],
+            previewAddition: 'button-login',
           },
+          // Step 8: Forgot Password (on your own)
           {
-            id: 'sb-query-2',
-            title: 'Write a SELECT query',
-            titleSk: 'Napíš SELECT dotaz',
-            explanation: 'Use supabase.from("users").select("*") to get all users. The result comes back as { data, error }.',
-            explanationSk: 'Použi supabase.from("users").select("*") na získanie všetkých používateľov. Výsledok príde ako { data, error }.',
-            starterCode: `import { supabase } from './lib/supabase';
+            id: 's8',
+            title: 'Add "Forgot Password?"',
+            titleSk: 'Pridaj "Forgot Password?"',
+            instruction: 'Below the button, add "Forgot Password?" as text. No hints. You already know how.',
+            instructionSk: 'Pod tlačidlo pridaj "Forgot Password?" ako text. Bez hintov. Už vieš ako.',
+            starterCode: `export default function LoginScreen() {
+  return (
+    <View>
+      <Text>Welcome Back 👋</Text>
+      <TextInput placeholder="Email" />
+      <TextInput placeholder="Password" />
+      <Button title="Login" />
 
-async function getUsers() {
-  // Write a SELECT query to get all users
-  const { data, error } = await ___
-
-  if (error) {
-    console.error('Error:', error.message);
-    return [];
-  }
-
-  return data;
+    </View>
+  )
 }`,
-            solution: `import { supabase } from './lib/supabase';
+            validateFn: `code.includes('Forgot Password') || code.includes('Zabudnuté heslo')`,
+            successMsg: 'Perfect. You added it without any help!',
+            successMsgSk: 'Perfektné. Pridal si to úplne sám!',
+            errorHints: ['<Text>Forgot Password?</Text>'],
+            errorHintsSk: ['<Text>Forgot Password?</Text>'],
+            previewAddition: 'forgot-password',
+          },
+          // Step 9: Google button (fully on your own)
+          {
+            id: 's9',
+            title: 'Add "Continue with Google"',
+            titleSk: 'Pridaj "Continue with Google"',
+            instruction: 'Add a second button: "Continue with Google". AI won\'t help this time.',
+            instructionSk: 'Pridaj druhé tlačidlo: "Continue with Google". AI tentokrát nepomôže.',
+            starterCode: `export default function LoginScreen() {
+  return (
+    <View>
+      <Text>Welcome Back 👋</Text>
+      <TextInput placeholder="Email" />
+      <TextInput placeholder="Password" />
+      <Button title="Login" />
+      <Text>Forgot Password?</Text>
 
-async function getUsers() {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*');
-
-  if (error) {
-    console.error('Error:', error.message);
-    return [];
-  }
-
-  return data;
+    </View>
+  )
 }`,
-            testFn: `code.includes(".from(") && code.includes(".select(")`,
-            previewType: 'database',
+            validateFn: `code.includes('Google') && ((code.match(/Button/g) || []).length >= 2 || (code.match(/<Text/g) || []).length >= 3)`,
+            successMsg: '🎉 You built a complete Login screen! Every component was written by your own hands. No copy-paste. In the next lesson, we\'ll make it respond to user taps.',
+            successMsgSk: '🎉 Vytvoril si kompletnú Login obrazovku! Každý komponent si napísal vlastnými rukami. Bez copy-paste. V ďalšej lekcii ju naučíme reagovať na kliknutia.',
+            errorHints: ['<Button title="Continue with Google" />'],
+            errorHintsSk: ['<Button title="Continue with Google" />'],
+            previewAddition: 'button-google',
           },
         ],
       },
@@ -371,10 +337,10 @@ async function getUsers() {
   },
 ];
 
-export function getProject(id: string): ProjectTopic | undefined {
-  return projects.find(p => p.id === id);
-}
-
-export function getProjectLesson(topicId: string, lessonId: string): ProjectLesson | undefined {
-  return getProject(topicId)?.lessons.find(l => l.id === lessonId);
+export function getProjectLesson(lessonId: string): { topic: ProjectTopic; lesson: ProjectLesson } | undefined {
+  for (const topic of projects) {
+    const lesson = topic.lessons.find(l => l.id === lessonId);
+    if (lesson) return { topic, lesson };
+  }
+  return undefined;
 }

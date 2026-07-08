@@ -197,6 +197,30 @@ export default function CodingPath() {
             );
           })}
         </div>
+
+        {/* Divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '20px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#222' }} />
+          <span style={{ fontSize: 12, color: '#555', fontWeight: 600 }}>
+            {locale === 'sk' ? 'alebo' : 'or'}
+          </span>
+          <div style={{ flex: 1, height: 1, background: '#222' }} />
+        </div>
+
+        {/* Browse all */}
+        <motion.button
+          onClick={() => selectPath('master')}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+          style={{
+            width: '100%', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            background: '#111', border: '1px solid #222', borderRadius: 12,
+            cursor: 'pointer', fontSize: 14, color: '#888', fontWeight: 600,
+          }}
+        >
+          <BookOpen size={16} />
+          {locale === 'sk' ? 'Zobraziť všetky moduly' : 'Browse all modules'}
+        </motion.button>
       </div>
     );
   }

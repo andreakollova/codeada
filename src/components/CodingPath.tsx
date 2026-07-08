@@ -229,7 +229,14 @@ export default function CodingPath() {
   // === CURRICULUM VIEW ===
   return (
     <div>
-      {/* Header with path info */}
+      {/* Back + Header */}
+      <button
+        onClick={() => { setSelectedPath(null); localStorage.removeItem('coduy-path'); }}
+        style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#888', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500, marginBottom: 12, padding: 0 }}
+      >
+        <ChevronDown size={16} style={{ transform: 'rotate(90deg)' }} />
+        {locale === 'sk' ? 'Späť na výber cesty' : 'Back to path selection'}
+      </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Terminal size={16} color="#fff" />
@@ -242,12 +249,6 @@ export default function CodingPath() {
             {doneCount} / {allLessons.length} {s('lessonsCompleted', locale)}
           </p>
         </div>
-        <button
-          onClick={() => { setSelectedPath(null); localStorage.removeItem('coduy-path'); }}
-          style={{ fontSize: 11, color: '#555', background: '#111', border: '1px solid #222', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 600 }}
-        >
-          {locale === 'sk' ? 'Zmeniť' : 'Change'}
-        </button>
       </div>
 
       {/* Modules grouped by syllabus */}

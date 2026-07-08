@@ -160,4 +160,24 @@ export function s(key: StringKey, locale: Locale): string {
   return strings[key][locale];
 }
 
+/** Slovak declension for "lekcia dokončená" */
+export function skLessons(count: number, locale: Locale): string {
+  if (locale === 'en') {
+    return count === 1 ? '1 lesson completed' : `${count} lessons completed`;
+  }
+  if (count === 1) return '1 lekcia dokončená';
+  if (count >= 2 && count <= 4) return `${count} lekcie dokončené`;
+  return `${count} lekcií dokončených`;
+}
+
+/** Slovak declension for streak sidebar */
+export function skStreak(count: number, locale: Locale): string {
+  if (locale === 'en') {
+    return count === 1 ? '1 day' : `${count} days`;
+  }
+  if (count === 1) return '1 deň';
+  if (count >= 2 && count <= 4) return `${count} dni`;
+  return `${count} dní`;
+}
+
 export default strings;

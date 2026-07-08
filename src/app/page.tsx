@@ -7,7 +7,7 @@ import NameModal from '@/components/NameModal';
 import Byte from '@/components/Byte';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
-import { s } from '@/data/strings';
+import { s, skLessons, skStreak } from '@/data/strings';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Zap, Heart, Trophy, BookOpen } from 'lucide-react';
@@ -15,14 +15,13 @@ import { Flame, Zap, Heart, Trophy, BookOpen } from 'lucide-react';
 const greetings = (name: string, streak: number, locale: 'en' | 'sk') => {
   if (locale === 'sk') {
     if (streak === 0) return `Vitaj späť, ${name}.`;
-    if (streak === 1) return `Ahoj ${name}. Prvý deň.`;
-    if (streak < 7) return `Ahoj ${name}. ${streak} dní v rade.`;
-    return `Ahoj ${name}. ${streak} dňový streak — super.`;
+    if (streak === 1) return `Ahoj ${name}. 1-dňový streak.`;
+    return `Ahoj ${name}. ${streak}-dňový streak.`;
   }
   if (streak === 0) return `Welcome back, ${name}.`;
   if (streak === 1) return `Hey ${name}. Day one.`;
-  if (streak < 7) return `Hey ${name}. ${streak} days in a row.`;
-  return `Hey ${name}. ${streak} day streak — impressive.`;
+  if (streak < 7) return `Hey ${name}. ${streak}-day streak.`;
+  return `Hey ${name}. ${streak}-day streak — impressive.`;
 };
 
 const COUNTDOWN_ENABLED = false;
@@ -110,7 +109,7 @@ export default function HomePage() {
                 <p style={{ fontSize: 14, color: '#999', lineHeight: 1.5 }}>
                   {completedLessons.length === 0
                     ? s('pickLesson', locale)
-                    : `${completedLessons.length} ${completedLessons.length === 1 ? s('lessonCompleted', locale) : s('lessonsCompleted', locale)}.`
+                    : `${skLessons(completedLessons.length, locale)}.`
                   }
                 </p>
               </div>
@@ -135,7 +134,7 @@ export default function HomePage() {
                   <Flame size={18} color={streak > 0 ? '#fff' : '#555'} />
                 </div>
                 <div>
-                  <div className="stat-card-value">{streak}</div>
+                  <div className="stat-card-value">{skStreak(streak, locale)}</div>
                   <div className="stat-card-label">{s('dayStreakLabel', locale)}</div>
                 </div>
               </div>

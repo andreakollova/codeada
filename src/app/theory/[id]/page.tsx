@@ -60,8 +60,8 @@ export default function TheoryLessonPage() {
   }
 
   // Build list of sections that have content
-  const sections = THEORY_SECTIONS.filter(s => {
-    const val = lesson[s.key];
+  const sections = THEORY_SECTIONS.filter(sec => {
+    const val = lesson[sec.key];
     if (Array.isArray(val)) return val.length > 0;
     return val && String(val).trim().length > 0;
   });

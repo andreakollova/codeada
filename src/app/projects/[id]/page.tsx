@@ -168,11 +168,11 @@ export default function ProjectWorkspace() {
   // === INTRO SCREEN ===
   if (stepIndex === -1) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex' }}>
+      <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex', justifyContent: 'center' }}>
         {/* Left: intro text */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '30px 40px', maxWidth: 560, overflow: 'auto' }}>
-          <Link href="/topics" style={{ color: '#555', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-            <ArrowLeft size={16} /> {locale === 'sk' ? 'Späť' : 'Back'}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '30px 60px', maxWidth: 580, overflow: 'auto', marginLeft: 'auto' }}>
+          <Link href="/" style={{ color: '#888', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, textDecoration: 'none', fontWeight: 500 }}>
+            <ArrowLeft size={18} /> {locale === 'sk' ? 'Späť na kurzy' : 'Back to courses'}
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <span style={{ fontSize: 28 }}>{lesson.icon}</span>
@@ -208,7 +208,7 @@ export default function ProjectWorkspace() {
         </div>
 
         {/* Right: final preview */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050505' }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050505', marginRight: 'auto' }}>
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontSize: 12, color: '#555', marginBottom: 16, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {locale === 'sk' ? 'Čo dnes vytvoríš' : 'What you\'ll build today'}

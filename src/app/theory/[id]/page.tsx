@@ -33,6 +33,8 @@ export default function TheoryLessonPage() {
   const [sectionIndex, setSectionIndex] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
   const [score, setScore] = useState(0);
+  // Safe string helper — ensures no objects reach React render
+  const safe = (v: unknown): string => (v == null ? '' : typeof v === 'string' ? v : String(v));
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
 
@@ -178,7 +180,7 @@ export default function TheoryLessonPage() {
                 <div style={{ width: 22, height: 22, borderRadius: 7, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                   <Check size={12} color="#000" strokeWidth={3} />
                 </div>
-                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{item}</p>
+                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{safe(item)}</p>
               </div>
             ))}
           </div>
@@ -244,12 +246,12 @@ export default function TheoryLessonPage() {
         </div>
 
         <h2 style={{ fontSize: 17, fontWeight: 700, color: '#EDEDED', lineHeight: 1.4 }}>
-          {t(q, 'question_text', locale)}
+          {safe(t(q, 'question_text', locale))}
         </h2>
 
         {q.code_snippet && (
           <pre style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '14px 16px', fontSize: 13, color: '#EDEDED', overflow: 'auto', lineHeight: 1.7 }}>
-            {q.code_snippet}
+            {safe(q.code_snippet)}
           </pre>
         )}
 
@@ -286,7 +288,7 @@ export default function TheoryLessonPage() {
                 }}>
                   {showCorrect ? <Check size={12} color="#052e16" /> : showWrong ? <X size={12} color="#ff6060" /> : opt.label}
                 </div>
-                {opt.text}
+                {safe(opt.text)}
               </motion.button>
             );
           })}
@@ -334,7 +336,7 @@ export default function TheoryLessonPage() {
           {s('lessonComplete', locale)}
         </h1>
         <p style={{ color: '#888', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
-          {t(lesson, 'title', locale)}
+          {safe(t(lesson, 'title', locale))}
         </p>
         <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
           <div style={{ textAlign: 'center' }}>
@@ -395,7 +397,7 @@ export default function TheoryLessonPage() {
       {/* Lesson title */}
       <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '16px 20px 4px' }}>
         <p style={{ fontSize: 11, color: '#777', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
-          {t(lesson, 'title', locale)}
+          {safe(t(lesson, 'title', locale))}
         </p>
       </div>
 

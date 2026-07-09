@@ -37,6 +37,7 @@ export default function TheoryLessonPage() {
   const safe = (v: unknown): string => (v == null ? '' : typeof v === 'string' ? v : String(v));
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
+  const [reward, setReward] = useState<string | null>(null);
 
   useEffect(() => {
     const idStr = Array.isArray(id) ? id[0] : id;
@@ -129,8 +130,6 @@ export default function TheoryLessonPage() {
       finishLesson();
     }
   };
-
-  const [reward, setReward] = useState<string | null>(null);
 
   const finishLesson = () => {
     const lessonKey = `theory-${lesson.id}`;

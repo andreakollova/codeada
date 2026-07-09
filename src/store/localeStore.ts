@@ -21,20 +21,27 @@ export const useLocaleStore = create<LocaleState>()(
   )
 );
 
-/** Helper to pick EN or SK field from a DB row */
+/** Helper to pick EN or SK field from a DB row — always returns string */
 export function t(row: any, field: string, locale: Locale): string {
   if (locale === 'sk') {
     const skVal = row[`${field}_sk`];
-    if (skVal) return skVal;
+    if (skVal != null) {
+      return typeof skVal === 'string' ? skVal : JSON.stringify(skVal);
+    }
   }
-  return row[field] ?? '';
+  const val = row[field];
+  if (val == null) return '';
+  return typeof val === 'string' ? val : JSON.stringify(val);
 }
 
-/** Helper for arrays (key_takeaways) */
+/** Helper for arrays (key_takeaways) — always returns string[] */
 export function tArray(row: any, field: string, locale: Locale): string[] {
   if (locale === 'sk') {
     const skVal = row[`${field}_sk`];
-    if (skVal && Array.isArray(skVal) && skVal.length > 0) return skVal;
+    if (Array.isArray(skVal) && skVal.length > 0) return skVal.map(String);
   }
-  return row[field] ?? [];
+  const val = row[field];
+  if (Array.isArray(val)) return val.map(String);
+  if (typeof val === 'string') return [val];
+  return [];
 }

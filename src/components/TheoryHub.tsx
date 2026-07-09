@@ -14,7 +14,7 @@ export default function TheoryHub() {
   const { locale } = useLocaleStore();
   const router = useRouter();
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(true);
 
   useEffect(() => {
     fetchModulesWithLessons().then(mods => {
@@ -32,13 +32,6 @@ export default function TheoryHub() {
   const unread = allTheoryLessons.filter(l => !completedLessons.includes(`theory-${l.id}`));
   const readCount = allTheoryLessons.length - unread.length;
 
-  // "Today's reads" — next 3 unread
-  const todaysReads = unread.slice(0, 3);
-
-  // Current module = the module of the first unread lesson
-  const currentModule = todaysReads.length > 0
-    ? dbModules.find(m => m.id === todaysReads[0].moduleId)
-    : null;
 
   return (
     <div style={{ marginBottom: 40 }}>
@@ -73,31 +66,25 @@ export default function TheoryHub() {
 
       {!showAll ? (
         <>
-          {/* Current module label */}
-          {currentModule && (
-            <p style={{ fontSize: 12, color: '#888', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
-              {s('nowReading', locale)} · {t(currentModule, 'title', locale)}
-            </p>
-          )}
-
-          {/* Today's reads — cards */}
+          {/* Modules with progress */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {todaysReads.map((lesson, i) => (
-              <ReadCard key={lesson.id} lesson={lesson} index={i} router={router} locale={locale} />
-            ))}
+            {dbModules.slice(0, 4).map(mod => {
+              const modDone = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+              const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
+              return (
+                <div key={mod.id} onClick={() => setShowAll(true)} style={{ padding: '14px 16px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <BookOpen size={16} color="#888" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: '#ccc', marginBottom: 4 }}>{modTitle}</div>
+                    <div style={{ fontSize: 11, color: '#555' }}>{modDone}/{mod.lessons.length} {s('lessons', locale)}</div>
+                  </div>
+                  <ChevronRight size={14} color="#555" />
+                </div>
+              );
+            })}
           </div>
 
-          {unread.length > 3 && (
-            <button
-              onClick={() => setShowAll(true)}
-              style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, color: '#888', fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: '8px 0' }}
-            >
-              {unread.length - 3} {s('moreLessonsAhead', locale)}
-              <ChevronRight size={14} />
-            </button>
-          )}
-
-          {todaysReads.length === 0 && (
+          {allTheoryLessons.length === readCount && (
             <div style={{ padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
               <p style={{ color: '#888', fontSize: 14 }}>{s('allTheoryDone', locale)}</p>
             </div>

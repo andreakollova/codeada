@@ -144,10 +144,14 @@ export default function TheoryLessonPage() {
     if (!sec) return null;
     const Icon = sec.icon;
 
-    // Pick localized content
-    const content = sec.key === 'key_takeaways'
-      ? tArray(lesson, sec.key, locale)
-      : t(lesson, sec.key as string, locale);
+    // Pick localized content — ensure it's always string or string[]
+    let content: string | string[];
+    if (sec.key === 'key_takeaways') {
+      content = tArray(lesson, sec.key, locale);
+    } else {
+      const raw = t(lesson, sec.key as string, locale);
+      content = typeof raw === 'string' ? raw : String(raw ?? '');
+    }
 
     return (
       <motion.div
@@ -167,7 +171,7 @@ export default function TheoryLessonPage() {
         </div>
 
         {/* Content */}
-        {sec.key === 'key_takeaways' && Array.isArray(content) ? (
+        {Array.isArray(content) ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {(content as string[]).map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12 }}>

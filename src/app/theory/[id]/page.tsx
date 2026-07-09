@@ -37,16 +37,22 @@ export default function TheoryLessonPage() {
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
 
   useEffect(() => {
-    const numId = parseInt(id);
+    const idStr = Array.isArray(id) ? id[0] : id;
+    if (!idStr) return;
+    const numId = parseInt(idStr);
     if (isNaN(numId)) return;
-    Promise.all([fetchLesson(numId), fetchQuizForLesson(numId)]).then(([l, q]) => {
-      if (l) {
-        setLesson(l);
-        setQuiz(q);
-        setPhase('intro');
-        setByteMood('happy');
-      }
-    });
+    Promise.all([fetchLesson(numId), fetchQuizForLesson(numId)])
+      .then(([l, q]) => {
+        if (l) {
+          setLesson(l);
+          setQuiz(q || []);
+          setPhase('intro');
+          setByteMood('happy');
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load lesson:', err);
+      });
   }, [id]);
 
   if (phase === 'loading' || !lesson) {

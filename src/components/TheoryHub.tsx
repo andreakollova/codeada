@@ -14,7 +14,7 @@ export default function TheoryHub() {
   const { locale } = useLocaleStore();
   const router = useRouter();
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
-  const [showAll, setShowAll] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     fetchModulesWithLessons().then(mods => {

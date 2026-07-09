@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 import BottomNav from '@/components/BottomNav';
+import LocaleInit from '@/components/LocaleInit';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body style={{ margin: 0, background: '#0A0A0A' }}>
+        <LocaleInit />
         <BottomNav />
         {children}
       </body>

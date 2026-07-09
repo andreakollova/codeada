@@ -4,20 +4,39 @@ import { persist } from 'zustand/middleware';
 
 type Locale = 'en' | 'sk';
 
+/** Detect locale from domain: .sk = Slovak, everything else = English */
+function detectLocaleFromDomain(): Locale {
+  if (typeof window === 'undefined') return 'en';
+  const host = window.location.hostname;
+  if (host.endsWith('.sk')) return 'sk';
+  return 'en';
+}
+
 interface LocaleState {
   locale: Locale;
+  _domainChecked: boolean;
   setLocale: (locale: Locale) => void;
   toggle: () => void;
+  checkDomain: () => void;
 }
 
 export const useLocaleStore = create<LocaleState>()(
   persist(
     (set, get) => ({
       locale: 'en',
+      _domainChecked: false,
       setLocale: (locale) => set({ locale }),
       toggle: () => set({ locale: get().locale === 'en' ? 'sk' : 'en' }),
+      checkDomain: () => {
+        if (get()._domainChecked) return;
+        const domainLocale = detectLocaleFromDomain();
+        set({ locale: domainLocale, _domainChecked: true });
+      },
     }),
-    { name: 'coduy-locale' }
+    {
+      name: 'coduy-locale',
+      partialize: (s) => ({ locale: s.locale, _domainChecked: s._domainChecked }),
+    }
   )
 );
 

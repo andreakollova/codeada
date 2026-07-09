@@ -122,8 +122,7 @@ export default function CodingPath() {
   const toggleModule = (id: number) =>
     setOpenModules(prev => ({ ...prev, [id]: !prev[id] }));
 
-  if (dbModules.length === 0) return null;
-
+  // Show path selection even before modules load
   const isAllMode = selectedPath === 'all';
   const activePath = isAllMode ? null : PATHS.find(p => p.id === selectedPath);
   const activeModuleNumbers = activePath ? activePath.modules : ALL_CODING_MODULES;
@@ -227,6 +226,11 @@ export default function CodingPath() {
   }
 
   // === CURRICULUM VIEW ===
+  if (dbModules.length === 0) return (
+    <div style={{ padding: 40, textAlign: 'center' }}>
+      <p style={{ color: '#555', fontSize: 13 }}>{locale === 'sk' ? 'Načítavam...' : 'Loading...'}</p>
+    </div>
+  );
   return (
     <div>
       {/* Back + Header */}

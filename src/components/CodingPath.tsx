@@ -241,18 +241,54 @@ export default function CodingPath() {
         <ChevronDown size={16} style={{ transform: 'rotate(90deg)' }} />
         {locale === 'sk' ? 'Späť na výber cesty' : 'Back to path selection'}
       </button>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Terminal size={16} color="#fff" />
+      {/* Path hero */}
+      {activePath && (
+        <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 16, padding: 24, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 20 }}>
+          <Byte mood="happy" size={72} equipment={activePath.equipment} />
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 22 }}>{activePath.emoji}</span>
+              <h2 style={{ fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '-0.02em' }}>
+                {locale === 'sk' ? activePath.titleSk : activePath.titleEn}
+              </h2>
+            </div>
+            <p style={{ fontSize: 13, color: '#aaa', marginBottom: 8, fontStyle: 'italic' }}>
+              &bdquo;{locale === 'sk' ? activePath.subtitleSk : activePath.subtitleEn}&ldquo;
+            </p>
+            <p style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>
+              {locale === 'sk' ? activePath.descSk : activePath.descEn}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>
+                {activeModuleNumbers.length} {locale === 'sk' ? 'modulov' : 'modules'} - {allLessons.length} {locale === 'sk' ? 'lekcií' : 'lessons'}
+              </span>
+              <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
+                {doneCount} {locale === 'sk' ? 'hotových' : 'done'}
+              </span>
+            </div>
+          </div>
         </div>
-        <div style={{ flex: 1 }}>
-          <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
-            {activePath ? `${activePath.emoji} ${locale === 'sk' ? activePath.titleSk : activePath.titleEn}` : (isAllMode ? (locale === 'sk' ? 'Všetky moduly' : 'All modules') : s('coding', locale))}
-          </h2>
-          <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
-            {doneCount} / {allLessons.length} {s('lessonsCompleted', locale)}
-          </p>
+      )}
+
+      {!activePath && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Terminal size={16} color="#fff" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
+              {locale === 'sk' ? 'Všetky moduly' : 'All modules'}
+            </h2>
+            <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
+              {doneCount} / {allLessons.length} {locale === 'sk' ? 'lekcií hotových' : 'lessons done'}
+            </p>
+          </div>
         </div>
+      )}
+
+      {/* Progress bar */}
+      <div style={{ height: 3, borderRadius: 2, background: '#1a1a1a', marginBottom: 20, overflow: 'hidden' }}>
+        <div style={{ height: '100%', background: allLessons.length > 0 ? '#4ade80' : '#333', borderRadius: 2, width: `${allLessons.length > 0 ? (doneCount / allLessons.length) * 100 : 0}%`, transition: 'width 0.4s' }} />
       </div>
 
       {/* Modules grouped by syllabus */}

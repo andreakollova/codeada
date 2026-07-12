@@ -23,14 +23,14 @@ const eyes: Record<ByteMood, { rx: number; ry: number; dy: number; opacity: numb
 // Aura color configs
 const auraColors: Record<string, { c1: string; c2: string; c3?: string }> = {
   'aura-soft':    { c1: 'rgba(255,255,255,0.08)', c2: 'rgba(255,255,255,0.03)' },
-  'aura-blue':    { c1: 'rgba(74,158,255,0.25)',  c2: 'rgba(74,158,255,0.08)' },
-  'aura-green':   { c1: 'rgba(74,222,128,0.25)',  c2: 'rgba(74,222,128,0.08)' },
+  'aura-blue':    { c1: 'rgba(74,158,255,0.15)',  c2: 'rgba(74,158,255,0.05)' },
+  'aura-green':   { c1: 'rgba(74,222,128,0.15)',  c2: 'rgba(74,222,128,0.05)' },
   'aura-fire':    { c1: 'rgba(255,100,30,0.35)',   c2: 'rgba(255,60,10,0.15)',  c3: 'rgba(255,200,50,0.2)' },
   'aura-water':   { c1: 'rgba(30,144,255,0.3)',    c2: 'rgba(0,100,255,0.12)',  c3: 'rgba(100,200,255,0.15)' },
   'aura-earth':   { c1: 'rgba(139,119,80,0.3)',    c2: 'rgba(74,222,128,0.15)', c3: 'rgba(200,170,100,0.1)' },
   'aura-air':     { c1: 'rgba(200,230,255,0.25)',   c2: 'rgba(180,220,255,0.1)', c3: 'rgba(255,255,255,0.15)' },
   'aura-golden':  { c1: 'rgba(245,158,11,0.4)',    c2: 'rgba(255,200,50,0.15)', c3: 'rgba(255,230,100,0.2)' },
-  'aura-galaxy':  { c1: 'rgba(168,85,247,0.35)',   c2: 'rgba(59,130,246,0.2)',  c3: 'rgba(236,72,153,0.15)' },
+  'aura-galaxy':  { c1: 'rgba(168,85,247,0.18)',   c2: 'rgba(59,130,246,0.1)',  c3: 'rgba(236,72,153,0.08)' },
   'aura-void':    { c1: 'rgba(255,51,102,0.35)',    c2: 'rgba(168,85,247,0.25)', c3: 'rgba(0,0,0,0.3)' },
   'aura-cosmic':  { c1: 'rgba(168,85,247,0.4)',    c2: 'rgba(255,51,102,0.25)', c3: 'rgba(59,130,246,0.2)' },
 };

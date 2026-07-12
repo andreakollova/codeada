@@ -36,27 +36,18 @@ export default function TheoryHub() {
   return (
     <div style={{ marginBottom: 40 }}>
       {/* Section header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BookOpen size={16} color="#fff" />
-          </div>
-          <div>
-            <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
-              {s('theoryHub', locale)}
-            </h2>
-            <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
-              {readCount} / {allTheoryLessons.length} {s('readsCompleted', locale)}
-            </p>
-          </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <BookOpen size={16} color="#fff" />
         </div>
-        <button
-          onClick={() => setShowAll(!showAll)}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, background: '#161616', border: '1px solid #222', color: '#aaa', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
-        >
-          <Library size={14} />
-          {showAll ? s('showLess', locale) : s('browseAll', locale)}
-        </button>
+        <div>
+          <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
+            {s('theoryHub', locale)}
+          </h2>
+          <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
+            {readCount} / {allTheoryLessons.length} {s('readsCompleted', locale)}
+          </p>
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -64,36 +55,34 @@ export default function TheoryHub() {
         <div style={{ height: '100%', background: '#fff', borderRadius: 2, width: `${(readCount / allTheoryLessons.length) * 100}%`, transition: 'width 0.4s' }} />
       </div>
 
-      {!showAll ? (
-        <>
-          {/* Modules with progress */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {dbModules.slice(0, 4).map(mod => {
-              const modDone = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
-              const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
-              return (
-                <div key={mod.id} onClick={() => setShowAll(true)} style={{ padding: '14px 16px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <BookOpen size={16} color="#888" />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: '#ccc', marginBottom: 4 }}>{modTitle}</div>
-                    <div style={{ fontSize: 11, color: '#555' }}>{modDone}/{mod.lessons.length} {s('lessons', locale)}</div>
-                  </div>
-                  <ChevronRight size={14} color="#555" />
-                </div>
-              );
-            })}
-          </div>
+      {/* First 4 modules */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {dbModules.slice(0, 4).map(mod => {
+          const modDone = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+          const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
+          return (
+            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} />
+          );
+        })}
+      </div>
 
-          {allTheoryLessons.length === readCount && (
-            <div style={{ padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
-              <p style={{ color: '#888', fontSize: 14 }}>{s('allTheoryDone', locale)}</p>
-            </div>
-          )}
-        </>
-      ) : (
-        /* Browse all — module list */
+      {/* Show all divider + button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '20px 0' }}>
+        <div style={{ flex: 1, height: 1, background: '#222' }} />
+        <button
+          onClick={() => setShowAll(!showAll)}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, background: 'none', border: '1px solid #222', color: '#888', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+        >
+          <Library size={13} />
+          {showAll ? (locale === 'sk' ? 'Skryť' : 'Show less') : (locale === 'sk' ? 'Zobraziť všetky' : 'Show all')}
+        </button>
+        <div style={{ flex: 1, height: 1, background: '#222' }} />
+      </div>
+
+      {/* Remaining modules */}
+      {showAll && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {dbModules.map((mod) => (
+          {dbModules.slice(4).map((mod) => (
             <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} />
           ))}
         </div>

@@ -346,9 +346,11 @@ export default function CodingPath() {
               const lessonTitle = locale === 'sk' && item.lesson.title_sk ? item.lesson.title_sk : item.lesson.title;
 
               // Zigzag offset: sine wave pattern
-              const offset = Math.sin(i * 0.8) * 60;
+              const offset = Math.sin(i * 0.8) * 80;
+              const prevOffset = i > 0 ? Math.sin((i - 1) * 0.8) * 80 : 0;
               const nodeSize = isNext ? 58 : 48;
               const trailDone = done || isNext;
+              const connectorH = 40;
 
               return (
                 <div key={item.lesson.id} style={{ width: '100%' }}>
@@ -363,15 +365,17 @@ export default function CodingPath() {
                     </div>
                   )}
 
-                  {/* Connector trail */}
+                  {/* Curved connector trail */}
                   {i > 0 && !item.isFirstInGroup && (
-                    <div style={{ display: 'flex', justifyContent: 'center', height: 32, position: 'relative' }}>
-                      <svg width="100%" height="32" style={{ position: 'absolute', top: 0, left: 0 }}>
-                        <line
-                          x1="50%" y1="0" x2="50%" y2="32"
+                    <div style={{ height: connectorH, position: 'relative' }}>
+                      <svg viewBox="0 0 300 40" preserveAspectRatio="none" style={{ width: '100%', height: connectorH, display: 'block' }}>
+                        <path
+                          d={`M ${150 + prevOffset} 0 C ${150 + prevOffset} 20, ${150 + offset} 20, ${150 + offset} 40`}
                           stroke={trailDone ? '#333' : '#1a1a1a'}
-                          strokeWidth="2"
-                          strokeDasharray={trailDone ? 'none' : '4 4'}
+                          strokeWidth="3"
+                          strokeDasharray={trailDone ? 'none' : '6 6'}
+                          fill="none"
+                          strokeLinecap="round"
                         />
                       </svg>
                     </div>

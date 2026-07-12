@@ -36,7 +36,7 @@ const strings = {
   checkpoint: { en: 'Checkpoint', sk: 'Kontrolný bod' },
 
   // TheoryHub
-  theoryHub: { en: 'Theory Hub', sk: 'Teória' },
+  theoryHub: { en: 'Theory & Interesting Reads', sk: 'Teória & Zaujímavé čítanie' },
   readsCompleted: { en: 'reads completed', sk: 'prečítaných' },
   browseAll: { en: 'Browse all', sk: 'Zobraziť všetko' },
   showLess: { en: 'Show less', sk: 'Zobraziť menej' },

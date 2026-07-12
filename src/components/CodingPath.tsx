@@ -244,40 +244,42 @@ export default function CodingPath() {
   );
   return (
     <div>
-      {/* Back + Header */}
-      <button
-        onClick={() => { setSelectedPath(null); localStorage.removeItem('coduy-path'); }}
-        style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#888', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500, marginBottom: 12, padding: 0 }}
-      >
-        <ChevronDown size={16} style={{ transform: 'rotate(90deg)' }} />
-        {locale === 'sk' ? 'Späť na výber cesty' : 'Back to path selection'}
-      </button>
       {/* Path hero */}
       {activePath && (
-        <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 16, padding: 24, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 20 }}>
-          <Byte mood="happy" size={72} equipment={activePath.equipment} />
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <span style={{ fontSize: 22 }}>{activePath.emoji}</span>
-              <h2 style={{ fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '-0.02em' }}>
-                {locale === 'sk' ? activePath.titleSk : activePath.titleEn}
-              </h2>
-            </div>
-            <p style={{ fontSize: 13, color: '#aaa', marginBottom: 8, fontStyle: 'italic' }}>
-              &bdquo;{locale === 'sk' ? activePath.subtitleSk : activePath.subtitleEn}&ldquo;
-            </p>
-            <p style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>
-              {locale === 'sk' ? activePath.descSk : activePath.descEn}
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>
-                {activeModuleNumbers.length} {locale === 'sk' ? 'modulov' : 'modules'} - {allLessons.length} {locale === 'sk' ? 'lekcií' : 'lessons'}
-              </span>
-              <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
-                {doneCount} {locale === 'sk' ? 'hotových' : 'done'}
-              </span>
+        <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <Byte mood="happy" size={72} equipment={activePath.equipment} />
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <span style={{ fontSize: 22 }}>{activePath.emoji}</span>
+                <h2 style={{ fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '-0.02em' }}>
+                  {locale === 'sk' ? activePath.titleSk : activePath.titleEn}
+                </h2>
+              </div>
+              <p style={{ fontSize: 13, color: '#aaa', marginBottom: 8, fontStyle: 'italic' }}>
+                &bdquo;{locale === 'sk' ? activePath.subtitleSk : activePath.subtitleEn}&ldquo;
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>
+                  {activeModuleNumbers.length} {locale === 'sk' ? 'modulov' : 'modules'} - {allLessons.length} {locale === 'sk' ? 'lekcií' : 'lessons'}
+                </span>
+                <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
+                  {doneCount} {locale === 'sk' ? 'hotových' : 'done'}
+                </span>
+              </div>
             </div>
           </div>
+          <button
+            onClick={() => { setSelectedPath(null); localStorage.removeItem('coduy-path'); }}
+            style={{
+              marginTop: 14, width: '100%', padding: '10px', borderRadius: 10,
+              background: '#161616', border: '1px solid #222', color: '#888',
+              fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            }}
+          >
+            {locale === 'sk' ? 'Zmeniť cestu' : 'Change path'}
+          </button>
         </div>
       )}
 

@@ -110,7 +110,7 @@ export default function GlossaryPage() {
         </div>
 
         {/* Category filter */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20, overflowX: 'auto', paddingBottom: 4 }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 20, flexWrap: 'wrap' }}>
           {categories.map(cat => {
             const label = cat === 'všetko' ? (locale === 'sk' ? 'Všetko' : 'All')
               : cat === 'môj' ? (locale === 'sk' ? 'Môj slovník' : 'My glossary')

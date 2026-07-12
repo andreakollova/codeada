@@ -5,9 +5,31 @@ import { motion } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { fetchModulesWithLessons, ModuleWithLessons, DbLessonSummary } from '@/lib/curriculum-api';
 import { useRouter } from 'next/navigation';
-import { BookOpen, ChevronRight, Check, ArrowRight, Library } from 'lucide-react';
+import { BookOpen, ChevronRight, Check, ArrowRight, Library, Coffee } from 'lucide-react';
 import { useLocaleStore, t } from '@/store/localeStore';
 import { s } from '@/data/strings';
+
+// Coffee collectible per module — earned when all lessons read
+const MODULE_COFFEES: Record<number, { icon: string; name: string; nameSk: string }> = {
+  1: { icon: '☕', name: 'Espresso', nameSk: 'Espresso' },
+  2: { icon: '🫖', name: 'Green Tea', nameSk: 'Zelený čaj' },
+  3: { icon: '☕', name: 'Cappuccino', nameSk: 'Cappuccino' },
+  4: { icon: '🍵', name: 'Matcha', nameSk: 'Matcha' },
+  5: { icon: '☕', name: 'Flat White', nameSk: 'Flat White' },
+  6: { icon: '🧋', name: 'Bubble Tea', nameSk: 'Bubble Tea' },
+  7: { icon: '☕', name: 'Americano', nameSk: 'Americano' },
+  8: { icon: '🍵', name: 'Chai Latte', nameSk: 'Chai Latte' },
+  9: { icon: '☕', name: 'Ristretto', nameSk: 'Ristretto' },
+  10: { icon: '🫖', name: 'Earl Grey', nameSk: 'Earl Grey' },
+  11: { icon: '☕', name: 'Macchiato', nameSk: 'Macchiato' },
+  12: { icon: '🍵', name: 'Oolong', nameSk: 'Oolong' },
+  13: { icon: '☕', name: 'Cortado', nameSk: 'Cortado' },
+  14: { icon: '🧋', name: 'Iced Latte', nameSk: 'Iced Latte' },
+  15: { icon: '☕', name: 'Doppio', nameSk: 'Doppio' },
+  16: { icon: '🍵', name: 'Jasmine Tea', nameSk: 'Jasmínový čaj' },
+  17: { icon: '☕', name: 'Mocha', nameSk: 'Mocha' },
+  18: { icon: '🫖', name: 'Rooibos', nameSk: 'Rooibos' },
+};
 
 export default function TheoryHub() {
   const { completedLessons } = useUserStore();
@@ -137,9 +159,10 @@ function ModuleRow({ mod, completedLessons, router, locale }: { mod: ModuleWithL
   const [open, setOpen] = useState(false);
   const doneCount = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
   const allDone = doneCount === mod.lessons.length;
+  const coffee = MODULE_COFFEES[mod.module_number];
 
   return (
-    <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden' }}>
+    <div style={{ background: '#0a0a0a', border: `1px solid ${allDone ? 'rgba(245,158,11,0.2)' : '#1a1a1a'}`, borderRadius: 12, overflow: 'hidden' }}>
       <button
         onClick={() => setOpen(!open)}
         style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left' }}
@@ -147,17 +170,23 @@ function ModuleRow({ mod, completedLessons, router, locale }: { mod: ModuleWithL
         <div style={{
           width: 32, height: 32, borderRadius: 8, flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: allDone ? '#fff' : '#111',
-          border: allDone ? 'none' : '1px solid #222',
+          background: allDone ? 'rgba(245,158,11,0.1)' : '#111',
+          border: allDone ? '1px solid rgba(245,158,11,0.3)' : '1px solid #222',
+          fontSize: allDone ? 18 : 14,
         }}>
-          {allDone
-            ? <Check size={16} color="#000" strokeWidth={2.5} />
+          {allDone && coffee
+            ? <span>{coffee.icon}</span>
             : <BookOpen size={14} color="#777" />
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600, fontSize: 14, color: '#ddd' }}>{t(mod, 'title', locale)}</div>
-          <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>{doneCount}/{mod.lessons.length} {s('lessons', locale)}</div>
+          <div style={{ fontWeight: 600, fontSize: 14, color: allDone ? '#f59e0b' : '#ddd' }}>{t(mod, 'title', locale)}</div>
+          <div style={{ fontSize: 11, color: allDone ? '#b45309' : '#777', marginTop: 2 }}>
+            {allDone && coffee
+              ? `${locale === 'sk' ? coffee.nameSk : coffee.name} ☕`
+              : `${doneCount}/${mod.lessons.length} ${s('lessons', locale)}`
+            }
+          </div>
         </div>
         <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.15 }}>
           <ChevronRight size={16} color="#555" />

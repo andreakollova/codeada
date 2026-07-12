@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
@@ -10,7 +10,22 @@ import { useRouter } from 'next/navigation';
 import Byte from './Byte';
 import {
   BookOpen, Code, ChevronDown, Check, Play, Terminal,
+  Variable, Keyboard, GitBranch, Layers, Braces, Hash,
+  List, Database, Repeat, Cpu, Zap, Shield, Globe, Server,
+  FileCode, FolderOpen, Bug, Gauge, Lock, Package, Wrench,
+  Puzzle, PenTool, Search, Filter, Clock, Bell, Settings,
+  RefreshCw, Box, Lightbulb, Star, Heart, Eye, Sparkles,
+  ArrowDownCircle,
 } from 'lucide-react';
+
+// Rotating icon set for lesson nodes (uniform lucide style)
+const LESSON_ICONS = [
+  Variable, Keyboard, Braces, Hash, List, Layers, Database,
+  Repeat, Cpu, Zap, Shield, Globe, Server, FileCode, FolderOpen,
+  Bug, Gauge, Lock, Package, Wrench, Puzzle, PenTool, Search,
+  Filter, Clock, Bell, Settings, RefreshCw, Box, Lightbulb,
+  Star, Eye, Sparkles, Code, GitBranch, Terminal,
+];
 
 // === CHARACTER PATHS ===
 interface CharacterPath {
@@ -100,6 +115,8 @@ export default function CodingPath() {
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
   const [openModules, setOpenModules] = useState<Record<number, boolean>>({});
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const nextLessonRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   // Persist selected path
   useEffect(() => {
@@ -361,7 +378,7 @@ export default function CodingPath() {
                   )}
 
                   {/* Lesson node */}
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <div ref={isNext ? nextLessonRef : undefined} style={{ display: 'flex', justifyContent: 'center' }}>
                     <motion.button
                       onClick={() => !locked && router.push(`/theory/${item.lesson.id}`)}
                       whileHover={!locked ? { scale: 1.06 } : {}}
@@ -378,23 +395,26 @@ export default function CodingPath() {
                       }}
                     >
                       {/* Circle node */}
-                      <div style={{
-                        width: nodeSize, height: nodeSize, borderRadius: '50%',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: done ? '#4ade80' : isNext ? '#fff' : locked ? '#111' : '#1a1a1a',
-                        border: done || isNext ? 'none' : `2px solid ${locked ? '#1a1a1a' : '#333'}`,
-                        boxShadow: isNext ? '0 0 24px rgba(255,255,255,0.2), 0 0 48px rgba(255,255,255,0.05)' : done ? '0 0 12px rgba(74,222,128,0.15)' : 'none',
-                        transition: 'all 0.2s',
-                      }}>
-                        {done
-                          ? <Check size={22} color="#052e16" strokeWidth={3} />
-                          : isNext
-                            ? <Play size={20} color="#000" fill="#000" />
-                            : locked
-                              ? <span style={{ fontSize: 14, color: '#333' }}>🔒</span>
-                              : <BookOpen size={16} color="#666" />
-                        }
-                      </div>
+                      {(() => {
+                        const LessonIcon = LESSON_ICONS[i % LESSON_ICONS.length];
+                        return (
+                          <div style={{
+                            width: nodeSize, height: nodeSize, borderRadius: '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: done ? '#4ade80' : isNext ? '#fff' : locked ? '#111' : '#1a1a1a',
+                            border: done || isNext ? 'none' : `2px solid ${locked ? '#1a1a1a' : '#333'}`,
+                            boxShadow: isNext ? '0 0 24px rgba(255,255,255,0.2), 0 0 48px rgba(255,255,255,0.05)' : done ? '0 0 12px rgba(74,222,128,0.15)' : 'none',
+                            transition: 'all 0.2s',
+                          }}>
+                            {done
+                              ? <Check size={22} color="#052e16" strokeWidth={3} />
+                              : isNext
+                                ? <Play size={20} color="#000" fill="#000" />
+                                : <LessonIcon size={locked ? 14 : 18} color={locked ? '#333' : '#666'} strokeWidth={1.8} />
+                            }
+                          </div>
+                        );
+                      })()}
                       {/* Label */}
                       <div style={{ textAlign: 'center', maxWidth: 140 }}>
                         <div style={{
@@ -414,6 +434,30 @@ export default function CodingPath() {
           </div>
         );
       })()}
+
+      {/* Scroll to next lesson button */}
+      {nextLessonRef.current && !hasScrolled && (
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          onClick={() => {
+            nextLessonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setHasScrolled(true);
+          }}
+          style={{
+            position: 'fixed', bottom: 90, left: '50%', transform: 'translateX(-50%)', zIndex: 50,
+            padding: '10px 20px', borderRadius: 20,
+            background: '#fff', color: '#000', fontWeight: 700, fontSize: 13,
+            border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          }}
+        >
+          <ArrowDownCircle size={16} />
+          {locale === 'sk' ? 'Pokračovať' : 'Continue'}
+        </motion.button>
+      )}
     </div>
   );
 }

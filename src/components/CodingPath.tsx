@@ -111,12 +111,23 @@ export default function CodingPath() {
     fetchModulesWithLessons().then(mods => {
       const codingMods = mods.filter(m => ALL_CODING_MODULES.includes(m.module_number));
       setDbModules(codingMods);
+      // If path is selected, open all modules by default
+      const saved = localStorage.getItem('coduy-path');
+      if (saved && saved !== 'all') {
+        const open: Record<number, boolean> = {};
+        codingMods.forEach(m => { open[m.id] = true; });
+        setOpenModules(open);
+      }
     });
   }, []);
 
   const selectPath = (pathId: string) => {
     setSelectedPath(pathId);
     localStorage.setItem('coduy-path', pathId);
+    // Open all modules when selecting a path
+    const open: Record<number, boolean> = {};
+    dbModules.forEach(m => { open[m.id] = true; });
+    setOpenModules(open);
   };
 
   const toggleModule = (id: number) =>

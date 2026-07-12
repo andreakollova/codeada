@@ -15,7 +15,7 @@ import {
   FileCode, FolderOpen, Bug, Gauge, Lock, Package, Wrench,
   Puzzle, PenTool, Search, Filter, Clock, Bell, Settings,
   RefreshCw, Box, Lightbulb, Star, Heart, Eye, Sparkles,
-  ArrowDownCircle,
+  ArrowDownCircle, Gift,
 } from 'lucide-react';
 
 // Rotating icon set for lesson nodes (uniform lucide style)
@@ -431,15 +431,21 @@ export default function CodingPath() {
                           const lessonNum = i + 1;
                           const getsReward = lessonNum === 1 || lessonNum === 3 || lessonNum % 5 === 0;
                           if (!getsReward) return null;
+                          const pathColor = activePath?.id === 'builder' ? '#4ade80'
+                            : activePath?.id === 'ai-pilot' ? '#a855f7'
+                            : activePath?.id === 'mechanic' ? '#60a5fa'
+                            : activePath?.id === 'master' ? '#f59e0b'
+                            : '#f59e0b';
+                          const badgeColor = done ? '#888' : pathColor;
                           return (
                             <div style={{
                               marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 3,
                               padding: '2px 8px', borderRadius: 10,
-                              background: done ? 'rgba(74,222,128,0.1)' : 'rgba(245,158,11,0.1)',
-                              border: `1px solid ${done ? 'rgba(74,222,128,0.2)' : 'rgba(245,158,11,0.2)'}`,
+                              background: `${badgeColor}15`,
+                              border: `1px solid ${badgeColor}33`,
                             }}>
-                              <span style={{ fontSize: 10 }}>🎁</span>
-                              <span style={{ fontSize: 9, fontWeight: 600, color: done ? '#4ade80' : '#f59e0b' }}>
+                              <Gift size={10} color={badgeColor} />
+                              <span style={{ fontSize: 9, fontWeight: 600, color: badgeColor }}>
                                 {locale === 'sk' ? 'Odmena' : 'Reward'}
                               </span>
                             </div>

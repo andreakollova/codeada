@@ -9,30 +9,75 @@ import { BookOpen, ChevronRight, Check, ArrowRight, Library, Coffee } from 'luci
 import { useLocaleStore, t } from '@/store/localeStore';
 import { s } from '@/data/strings';
 
-// Coffee collectible per module — earned when all lessons read
-const MODULE_COFFEES: Record<number, { icon: string; name: string; nameSk: string }> = {
-  1: { icon: '☕', name: 'Espresso', nameSk: 'Espresso' },
-  2: { icon: '🫖', name: 'Green Tea', nameSk: 'Zelený čaj' },
-  3: { icon: '☕', name: 'Cappuccino', nameSk: 'Cappuccino' },
-  4: { icon: '🍵', name: 'Matcha', nameSk: 'Matcha' },
-  5: { icon: '☕', name: 'Flat White', nameSk: 'Flat White' },
-  6: { icon: '🧋', name: 'Bubble Tea', nameSk: 'Bubble Tea' },
-  7: { icon: '☕', name: 'Americano', nameSk: 'Americano' },
-  8: { icon: '🍵', name: 'Chai Latte', nameSk: 'Chai Latte' },
-  9: { icon: '☕', name: 'Ristretto', nameSk: 'Ristretto' },
-  10: { icon: '🫖', name: 'Earl Grey', nameSk: 'Earl Grey' },
-  11: { icon: '☕', name: 'Macchiato', nameSk: 'Macchiato' },
-  12: { icon: '🍵', name: 'Oolong', nameSk: 'Oolong' },
-  13: { icon: '☕', name: 'Cortado', nameSk: 'Cortado' },
-  14: { icon: '🧋', name: 'Iced Latte', nameSk: 'Iced Latte' },
-  15: { icon: '☕', name: 'Doppio', nameSk: 'Doppio' },
-  16: { icon: '🍵', name: 'Jasmine Tea', nameSk: 'Jasmínový čaj' },
-  17: { icon: '☕', name: 'Mocha', nameSk: 'Mocha' },
-  18: { icon: '🫖', name: 'Rooibos', nameSk: 'Rooibos' },
+// Drink rewards per module — varies by user's favorite drink
+type DrinkType = 'coffee' | 'tea' | 'energy' | 'juice' | 'water';
+const DRINK_REWARDS: Record<DrinkType, { icon: string; items: { name: string; nameSk: string }[] }> = {
+  coffee: { icon: '☕', items: [
+    { name: 'Espresso', nameSk: 'Espresso' }, { name: 'Cappuccino', nameSk: 'Cappuccino' },
+    { name: 'Flat White', nameSk: 'Flat White' }, { name: 'Americano', nameSk: 'Americano' },
+    { name: 'Ristretto', nameSk: 'Ristretto' }, { name: 'Cortado', nameSk: 'Cortado' },
+    { name: 'Macchiato', nameSk: 'Macchiato' }, { name: 'Doppio', nameSk: 'Doppio' },
+    { name: 'Mocha', nameSk: 'Mocha' }, { name: 'Latte', nameSk: 'Latte' },
+    { name: 'Iced Coffee', nameSk: 'Iced Coffee' }, { name: 'Irish Coffee', nameSk: 'Irish Coffee' },
+    { name: 'Affogato', nameSk: 'Affogato' }, { name: 'Cold Brew', nameSk: 'Cold Brew' },
+    { name: 'Turkish Coffee', nameSk: 'Turecká káva' }, { name: 'Frappuccino', nameSk: 'Frappuccino' },
+    { name: 'Lungo', nameSk: 'Lungo' }, { name: 'Vienna Coffee', nameSk: 'Viedenská káva' },
+  ]},
+  tea: { icon: '🍵', items: [
+    { name: 'Green Tea', nameSk: 'Zelený čaj' }, { name: 'Matcha', nameSk: 'Matcha' },
+    { name: 'Chai Latte', nameSk: 'Chai Latte' }, { name: 'Earl Grey', nameSk: 'Earl Grey' },
+    { name: 'Oolong', nameSk: 'Oolong' }, { name: 'Jasmine Tea', nameSk: 'Jasmínový čaj' },
+    { name: 'Rooibos', nameSk: 'Rooibos' }, { name: 'Chamomile', nameSk: 'Harmanček' },
+    { name: 'Peppermint', nameSk: 'Mäta' }, { name: 'White Tea', nameSk: 'Biely čaj' },
+    { name: 'Darjeeling', nameSk: 'Darjeeling' }, { name: 'Sencha', nameSk: 'Sencha' },
+    { name: 'Ginger Tea', nameSk: 'Zázvorový čaj' }, { name: 'Hibiscus', nameSk: 'Ibištek' },
+    { name: 'Pu-erh', nameSk: 'Pu-erh' }, { name: 'Lemon Balm', nameSk: 'Medovka' },
+    { name: 'Turmeric Tea', nameSk: 'Kurkumový čaj' }, { name: 'Bubble Tea', nameSk: 'Bubble Tea' },
+  ]},
+  energy: { icon: '⚡', items: [
+    { name: 'Classic Boost', nameSk: 'Klasický boost' }, { name: 'Tropical Storm', nameSk: 'Tropická búrka' },
+    { name: 'Berry Blast', nameSk: 'Berry výbuch' }, { name: 'Citrus Rush', nameSk: 'Citrusový nával' },
+    { name: 'Midnight Fuel', nameSk: 'Polnočné palivo' }, { name: 'Green Thunder', nameSk: 'Zelený hrom' },
+    { name: 'Arctic Chill', nameSk: 'Arktický chill' }, { name: 'Mango Surge', nameSk: 'Mangový prúd' },
+    { name: 'Cherry Volt', nameSk: 'Čerešňový volt' }, { name: 'Cosmic Wave', nameSk: 'Kozmická vlna' },
+    { name: 'Dragon Pulse', nameSk: 'Dračí pulz' }, { name: 'Neon Splash', nameSk: 'Neónový splash' },
+    { name: 'Power Grid', nameSk: 'Power Grid' }, { name: 'Solar Flare', nameSk: 'Solárna erupcia' },
+    { name: 'Turbo Mode', nameSk: 'Turbo mód' }, { name: 'Ultra Spark', nameSk: 'Ultra iskra' },
+    { name: 'Voltage Peak', nameSk: 'Voltage Peak' }, { name: 'Zero Gravity', nameSk: 'Nulová gravitácia' },
+  ]},
+  juice: { icon: '🧃', items: [
+    { name: 'Orange Juice', nameSk: 'Pomarančový džús' }, { name: 'Apple Juice', nameSk: 'Jablkový džús' },
+    { name: 'Mango Smoothie', nameSk: 'Mangové smoothie' }, { name: 'Berry Mix', nameSk: 'Berry mix' },
+    { name: 'Pineapple Juice', nameSk: 'Ananásový džús' }, { name: 'Watermelon Fresh', nameSk: 'Melónový fresh' },
+    { name: 'Carrot Ginger', nameSk: 'Mrkva so zázvorom' }, { name: 'Green Smoothie', nameSk: 'Zelené smoothie' },
+    { name: 'Peach Nectar', nameSk: 'Broskyňový nektár' }, { name: 'Grape Juice', nameSk: 'Hroznový džús' },
+    { name: 'Lemonade', nameSk: 'Limonáda' }, { name: 'Passion Fruit', nameSk: 'Maracuja' },
+    { name: 'Pomegranate', nameSk: 'Granátové jablko' }, { name: 'Coconut Water', nameSk: 'Kokosová voda' },
+    { name: 'Acai Bowl', nameSk: 'Acai bowl' }, { name: 'Kiwi Blast', nameSk: 'Kiwi blast' },
+    { name: 'Strawberry Shake', nameSk: 'Jahodový shake' }, { name: 'Tropical Mix', nameSk: 'Tropický mix' },
+  ]},
+  water: { icon: '💧', items: [
+    { name: 'Sparkling Water', nameSk: 'Perlivá voda' }, { name: 'Mineral Water', nameSk: 'Minerálka' },
+    { name: 'Lemon Water', nameSk: 'Citrónová voda' }, { name: 'Cucumber Water', nameSk: 'Uhorkový fresh' },
+    { name: 'Spring Water', nameSk: 'Pramenitá voda' }, { name: 'Rose Water', nameSk: 'Ružová voda' },
+    { name: 'Coconut Water', nameSk: 'Kokosová voda' }, { name: 'Mint Infusion', nameSk: 'Mätový nálev' },
+    { name: 'Ginger Water', nameSk: 'Zázvorová voda' }, { name: 'Berry Infusion', nameSk: 'Ovocný nálev' },
+    { name: 'Alkaline Water', nameSk: 'Alkalická voda' }, { name: 'Glacier Melt', nameSk: 'Ľadovcová voda' },
+    { name: 'Herbal Infusion', nameSk: 'Bylinkový nálev' }, { name: 'Detox Water', nameSk: 'Detox voda' },
+    { name: 'Aloe Vera', nameSk: 'Aloe vera' }, { name: 'Birch Water', nameSk: 'Brezová voda' },
+    { name: 'Electrolyte', nameSk: 'Elektrolyt' }, { name: 'Ice Crystal', nameSk: 'Ľadový kryštál' },
+  ]},
 };
 
+function getModuleDrink(moduleNumber: number, favDrink: DrinkType | null) {
+  const drink = favDrink || 'coffee';
+  const rewards = DRINK_REWARDS[drink];
+  const idx = (moduleNumber - 1) % rewards.items.length;
+  return { icon: rewards.icon, ...rewards.items[idx] };
+}
+
 export default function TheoryHub() {
-  const { completedLessons } = useUserStore();
+  const { completedLessons, favDrink } = useUserStore();
   const { locale } = useLocaleStore();
   const router = useRouter();
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
@@ -83,7 +128,7 @@ export default function TheoryHub() {
           const modDone = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
           const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
           return (
-            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} />
+            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
           );
         })}
       </div>
@@ -105,7 +150,7 @@ export default function TheoryHub() {
       {showAll && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {dbModules.slice(4).map((mod) => (
-            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} />
+            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
           ))}
         </div>
       )}
@@ -155,11 +200,11 @@ function ReadCard({ lesson, index, router, locale }: { lesson: DbLessonSummary &
   );
 }
 
-function ModuleRow({ mod, completedLessons, router, locale }: { mod: ModuleWithLessons; completedLessons: string[]; router: any; locale: 'en' | 'sk' }) {
+function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: ModuleWithLessons; completedLessons: string[]; router: any; locale: 'en' | 'sk'; favDrink: DrinkType | null }) {
   const [open, setOpen] = useState(false);
   const doneCount = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
   const allDone = doneCount === mod.lessons.length;
-  const coffee = MODULE_COFFEES[mod.module_number];
+  const drinkReward = getModuleDrink(mod.module_number, favDrink);
 
   return (
     <div style={{ background: '#0a0a0a', border: `1px solid ${allDone ? 'rgba(245,158,11,0.2)' : '#1a1a1a'}`, borderRadius: 12, overflow: 'hidden' }}>
@@ -174,16 +219,16 @@ function ModuleRow({ mod, completedLessons, router, locale }: { mod: ModuleWithL
           border: allDone ? '1px solid rgba(245,158,11,0.3)' : '1px solid #222',
           fontSize: allDone ? 18 : 14,
         }}>
-          {allDone && coffee
-            ? <span>{coffee.icon}</span>
+          {allDone
+            ? <span>{drinkReward.icon}</span>
             : <BookOpen size={14} color="#777" />
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 600, fontSize: 14, color: allDone ? '#f59e0b' : '#ddd' }}>{t(mod, 'title', locale)}</div>
           <div style={{ fontSize: 11, color: allDone ? '#b45309' : '#777', marginTop: 2 }}>
-            {allDone && coffee
-              ? `${locale === 'sk' ? coffee.nameSk : coffee.name} ☕`
+            {allDone
+              ? `${locale === 'sk' ? drinkReward.nameSk : drinkReward.name} ${drinkReward.icon}`
               : `${doneCount}/${mod.lessons.length} ${s('lessons', locale)}`
             }
           </div>

@@ -22,6 +22,7 @@ interface UserActions {
   setName: (name: string) => void;
   toggleTopic: (topicId: string) => void;
   addCoffee: () => void;
+  setFavDrink: (drink: 'coffee' | 'tea' | 'energy' | 'juice' | 'water') => void;
 }
 
 const initialState: UserState = {
@@ -43,6 +44,7 @@ const initialState: UserState = {
   name: null,
   selectedTopics: [],
   coffees: 0,
+  favDrink: null,
 };
 
 export const useUserStore = create<UserState & UserActions>()(
@@ -131,6 +133,7 @@ export const useUserStore = create<UserState & UserActions>()(
       })),
 
       addCoffee: () => set((s) => ({ coffees: (s.coffees || 0) + 1 })),
+      setFavDrink: (drink) => set({ favDrink: drink }),
 
       syncToSupabase: async () => {
         const s = get();
@@ -164,7 +167,7 @@ export const useUserStore = create<UserState & UserActions>()(
         byteBattery: s.byteBattery, completedLessons: s.completedLessons,
         badges: s.badges, weeklyXp: s.weeklyXp, weekStartDate: s.weekStartDate,
         ownedItems: s.ownedItems, equipment: s.equipment, name: s.name,
-        selectedTopics: s.selectedTopics, coffees: s.coffees,
+        selectedTopics: s.selectedTopics, coffees: s.coffees, favDrink: s.favDrink,
       }),
     }
   )

@@ -86,6 +86,7 @@ export interface UserState {
   equipment: ByteEquipment;
   selectedTopics: string[];
   coffees: number;
+  favDrink: 'coffee' | 'tea' | 'energy' | 'juice' | 'water' | null;
 }
 
 export interface GlossaryEntry {

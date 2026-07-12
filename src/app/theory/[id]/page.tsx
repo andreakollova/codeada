@@ -25,7 +25,7 @@ const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: st
 export default function TheoryLessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees } = useUserStore();
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees, favDrink } = useUserStore();
   const { locale } = useLocaleStore();
 
   const [lesson, setLesson] = useState<DbLesson | null>(null);
@@ -81,9 +81,19 @@ export default function TheoryLessonPage() {
     );
   }
 
-  // Coffee intro screen
+  // Drink intro screen
   if (phase === 'coffee') {
     const readTime = Math.max(3, Math.round((lesson.learning_content?.length || 500) / 800));
+    const drinkMap = {
+      coffee: { icon: '☕', en: 'Grab your coffee', sk: 'Daj si kávičku', counterEn: 'coffees', counterSk: ['káva', 'kávy', 'káv'] },
+      tea: { icon: '🍵', en: 'Brew some tea', sk: 'Zavár si čaj', counterEn: 'teas', counterSk: ['čaj', 'čaje', 'čajov'] },
+      energy: { icon: '⚡', en: 'Crack open an energy drink', sk: 'Otvor si energiťák', counterEn: 'energy drinks', counterSk: ['energiťák', 'energiťáky', 'energiťákov'] },
+      juice: { icon: '🧃', en: 'Pour some juice', sk: 'Nalej si džús', counterEn: 'juices', counterSk: ['džús', 'džúsy', 'džúsov'] },
+      water: { icon: '💧', en: 'Pour a glass of water', sk: 'Nalej si vodu', counterEn: 'glasses', counterSk: ['pohár', 'poháre', 'pohárov'] },
+    };
+    const d = drinkMap[favDrink || 'coffee'];
+    const counterSk = coffees === 1 ? d.counterSk[0] : coffees < 5 ? d.counterSk[1] : d.counterSk[2];
+
     return (
       <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <motion.div
@@ -97,10 +107,10 @@ export default function TheoryLessonPage() {
             transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
             style={{ fontSize: 48, marginBottom: 20 }}
           >
-            <Coffee size={48} color="#f59e0b" strokeWidth={1.5} />
+            {d.icon}
           </motion.div>
           <h2 style={{ fontWeight: 800, fontSize: 22, color: '#fff', marginBottom: 8 }}>
-            {locale === 'sk' ? 'Daj si kávičku' : 'Grab a coffee'}
+            {locale === 'sk' ? d.sk : d.en}
           </h2>
           <p style={{ fontSize: 14, color: '#888', lineHeight: 1.6, marginBottom: 6 }}>
             {locale === 'sk'
@@ -112,7 +122,7 @@ export default function TheoryLessonPage() {
           </p>
           {(coffees || 0) > 0 && (
             <p style={{ fontSize: 11, color: '#f59e0b', marginBottom: 20, fontWeight: 600 }}>
-              ☕ {coffees} {locale === 'sk' ? (coffees === 1 ? 'káva vypitá' : coffees < 5 ? 'kávy vypité' : 'káv vypitých') : (coffees === 1 ? 'coffee enjoyed' : 'coffees enjoyed')}
+              {d.icon} {coffees} {locale === 'sk' ? counterSk : d.counterEn}
             </p>
           )}
           <motion.button
@@ -121,7 +131,7 @@ export default function TheoryLessonPage() {
             whileTap={{ scale: 0.97 }}
             style={{ padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
           >
-            {locale === 'sk' ? 'Poďme na to' : "Let's go"} ☕
+            {locale === 'sk' ? 'Poďme na to' : "Let's go"} {d.icon}
           </motion.button>
         </motion.div>
       </div>

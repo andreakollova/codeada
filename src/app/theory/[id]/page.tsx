@@ -34,7 +34,7 @@ export default function TheoryLessonPage() {
   const [sectionIndex, setSectionIndex] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
   const [score, setScore] = useState(0);
-  // Safe string helper — ensures no objects reach React render
+  // Safe string helper - ensures no objects reach React render
   const safe = (v: unknown): string => (v == null ? '' : typeof v === 'string' ? v : String(v));
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
@@ -215,7 +215,7 @@ export default function TheoryLessonPage() {
     if (!sec) return null;
     const Icon = sec.icon;
 
-    // Pick localized content — ensure it's always string or string[]
+    // Pick localized content - ensure it's always string or string[]
     let content: string | string[];
     if (sec.key === 'key_takeaways') {
       content = tArray(lesson, sec.key, locale);
@@ -241,7 +241,7 @@ export default function TheoryLessonPage() {
           </span>
         </div>
 
-        {/* Reel video — shown in intro section */}
+        {/* Reel video - shown in intro section */}
         {sec.phase === 'intro' && reelUrl && (
           <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #1a1a1a', background: '#000' }}>
             <video

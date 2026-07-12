@@ -28,7 +28,7 @@ export default function StatusBar() {
           </span>
         </div>
 
-        {/* XP — center */}
+        {/* XP - center */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' }}>
           <Zap size={14} color="#EDEDED" fill="#EDEDED" />
           <span style={{ fontWeight: 600, fontSize: 13, color: '#EDEDED' }}>

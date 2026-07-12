@@ -57,7 +57,7 @@ export const useUserStore = create<UserState & UserActions>()(
       addXp: (amount) => set((s) => ({ xp: s.xp + amount, weeklyXp: s.weeklyXp + amount })),
 
       // Hearts = health indicator based on activity, NOT lost on wrong answers
-      loseHeart: () => {}, // no-op — hearts are not lost on mistakes
+      loseHeart: () => {}, // no-op - hearts are not lost on mistakes
 
       gainHeart: () => set((s) => ({ hearts: Math.min(s.hearts + 1, s.maxHearts) })),
 
@@ -65,7 +65,7 @@ export const useUserStore = create<UserState & UserActions>()(
         const { completedLessons, ownedItems } = get();
         if (completedLessons.includes(lessonId)) return null;
 
-        // Reward every 5th lesson (not every lesson — 50 items for 293 lessons)
+        // Reward every 5th lesson (not every lesson - 50 items for 293 lessons)
         const newCount = completedLessons.length + 1;
         const getsReward = newCount % 5 === 0 || newCount === 1 || newCount === 3;
         const reward = getsReward ? pickReward(newCount, ownedItems) : null;

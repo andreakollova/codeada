@@ -6,7 +6,7 @@ import { ByteMood } from '@/types';
 import { motion } from 'framer-motion';
 
 const moods: { mood: ByteMood; label: string; description: string }[] = [
-  { mood: 'happy', label: 'Happy', description: 'Výchozí stav — vitajte' },
+  { mood: 'happy', label: 'Happy', description: 'Výchozí stav - vitajte' },
   { mood: 'celebrating', label: 'Celebrating', description: 'Lekcia dokončená!' },
   { mood: 'sleepy', label: 'Sleepy', description: 'Kde si bol 3 dni?' },
   { mood: 'worried', label: 'Worried', description: 'Séria je v ohrození' },
@@ -30,7 +30,7 @@ export default function ByteShowcase() {
     <div className="min-h-screen px-4 py-12" style={{ background: '#0A0A0A' }}>
       <div className="max-w-xl mx-auto">
         <h1 className="text-3xl font-black mb-2" style={{ fontWeight: 600, fontFamily: 'inherit', color: '#DEFF4A' }}>
-          Byte — všetky stavy
+          Byte - všetky stavy
         </h1>
         <p className="mb-10 text-sm" style={{ color: '#888780' }}>
           Klikni na stav pre náhľad

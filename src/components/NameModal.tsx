@@ -17,10 +17,10 @@ const DRINKS = [
 ];
 
 const PATHS = [
-  { id: 'builder', emoji: '👩‍💻', titleEn: 'The Builder', titleSk: 'Builder', subtitleEn: 'I want to build apps.', subtitleSk: 'Chcem vytvárať aplikácie.', equipment: { hat: 'hat-graduation', glasses: 'glasses-cool' } },
-  { id: 'ai-pilot', emoji: '🤖', titleEn: 'The AI Pilot', titleSk: 'AI Pilot', subtitleEn: 'I want to understand AI.', subtitleSk: 'Chcem rozumieť AI.', equipment: { hat: 'hat-pilot', glasses: 'glasses-aviator' } },
-  { id: 'mechanic', emoji: '🛠️', titleEn: 'The Mechanic', titleSk: 'Mechanik', subtitleEn: 'I want to fix and read code.', subtitleSk: 'Chcem opravovať kód.', equipment: { hat: 'hat-pilot', glasses: 'glasses-aviator' } },
-  { id: 'master', emoji: '🏆', titleEn: 'The Master', titleSk: 'Master', subtitleEn: 'I want to master Python.', subtitleSk: 'Chcem ovládnuť Python.', equipment: { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold' } },
+  { id: 'builder', titleEn: 'The Builder', titleSk: 'Builder', subtitleEn: 'I want to build apps.', subtitleSk: 'Chcem vytvárať aplikácie.', equipment: { hat: 'hat-graduation', glasses: 'glasses-cool', accessory: 'acc-medal' } },
+  { id: 'ai-pilot', titleEn: 'The AI Pilot', titleSk: 'AI Pilot', subtitleEn: 'I want to understand AI.', subtitleSk: 'Chcem rozumieť AI.', equipment: { hat: 'hat-pilot', glasses: 'glasses-aviator', antenna: 'ant-lightning' } },
+  { id: 'mechanic', titleEn: 'The Mechanic', titleSk: 'Mechanik', subtitleEn: 'I want to fix and read code.', subtitleSk: 'Chcem opravovať kód.', equipment: { hat: 'hat-headband', glasses: 'glasses-round', accessory: 'acc-chain' } },
+  { id: 'master', titleEn: 'The Master', titleSk: 'Master', subtitleEn: 'I want to master Python.', subtitleSk: 'Chcem ovládnuť Python.', equipment: { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold', aura: 'aura-fire' } },
 ];
 
 export default function NameModal() {
@@ -168,11 +168,8 @@ export default function NameModal() {
                         <Byte mood="happy" size={44} equipment={path.equipment} />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                          <span style={{ fontSize: 16 }}>{path.emoji}</span>
-                          <span style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>
-                            {locale === 'sk' ? path.titleSk : path.titleEn}
-                          </span>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 2 }}>
+                          {locale === 'sk' ? path.titleSk : path.titleEn}
                         </div>
                         <p style={{ fontSize: 12, color: '#888', margin: 0 }}>
                           {locale === 'sk' ? path.subtitleSk : path.subtitleEn}

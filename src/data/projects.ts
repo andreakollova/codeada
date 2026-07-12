@@ -2,9 +2,9 @@ export interface ProjectStep {
   id: string;
   title: string;
   titleSk: string;
-  instruction: string;       // Short — what to do
+  instruction: string;       // Short - what to do
   instructionSk: string;
-  context?: string;          // Short — why (optional, 1-2 sentences max)
+  context?: string;          // Short - why (optional, 1-2 sentences max)
   contextSk?: string;
   starterCode: string;       // Code with ___ blanks or empty spots
   validateFn: string;        // JS: (code) => true/false
@@ -59,8 +59,8 @@ export const projects: ProjectTopic[] = [
         id: 'login-screen',
         title: 'Build your first Login Screen',
         titleSk: 'Vytvor svoju prvú Login obrazovku',
-        subtitle: 'From empty screen to working login — step by step.',
-        subtitleSk: 'Od prázdneho screenu po funkčný login — krok po kroku.',
+        subtitle: 'From empty screen to working login - step by step.',
+        subtitleSk: 'Od prázdneho screenu po funkčný login - krok po kroku.',
         duration: '25 min',
         level: 'Beginner',
         levelSk: 'Začiatočník',
@@ -79,16 +79,16 @@ export const projects: ProjectTopic[] = [
             titleSk: 'Pridaj View',
             instruction: 'Inside return, add a <View> component. Write it yourself.',
             instructionSk: 'Do return pridaj komponent <View>. Napíš ho sám.',
-            context: 'Every React Native screen returns what should be displayed. Right now it returns nothing — that\'s why the preview is empty.',
-            contextSk: 'Každá React Native obrazovka vracia to, čo sa má zobraziť. Momentálne nevracia nič — preto je preview prázdne.',
+            context: 'Every React Native screen returns what should be displayed. Right now it returns nothing - that\'s why the preview is empty.',
+            contextSk: 'Každá React Native obrazovka vracia to, čo sa má zobraziť. Momentálne nevracia nič - preto je preview prázdne.',
             starterCode: `export default function LoginScreen() {
   return (
 
   )
 }`,
             validateFn: `code.includes('<View>') || code.includes('<View ')`,
-            successMsg: 'View is like an empty room. It doesn\'t show anything yet — but everything will go inside it.',
-            successMsgSk: 'View je ako prázdna miestnosť. Zatiaľ nič nezobrazuje — ale všetko pôjde dovnútra.',
+            successMsg: 'View is like an empty room. It doesn\'t show anything yet - but everything will go inside it.',
+            successMsgSk: 'View je ako prázdna miestnosť. Zatiaľ nič nezobrazuje - ale všetko pôjde dovnútra.',
             errorHints: [
               'The component is called View.',
               'View needs opening and closing tags.',
@@ -226,8 +226,8 @@ export const projects: ProjectTopic[] = [
             id: 's6',
             title: 'Add password input',
             titleSk: 'Pridaj heslo input',
-            instruction: 'Now create a second TextInput for Password. On your own — no hints this time.',
-            instructionSk: 'Teraz vytvor druhý TextInput pre heslo. Sám — tentokrát bez hintov.',
+            instruction: 'Now create a second TextInput for Password. On your own - no hints this time.',
+            instructionSk: 'Teraz vytvor druhý TextInput pre heslo. Sám - tentokrát bez hintov.',
             starterCode: `export default function LoginScreen() {
   return (
     <View>
@@ -338,15 +338,15 @@ export const projects: ProjectTopic[] = [
         id: 'signup-screen',
         title: 'Build a Sign Up Screen',
         titleSk: 'Vytvor Sign Up obrazovku',
-        subtitle: 'Registration form with name, email, password — step by step.',
-        subtitleSk: 'Registracny formular s menom, emailom, heslom — krok po kroku.',
+        subtitle: 'Registration form with name, email, password - step by step.',
+        subtitleSk: 'Registracny formular s menom, emailom, heslom - krok po kroku.',
         duration: '20 min',
         level: 'Beginner',
         levelSk: 'Zaciatocnik',
         goal: 'You will build a complete registration screen that collects user info.',
         goalSk: 'Vytvoris kompletnu registracnu obrazovku, ktora zbiera udaje pouzivatela.',
-        preIntro: 'This is very similar to the Login screen. If you completed that one, this will feel familiar. If not, no worries — every step is guided.',
-        preIntroSk: 'Toto je velmi podobne Login obrazovke. Ak si ju dokoncil, bude ti to zname. Ak nie, ziadny problem — kazdy krok je vedeny.',
+        preIntro: 'This is very similar to the Login screen. If you completed that one, this will feel familiar. If not, no worries - every step is guided.',
+        preIntroSk: 'Toto je velmi podobne Login obrazovke. Ak si ju dokoncil, bude ti to zname. Ak nie, ziadny problem - kazdy krok je vedeny.',
         icon: '📝',
         previewType: 'react-native',
         language: 'typescript',
@@ -577,8 +577,8 @@ export const projects: ProjectTopic[] = [
             instructionSk: 'Pridaj <Text>Posts</Text> ako hlavicku sekcie pre grid nizsie.',
             starterCode: `export default function ProfileScreen() {\n  return (\n    <View>\n      <View>{/* Avatar */}</View>\n      <Text>John Doe</Text>\n      <Text>Mobile developer & coffee lover</Text>\n      <View>\n        <Text>120 Posts</Text>\n        <Text>4.5K Followers</Text>\n        <Text>380 Following</Text>\n      </View>\n      <Button title="Edit Profile" />\n\n    </View>\n  )\n}`,
             validateFn: `(code.match(/<Text>Posts<\\/Text>/g) || []).length >= 1 || (code.match(/Posts/g) || []).length >= 2`,
-            successMsg: 'Profile screen complete! Avatar, stats, bio, and posts section — just like a real app.',
-            successMsgSk: 'Profilova obrazovka hotova! Avatar, statistiky, bio a sekcia prispevkov — presne ako v realnej appke.',
+            successMsg: 'Profile screen complete! Avatar, stats, bio, and posts section - just like a real app.',
+            successMsgSk: 'Profilova obrazovka hotova! Avatar, statistiky, bio a sekcia prispevkov - presne ako v realnej appke.',
             errorHints: ['Add <Text>Posts</Text> at the bottom.'],
             errorHintsSk: ['Pridaj <Text>Posts</Text> na spodok.'],
             previewAddition: 'profile-posts-grid',
@@ -683,8 +683,8 @@ export const projects: ProjectTopic[] = [
             instructionSk: 'Pridaj <Button title="Log Out" /> na spodok.',
             starterCode: `export default function SettingsScreen() {\n  return (\n    <View>\n      <Text>Settings</Text>\n      <View>\n        <Text>Notifications</Text>\n        <Switch />\n      </View>\n      <View>\n        <Text>Dark Mode</Text>\n        <Switch />\n      </View>\n      <View>\n        <Text>Language</Text>\n        <Text>English</Text>\n      </View>\n\n    </View>\n  )\n}`,
             validateFn: `code.includes('Log Out') && code.includes('Button')`,
-            successMsg: 'Settings page complete! Notifications, dark mode, language, and logout — a full settings experience.',
-            successMsgSk: 'Stranka nastaveni hotova! Notifikacie, dark mode, jazyk a odhlasenie — kompletny zazitok z nastaveni.',
+            successMsg: 'Settings page complete! Notifications, dark mode, language, and logout - a full settings experience.',
+            successMsgSk: 'Stranka nastaveni hotova! Notifikacie, dark mode, jazyk a odhlasenie - kompletny zazitok z nastaveni.',
             errorHints: ['<Button title="Log Out" />'],
             errorHintsSk: ['<Button title="Log Out" />'],
             previewAddition: 'settings-logout',
@@ -708,8 +708,8 @@ export const projects: ProjectTopic[] = [
         id: 'todo-list',
         title: 'Build a Todo List',
         titleSk: 'Vytvor Todo zoznam',
-        subtitle: 'A command-line todo app in Python — add, show, complete tasks.',
-        subtitleSk: 'Prikazovy riadok todo appka v Pythone — pridavaj, zobrazuj, dokoncuj ulohy.',
+        subtitle: 'A command-line todo app in Python - add, show, complete tasks.',
+        subtitleSk: 'Prikazovy riadok todo appka v Pythone - pridavaj, zobrazuj, dokoncuj ulohy.',
         duration: '20 min',
         level: 'Beginner',
         levelSk: 'Zaciatocnik',
@@ -927,8 +927,8 @@ export const projects: ProjectTopic[] = [
         levelSk: 'Mierne pokrocily',
         goal: 'Build a GET endpoint that receives query params, queries a database, and returns JSON.',
         goalSk: 'Vytvor GET endpoint, ktory prijme query parametre, dopytuje databazu a vrati JSON.',
-        preIntro: 'APIs are how apps talk to servers. Every button tap, every data load — it goes through an API. You will build one from scratch.',
-        preIntroSk: 'API je sposob, akym appky komunikuju so servermi. Kazde kliknutie, kazde nacitanie dat — ide cez API. Vytvoris jedno od nuly.',
+        preIntro: 'APIs are how apps talk to servers. Every button tap, every data load - it goes through an API. You will build one from scratch.',
+        preIntroSk: 'API je sposob, akym appky komunikuju so servermi. Kazde kliknutie, kazde nacitanie dat - ide cez API. Vytvoris jedno od nuly.',
         icon: '🔌',
         previewType: 'terminal',
         language: 'typescript',
@@ -1114,8 +1114,8 @@ export const projects: ProjectTopic[] = [
         id: 'zustand-store',
         title: 'Build a Zustand Store',
         titleSk: 'Vytvor Zustand Store',
-        subtitle: 'Global state management with Zustand — clean and simple.',
-        subtitleSk: 'Globalna sprava stavu so Zustand — cista a jednoducha.',
+        subtitle: 'Global state management with Zustand - clean and simple.',
+        subtitleSk: 'Globalna sprava stavu so Zustand - cista a jednoducha.',
         duration: '15 min',
         level: 'Intermediate',
         levelSk: 'Mierne pokrocily',

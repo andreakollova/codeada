@@ -3,7 +3,7 @@ import { Module } from '@/types';
 export const pythonModule: Module = {
   id: 'python',
   title: 'Python Základy',
-  description: 'Programovanie od nuly — premenné, podmienky, funkcie',
+  description: 'Programovanie od nuly - premenné, podmienky, funkcie',
   units: [
     {
       id: 'py-variables', moduleId: 'python', title: 'Premenné a typy', description: 'Ukladanie dát',
@@ -30,7 +30,7 @@ export const pythonModule: Module = {
           exercises: [
             { id: 'e1', type: 'explain', conceptId: 'types', prompt: 'Štyri základné typy',
               codeSnippet: `cislo   = 42        # int\ndesatin = 3.14      # float\ntext    = "ahoj"    # str\npravda  = True      # bool`,
-              explanation: 'Python sám uhádne typ — nemusíš ho písať. Celé čísla sú int, desatinné float, text str, pravda/nepravda bool.', xp: 5 },
+              explanation: 'Python sám uhádne typ - nemusíš ho písať. Celé čísla sú int, desatinné float, text str, pravda/nepravda bool.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'types', prompt: 'Aký typ má hodnota 3.14?',
               options: ['int', 'float', 'str', 'bool'], correctAnswer: 'float', xp: 10 },
             { id: 'e3', type: 'mcq', conceptId: 'types', prompt: 'Aký typ vráti type("Ahoj")?',
@@ -39,7 +39,7 @@ export const pythonModule: Module = {
               codeSnippet: 'aktívny = True   # ___', blanks: [{ id: 'b1', options: ['bool', 'int', 'str', 'float'], correct: 'bool' }], xp: 15 },
             { id: 'e5', type: 'mcq', conceptId: 'type-conversion', prompt: 'Čo robí int("42")?',
               options: ['Konvertuje string "42" na číslo 42', 'Vypíše 42', 'Hodí chybu', 'Vráti True'], correctAnswer: 'Konvertuje string "42" na číslo 42',
-              explanation: 'int(), float(), str() sú konverzné funkcie — zmenia typ hodnoty.', xp: 10 },
+              explanation: 'int(), float(), str() sú konverzné funkcie - zmenia typ hodnoty.', xp: 10 },
           ],
         },
         {
@@ -67,7 +67,7 @@ export const pythonModule: Module = {
           id: 'py-math', unitId: 'py-operators', title: 'Matematické operátory',
           exercises: [
             { id: 'e1', type: 'explain', conceptId: 'math-ops', prompt: 'Operátory v Pythone',
-              codeSnippet: `print(10 + 3)   # 13\nprint(10 - 3)   # 7\nprint(10 * 3)   # 30\nprint(10 / 3)   # 3.333\nprint(10 // 3)  # 3  — celočíselné\nprint(10 % 3)   # 1  — zvyšok\nprint(2 ** 8)   # 256 — umocnenie`, xp: 5, explanation: '// je celé delenie, % je modulo (zvyšok), ** je umocnenie.' },
+              codeSnippet: `print(10 + 3)   # 13\nprint(10 - 3)   # 7\nprint(10 * 3)   # 30\nprint(10 / 3)   # 3.333\nprint(10 // 3)  # 3  - celočíselné\nprint(10 % 3)   # 1  - zvyšok\nprint(2 ** 8)   # 256 - umocnenie`, xp: 5, explanation: '// je celé delenie, % je modulo (zvyšok), ** je umocnenie.' },
             { id: 'e2', type: 'mcq', conceptId: 'modulo', prompt: 'Čo vráti 17 % 5?',
               options: ['2', '3', '3.4', '12'], correctAnswer: '2', explanation: '17 = 3×5 + 2, zvyšok je 2.', xp: 10 },
             { id: 'e3', type: 'fill', conceptId: 'math-ops', prompt: 'Doplň operátor umocnenia:',
@@ -79,8 +79,8 @@ export const pythonModule: Module = {
         {
           id: 'py-comparison', unitId: 'py-operators', title: 'Porovnávacie operátory',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'comparison', prompt: 'Porovnávanie — vždy vracia True alebo False',
-              codeSnippet: `x = 10\nprint(x > 5)    # True\nprint(x < 5)    # False\nprint(x == 10)  # True  — rovná sa\nprint(x != 10)  # False — nerovná sa\nprint(x >= 10)  # True\nprint(x <= 9)   # False`,
+            { id: 'e1', type: 'explain', conceptId: 'comparison', prompt: 'Porovnávanie - vždy vracia True alebo False',
+              codeSnippet: `x = 10\nprint(x > 5)    # True\nprint(x < 5)    # False\nprint(x == 10)  # True  - rovná sa\nprint(x != 10)  # False - nerovná sa\nprint(x >= 10)  # True\nprint(x <= 9)   # False`,
               explanation: 'Dôležité: == (porovnanie) vs = (priradenie). Zámenáš ich a Python ti to vyčíta.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'comparison', prompt: 'Aký operátor porovnáva rovnosť?',
               options: ['=', '==', '===', ':='], correctAnswer: '==', xp: 10 },
@@ -100,7 +100,7 @@ export const pythonModule: Module = {
           exercises: [
             { id: 'e1', type: 'explain', conceptId: 'if-else', prompt: 'Podmienka if / else',
               codeSnippet: `vek = 18\nif vek >= 18:\n    print("Dospelý")\nelse:\n    print("Mladistvý")`,
-              explanation: 'if spustí blok ak je podmienka True, else ak nie. Kód vnútri MUSÍ byť odsadený (4 medzery alebo Tab) — Python to vyžaduje.', xp: 5 },
+              explanation: 'if spustí blok ak je podmienka True, else ak nie. Kód vnútri MUSÍ byť odsadený (4 medzery alebo Tab) - Python to vyžaduje.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'if-else', prompt: 'Čo vypíše kód pre skore = 45?\n\nif skore >= 50:\n    print("Pass")\nelse:\n    print("Fail")',
               options: ['Pass', 'Fail', 'Nič', 'chyba'], correctAnswer: 'Fail', xp: 10 },
             { id: 'e3', type: 'fill', conceptId: 'if-else', prompt: 'Doplň kľúčové slová:',
@@ -111,14 +111,14 @@ export const pythonModule: Module = {
           ],
         },
         {
-          id: 'py-elif', unitId: 'py-conditions', title: 'elif — viac vetiev',
+          id: 'py-elif', unitId: 'py-conditions', title: 'elif - viac vetiev',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'elif', prompt: 'elif — keď máš viac možností',
+            { id: 'e1', type: 'explain', conceptId: 'elif', prompt: 'elif - keď máš viac možností',
               codeSnippet: `skore = 75\nif skore >= 90:\n    print("Výborný")\nelif skore >= 70:\n    print("Dobrý")\nelif skore >= 50:\n    print("Dostatočný")\nelse:\n    print("Nedostatočný")`,
               explanation: 'elif (else if) kontroluje ďalšiu podmienku. Python ide zhora nadol a zastaví pri prvej True.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'elif', prompt: 'Čo vypíše kód pre skore = 75?',
               options: ['Výborný', 'Dobrý', 'Dostatočný', 'Nedostatočný'], correctAnswer: 'Dobrý', xp: 10 },
-            { id: 'e3', type: 'write', conceptId: 'elif', prompt: 'Napíš hodnotenie veku: < 13 → "dieťa", 13–17 → "teenager", 18+ → "dospelý". Otestuj pre vek = 15.',
+            { id: 'e3', type: 'write', conceptId: 'elif', prompt: 'Napíš hodnotenie veku: < 13 → "dieťa", 13-17 → "teenager", 18+ → "dospelý". Otestuj pre vek = 15.',
               codeSnippet: 'vek = 15\n', testCases: [{ expected: 'contains:teenager', description: 'Pre 15 vypíše "teenager"' }], xp: 30 },
           ],
         },
@@ -130,7 +130,7 @@ export const pythonModule: Module = {
         {
           id: 'py-for', unitId: 'py-loops', title: 'for cyklus',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'for-loop', prompt: 'for — prejdi každý prvok',
+            { id: 'e1', type: 'explain', conceptId: 'for-loop', prompt: 'for - prejdi každý prvok',
               codeSnippet: `# Cez zoznam:\nfarby = ["červená", "modrá", "zelená"]\nfor farba in farby:\n    print(farba)\n\n# N-krát pomocou range:\nfor i in range(5):  # 0,1,2,3,4\n    print(i)`,
               explanation: 'for prejde každý prvok zoznamu (alebo range) a vykoná kód. range(5) vytvorí čísla 0 až 4.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'for-loop', prompt: 'Koľkokrát prebehne cyklus?\nfor i in range(3):\n    print("ahoj")',
@@ -145,11 +145,11 @@ export const pythonModule: Module = {
         {
           id: 'py-while', unitId: 'py-loops', title: 'while cyklus',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'while', prompt: 'while — opakuj kým platí podmienka',
+            { id: 'e1', type: 'explain', conceptId: 'while', prompt: 'while - opakuj kým platí podmienka',
               codeSnippet: `pocitadlo = 0\nwhile pocitadlo < 5:\n    print(pocitadlo)\n    pocitadlo += 1  # bez toho = nekonečná slučka!`,
-              explanation: 'while beží kým je podmienka True. Musíš zaručiť, že podmienka sa niekedy stane False — inak program nikdy neskončí.', xp: 5 },
+              explanation: 'while beží kým je podmienka True. Musíš zaručiť, že podmienka sa niekedy stane False - inak program nikdy neskončí.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'while', prompt: 'Čo sa stane ak zabudneš aktualizovať podmienku v while?',
-              options: ['Python to opraví', 'Program skončí automaticky', 'Nekonečná slučka — program zamrzne', 'SyntaxError'], correctAnswer: 'Nekonečná slučka — program zamrzne', xp: 10 },
+              options: ['Python to opraví', 'Program skončí automaticky', 'Nekonečná slučka - program zamrzne', 'SyntaxError'], correctAnswer: 'Nekonečná slučka - program zamrzne', xp: 10 },
             { id: 'e3', type: 'fill', conceptId: 'while', prompt: 'Doplň kľúčové slovo:',
               codeSnippet: 'x = 10\n___ x > 0:\n    x -= 1\nprint("Hotovo")',
               blanks: [{ id: 'b1', options: ['while', 'for', 'if', 'do'], correct: 'while' }], xp: 15 },
@@ -163,7 +163,7 @@ export const pythonModule: Module = {
         {
           id: 'py-def', unitId: 'py-functions', title: 'Definícia funkcie',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'functions', prompt: 'Funkcia — kód s názvom',
+            { id: 'e1', type: 'explain', conceptId: 'functions', prompt: 'Funkcia - kód s názvom',
               codeSnippet: `def pozdrav(meno):\n    return f"Ahoj, {meno}!"\n\nvysledok = pozdrav("Zuzka")\nprint(vysledok)  # Ahoj, Zuzka!`,
               explanation: 'def definuje funkciu. V zátvorkách sú parametre (vstupy). return vracia výsledok. Funkciu zavoláš menom + zátvorkách.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'functions', prompt: 'Čo robí kľúčové slovo return?',
@@ -182,7 +182,7 @@ export const pythonModule: Module = {
               codeSnippet: `def pozdrav(meno, jazyk="sk"):\n    if jazyk == "sk":\n        return f"Ahoj, {meno}!"\n    return f"Hello, {meno}!"\n\npozdrav("Zuzka")        # Ahoj, Zuzka!\npozdrav("John", "en")  # Hello, John!`,
               explanation: 'Parameter môže mať predvolenú hodnotu (= hodnota). Ak ho nezadáš, použije sa predvolená.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'default-params', prompt: 'Čo sa stane keď zavoláš pozdrav("Zuzka") z príkladu vyššie?',
-              options: ['Chyba — chýba jazyk', 'Ahoj, Zuzka! (použije predvolenú sk)', 'Hello, Zuzka!', 'Nič nevypíše'], correctAnswer: 'Ahoj, Zuzka! (použije predvolenú sk)', xp: 10 },
+              options: ['Chyba - chýba jazyk', 'Ahoj, Zuzka! (použije predvolenú sk)', 'Hello, Zuzka!', 'Nič nevypíše'], correctAnswer: 'Ahoj, Zuzka! (použije predvolenú sk)', xp: 10 },
           ],
         },
       ],
@@ -193,7 +193,7 @@ export const pythonModule: Module = {
         {
           id: 'py-lists', unitId: 'py-collections', title: 'Zoznamy (Lists)',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'lists', prompt: 'Zoznam — usporiadaná kolekcia',
+            { id: 'e1', type: 'explain', conceptId: 'lists', prompt: 'Zoznam - usporiadaná kolekcia',
               codeSnippet: `ovocie = ["jablko", "hruška", "slivka"]\nprint(ovocie[0])      # jablko\nprint(len(ovocie))    # 3\novocie.append("čerešňa")  # pridaj na koniec\novocie.remove("hruška")   # odober\nprint(ovocie)         # ['jablko', 'slivka', 'čerešňa']`,
               explanation: 'Zoznam uchováva viac hodnôt v jednej premennej. Indexovanie začína od 0. append() pridá, remove() odoberie prvok.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'lists', prompt: 'Čo vráti ovocie[1] kde ovocie = ["jablko","hruška","slivka"]?',
@@ -201,20 +201,20 @@ export const pythonModule: Module = {
             { id: 'e3', type: 'fill', conceptId: 'lists', prompt: 'Doplň metódu na pridanie prvku:',
               codeSnippet: 'cisla = [1, 2, 3]\ncisla.___(4)\nprint(cisla)  # [1,2,3,4]',
               blanks: [{ id: 'b1', options: ['append', 'add', 'push', 'insert'], correct: 'append' }], xp: 15 },
-            { id: 'e4', type: 'write', conceptId: 'list-comprehension', prompt: 'Vytvor zoznam druhých mocnín čísel 1–5 pomocou list comprehension.',
+            { id: 'e4', type: 'write', conceptId: 'list-comprehension', prompt: 'Vytvor zoznam druhých mocnín čísel 1-5 pomocou list comprehension.',
               codeSnippet: '# [x**2 for x in range(1, 6)]\nmocniny = ___\nprint(mocniny)\n', testCases: [{ expected: 'contains:[1, 4, 9, 16, 25]', description: 'Výsledok: [1, 4, 9, 16, 25]' }], xp: 30 },
           ],
         },
         {
           id: 'py-dicts', unitId: 'py-collections', title: 'Slovníky (Dictionaries)',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'dicts', prompt: 'Slovník — kľúč: hodnota',
+            { id: 'e1', type: 'explain', conceptId: 'dicts', prompt: 'Slovník - kľúč: hodnota',
               codeSnippet: `uzivatel = {\n    "meno": "Zuzka",\n    "vek": 20,\n    "aktívny": True\n}\nprint(uzivatel["meno"])  # Zuzka\nuzivatel["email"] = "z@example.com"  # pridaj\nprint(uzivatel.keys())   # všetky kľúče`,
               explanation: 'Slovník ukladá páry kľúč:hodnota. Pristúpiš k hodnote cez slovnik["kluč"]. Kľúče musia byť unikátne.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'dicts', prompt: 'Ako pristúpiš k hodnote kľúča "vek" zo slovníka uzivatel?',
               options: ['uzivatel.vek', 'uzivatel["vek"]', 'uzivatel->vek', 'uzivatel[1]'], correctAnswer: 'uzivatel["vek"]', xp: 10 },
             { id: 'e3', type: 'mcq', conceptId: 'dicts', prompt: 'Čo vráti uzivatel.get("email", "neznámy") ak email neexistuje?',
-              options: ['None', 'chyba', '"neznámy"', '""'], correctAnswer: '"neznámy"', explanation: '.get() vracia predvolenú hodnotu ak kľúč neexistuje — bezpečnejšie ako priamy prístup.', xp: 10 },
+              options: ['None', 'chyba', '"neznámy"', '""'], correctAnswer: '"neznámy"', explanation: '.get() vracia predvolenú hodnotu ak kľúč neexistuje - bezpečnejšie ako priamy prístup.', xp: 10 },
           ],
         },
       ],
@@ -225,11 +225,11 @@ export const pythonModule: Module = {
         {
           id: 'py-try-except', unitId: 'py-errors', title: 'try / except',
           exercises: [
-            { id: 'e1', type: 'explain', conceptId: 'try-except', prompt: 'Spracovanie chýb — try / except',
+            { id: 'e1', type: 'explain', conceptId: 'try-except', prompt: 'Spracovanie chýb - try / except',
               codeSnippet: `try:\n    cislo = int("abc")  # hodí ValueError\nexcept ValueError:\n    print("Toto nie je číslo!")\nexcept Exception as e:\n    print(f"Nejaká chyba: {e}")\nfinally:\n    print("Toto sa spustí vždy")`,
-              explanation: 'try obsahuje kód, ktorý môže zlyhať. except zachytí konkrétnu chybu. finally sa spustí vždy — napr. na zatvorenie súboru.', xp: 5 },
+              explanation: 'try obsahuje kód, ktorý môže zlyhať. except zachytí konkrétnu chybu. finally sa spustí vždy - napr. na zatvorenie súboru.', xp: 5 },
             { id: 'e2', type: 'mcq', conceptId: 'try-except', prompt: 'Kedy sa spustí blok finally?',
-              options: ['Len keď nastane chyba', 'Len keď nenastane chyba', 'Vždy — či nastala chyba alebo nie', 'Nikdy automaticky'], correctAnswer: 'Vždy — či nastala chyba alebo nie', xp: 10 },
+              options: ['Len keď nastane chyba', 'Len keď nenastane chyba', 'Vždy - či nastala chyba alebo nie', 'Nikdy automaticky'], correctAnswer: 'Vždy - či nastala chyba alebo nie', xp: 10 },
             { id: 'e3', type: 'fill', conceptId: 'try-except', prompt: 'Doplň kľúčové slovo:',
               codeSnippet: 'try:\n    x = 1 / 0\n___ ZeroDivisionError:\n    print("Delenie nulou!")',
               blanks: [{ id: 'b1', options: ['except', 'catch', 'error', 'handle'], correct: 'except' }], xp: 15 },

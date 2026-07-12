@@ -5,7 +5,7 @@ const strings = {
   welcomeBack: { en: 'Welcome back', sk: 'Vitaj späť' },
   dayOne: { en: 'Day one', sk: 'Prvý deň' },
   daysInRow: { en: 'days in a row', sk: 'dní v rade' },
-  dayStreak: { en: 'day streak — impressive', sk: 'dňový streak — super' },
+  dayStreak: { en: 'day streak - impressive', sk: 'dňový streak - super' },
   pickLesson: { en: 'Pick a lesson and start learning.', sk: 'Vyber si lekciu a začni sa učiť.' },
   lessonsCompleted: { en: 'lessons completed', sk: 'lekcií dokončených' },
   lessonCompleted: { en: 'lesson completed', sk: 'lekcia dokončená' },
@@ -85,7 +85,7 @@ const strings = {
   locker: { en: 'Locker', sk: 'Skrinka' },
   itemsUnlocked: { en: 'items unlocked', sk: 'predmetov odomknutých' },
   random: { en: 'Random', sk: 'Náhodne' },
-  noEquipment: { en: 'No equipment — pick something below', sk: 'Žiadne vybavenie — vyber si niečo' },
+  noEquipment: { en: 'No equipment - pick something below', sk: 'Žiadne vybavenie - vyber si niečo' },
   previewMode: { en: 'Preview Mode', sk: 'Náhľad' },
   backToEquipped: { en: 'Back to equipped', sk: 'Späť na nasadené' },
   completeLessonsToUnlock: { en: 'Complete lessons to unlock new items', sk: 'Dokonči lekcie a odomkni nové predmety' },
@@ -109,7 +109,7 @@ const strings = {
 
   // NameModal
   heyImByte: { en: "Hi, I'm Coduy", sk: 'Čauko, ja som Coduy' },
-  illTeachYou: { en: "I'm the small cute little code guy. I'll teach you how to code. But first — what's your name?", sk: 'Som malý, milý sprievodca svetom kódu. Naučím ťa programovať. Ale najprv — ako sa voláš?' },
+  illTeachYou: { en: "I'm the small cute little code guy. I'll teach you how to code. But first - what's your name?", sk: 'Som malý, milý sprievodca svetom kódu. Naučím ťa programovať. Ale najprv - ako sa voláš?' },
   yourName: { en: 'Your name...', sk: 'Tvoje meno...' },
   letsGo: { en: "Let's go", sk: 'Poďme' },
 
@@ -132,7 +132,7 @@ const strings = {
   selectOneTopic: { en: 'Select at least one topic to start learning.', sk: 'Vyber aspoň jednu tému a začni sa učiť z praxe.' },
 
   // Glossary
-  glossarySubtitle: { en: 'Abbreviations, concepts and tools — explained simply.', sk: 'Skratky, koncepty a nástroje — vysvetlené jednoducho.' },
+  glossarySubtitle: { en: 'Abbreviations, concepts and tools - explained simply.', sk: 'Skratky, koncepty a nástroje - vysvetlené jednoducho.' },
 
   // Write exercise
   testsPassed: { en: 'Tests passed', sk: 'Testy prešli' },
@@ -148,8 +148,8 @@ const strings = {
   streakTooltip: { en: 'Number of consecutive days you studied.', sk: 'Počet dní za sebou, kedy si sa učil.' },
   xpTooltip: { en: 'Experience points earned from lessons and exercises.', sk: 'Skúsenostné body za dokončené lekcie a cvičenia.' },
   lessonsTooltip: { en: 'Number of completed lessons.', sk: 'Počet dokončených lekcií.' },
-  heartsTooltip: { en: 'Health — grows when you are active, drops when you miss a day.', sk: 'Zdravie — rastie keď si aktívny, klesá keď vynecháš deň.' },
-  gemsTooltip: { en: 'Gems — virtual currency for rewards and purchases.', sk: 'Gemy — virtuálna mena za odmeny a nákupy.' },
+  heartsTooltip: { en: 'Health - grows when you are active, drops when you miss a day.', sk: 'Zdravie - rastie keď si aktívny, klesá keď vynecháš deň.' },
+  gemsTooltip: { en: 'Gems - virtual currency for rewards and purchases.', sk: 'Gemy - virtuálna mena za odmeny a nákupy.' },
 
   // Reward
   newWardrobeItem: { en: 'New wardrobe item!', sk: 'Nová vec do šatníka!' },

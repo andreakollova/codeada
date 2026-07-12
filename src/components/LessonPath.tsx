@@ -176,7 +176,7 @@ export default function LessonPath() {
             transition={{ delay: mi * 0.08 }}
             style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 20, overflow: 'hidden' }}
           >
-            {/* Module header — tap to collapse */}
+            {/* Module header - tap to collapse */}
             <button
               onClick={() => toggleModule(module.id)}
               style={{ width: '100%', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', background: 'none', border: 'none', textAlign: 'left' }}

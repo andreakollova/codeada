@@ -284,7 +284,7 @@ export default function ProjectWorkspace() {
   const { locale } = useLocaleStore();
   const { addXp } = useUserStore();
 
-  // Hide nav on workspace — fullscreen experience
+  // Hide nav on workspace - fullscreen experience
   useEffect(() => {
     document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => {
       (el as HTMLElement).style.display = 'none';

@@ -21,7 +21,7 @@ const greetings = (name: string, streak: number, locale: 'en' | 'sk') => {
   if (streak === 0) return `Welcome back, ${name}.`;
   if (streak === 1) return `Hey ${name}. Day one.`;
   if (streak < 7) return `Hey ${name}. ${streak}-day streak.`;
-  return `Hey ${name}. ${streak}-day streak — impressive.`;
+  return `Hey ${name}. ${streak}-day streak - impressive.`;
 };
 
 const COUNTDOWN_ENABLED = false;
@@ -115,14 +115,14 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Theory Hub — reading section */}
+            {/* Theory Hub - reading section */}
             <TheoryHub />
 
-            {/* Coding — hands-on exercises */}
+            {/* Coding - hands-on exercises */}
             <CodingPath />
           </div>
 
-          {/* Right sidebar — stats (desktop only) */}
+          {/* Right sidebar - stats (desktop only) */}
           <div className="dashboard-sidebar">
             <h3 style={{ fontWeight: 700, fontSize: 13, color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
               {s('yourStats', locale)}

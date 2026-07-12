@@ -47,7 +47,7 @@ export const curriculum: Module[] = [
                 prompt: 'Čo vypíše tento kód?\n\nx = 5\nx = 10\nprint(x)',
                 options: ['5', '10', '5 10', 'chyba'],
                 correctAnswer: '10',
-                explanation: 'Premenná x sa najprv rovná 5, potom sa prepíše na 10. print(x) vypíše aktuálnu hodnotu — teda 10.',
+                explanation: 'Premenná x sa najprv rovná 5, potom sa prepíše na 10. print(x) vypíše aktuálnu hodnotu - teda 10.',
                 xp: 10,
               },
               {
@@ -84,7 +84,7 @@ export const curriculum: Module[] = [
                 conceptId: 'data-types',
                 prompt: 'Typy dát v Pythone',
                 codeSnippet: `cislo = 42          # int (celé číslo)\ndesatinne = 3.14    # float (desatinné)\ntexT = "Ahoj"       # str (text)\npravda = True       # bool (pravda/nepravda)`,
-                explanation: 'Každá hodnota v Pythone má typ. Python ho uhádne sám — nemusíš ho písať. Celé čísla sú int, desatinné float, text str (string) a pravda/nepravda bool.',
+                explanation: 'Každá hodnota v Pythone má typ. Python ho uhádne sám - nemusíš ho písať. Celé čísla sú int, desatinné float, text str (string) a pravda/nepravda bool.',
                 xp: 5,
               },
               {
@@ -178,7 +178,7 @@ export const curriculum: Module[] = [
                 id: 'explain-fstring',
                 type: 'explain',
                 conceptId: 'f-strings',
-                prompt: 'F-strings — moderný spôsob spájania textu',
+                prompt: 'F-strings - moderný spôsob spájania textu',
                 codeSnippet: `meno = "Zuzka"\nvek = 20\nprint(f"Volám sa {meno} a mám {vek} rokov.")`,
                 explanation: 'F-string začína písmenom f pred úvodzovkami. Do zložených zátvork {} dáš premennú a Python ju automaticky vloží do textu. Oveľa elegantnejšie ako spájanie cez +.',
                 xp: 5,
@@ -225,8 +225,8 @@ export const curriculum: Module[] = [
                 type: 'explain',
                 conceptId: 'math-ops',
                 prompt: 'Matematické operátory',
-                codeSnippet: `a = 10\nb = 3\nprint(a + b)   # 13 — sčítanie\nprint(a - b)   # 7  — odčítanie\nprint(a * b)   # 30 — násobenie\nprint(a / b)   # 3.333 — delenie\nprint(a // b)  # 3  — celočíselné delenie\nprint(a % b)   # 1  — zvyšok po delení\nprint(a ** b)  # 1000 — umocnenie`,
-                explanation: 'Python má všetky bežné matematické operácie. Špeciálne sú // (delenie bez zvyšku), % (modulo — zvyšok) a ** (umocnenie).',
+                codeSnippet: `a = 10\nb = 3\nprint(a + b)   # 13 - sčítanie\nprint(a - b)   # 7  - odčítanie\nprint(a * b)   # 30 - násobenie\nprint(a / b)   # 3.333 - delenie\nprint(a // b)  # 3  - celočíselné delenie\nprint(a % b)   # 1  - zvyšok po delení\nprint(a ** b)  # 1000 - umocnenie`,
+                explanation: 'Python má všetky bežné matematické operácie. Špeciálne sú // (delenie bez zvyšku), % (modulo - zvyšok) a ** (umocnenie).',
                 xp: 5,
               },
               {
@@ -337,7 +337,7 @@ export const curriculum: Module[] = [
                 id: 'explain-if-1',
                 type: 'explain',
                 conceptId: 'if-else',
-                prompt: 'Podmienky — if / else',
+                prompt: 'Podmienky - if / else',
                 codeSnippet: `vek = 18\nif vek >= 18:\n    print("Dospelý")\nelse:\n    print("Mladistvý")`,
                 explanation: 'if spustí blok kódu iba ak je podmienka True. else sa vykoná keď podmienka nie je splnená. Dôležité: za podmienkou musí byť dvojbodka : a kód vnútri musí byť odsadený (4 medzery alebo Tab).',
                 xp: 5,
@@ -380,14 +380,14 @@ export const curriculum: Module[] = [
           {
             id: 'elif',
             unitId: 'conditions',
-            title: 'elif — viac možností',
+            title: 'elif - viac možností',
 
             exercises: [
               {
                 id: 'explain-elif-1',
                 type: 'explain',
                 conceptId: 'elif',
-                prompt: 'elif — keď máš viac podmienok',
+                prompt: 'elif - keď máš viac podmienok',
                 codeSnippet: `skore = 75\nif skore >= 90:\n    print("Výborný")\nelif skore >= 70:\n    print("Dobrý")\nelif skore >= 50:\n    print("Dostatočný")\nelse:\n    print("Nedostatočný")`,
                 explanation: 'elif (skratka pre "else if") ti umožní skontrolovať viac podmienok za sebou. Python ich prejde zhora nadol a zastaví pri prvej, ktorá je True.',
                 xp: 5,
@@ -443,7 +443,7 @@ export const curriculum: Module[] = [
                 id: 'explain-for-1',
                 type: 'explain',
                 conceptId: 'for-loop',
-                prompt: 'for cyklus — opakuj pre každý prvok',
+                prompt: 'for cyklus - opakuj pre každý prvok',
                 codeSnippet: `# Prejdi cez zoznam\nfarby = ["červená", "zelená", "modrá"]\nfor farba in farby:\n    print(farba)\n\n# Opakuj N-krát pomocou range()\nfor i in range(5):\n    print(i)  # 0, 1, 2, 3, 4`,
                 explanation: 'for cyklus prejde každý prvok v zozname (alebo v range) a vykoná kód pre každý z nich. range(5) vytvorí čísla 0 až 4.',
                 xp: 5,
@@ -455,7 +455,7 @@ export const curriculum: Module[] = [
                 prompt: 'Koľkokrát sa vykoná kód:\nfor i in range(3):\n    print("Byte")',
                 options: ['2×', '3×', '4×', '1×'],
                 correctAnswer: '3×',
-                explanation: 'range(3) generuje 0, 1, 2 — tri čísla, teda cyklus prebehne 3-krát.',
+                explanation: 'range(3) generuje 0, 1, 2 - tri čísla, teda cyklus prebehne 3-krát.',
                 xp: 10,
               },
               {
@@ -487,7 +487,7 @@ export const curriculum: Module[] = [
   {
     id: 'my-projects',
     title: 'Moje Projekty',
-    description: 'Koncepty z reálnych projektov — React Native, TypeScript, Supabase',
+    description: 'Koncepty z reálnych projektov - React Native, TypeScript, Supabase',
 
 
     units: [
@@ -508,7 +508,7 @@ export const curriculum: Module[] = [
                 id: 'explain-async-1',
                 type: 'explain',
                 conceptId: 'async-await',
-                prompt: 'Async/Await — neblokujúci kód',
+                prompt: 'Async/Await - neblokujúci kód',
                 codeSnippet: `// Bez async/await (callback hell):\nfetch(url).then(res => res.json()).then(data => {\n  console.log(data);\n});\n\n// S async/await (čitateľné):\nasync function nacitajData() {\n  const res = await fetch(url);\n  const data = await res.json();\n  console.log(data);\n}`,
                 explanation: 'async/await je moderný spôsob práce s asynchrónnymi operáciami (sieť, databáza). Namiesto reťaze .then() môžeš písať kód, ktorý vyzerá synchrónne. await "počká" na výsledok bez blokovania ostatného kódu.',
                 xp: 5,
@@ -561,9 +561,9 @@ export const curriculum: Module[] = [
                 id: 'explain-dest-1',
                 type: 'explain',
                 conceptId: 'destructuring',
-                prompt: 'Destructuring — vyber len čo potrebuješ',
-                codeSnippet: `// Objekt destructuring:\nconst user = { name: "Zuzka", age: 20, city: "BA" };\nconst { name, city } = user; // vytiahne len name a city\n\n// Array destructuring:\nconst [first, second] = [10, 20, 30];\n\n// Spread — spoj objekty:\nconst updated = { ...user, city: "KE" }; // city sa prepíše`,
-                explanation: 'Destructuring ti umožní "vybalit" len konkrétne hodnoty z objektu alebo poľa. Spread operátor (...) skopíruje všetky vlastnosti — ako keby si vyliala celú škatuľu a niektoré veci vymenila.',
+                prompt: 'Destructuring - vyber len čo potrebuješ',
+                codeSnippet: `// Objekt destructuring:\nconst user = { name: "Zuzka", age: 20, city: "BA" };\nconst { name, city } = user; // vytiahne len name a city\n\n// Array destructuring:\nconst [first, second] = [10, 20, 30];\n\n// Spread - spoj objekty:\nconst updated = { ...user, city: "KE" }; // city sa prepíše`,
+                explanation: 'Destructuring ti umožní "vybalit" len konkrétne hodnoty z objektu alebo poľa. Spread operátor (...) skopíruje všetky vlastnosti - ako keby si vyliala celú škatuľu a niektoré veci vymenila.',
                 xp: 5,
               },
               {
@@ -597,7 +597,7 @@ export const curriculum: Module[] = [
         id: 'typescript',
         moduleId: 'my-projects',
         title: 'TypeScript',
-        description: 'Typy, interfaces, generics — bezpečnejší JavaScript',
+        description: 'Typy, interfaces, generics - bezpečnejší JavaScript',
 
         lessons: [
           {
@@ -610,8 +610,8 @@ export const curriculum: Module[] = [
                 id: 'explain-ts-1',
                 type: 'explain',
                 conceptId: 'ts-types',
-                prompt: 'TypeScript — statické typy',
-                codeSnippet: `// Type alias — pomenovaný tvar\ntype Attendee = {\n  id: string;\n  name: string;\n  avatar: string | null;  // union type\n};\n\n// Funkcia s typmi\nfunction greet(name: string): string {\n  return \`Ahoj, \${name}!\`;\n}`,
+                prompt: 'TypeScript - statické typy',
+                codeSnippet: `// Type alias - pomenovaný tvar\ntype Attendee = {\n  id: string;\n  name: string;\n  avatar: string | null;  // union type\n};\n\n// Funkcia s typmi\nfunction greet(name: string): string {\n  return \`Ahoj, \${name}!\`;\n}`,
                 explanation: 'TypeScript pridáva typy do JavaScriptu. type alias ti umožní pomenovať štruktúru (tvar objektu). Union type (|) hovorí "môže byť jedno ALEBO druhé". Toto odchytí chyby ešte pred spustením kódu.',
                 xp: 5,
               },
@@ -635,13 +635,13 @@ export const curriculum: Module[] = [
                 conceptId: 'optional-chaining',
                 prompt: 'Čo robí optional chaining (?.) v TypeScript/JS?\nprofile?.avatar_url',
                 options: [
-                  'Bezpečne pristúpi k vlastnosti — ak je profile null, vráti undefined namiesto chyby',
+                  'Bezpečne pristúpi k vlastnosti - ak je profile null, vráti undefined namiesto chyby',
                   'Označí vlastnosť ako povinnú',
                   'Vytvorí novú premennú',
                   'Skontroluje či je profile string',
                 ],
-                correctAnswer: 'Bezpečne pristúpi k vlastnosti — ak je profile null, vráti undefined namiesto chyby',
-                explanation: 'Bez ?. by null.avatar_url hodilo chybu. S ?. dostaneš undefined — bezpečne.',
+                correctAnswer: 'Bezpečne pristúpi k vlastnosti - ak je profile null, vráti undefined namiesto chyby',
+                explanation: 'Bez ?. by null.avatar_url hodilo chybu. S ?. dostaneš undefined - bezpečne.',
                 xp: 10,
               },
               {
@@ -675,7 +675,7 @@ export const curriculum: Module[] = [
                 id: 'explain-usestate-1',
                 type: 'explain',
                 conceptId: 'useState',
-                prompt: 'useState — lokálny stav komponentu',
+                prompt: 'useState - lokálny stav komponentu',
                 codeSnippet: `import { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  //     ↑ hodnota  ↑ setter   ↑ počiatočná hodnota\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      Kliknutí: {count}\n    </button>\n  );\n}`,
                 explanation: 'useState vracia dvojicu: [aktuálna hodnota, funkcia na zmenu]. Keď zavoláš setter, React re-renderuje komponent s novou hodnotou. Počiatočná hodnota sa použije len raz.',
                 xp: 5,
@@ -689,7 +689,7 @@ export const curriculum: Module[] = [
                   'Komponent sa re-renderuje s novou hodnotou',
                   'Stránka sa znovu načíta',
                   'Hodnota sa uloží do localStorage',
-                  'Nič — musíš zavolať render() ručne',
+                  'Nič - musíš zavolať render() ručne',
                 ],
                 correctAnswer: 'Komponent sa re-renderuje s novou hodnotou',
                 xp: 10,
@@ -698,7 +698,7 @@ export const curriculum: Module[] = [
                 id: 'explain-useeffect',
                 type: 'explain',
                 conceptId: 'useEffect',
-                prompt: 'useEffect — vedľajšie efekty',
+                prompt: 'useEffect - vedľajšie efekty',
                 codeSnippet: `useEffect(() => {\n  // Toto sa spustí po každom renderi\n  fetchData();\n}, [userId]); // ← dependency array\n// Ak je [] prázdne: spustí sa LEN raz (pri mountnutí)\n// Ak obsahuje [userId]: spustí sa keď sa zmení userId`,
                 explanation: 'useEffect spúšťa kód po tom, čo React vykreslí komponent. Používa sa na načítanie dát, subscripcie, timery. Dependency array určuje kedy sa efekt znovu spustí.',
                 xp: 5,
@@ -709,12 +709,12 @@ export const curriculum: Module[] = [
                 conceptId: 'useEffect',
                 prompt: 'Kedy sa spustí useEffect s prázdnym dependency array []?',
                 options: [
-                  'Len raz — keď sa komponent prvýkrát vykreslí (mount)',
+                  'Len raz - keď sa komponent prvýkrát vykreslí (mount)',
                   'Pri každej zmene state',
                   'Nikdy',
                   'Každú sekundu',
                 ],
-                correctAnswer: 'Len raz — keď sa komponent prvýkrát vykreslí (mount)',
+                correctAnswer: 'Len raz - keď sa komponent prvýkrát vykreslí (mount)',
                 xp: 10,
               },
               {
@@ -740,7 +740,7 @@ export const curriculum: Module[] = [
         id: 'supabase-basics',
         moduleId: 'my-projects',
         title: 'Supabase',
-        description: 'Databáza, auth, RLS — backend pre tvoje projekty',
+        description: 'Databáza, auth, RLS - backend pre tvoje projekty',
 
         lessons: [
           {
@@ -753,7 +753,7 @@ export const curriculum: Module[] = [
                 id: 'explain-supabase-1',
                 type: 'explain',
                 conceptId: 'supabase-client',
-                prompt: 'Supabase — databáza v JavaScripte',
+                prompt: 'Supabase - databáza v JavaScripte',
                 codeSnippet: `// Jednoduchý SELECT:\nconst { data, error } = await supabase\n  .from('events')\n  .select('*')\n  .eq('city', 'Bratislava');\n\n// S joinmi:\nconst { data } = await supabase\n  .from('attendees')\n  .select('id, profile:profiles(name, avatar)')`,
                 explanation: 'Supabase client ti dá prístup k PostgreSQL databáze cez čitateľné JS/TS API. .from() vyberie tabuľku, .select() stĺpce, .eq() filtráciu. V zátvorkách select() môžeš joinovať cudzie tabuľky.',
                 xp: 5,

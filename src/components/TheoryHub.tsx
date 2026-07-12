@@ -9,7 +9,7 @@ import { BookOpen, ChevronRight, Check, ArrowRight, Library, Coffee } from 'luci
 import { useLocaleStore, t } from '@/store/localeStore';
 import { s } from '@/data/strings';
 
-// Drink rewards per module — varies by user's favorite drink
+// Drink rewards per module - varies by user's favorite drink
 type DrinkType = 'coffee' | 'tea' | 'energy' | 'juice' | 'water';
 const DRINK_REWARDS: Record<DrinkType, { icon: string; items: { name: string; nameSk: string }[] }> = {
   coffee: { icon: '☕', items: [

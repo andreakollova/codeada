@@ -62,7 +62,7 @@ export default function WorkshopPage() {
       setPreviewEquipment(null);
       setSelectedItem(null);
     } else {
-      // Preview only — show on Byte temporarily
+      // Preview only - show on Byte temporarily
       setPreviewEquipment({ ...displayEquipment, [item.type]: item.id });
       setSelectedItem(item);
     }
@@ -280,7 +280,7 @@ export default function WorkshopPage() {
                     }} />
                   )}
 
-                  {/* Mini Byte preview — always show the item */}
+                  {/* Mini Byte preview - always show the item */}
                   <div style={{ position: 'relative', opacity: owned ? 1 : 0.5 }}>
                     <Byte
                       mood="happy"

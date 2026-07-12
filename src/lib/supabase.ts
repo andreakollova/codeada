@@ -14,7 +14,7 @@ export function getSupabase(): SupabaseClient | null {
   return _client;
 }
 
-// Convenience alias — returns null when not configured
+// Convenience alias - returns null when not configured
 export const supabase = {
   from: (table: string) => getSupabase()?.from(table) as any,
   auth: {

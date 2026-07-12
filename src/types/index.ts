@@ -85,6 +85,7 @@ export interface UserState {
   ownedItems: string[];
   equipment: ByteEquipment;
   selectedTopics: string[];
+  coffees: number;
 }
 
 export interface GlossaryEntry {

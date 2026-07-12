@@ -11,7 +11,8 @@ import Byte from '@/components/Byte';
 import { cosmeticItems } from '@/data/cosmetics';
 import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check } from 'lucide-react';
 
-type Phase = 'loading' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
+import { Coffee } from 'lucide-react';
+type Phase = 'loading' | 'coffee' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
 
 const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: string; labelSk: string }[] = [
   { key: 'introduction', phase: 'intro', icon: BookOpen, label: 'Introduction', labelSk: 'Úvod' },
@@ -24,7 +25,7 @@ const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: st
 export default function TheoryLessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip } = useUserStore();
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees } = useUserStore();
   const { locale } = useLocaleStore();
 
   const [lesson, setLesson] = useState<DbLesson | null>(null);
@@ -50,7 +51,7 @@ export default function TheoryLessonPage() {
         if (l) {
           setLesson(l);
           setQuiz(q || []);
-          setPhase('intro');
+          setPhase('coffee');
           setByteMood('happy');
         }
       })
@@ -75,6 +76,53 @@ export default function TheoryLessonPage() {
       <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5 }}>
           <p style={{ color: '#888', fontWeight: 700 }}>{s('loading', locale)}</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Coffee intro screen
+  if (phase === 'coffee') {
+    const readTime = Math.max(3, Math.round((lesson.learning_content?.length || 500) / 800));
+    return (
+      <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200 }}
+          style={{ textAlign: 'center', maxWidth: 360 }}
+        >
+          <motion.div
+            animate={{ rotate: [0, -10, 10, -5, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            style={{ fontSize: 48, marginBottom: 20 }}
+          >
+            <Coffee size={48} color="#f59e0b" strokeWidth={1.5} />
+          </motion.div>
+          <h2 style={{ fontWeight: 800, fontSize: 22, color: '#fff', marginBottom: 8 }}>
+            {locale === 'sk' ? 'Daj si kávičku' : 'Grab a coffee'}
+          </h2>
+          <p style={{ fontSize: 14, color: '#888', lineHeight: 1.6, marginBottom: 6 }}>
+            {locale === 'sk'
+              ? `Vezmi si ${readTime} minút a prečítaj si toto v pohode.`
+              : `Take ${readTime} minutes and enjoy this read.`}
+          </p>
+          <p style={{ fontSize: 12, color: '#555', marginBottom: 28 }}>
+            {safe(t(lesson, 'title', locale))}
+          </p>
+          {(coffees || 0) > 0 && (
+            <p style={{ fontSize: 11, color: '#f59e0b', marginBottom: 20, fontWeight: 600 }}>
+              ☕ {coffees} {locale === 'sk' ? (coffees === 1 ? 'káva vypitá' : coffees < 5 ? 'kávy vypité' : 'káv vypitých') : (coffees === 1 ? 'coffee enjoyed' : 'coffees enjoyed')}
+            </p>
+          )}
+          <motion.button
+            onClick={() => { addCoffee(); setPhase('intro'); }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
+          >
+            {locale === 'sk' ? 'Poďme na to' : "Let's go"} ☕
+          </motion.button>
         </motion.div>
       </div>
     );

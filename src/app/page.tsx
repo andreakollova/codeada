@@ -75,7 +75,7 @@ function CountdownOverlay() {
 }
 
 export default function HomePage() {
-  const { checkStreak, name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems } = useUserStore();
+  const { checkStreak, name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems, coffees } = useUserStore();
   const { locale } = useLocaleStore();
 
   useEffect(() => { checkStreak(); }, []);
@@ -178,6 +178,16 @@ export default function HomePage() {
                   <div className="stat-card-label">{s('gems', locale)}</div>
                 </div>
               </div>
+
+              {(coffees || 0) > 0 && (
+                <div className="stat-card">
+                  <div className="stat-card-icon" style={{ fontSize: 18 }}>☕</div>
+                  <div>
+                    <div className="stat-card-value">{coffees}</div>
+                    <div className="stat-card-label">{locale === 'sk' ? 'Káv vypitých' : 'Coffees enjoyed'}</div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Byte character on desktop */}

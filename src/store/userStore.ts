@@ -21,6 +21,7 @@ interface UserActions {
   setUserId: (id: string | null) => void;
   setName: (name: string) => void;
   toggleTopic: (topicId: string) => void;
+  addCoffee: () => void;
 }
 
 const initialState: UserState = {
@@ -41,6 +42,7 @@ const initialState: UserState = {
   equipment: {},
   name: null,
   selectedTopics: [],
+  coffees: 0,
 };
 
 export const useUserStore = create<UserState & UserActions>()(
@@ -128,6 +130,8 @@ export const useUserStore = create<UserState & UserActions>()(
           : [...s.selectedTopics, topicId],
       })),
 
+      addCoffee: () => set((s) => ({ coffees: (s.coffees || 0) + 1 })),
+
       syncToSupabase: async () => {
         const s = get();
         if (!s.userId) return;
@@ -160,7 +164,7 @@ export const useUserStore = create<UserState & UserActions>()(
         byteBattery: s.byteBattery, completedLessons: s.completedLessons,
         badges: s.badges, weeklyXp: s.weeklyXp, weekStartDate: s.weekStartDate,
         ownedItems: s.ownedItems, equipment: s.equipment, name: s.name,
-        selectedTopics: s.selectedTopics,
+        selectedTopics: s.selectedTopics, coffees: s.coffees,
       }),
     }
   )

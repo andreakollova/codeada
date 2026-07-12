@@ -260,12 +260,9 @@ export default function CodingPath() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <Byte mood="happy" size={72} equipment={activePath.equipment} />
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <span style={{ fontSize: 22 }}>{activePath.emoji}</span>
-                <h2 style={{ fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '-0.02em' }}>
-                  {locale === 'sk' ? activePath.titleSk : activePath.titleEn}
-                </h2>
-              </div>
+              <h2 style={{ fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '-0.02em', marginBottom: 6 }}>
+                {locale === 'sk' ? activePath.titleSk : activePath.titleEn}
+              </h2>
               <p style={{ fontSize: 13, color: '#aaa', marginBottom: 8, fontStyle: 'italic' }}>
                 &bdquo;{locale === 'sk' ? activePath.subtitleSk : activePath.subtitleEn}&ldquo;
               </p>

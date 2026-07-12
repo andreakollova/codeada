@@ -37,10 +37,18 @@ export default function ReelsPage() {
         if (data) {
           const all: ReelData[] = JSON.parse(await data.text());
           // Filter by locale, newest first
-          const filtered = all
-            .filter(r => r.lang === locale)
+          // Filter by locale, deduplicate per lesson (keep latest only), newest first
+          const byLang = all.filter(r => r.lang === locale)
             .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-          setReels(filtered);
+          const seen = new Set<number>();
+          const unique: ReelData[] = [];
+          for (const r of byLang) {
+            if (!seen.has(r.lessonId)) {
+              seen.add(r.lessonId);
+              unique.push(r);
+            }
+          }
+          setReels(unique);
         }
       } catch {}
     }

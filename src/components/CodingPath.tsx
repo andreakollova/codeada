@@ -44,7 +44,6 @@ interface CharacterPath {
 const PATHS: CharacterPath[] = [
   {
     id: 'builder',
-    emoji: '',
     titleEn: 'The Builder',
     titleSk: 'Builder',
     subtitleEn: 'I want to build apps.',
@@ -52,11 +51,10 @@ const PATHS: CharacterPath[] = [
     descEn: 'Full Python curriculum for creating your own projects.',
     descSk: 'Kompletný Python kurz na tvorbu vlastných projektov.',
     modules: [30, 31, 32, 11, 14, 20, 21, 23, 24, 25, 26, 27, 28, 29, 33, 39, 40, 47, 45],
-    equipment: { hat: 'hat-graduation', glasses: 'glasses-cool', accessory: 'acc-medal' },
+    equipment: { hat: 'hat-graduation', glasses: 'glasses-cool', accessory: 'acc-crystal', aura: 'aura-green' },
   },
   {
     id: 'ai-pilot',
-    emoji: '',
     titleEn: 'The AI Pilot',
     titleSk: 'AI Pilot',
     subtitleEn: 'I want to understand AI and vibe coding.',
@@ -64,11 +62,10 @@ const PATHS: CharacterPath[] = [
     descEn: 'Learn enough Python to work with AI tools effectively.',
     descSk: 'Nauč sa dosť Pythonu na efektívnu prácu s AI nástrojmi.',
     modules: [30, 31, 11, 21, 25, 24, 32, 42],
-    equipment: { hat: 'hat-pilot', glasses: 'glasses-aviator', antenna: 'ant-lightning' },
+    equipment: { hat: 'hat-galaxy', glasses: 'glasses-laser', antenna: 'ant-lightning', aura: 'aura-galaxy' },
   },
   {
     id: 'mechanic',
-    emoji: '',
     titleEn: 'The Code Mechanic',
     titleSk: 'Mechanik',
     subtitleEn: 'I want to fix and understand existing code.',
@@ -76,11 +73,10 @@ const PATHS: CharacterPath[] = [
     descEn: 'Perfect for people using Cursor, Claude Code or ChatGPT.',
     descSk: 'Ideálne pre ľudí používajúcich Cursor, Claude Code alebo ChatGPT.',
     modules: [30, 32, 42, 26, 27, 28, 39, 35],
-    equipment: { hat: 'hat-headband', glasses: 'glasses-round', accessory: 'acc-chain' },
+    equipment: { hat: 'hat-samurai', glasses: 'glasses-frost', accessory: 'acc-chain', aura: 'aura-blue' },
   },
   {
     id: 'master',
-    emoji: '',
     titleEn: 'The Master',
     titleSk: 'Master',
     subtitleEn: 'I want to master Python from basics to professional level.',
@@ -88,7 +84,7 @@ const PATHS: CharacterPath[] = [
     descEn: 'All 29 modules, 200+ lessons. Become a real Python developer.',
     descSk: 'Všetkých 29 modulov, 200+ lekcií. Staň sa skutočným Python vývojárom.',
     modules: [30, 31, 32, 11, 14, 20, 21, 23, 24, 25, 26, 27, 28, 29, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
-    equipment: { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold', aura: 'aura-fire' },
+    equipment: { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold', aura: 'aura-golden' },
   },
 ];
 

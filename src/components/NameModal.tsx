@@ -17,10 +17,10 @@ const DRINKS = [
 ];
 
 const PATHS = [
-  { id: 'builder', titleEn: 'The Builder', titleSk: 'Builder', subtitleEn: 'I want to build apps.', subtitleSk: 'Chcem vytvárať aplikácie.', equipment: { hat: 'hat-graduation', glasses: 'glasses-cool', accessory: 'acc-medal' } },
-  { id: 'ai-pilot', titleEn: 'The AI Pilot', titleSk: 'AI Pilot', subtitleEn: 'I want to understand AI.', subtitleSk: 'Chcem rozumieť AI.', equipment: { hat: 'hat-pilot', glasses: 'glasses-aviator', antenna: 'ant-lightning' } },
-  { id: 'mechanic', titleEn: 'The Mechanic', titleSk: 'Mechanik', subtitleEn: 'I want to fix and read code.', subtitleSk: 'Chcem opravovať kód.', equipment: { hat: 'hat-headband', glasses: 'glasses-round', accessory: 'acc-chain' } },
-  { id: 'master', titleEn: 'The Master', titleSk: 'Master', subtitleEn: 'I want to master Python.', subtitleSk: 'Chcem ovládnuť Python.', equipment: { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold', aura: 'aura-fire' } },
+  { id: 'builder', titleEn: 'The Builder', titleSk: 'Builder', subtitleEn: 'I want to build apps.', subtitleSk: 'Chcem vytvárať aplikácie.', equipment: { hat: 'hat-graduation', glasses: 'glasses-cool', accessory: 'acc-crystal', aura: 'aura-green' } },
+  { id: 'ai-pilot', titleEn: 'The AI Pilot', titleSk: 'AI Pilot', subtitleEn: 'I want to understand AI.', subtitleSk: 'Chcem rozumieť AI.', equipment: { hat: 'hat-galaxy', glasses: 'glasses-laser', antenna: 'ant-lightning', aura: 'aura-galaxy' } },
+  { id: 'mechanic', titleEn: 'The Mechanic', titleSk: 'Mechanik', subtitleEn: 'I want to fix and read code.', subtitleSk: 'Chcem opravovať kód.', equipment: { hat: 'hat-samurai', glasses: 'glasses-frost', accessory: 'acc-chain', aura: 'aura-blue' } },
+  { id: 'master', titleEn: 'The Master', titleSk: 'Master', subtitleEn: 'I want to master Python.', subtitleSk: 'Chcem ovládnuť Python.', equipment: { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold', aura: 'aura-golden' } },
 ];
 
 export default function NameModal() {

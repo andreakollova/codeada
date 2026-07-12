@@ -299,136 +299,100 @@ export default function CodingPath() {
         </div>
       )}
 
-      {/* Progress bar */}
-      <div style={{ height: 3, borderRadius: 2, background: '#1a1a1a', marginBottom: 20, overflow: 'hidden' }}>
-        <div style={{ height: '100%', background: allLessons.length > 0 ? '#4ade80' : '#333', borderRadius: 2, width: `${allLessons.length > 0 ? (doneCount / allLessons.length) * 100 : 0}%`, transition: 'width 0.4s' }} />
-      </div>
+      {/* Path-style lesson trail */}
+      <div style={{ position: 'relative', paddingTop: 8 }}>
+        {(() => {
+          // Flatten all lessons in path order
+          const pathLessons: { lesson: any; modTitle: string; groupTitle: string; isFirstInGroup: boolean }[] = [];
+          filteredGroups.forEach(group => {
+            const groupMods = group.modules.map(mn => dbModules.find(m => m.module_number === mn)).filter(Boolean) as ModuleWithLessons[];
+            const groupTitle = locale === 'sk' ? group.titleSk : group.titleEn;
+            let first = true;
+            groupMods.forEach(mod => {
+              const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
+              mod.lessons.forEach(lesson => {
+                pathLessons.push({ lesson, modTitle, groupTitle, isFirstInGroup: first });
+                first = false;
+              });
+            });
+          });
 
-      {/* Modules grouped by syllabus */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {filteredGroups.map((group, gi) => {
-          const groupMods = group.modules.map(mn => dbModules.find(m => m.module_number === mn)).filter(Boolean) as ModuleWithLessons[];
-          if (groupMods.length === 0) return null;
-          const groupLessons = groupMods.flatMap(m => m.lessons);
-          const groupDone = groupLessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
-          const groupTitle = locale === 'sk' ? group.titleSk : group.titleEn;
+          // Find first incomplete lesson
+          const nextIdx = pathLessons.findIndex(p => !completedLessons.includes(`theory-${p.lesson.id}`));
 
-          return (
-            <div key={gi}>
-              <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#888', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{groupTitle}</span>
-                <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
-                <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>{groupDone}/{groupLessons.length}</span>
+          return pathLessons.map((item, i) => {
+            const done = completedLessons.includes(`theory-${item.lesson.id}`);
+            const isNext = i === nextIdx;
+            const locked = !done && !isNext && nextIdx >= 0 && i > nextIdx;
+            const lessonTitle = locale === 'sk' && item.lesson.title_sk ? item.lesson.title_sk : item.lesson.title;
+            // Zigzag: alternate left and right
+            const side = i % 2 === 0 ? 'left' : 'right';
+            const nodeSize = isNext ? 56 : 48;
+
+            return (
+              <div key={item.lesson.id}>
+                {/* Group divider */}
+                {item.isFirstInGroup && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: i === 0 ? '0 0 16px' : '24px 0 16px' }}>
+                    <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                      {item.groupTitle}
+                    </span>
+                    <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
+                  </div>
+                )}
+
+                {/* Connector line */}
+                {i > 0 && !item.isFirstInGroup && (
+                  <div style={{ display: 'flex', justifyContent: 'center', height: 28 }}>
+                    <div style={{ width: 2, height: '100%', background: done || isNext ? '#222' : '#111' }} />
+                  </div>
+                )}
+
+                {/* Lesson node */}
+                <div style={{ display: 'flex', justifyContent: side === 'left' ? 'flex-start' : 'flex-end', paddingLeft: side === 'left' ? 0 : 40, paddingRight: side === 'right' ? 0 : 40 }}>
+                  <motion.button
+                    onClick={() => !locked && router.push(`/theory/${item.lesson.id}`)}
+                    whileHover={!locked ? { scale: 1.03 } : {}}
+                    whileTap={!locked ? { scale: 0.97 } : {}}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 14,
+                      padding: '10px 16px 10px 10px', borderRadius: 16,
+                      background: isNext ? '#111' : '#0a0a0a',
+                      border: `1px solid ${isNext ? '#333' : done ? '#1a1a1a' : '#111'}`,
+                      cursor: locked ? 'default' : 'pointer',
+                      opacity: locked ? 0.4 : 1,
+                      maxWidth: 320,
+                    }}
+                  >
+                    <div style={{
+                      width: nodeSize, height: nodeSize, borderRadius: nodeSize / 2, flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: done ? '#4ade80' : isNext ? '#fff' : '#161616',
+                      border: done ? 'none' : isNext ? 'none' : '1px solid #222',
+                      boxShadow: isNext ? '0 0 20px rgba(255,255,255,0.15)' : 'none',
+                    }}>
+                      {done
+                        ? <Check size={22} color="#052e16" strokeWidth={2.5} />
+                        : isNext
+                          ? <Play size={20} color="#000" fill="#000" />
+                          : <BookOpen size={16} color="#555" />
+                      }
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: isNext ? 700 : 500, fontSize: isNext ? 14 : 13, color: done ? '#aaa' : '#fff', marginBottom: 2 }}>
+                        {lessonTitle}
+                      </div>
+                      <div style={{ fontSize: 10, color: '#555' }}>
+                        {item.modTitle}
+                      </div>
+                    </div>
+                  </motion.button>
+                </div>
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {groupMods.map((mod) => {
-                  const isOpen = !!openModules[mod.id];
-                  const modDone = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
-                  const pct = mod.lessons.length ? Math.round((modDone / mod.lessons.length) * 100) : 0;
-                  const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
-
-                  return (
-                    <motion.div
-                      key={mod.id}
-                      style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 16, overflow: 'hidden' }}
-                    >
-                      <button
-                        onClick={() => toggleModule(mod.id)}
-                        style={{ width: '100%', padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', textAlign: 'left' }}
-                      >
-                        <div style={{ width: 40, height: 40, borderRadius: 12, background: '#111', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Code size={18} color="#888" />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, fontSize: 15, color: '#fff', marginBottom: 4 }}>
-                            {modTitle}
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ flex: 1, height: 3, borderRadius: 2, background: '#1a1a1a', overflow: 'hidden' }}>
-                              <div style={{ width: `${pct}%`, height: '100%', background: '#fff', borderRadius: 2, transition: 'width 0.4s' }} />
-                            </div>
-                            <span style={{ fontSize: 11, color: '#888', fontWeight: 600, flexShrink: 0 }}>
-                              {modDone}/{mod.lessons.length}
-                            </span>
-                          </div>
-                        </div>
-                        <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                          <ChevronDown size={18} color="#555" />
-                        </motion.div>
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {isOpen && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
-                            style={{ overflow: 'hidden' }}
-                          >
-                            <div style={{ borderTop: '1px solid #111' }}>
-                              {mod.lessons.map((lesson, li) => {
-                                const done = completedLessons.includes(`theory-${lesson.id}`);
-                                const lessonTitle = locale === 'sk' && lesson.title_sk ? lesson.title_sk : lesson.title;
-
-                                return (
-                                  <motion.button
-                                    key={lesson.id}
-                                    onClick={() => router.push(`/theory/${lesson.id}`)}
-                                    whileHover={{ background: '#111' }}
-                                    whileTap={{ scale: 0.99 }}
-                                    style={{
-                                      width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-                                      padding: '12px 20px', cursor: 'pointer', textAlign: 'left',
-                                      borderTop: li === 0 ? 'none' : '1px solid #0f0f0f',
-                                      transition: 'background 0.15s',
-                                    }}
-                                  >
-                                    <div style={{
-                                      width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      background: done ? '#4ade80' : '#111',
-                                      border: done ? 'none' : '1px solid #1f1f1f',
-                                    }}>
-                                      {done
-                                        ? <Check size={20} color="#052e16" strokeWidth={2.5} />
-                                        : <BookOpen size={18} color="#888" />
-                                      }
-                                    </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                      <div style={{ fontWeight: 500, fontSize: 14, color: done ? '#fff' : '#ccc', marginBottom: 2 }}>
-                                        {lessonTitle}
-                                      </div>
-                                      <div style={{ fontSize: 11, color: '#777' }}>
-                                        {s('lesson', locale)} {lesson.lesson_number}
-                                      </div>
-                                    </div>
-                                    <div style={{
-                                      width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      background: done ? 'transparent' : '#fff',
-                                      border: done ? '1px solid #1f1f1f' : 'none',
-                                    }}>
-                                      {done
-                                        ? <Check size={14} color="#888" />
-                                        : <Play size={13} color="#000" fill="#000" />
-                                      }
-                                    </div>
-                                  </motion.button>
-                                );
-                              })}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          });
+        })()}
       </div>
     </div>
   );

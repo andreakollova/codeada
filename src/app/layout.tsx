@@ -64,6 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import BottomNav from '@/components/BottomNav';
 import LocaleInit from '@/components/LocaleInit';
+import { Analytics } from '@vercel/analytics/next';
 
 // JSON-LD structured data
 function JsonLd({ isSk }: { isSk: boolean }) {
@@ -116,6 +117,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <LocaleInit />
         <BottomNav />
         {children}
+        <Analytics />
       </body>
     </html>
   );

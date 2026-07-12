@@ -64,6 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import BottomNav from '@/components/BottomNav';
 import LocaleInit from '@/components/LocaleInit';
+import AuthGate from '@/components/AuthGate';
 import { Analytics } from '@vercel/analytics/next';
 
 // JSON-LD structured data
@@ -115,8 +116,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body style={{ margin: 0, background: '#0A0A0A' }}>
         <LocaleInit />
-        <BottomNav />
-        {children}
+        <AuthGate>
+          <BottomNav />
+          {children}
+        </AuthGate>
         <Analytics />
       </body>
     </html>

@@ -86,10 +86,10 @@ export default function TheoryLessonPage() {
     const readTime = Math.max(3, Math.round((lesson.learning_content?.length || 500) / 800));
     const drinkMap = {
       coffee: { icon: '☕', en: 'Grab your coffee', sk: 'Daj si kávičku', counterEn: 'coffees', counterSk: ['káva', 'kávy', 'káv'] },
-      tea: { icon: '🍵', en: 'Brew some tea', sk: 'Zavár si čaj', counterEn: 'teas', counterSk: ['čaj', 'čaje', 'čajov'] },
-      energy: { icon: '⚡', en: 'Crack open an energy drink', sk: 'Otvor si energiťák', counterEn: 'energy drinks', counterSk: ['energiťák', 'energiťáky', 'energiťákov'] },
-      juice: { icon: '🧃', en: 'Pour some juice', sk: 'Nalej si džús', counterEn: 'juices', counterSk: ['džús', 'džúsy', 'džúsov'] },
-      water: { icon: '💧', en: 'Pour a glass of water', sk: 'Nalej si vodu', counterEn: 'glasses', counterSk: ['pohár', 'poháre', 'pohárov'] },
+      tea: { icon: '🍵', en: 'Make yourself some tea', sk: 'Prichystaj si čaj', counterEn: 'teas', counterSk: ['čaj', 'čaje', 'čajov'] },
+      energy: { icon: '⚡', en: 'Grab your energy drink', sk: 'Daj si energiťák', counterEn: 'energy drinks', counterSk: ['energiťák', 'energiťáky', 'energiťákov'] },
+      juice: { icon: '🧃', en: 'Pour yourself some juice', sk: 'Nalej si džúsik', counterEn: 'juices', counterSk: ['džús', 'džúsy', 'džúsov'] },
+      water: { icon: '💧', en: 'Pour a glass of water', sk: 'Nalej si pohárik vody', counterEn: 'glasses', counterSk: ['pohár', 'poháre', 'pohárov'] },
     };
     const d = drinkMap[favDrink || 'coffee'];
     const counterSk = coffees === 1 ? d.counterSk[0] : coffees < 5 ? d.counterSk[1] : d.counterSk[2];

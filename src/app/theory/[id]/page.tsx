@@ -24,7 +24,7 @@ const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: st
 export default function TheoryLessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment } = useUserStore();
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip } = useUserStore();
   const { locale } = useLocaleStore();
 
   const [lesson, setLesson] = useState<DbLesson | null>(null);
@@ -347,29 +347,59 @@ export default function TheoryLessonPage() {
             <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{s('xpEarned', locale)}</p>
           </div>
         </div>
-        {reward && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, type: 'spring' }}
-            style={{ marginTop: 24, padding: '16px 32px', borderRadius: 14, background: '#1a1a1a', border: '1px solid #333', textAlign: 'center' }}
+        {reward && (() => {
+          const item = cosmeticItems.find(c => c.id === reward);
+          const slot = item?.type as keyof typeof equipment | undefined;
+          // Preview equipment with new item
+          const previewEquip = slot ? { ...equipment, [slot]: reward } : equipment;
+          const rarityColors: Record<string, string> = { common: '#888', rare: '#3b82f6', epic: '#a855f7', legendary: '#f59e0b', mythic: '#ff3366' };
+          const color = rarityColors[item?.rarity || 'common'] || '#888';
+          return (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, type: 'spring' }}
+              style={{ marginTop: 28, padding: 24, borderRadius: 16, background: '#111', border: `1px solid ${color}33`, textAlign: 'center', minWidth: 240 }}
+            >
+              <p style={{ fontSize: 11, color: '#888', margin: '0 0 12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                {s('newWardrobeItem', locale)}
+              </p>
+              <Byte mood="celebrating" size={80} equipment={previewEquip} />
+              <p style={{ fontSize: 17, color: '#fff', fontWeight: 800, margin: '12px 0 4px' }}>
+                {item?.name || reward}
+              </p>
+              <p style={{ fontSize: 11, color, fontWeight: 700, margin: '0 0 16px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                {item?.rarity}
+              </p>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                <motion.button
+                  onClick={() => { if (slot) equip(slot, reward); router.push('/'); }}
+                  whileTap={{ scale: 0.96 }}
+                  style={{ padding: '10px 20px', borderRadius: 10, background: '#fff', color: '#000', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}
+                >
+                  {locale === 'sk' ? 'Nasadiť' : 'Equip now'}
+                </motion.button>
+                <motion.button
+                  onClick={() => router.push('/')}
+                  whileTap={{ scale: 0.96 }}
+                  style={{ padding: '10px 20px', borderRadius: 10, background: '#222', color: '#888', fontWeight: 600, fontSize: 13, border: 'none', cursor: 'pointer' }}
+                >
+                  {locale === 'sk' ? 'Neskôr' : 'Later'}
+                </motion.button>
+              </div>
+            </motion.div>
+          );
+        })()}
+        {!reward && (
+          <motion.button
+            onClick={() => router.push('/')}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{ marginTop: 24, padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
           >
-            <p style={{ fontSize: 12, color: '#888', margin: '0 0 4px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              {s('newWardrobeItem', locale)}
-            </p>
-            <p style={{ fontSize: 16, color: '#fff', fontWeight: 700, margin: 0 }}>
-              {cosmeticItems.find(c => c.id === reward)?.name || reward}
-            </p>
-          </motion.div>
+            {s('backHome', locale)}
+          </motion.button>
         )}
-        <motion.button
-          onClick={() => router.push('/')}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          style={{ marginTop: 24, padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
-        >
-          {s('backHome', locale)}
-        </motion.button>
       </div>
     );
   }

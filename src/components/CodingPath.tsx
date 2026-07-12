@@ -375,11 +375,11 @@ export default function CodingPath() {
                                     <div style={{
                                       width: 44, height: 44, borderRadius: 14, flexShrink: 0,
                                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      background: done ? '#fff' : '#111',
+                                      background: done ? '#4ade80' : '#111',
                                       border: done ? 'none' : '1px solid #1f1f1f',
                                     }}>
                                       {done
-                                        ? <Check size={20} color="#000" strokeWidth={2.5} />
+                                        ? <Check size={20} color="#052e16" strokeWidth={2.5} />
                                         : <BookOpen size={18} color="#888" />
                                       }
                                     </div>

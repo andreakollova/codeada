@@ -181,7 +181,7 @@ function ModuleRow({ mod, completedLessons, router, locale }: { mod: ModuleWithL
                 <div style={{
                   width: 24, height: 24, borderRadius: 7, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: done ? '#fff' : 'transparent',
+                  background: done ? '#4ade80' : 'transparent',
                   border: done ? 'none' : '1px solid #2a2a2a',
                 }}>
                   {done && <Check size={12} color="#000" strokeWidth={3} />}

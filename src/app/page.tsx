@@ -10,7 +10,9 @@ import { useLocaleStore } from '@/store/localeStore';
 import { s, skLessons, skStreak } from '@/data/strings';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Zap, Heart, Trophy, BookOpen } from 'lucide-react';
+import { Flame, Zap, Heart, Trophy, BookOpen, LogIn, LogOut, User } from 'lucide-react';
+import AuthModal from '@/components/AuthModal';
+import { getSupabase } from '@/lib/supabase';
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk') => {
   if (locale === 'sk') {
@@ -78,7 +80,17 @@ export default function HomePage() {
   const { checkStreak, name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems, coffees } = useUserStore();
   const { locale } = useLocaleStore();
 
-  useEffect(() => { checkStreak(); }, []);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authUser, setAuthUser] = useState<any>(null);
+
+  useEffect(() => {
+    checkStreak();
+    const sb = getSupabase();
+    if (sb) {
+      sb.auth.getSession().then(({ data }) => setAuthUser(data?.session?.user || null));
+      sb.auth.onAuthStateChange((_event, session) => setAuthUser(session?.user || null));
+    }
+  }, []);
 
   if (COUNTDOWN_ENABLED && Date.now() < COUNTDOWN_TARGET.getTime()) {
     return <CountdownOverlay />;
@@ -87,6 +99,7 @@ export default function HomePage() {
   return (
     <div className="page-shell">
       <NameModal />
+      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 
       <div className="dashboard">
         <StatusBar />
@@ -190,8 +203,41 @@ export default function HomePage() {
               )}
             </div>
 
+            {/* Auth */}
+            <div style={{ marginTop: 20 }}>
+              {authUser ? (
+                <div style={{ padding: '14px 16px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <User size={16} color="#4ade80" />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, color: '#aaa', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {authUser.email}
+                    </div>
+                  </div>
+                  <button
+                    onClick={async () => { const sb = getSupabase(); if (sb) await sb.auth.signOut(); setAuthUser(null); }}
+                    style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', padding: 4 }}
+                  >
+                    <LogOut size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuth(true)}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: 12,
+                    background: '#111', border: '1px solid #222', color: '#aaa',
+                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  }}
+                >
+                  <LogIn size={14} />
+                  {locale === 'sk' ? 'Prihlásiť sa' : 'Log in'}
+                </button>
+              )}
+            </div>
+
             {/* Byte character on desktop */}
-            <div style={{ marginTop: 32, padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
+            <div style={{ marginTop: 20, padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
               <Byte mood={byteMood} size={100} equipment={equipment} />
               <p style={{ fontSize: 13, color: '#888', marginTop: 12 }}>
                 {byteMood === 'celebrating' ? s('greatJob', locale) : byteMood === 'worried' ? s('keepTrying', locale) : byteMood === 'proud' ? s('onFire', locale) : s('readyToLearn', locale)}

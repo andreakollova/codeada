@@ -281,7 +281,7 @@ export default function CodingPath() {
                   {activeModuleNumbers.length} {locale === 'sk' ? 'modulov' : 'modules'} - {allLessons.length} {locale === 'sk' ? 'lekcií' : 'lessons'}
                 </span>
                 <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
-                  {doneCount} {locale === 'sk' ? 'hotových' : 'done'}
+                  {doneCount} {locale === 'sk' ? (doneCount === 1 ? 'hotová' : doneCount >= 2 && doneCount <= 4 ? 'hotové' : 'hotových') : 'done'}
                 </span>
               </div>
             </div>
@@ -310,7 +310,7 @@ export default function CodingPath() {
               {locale === 'sk' ? 'Všetky moduly' : 'All modules'}
             </h2>
             <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
-              {doneCount} / {allLessons.length} {locale === 'sk' ? 'lekcií hotových' : 'lessons done'}
+              {doneCount} / {allLessons.length} {locale === 'sk' ? (doneCount === 1 ? 'lekcia hotová' : doneCount >= 2 && doneCount <= 4 ? 'lekcie hotové' : 'lekcií hotových') : 'lessons done'}
             </p>
           </div>
         </div>

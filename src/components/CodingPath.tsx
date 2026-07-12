@@ -345,9 +345,9 @@ export default function CodingPath() {
               const locked = !unlocked;
               const lessonTitle = locale === 'sk' && item.lesson.title_sk ? item.lesson.title_sk : item.lesson.title;
 
-              // Zigzag offset: sine wave pattern
-              const offset = Math.sin(i * 0.8) * 80;
-              const prevOffset = i > 0 ? Math.sin((i - 1) * 0.8) * 80 : 0;
+              // Zigzag: even=left, odd=right
+              const xPos = i % 2 === 0 ? 60 : 240;  // left or right in 300-wide viewBox
+              const prevXPos = i > 0 ? ((i - 1) % 2 === 0 ? 60 : 240) : 150;
               const nodeSize = isNext ? 58 : 48;
               const trailDone = done || isNext;
               const connectorH = 40;
@@ -370,7 +370,7 @@ export default function CodingPath() {
                     <div style={{ height: connectorH, position: 'relative' }}>
                       <svg viewBox="0 0 300 40" preserveAspectRatio="none" style={{ width: '100%', height: connectorH, display: 'block' }}>
                         <path
-                          d={`M ${150 + prevOffset} 0 C ${150 + prevOffset} 20, ${150 + offset} 20, ${150 + offset} 40`}
+                          d={`M ${prevXPos} 0 C ${prevXPos} 20, ${xPos} 20, ${xPos} 40`}
                           stroke={trailDone ? '#333' : '#1a1a1a'}
                           strokeWidth="3"
                           strokeDasharray={trailDone ? 'none' : '6 6'}
@@ -382,7 +382,15 @@ export default function CodingPath() {
                   )}
 
                   {/* Lesson node */}
-                  <div ref={isNext ? nextLessonRef : undefined} style={{ display: 'flex', justifyContent: 'center' }}>
+                  <div
+                    ref={isNext ? nextLessonRef : undefined}
+                    style={{
+                      display: 'flex',
+                      justifyContent: i % 2 === 0 ? 'flex-start' : 'flex-end',
+                      paddingLeft: i % 2 === 0 ? 20 : 0,
+                      paddingRight: i % 2 === 1 ? 20 : 0,
+                    }}
+                  >
                     <motion.button
                       onClick={() => !locked && router.push(`/theory/${item.lesson.id}`)}
                       whileHover={!locked ? { scale: 1.06 } : {}}
@@ -394,7 +402,6 @@ export default function CodingPath() {
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                         cursor: locked ? 'default' : 'pointer',
                         opacity: locked ? 0.3 : 1,
-                        transform: `translateX(${offset}px)`,
                         background: 'none', border: 'none', padding: '4px 8px',
                       }}
                     >
@@ -429,6 +436,25 @@ export default function CodingPath() {
                         }}>
                           {lessonTitle}
                         </div>
+                        {/* Reward badge — every 5th lesson or 1st/3rd */}
+                        {(() => {
+                          const lessonNum = i + 1;
+                          const getsReward = lessonNum === 1 || lessonNum === 3 || lessonNum % 5 === 0;
+                          if (!getsReward) return null;
+                          return (
+                            <div style={{
+                              marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 3,
+                              padding: '2px 8px', borderRadius: 10,
+                              background: done ? 'rgba(74,222,128,0.1)' : 'rgba(245,158,11,0.1)',
+                              border: `1px solid ${done ? 'rgba(74,222,128,0.2)' : 'rgba(245,158,11,0.2)'}`,
+                            }}>
+                              <span style={{ fontSize: 10 }}>🎁</span>
+                              <span style={{ fontSize: 9, fontWeight: 600, color: done ? '#4ade80' : '#f59e0b' }}>
+                                {locale === 'sk' ? 'Odmena' : 'Reward'}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </motion.button>
                   </div>

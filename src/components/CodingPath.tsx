@@ -299,101 +299,121 @@ export default function CodingPath() {
         </div>
       )}
 
-      {/* Path-style lesson trail */}
-      <div style={{ position: 'relative', paddingTop: 8 }}>
-        {(() => {
-          // Flatten all lessons in path order
-          const pathLessons: { lesson: any; modTitle: string; groupTitle: string; isFirstInGroup: boolean }[] = [];
-          filteredGroups.forEach(group => {
-            const groupMods = group.modules.map(mn => dbModules.find(m => m.module_number === mn)).filter(Boolean) as ModuleWithLessons[];
-            const groupTitle = locale === 'sk' ? group.titleSk : group.titleEn;
-            let first = true;
-            groupMods.forEach(mod => {
-              const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
-              mod.lessons.forEach(lesson => {
-                pathLessons.push({ lesson, modTitle, groupTitle, isFirstInGroup: first });
-                first = false;
-              });
+      {/* Path trail */}
+      {(() => {
+        const pathLessons: { lesson: any; modTitle: string; groupTitle: string; isFirstInGroup: boolean }[] = [];
+        filteredGroups.forEach(group => {
+          const groupMods = group.modules.map(mn => dbModules.find(m => m.module_number === mn)).filter(Boolean) as ModuleWithLessons[];
+          const groupTitle = locale === 'sk' ? group.titleSk : group.titleEn;
+          let first = true;
+          groupMods.forEach(mod => {
+            const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
+            mod.lessons.forEach(lesson => {
+              pathLessons.push({ lesson, modTitle, groupTitle, isFirstInGroup: first });
+              first = false;
             });
           });
+        });
 
-          // Find first incomplete lesson
-          const nextIdx = pathLessons.findIndex(p => !completedLessons.includes(`theory-${p.lesson.id}`));
+        // Unlock logic: first 3 + all completed + next after last completed
+        const nextIdx = pathLessons.findIndex(p => !completedLessons.includes(`theory-${p.lesson.id}`));
+        const UNLOCK_AHEAD = 3;
 
-          return pathLessons.map((item, i) => {
-            const done = completedLessons.includes(`theory-${item.lesson.id}`);
-            const isNext = i === nextIdx;
-            const locked = !done && !isNext && nextIdx >= 0 && i > nextIdx;
-            const lessonTitle = locale === 'sk' && item.lesson.title_sk ? item.lesson.title_sk : item.lesson.title;
-            // Zigzag: alternate left and right
-            const side = i % 2 === 0 ? 'left' : 'right';
-            const nodeSize = isNext ? 56 : 48;
+        return (
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 8 }}>
+            {pathLessons.map((item, i) => {
+              const done = completedLessons.includes(`theory-${item.lesson.id}`);
+              const isNext = i === nextIdx;
+              const unlocked = done || i < UNLOCK_AHEAD || (nextIdx >= 0 && i <= nextIdx + UNLOCK_AHEAD);
+              const locked = !unlocked;
+              const lessonTitle = locale === 'sk' && item.lesson.title_sk ? item.lesson.title_sk : item.lesson.title;
 
-            return (
-              <div key={item.lesson.id}>
-                {/* Group divider */}
-                {item.isFirstInGroup && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: i === 0 ? '0 0 16px' : '24px 0 16px' }}>
-                    <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                      {item.groupTitle}
-                    </span>
-                    <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
-                  </div>
-                )}
+              // Zigzag offset: sine wave pattern
+              const offset = Math.sin(i * 0.8) * 60;
+              const nodeSize = isNext ? 58 : 48;
+              const trailDone = done || isNext;
 
-                {/* Connector line */}
-                {i > 0 && !item.isFirstInGroup && (
-                  <div style={{ display: 'flex', justifyContent: 'center', height: 28 }}>
-                    <div style={{ width: 2, height: '100%', background: done || isNext ? '#222' : '#111' }} />
-                  </div>
-                )}
-
-                {/* Lesson node */}
-                <div style={{ display: 'flex', justifyContent: side === 'left' ? 'flex-start' : 'flex-end', paddingLeft: side === 'left' ? 0 : 40, paddingRight: side === 'right' ? 0 : 40 }}>
-                  <motion.button
-                    onClick={() => !locked && router.push(`/theory/${item.lesson.id}`)}
-                    whileHover={!locked ? { scale: 1.03 } : {}}
-                    whileTap={!locked ? { scale: 0.97 } : {}}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 14,
-                      padding: '10px 16px 10px 10px', borderRadius: 16,
-                      background: isNext ? '#111' : '#0a0a0a',
-                      border: `1px solid ${isNext ? '#333' : done ? '#1a1a1a' : '#111'}`,
-                      cursor: locked ? 'default' : 'pointer',
-                      opacity: locked ? 0.4 : 1,
-                      maxWidth: 320,
-                    }}
-                  >
-                    <div style={{
-                      width: nodeSize, height: nodeSize, borderRadius: nodeSize / 2, flexShrink: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: done ? '#4ade80' : isNext ? '#fff' : '#161616',
-                      border: done ? 'none' : isNext ? 'none' : '1px solid #222',
-                      boxShadow: isNext ? '0 0 20px rgba(255,255,255,0.15)' : 'none',
-                    }}>
-                      {done
-                        ? <Check size={22} color="#052e16" strokeWidth={2.5} />
-                        : isNext
-                          ? <Play size={20} color="#000" fill="#000" />
-                          : <BookOpen size={16} color="#555" />
-                      }
+              return (
+                <div key={item.lesson.id} style={{ width: '100%' }}>
+                  {/* Group label */}
+                  {item.isFirstInGroup && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: i === 0 ? '0 0 20px' : '28px 0 20px' }}>
+                      <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#444', letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                        {item.groupTitle}
+                      </span>
+                      <div style={{ flex: 1, height: 1, background: '#1a1a1a' }} />
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: isNext ? 700 : 500, fontSize: isNext ? 14 : 13, color: done ? '#aaa' : '#fff', marginBottom: 2 }}>
-                        {lessonTitle}
-                      </div>
-                      <div style={{ fontSize: 10, color: '#555' }}>
-                        {item.modTitle}
-                      </div>
+                  )}
+
+                  {/* Connector trail */}
+                  {i > 0 && !item.isFirstInGroup && (
+                    <div style={{ display: 'flex', justifyContent: 'center', height: 32, position: 'relative' }}>
+                      <svg width="100%" height="32" style={{ position: 'absolute', top: 0, left: 0 }}>
+                        <line
+                          x1="50%" y1="0" x2="50%" y2="32"
+                          stroke={trailDone ? '#333' : '#1a1a1a'}
+                          strokeWidth="2"
+                          strokeDasharray={trailDone ? 'none' : '4 4'}
+                        />
+                      </svg>
                     </div>
-                  </motion.button>
+                  )}
+
+                  {/* Lesson node */}
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <motion.button
+                      onClick={() => !locked && router.push(`/theory/${item.lesson.id}`)}
+                      whileHover={!locked ? { scale: 1.06 } : {}}
+                      whileTap={!locked ? { scale: 0.95 } : {}}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(i * 0.03, 0.5) }}
+                      style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                        cursor: locked ? 'default' : 'pointer',
+                        opacity: locked ? 0.3 : 1,
+                        transform: `translateX(${offset}px)`,
+                        background: 'none', border: 'none', padding: '4px 8px',
+                      }}
+                    >
+                      {/* Circle node */}
+                      <div style={{
+                        width: nodeSize, height: nodeSize, borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: done ? '#4ade80' : isNext ? '#fff' : locked ? '#111' : '#1a1a1a',
+                        border: done || isNext ? 'none' : `2px solid ${locked ? '#1a1a1a' : '#333'}`,
+                        boxShadow: isNext ? '0 0 24px rgba(255,255,255,0.2), 0 0 48px rgba(255,255,255,0.05)' : done ? '0 0 12px rgba(74,222,128,0.15)' : 'none',
+                        transition: 'all 0.2s',
+                      }}>
+                        {done
+                          ? <Check size={22} color="#052e16" strokeWidth={3} />
+                          : isNext
+                            ? <Play size={20} color="#000" fill="#000" />
+                            : locked
+                              ? <span style={{ fontSize: 14, color: '#333' }}>🔒</span>
+                              : <BookOpen size={16} color="#666" />
+                        }
+                      </div>
+                      {/* Label */}
+                      <div style={{ textAlign: 'center', maxWidth: 140 }}>
+                        <div style={{
+                          fontWeight: isNext ? 700 : 500,
+                          fontSize: isNext ? 12 : 11,
+                          color: done ? '#888' : isNext ? '#fff' : locked ? '#333' : '#aaa',
+                          lineHeight: 1.3,
+                        }}>
+                          {lessonTitle}
+                        </div>
+                      </div>
+                    </motion.button>
+                  </div>
                 </div>
-              </div>
-            );
-          });
-        })()}
-      </div>
+              );
+            })}
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -87,7 +87,7 @@ export default function TheoryLessonPage() {
     const drinkMap = {
       coffee: { icon: '☕', en: 'Grab your coffee', sk: 'Daj si kávičku', counterEn: 'coffees', counterSk: ['káva', 'kávy', 'káv'] },
       tea: { icon: '🍵', en: 'Make yourself some tea', sk: 'Prichystaj si čaj', counterEn: 'teas', counterSk: ['čaj', 'čaje', 'čajov'] },
-      energy: { icon: '⚡', en: 'Grab your energy drink', sk: 'Daj si energiťák', counterEn: 'energy drinks', counterSk: ['energiťák', 'energiťáky', 'energiťákov'] },
+      energy: { icon: '⚡', en: 'Grab your energy drink', sk: 'Otvor si energeťák', counterEn: 'energy drinks', counterSk: ['energiťák', 'energiťáky', 'energiťákov'] },
       juice: { icon: '🧃', en: 'Pour yourself some juice', sk: 'Nalej si džúsik', counterEn: 'juices', counterSk: ['džús', 'džúsy', 'džúsov'] },
       water: { icon: '💧', en: 'Pour a glass of water', sk: 'Nalej si pohárik vody', counterEn: 'glasses', counterSk: ['pohár', 'poháre', 'pohárov'] },
     };

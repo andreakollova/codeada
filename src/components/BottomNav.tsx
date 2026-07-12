@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, FolderCode, BookMarked, Wrench, Play } from 'lucide-react';
+import { BookOpen, FolderCode, BookMarked, Wrench, Settings } from 'lucide-react';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
 
@@ -11,7 +11,7 @@ const tabDefs = [
   { href: '/topics',   labelKey: 'projects' as const, Icon: FolderCode },
   { href: '/glossary', labelKey: 'glossary' as const,  Icon: BookMarked },
   { href: '/workshop', labelKey: 'workshop' as const,  Icon: Wrench },
-  { href: '/reels',    labelKey: 'reels' as const,    Icon: Play },
+  { href: '/settings', labelKey: 'settings' as const, Icon: Settings },
 ];
 
 export default function BottomNav() {

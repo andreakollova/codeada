@@ -25,6 +25,7 @@ const strings = {
   // BottomNav
   courses: { en: 'Courses', sk: 'Kurzy' },
   reels: { en: 'Reels', sk: 'Reels' },
+  settings: { en: 'Settings', sk: 'Nastavenia' },
   projects: { en: 'Projects', sk: 'Projekty' },
   glossary: { en: 'Glossary', sk: 'Slovník' },
   workshop: { en: 'Workshop', sk: 'Šatník' },

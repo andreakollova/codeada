@@ -1,16 +1,31 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { glossaryEntries, categoryLabels } from '@/data/glossary';
 import BottomNav from '@/components/BottomNav';
 import StatusBar from '@/components/StatusBar';
 import { GlossaryEntry } from '@/types';
-import { ChevronDown, Search, X } from 'lucide-react';
+import { ChevronDown, Search, X, Plus, Trash2 } from 'lucide-react';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
 
-const categories = ['všetko', 'skratka', 'symbol', 'koncept', 'nastroj'] as const;
+interface CustomEntry {
+  id: string;
+  term: string;
+  explanation: string;
+  example: string;
+}
+
+function loadCustomEntries(): CustomEntry[] {
+  if (typeof window === 'undefined') return [];
+  try { return JSON.parse(localStorage.getItem('coduy-my-glossary') || '[]'); } catch { return []; }
+}
+function saveCustomEntries(entries: CustomEntry[]) {
+  localStorage.setItem('coduy-my-glossary', JSON.stringify(entries));
+}
+
+const categories = ['všetko', 'môj', 'skratka', 'symbol', 'koncept', 'nastroj'] as const;
 type Filter = typeof categories[number];
 
 export default function GlossaryPage() {
@@ -18,15 +33,45 @@ export default function GlossaryPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('všetko');
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [customEntries, setCustomEntries] = useState<CustomEntry[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newTerm, setNewTerm] = useState('');
+  const [newExplanation, setNewExplanation] = useState('');
+  const [newCode, setNewCode] = useState('');
+
+  useEffect(() => { setCustomEntries(loadCustomEntries()); }, []);
+
+  const addCustomEntry = () => {
+    if (!newTerm.trim() || !newExplanation.trim()) return;
+    const entry: CustomEntry = { id: `custom-${Date.now()}`, term: newTerm.trim(), explanation: newExplanation.trim(), example: newCode.trim() };
+    const updated = [...customEntries, entry];
+    setCustomEntries(updated);
+    saveCustomEntries(updated);
+    setNewTerm(''); setNewExplanation(''); setNewCode(''); setShowAddForm(false);
+  };
+
+  const removeCustomEntry = (id: string) => {
+    const updated = customEntries.filter(e => e.id !== id);
+    setCustomEntries(updated);
+    saveCustomEntries(updated);
+  };
+
+  // Convert custom entries to GlossaryEntry format
+  const customAsGlossary: (GlossaryEntry & { isCustom: true })[] = customEntries.map(e => ({
+    id: e.id, term: e.term, category: 'skratka' as const, short: e.explanation.slice(0, 60),
+    explanation: e.explanation, example: e.example || undefined, isCustom: true as const,
+  }));
 
   const results = useMemo(() => {
     const q = query.toLowerCase();
-    return glossaryEntries.filter(e => {
-      const matchCat = filter === 'všetko' || e.category === filter;
+    const allEntries = [...customAsGlossary, ...glossaryEntries];
+    return allEntries.filter(e => {
+      if (filter === 'môj') return 'isCustom' in e;
+      const matchCat = filter === 'všetko' || e.category === filter || ('isCustom' in e);
       const matchQ = !q || e.term.toLowerCase().includes(q) || e.short.toLowerCase().includes(q) || e.explanation.toLowerCase().includes(q);
       return matchCat && matchQ;
     });
-  }, [query, filter]);
+  }, [query, filter, customAsGlossary]);
 
   return (
     <div className="page-shell" style={{ minHeight: '100vh', background: '#0F0F0F', paddingBottom: 80 }}>
@@ -66,22 +111,83 @@ export default function GlossaryPage() {
 
         {/* Category filter */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 20, overflowX: 'auto', paddingBottom: 4 }}>
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              style={{
-                padding: '6px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                whiteSpace: 'nowrap', cursor: 'pointer', border: 'none',
-                background: filter === cat ? '#fff' : '#111',
-                color: filter === cat ? '#000' : '#555',
-                transition: 'all 0.15s',
-              }}
-            >
-              {cat === 'všetko' ? 'Všetko' : categoryLabels[cat as GlossaryEntry['category']]}
-            </button>
-          ))}
+          {categories.map(cat => {
+            const label = cat === 'všetko' ? (locale === 'sk' ? 'Všetko' : 'All')
+              : cat === 'môj' ? (locale === 'sk' ? 'Môj slovník' : 'My glossary')
+              : categoryLabels[cat as GlossaryEntry['category']] || cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setFilter(cat)}
+                style={{
+                  padding: '6px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                  whiteSpace: 'nowrap', cursor: 'pointer', border: 'none',
+                  background: filter === cat ? (cat === 'môj' ? '#4ade80' : '#fff') : '#111',
+                  color: filter === cat ? '#000' : '#555',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {label} {cat === 'môj' && customEntries.length > 0 ? `(${customEntries.length})` : ''}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Add custom entry button */}
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          style={{
+            width: '100%', padding: '12px 16px', borderRadius: 12, marginBottom: 16,
+            background: showAddForm ? '#111' : '#0a0a0a', border: '1px solid #222',
+            color: '#aaa', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          }}
+        >
+          <Plus size={14} />
+          {locale === 'sk' ? 'Pridať do môjho slovníka' : 'Add to my glossary'}
+        </button>
+
+        {/* Add form */}
+        <AnimatePresence>
+          {showAddForm && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+              style={{ overflow: 'hidden', marginBottom: 16 }}
+            >
+              <div style={{ background: '#0a0a0a', border: '1px solid #222', borderRadius: 14, padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <input
+                  value={newTerm} onChange={e => setNewTerm(e.target.value)}
+                  placeholder={locale === 'sk' ? 'Skratka / pojem (napr. API)' : 'Term (e.g. API)'}
+                  style={{ padding: '10px 14px', background: '#111', border: '1px solid #1a1a1a', borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'inherit', outline: 'none' }}
+                />
+                <textarea
+                  value={newExplanation} onChange={e => setNewExplanation(e.target.value)}
+                  placeholder={locale === 'sk' ? 'Vysvetlenie...' : 'Explanation...'}
+                  rows={3}
+                  style={{ padding: '10px 14px', background: '#111', border: '1px solid #1a1a1a', borderRadius: 10, color: '#fff', fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical' }}
+                />
+                <textarea
+                  value={newCode} onChange={e => setNewCode(e.target.value)}
+                  placeholder={locale === 'sk' ? 'Kód (voliteľné)' : 'Code (optional)'}
+                  rows={2}
+                  style={{ padding: '10px 14px', background: '#111', border: '1px solid #1a1a1a', borderRadius: 10, color: '#aaa', fontSize: 12, fontFamily: 'monospace', outline: 'none', resize: 'vertical' }}
+                />
+                <button
+                  onClick={addCustomEntry}
+                  disabled={!newTerm.trim() || !newExplanation.trim()}
+                  style={{
+                    padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                    background: newTerm.trim() && newExplanation.trim() ? '#4ade80' : '#222',
+                    color: newTerm.trim() && newExplanation.trim() ? '#000' : '#555',
+                    fontWeight: 700, fontSize: 13,
+                  }}
+                >
+                  {locale === 'sk' ? 'Pridať' : 'Add'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Results */}
@@ -109,14 +215,24 @@ export default function GlossaryPage() {
                   }}
                 >
                   {/* Category badge */}
-                  <span style={{
-                    fontSize: 9, padding: '3px 7px', borderRadius: 6, fontWeight: 800,
-                    letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0,
-                    background: entry.category === 'skratka' ? '#1a1a1a' : entry.category === 'symbol' ? '#161616' : entry.category === 'koncept' ? '#181818' : '#141414',
-                    color: entry.category === 'skratka' ? '#888' : entry.category === 'symbol' ? '#777' : entry.category === 'koncept' ? '#666' : '#555',
-                  }}>
-                    {entry.category === 'nastroj' ? 'nástroj' : entry.category}
-                  </span>
+                  {'isCustom' in entry ? (
+                    <span style={{
+                      fontSize: 9, padding: '3px 7px', borderRadius: 6, fontWeight: 800,
+                      letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0,
+                      background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80',
+                    }}>
+                      {locale === 'sk' ? 'môj' : 'mine'}
+                    </span>
+                  ) : (
+                    <span style={{
+                      fontSize: 9, padding: '3px 7px', borderRadius: 6, fontWeight: 800,
+                      letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0,
+                      background: entry.category === 'skratka' ? '#1a1a1a' : entry.category === 'symbol' ? '#161616' : entry.category === 'koncept' ? '#181818' : '#141414',
+                      color: entry.category === 'skratka' ? '#888' : entry.category === 'symbol' ? '#777' : entry.category === 'koncept' ? '#666' : '#555',
+                    }}>
+                      {entry.category === 'nastroj' ? 'nástroj' : entry.category}
+                    </span>
+                  )}
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, fontSize: 14, color: '#fff', marginBottom: 1 }}>
@@ -151,6 +267,14 @@ export default function GlossaryPage() {
                               {entry.example}
                             </pre>
                           </div>
+                        )}
+                        {'isCustom' in entry && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); removeCustomEntry(entry.id); setExpanded(null); }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontSize: 11, fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start' }}
+                          >
+                            <Trash2 size={11} /> {locale === 'sk' ? 'Odstrániť' : 'Remove'}
+                          </button>
                         )}
                       </div>
                     </motion.div>

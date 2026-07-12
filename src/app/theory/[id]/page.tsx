@@ -38,6 +38,7 @@ export default function TheoryLessonPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
   const [reward, setReward] = useState<string | null>(null);
+  const [reelUrl, setReelUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const idStr = Array.isArray(id) ? id[0] : id;
@@ -56,7 +57,18 @@ export default function TheoryLessonPage() {
       .catch(err => {
         console.error('Failed to load lesson:', err);
       });
-  }, [id]);
+
+    // Fetch latest reel video for this lesson
+    fetch('https://zjyolgkakxuaegpvhimy.supabase.co/storage/v1/object/public/ig-media/tracking/reels.json')
+      .then(r => r.json())
+      .then((reels: any[]) => {
+        const match = reels
+          .filter((r: any) => r.lessonId === numId && r.lang === locale && r.videoUrl)
+          .sort((a: any, b: any) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+        if (match.length > 0) setReelUrl(match[0].videoUrl);
+      })
+      .catch(() => {});
+  }, [id, locale]);
 
   if (phase === 'loading' || !lesson) {
     return (
@@ -170,6 +182,25 @@ export default function TheoryLessonPage() {
             {locale === 'sk' ? sec.labelSk : sec.label}
           </span>
         </div>
+
+        {/* Reel video — shown in intro section */}
+        {sec.phase === 'intro' && reelUrl && (
+          <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #1a1a1a', background: '#000' }}>
+            <video
+              src={reelUrl}
+              controls
+              playsInline
+              preload="metadata"
+              style={{ width: '100%', display: 'block', maxHeight: 400, objectFit: 'contain', background: '#000' }}
+              poster=""
+            />
+            <div style={{ padding: '8px 12px', background: '#0a0a0a', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 10, color: '#555', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                {locale === 'sk' ? 'Coduy Reel' : 'Coduy Reel'}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Content */}
         {Array.isArray(content) ? (

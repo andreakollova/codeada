@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocaleStore } from '@/store/localeStore';
 import { getSupabase } from '@/lib/supabase';
@@ -18,6 +18,8 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resendTimer, setResendTimer] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleGoogle = async () => {
     const sb = getSupabase();
@@ -43,8 +45,21 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       setError(err.message);
     } else {
       setStep('otp');
+      setResendTimer(60);
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setResendTimer(prev => {
+          if (prev <= 1) { clearInterval(timerRef.current!); return 0; }
+          return prev - 1;
+        });
+      }, 1000);
     }
     setLoading(false);
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0) return;
+    await handleSendOtp();
   };
 
   const handleVerifyOtp = async () => {
@@ -203,12 +218,23 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                     ? (locale === 'sk' ? 'Overujem...' : 'Verifying...')
                     : (locale === 'sk' ? 'Overiť kód' : 'Verify code')}
                 </button>
-                <button
-                  onClick={() => { setStep('email'); setOtp(''); setError(null); }}
-                  style={{ marginTop: 12, width: '100%', background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer' }}
-                >
-                  {locale === 'sk' ? 'Zmeniť email' : 'Change email'}
-                </button>
+                <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                  <button
+                    onClick={handleResend}
+                    disabled={resendTimer > 0}
+                    style={{ background: 'none', border: 'none', color: resendTimer > 0 ? '#333' : '#888', fontSize: 12, cursor: resendTimer > 0 ? 'default' : 'pointer' }}
+                  >
+                    {resendTimer > 0
+                      ? (locale === 'sk' ? `Poslať znova (${resendTimer}s)` : `Resend (${resendTimer}s)`)
+                      : (locale === 'sk' ? 'Neprišiel kód? Poslať znova' : "Didn't get the code? Resend")}
+                  </button>
+                  <button
+                    onClick={() => { setStep('email'); setOtp(''); setError(null); setResendTimer(0); if (timerRef.current) clearInterval(timerRef.current); }}
+                    style={{ background: 'none', border: 'none', color: '#555', fontSize: 11, cursor: 'pointer' }}
+                  >
+                    {locale === 'sk' ? 'Zmeniť email' : 'Change email'}
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

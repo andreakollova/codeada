@@ -11,7 +11,7 @@ import Byte from '@/components/Byte';
 import { cosmeticItems } from '@/data/cosmetics';
 import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check } from 'lucide-react';
 
-import { Coffee } from 'lucide-react';
+import { Coffee, Droplets, Zap as ZapIcon, CupSoda, GlassWater } from 'lucide-react';
 type Phase = 'loading' | 'coffee' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
 
 const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: string; labelSk: string }[] = [
@@ -85,11 +85,11 @@ export default function TheoryLessonPage() {
   if (phase === 'coffee') {
     const readTime = Math.max(3, Math.round((lesson.learning_content?.length || 500) / 800));
     const drinkMap = {
-      coffee: { icon: '☕', en: 'Grab your coffee', sk: 'Daj si kávičku', counterEn: 'coffees', counterSk: ['káva', 'kávy', 'káv'] },
-      tea: { icon: '🍵', en: 'Make yourself some tea', sk: 'Prichystaj si čaj', counterEn: 'teas', counterSk: ['čaj', 'čaje', 'čajov'] },
-      energy: { icon: '⚡', en: 'Grab your energy drink', sk: 'Otvor si energeťák', counterEn: 'energy drinks', counterSk: ['energiťák', 'energiťáky', 'energiťákov'] },
-      juice: { icon: '🧃', en: 'Pour yourself some juice', sk: 'Nalej si džúsik', counterEn: 'juices', counterSk: ['džús', 'džúsy', 'džúsov'] },
-      water: { icon: '💧', en: 'Pour a glass of water', sk: 'Nalej si pohárik vody', counterEn: 'glasses', counterSk: ['pohár', 'poháre', 'pohárov'] },
+      coffee: { Icon: Coffee, en: 'Grab your coffee', sk: 'Daj si kávičku', counterEn: 'coffees', counterSk: ['káva', 'kávy', 'káv'] },
+      tea: { Icon: Coffee, en: 'Make yourself some tea', sk: 'Prichystaj si čaj', counterEn: 'teas', counterSk: ['čaj', 'čaje', 'čajov'] },
+      energy: { Icon: ZapIcon, en: 'Grab your energy drink', sk: 'Otvor si energeťák', counterEn: 'energy drinks', counterSk: ['energiťák', 'energiťáky', 'energiťákov'] },
+      juice: { Icon: CupSoda, en: 'Pour yourself some juice', sk: 'Nalej si džúsik', counterEn: 'juices', counterSk: ['džús', 'džúsy', 'džúsov'] },
+      water: { Icon: GlassWater, en: 'Pour a glass of water', sk: 'Nalej si pohárik vody', counterEn: 'glasses', counterSk: ['pohár', 'poháre', 'pohárov'] },
     };
     const d = drinkMap[favDrink || 'coffee'];
     const counterSk = coffees === 1 ? d.counterSk[0] : coffees < 5 ? d.counterSk[1] : d.counterSk[2];
@@ -105,9 +105,9 @@ export default function TheoryLessonPage() {
           <motion.div
             animate={{ rotate: [0, -10, 10, -5, 0] }}
             transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            style={{ fontSize: 48, marginBottom: 20 }}
+            style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}
           >
-            {d.icon}
+            <d.Icon size={48} color="#fff" strokeWidth={1.5} />
           </motion.div>
           <h2 style={{ fontWeight: 800, fontSize: 22, color: '#fff', marginBottom: 8 }}>
             {locale === 'sk' ? d.sk : d.en}
@@ -121,8 +121,8 @@ export default function TheoryLessonPage() {
             {safe(t(lesson, 'title', locale))}
           </p>
           {(coffees || 0) > 0 && (
-            <p style={{ fontSize: 11, color: '#f59e0b', marginBottom: 20, fontWeight: 600 }}>
-              {d.icon} {coffees} {locale === 'sk' ? counterSk : d.counterEn}
+            <p style={{ fontSize: 11, color: '#888', marginBottom: 20, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+              <d.Icon size={12} /> {coffees} {locale === 'sk' ? counterSk : d.counterEn}
             </p>
           )}
           <motion.button
@@ -131,7 +131,7 @@ export default function TheoryLessonPage() {
             whileTap={{ scale: 0.97 }}
             style={{ padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
           >
-            {locale === 'sk' ? 'Poďme na to' : "Let's go"} {d.icon}
+            {locale === 'sk' ? 'Poďme na to' : "Let's go"}
           </motion.button>
         </motion.div>
       </div>

@@ -27,6 +27,7 @@ const strings = {
   reels: { en: 'Reels', sk: 'Reels' },
   settings: { en: 'Settings', sk: 'Nastavenia' },
   projects: { en: 'Projects', sk: 'Projekty' },
+  arena: { en: 'Arena', sk: 'Aréna' },
   glossary: { en: 'Glossary', sk: 'Slovník' },
   workshop: { en: 'Workshop', sk: 'Šatník' },
 

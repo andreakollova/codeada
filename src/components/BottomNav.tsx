@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, FolderCode, BookMarked, Wrench, Settings } from 'lucide-react';
+import { BookOpen, FolderCode, BookMarked, Wrench, Settings, Swords } from 'lucide-react';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
 
 const tabDefs = [
   { href: '/',          labelKey: 'courses' as const,  Icon: BookOpen },
   { href: '/topics',   labelKey: 'projects' as const, Icon: FolderCode },
+  { href: '/arena',    labelKey: 'arena' as const,     Icon: Swords },
   { href: '/glossary', labelKey: 'glossary' as const,  Icon: BookMarked },
   { href: '/workshop', labelKey: 'workshop' as const,  Icon: Wrench },
   { href: '/settings', labelKey: 'settings' as const, Icon: Settings },

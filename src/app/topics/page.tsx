@@ -368,7 +368,11 @@ export default function TopicsPage() {
               const allDone = done === exercises.length;
 
               return (
-                <div key={lesson.id} style={{ background: '#0a0a0a', border: `1px solid ${allDone ? 'rgba(74,222,128,0.2)' : '#1a1a1a'}`, borderRadius: 14, overflow: 'hidden' }}>
+                <div
+                  key={lesson.id}
+                  onClick={() => router.push(`/topics/${activeTopic.id}/${lesson.id}`)}
+                  style={{ background: '#0a0a0a', border: `1px solid ${allDone ? 'rgba(74,222,128,0.2)' : '#1a1a1a'}`, borderRadius: 14, overflow: 'hidden', cursor: 'pointer', transition: 'border-color 0.15s' }}
+                >
                   <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -381,6 +385,7 @@ export default function TopicsPage() {
                       <div style={{ fontWeight: 700, fontSize: 14, color: allDone ? '#4ade80' : '#ddd' }}>{lesson.title}</div>
                       <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>{done}/{exercises.length} {locale === 'sk' ? 'hotových' : 'done'}</div>
                     </div>
+                    <ChevronRight size={16} color="#333" />
                   </div>
 
                   {/* Exercise list */}
@@ -394,14 +399,12 @@ export default function TopicsPage() {
                         : (locale === 'sk' ? 'Napíš kód' : 'Write code');
 
                       return (
-                        <button
+                        <div
                           key={ex.id}
-                          onClick={() => setActiveExercise({ exercise: ex, topicId: activeTopic.id })}
                           style={{
                             width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                            padding: '10px 16px', cursor: 'pointer', textAlign: 'left',
+                            padding: '10px 16px', textAlign: 'left',
                             borderTop: ei === 0 ? 'none' : '1px solid #0f0f0f',
-                            background: 'none', border: 'none',
                           }}
                         >
                           <div style={{
@@ -420,7 +423,7 @@ export default function TopicsPage() {
                           <span style={{ fontSize: 9, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             {typeLabel}
                           </span>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>

@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     const sb = getSupabase();
     if (sb) await sb.auth.signOut();
-    localStorage.removeItem('coduy-store');
+    localStorage.removeItem('coduy-user');
     localStorage.removeItem('coduy-path');
     localStorage.removeItem('coduy-locale');
     window.location.href = '/';

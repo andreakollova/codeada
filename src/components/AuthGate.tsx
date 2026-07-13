@@ -47,7 +47,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         const newId = data.session.user.id;
         if (userId && userId !== newId) {
           // Different user - reset store
-          localStorage.removeItem('coduy-store');
+          localStorage.removeItem('coduy-user');
           localStorage.removeItem('coduy-path');
           window.location.reload();
           return;
@@ -62,7 +62,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         const newId = session.user.id;
         if (userId && userId !== newId) {
-          localStorage.removeItem('coduy-store');
+          localStorage.removeItem('coduy-user');
           localStorage.removeItem('coduy-path');
           window.location.reload();
           return;

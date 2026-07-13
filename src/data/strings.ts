@@ -20,7 +20,7 @@ const strings = {
   greatJob: { en: 'Great job!', sk: 'Výborne!' },
   keepTrying: { en: 'Keep trying!', sk: 'Nevzdávaj sa!' },
   onFire: { en: 'On fire!', sk: 'Si v rane!' },
-  readyToLearn: { en: 'Ready to learn?', sk: 'Pripravený učiť sa?' },
+  readyToLearn: { en: 'Ready to learn?', sk: 'Pripravený/á učiť sa?' },
 
   // BottomNav
   courses: { en: 'Courses', sk: 'Kurzy' },

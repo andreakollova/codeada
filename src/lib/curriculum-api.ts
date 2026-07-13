@@ -31,6 +31,8 @@ export interface DbQuizQuestion {
   question_type: string; // 'mcq' | 'true_false'
   correct_answer: string;
   code_snippet: string | null;
+  explanation: string | null;
+  explanation_sk: string | null;
   options: DbQuizOption[];
 }
 

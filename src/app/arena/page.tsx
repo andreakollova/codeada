@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { fetchQuizForLesson, DbQuizQuestion } from '@/lib/curriculum-api';
-import { ArrowLeft, Check, Zap, ArrowUp, ArrowDown, ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
+import { ArrowLeft, Check, Zap, ArrowUp, ArrowDown, ArrowLeftIcon, ArrowRightIcon, X } from 'lucide-react';
 import Byte from '@/components/Byte';
 import { t } from '@/store/localeStore';
 import type { ByteEquipment } from '@/types';
@@ -14,7 +14,7 @@ const WORLD_W = 2400;
 const WORLD_H = 2400;
 const BYTE_R = 44;
 const BOUNCE_FORCE = 8;
-const PLAYER_SPEED = 7;
+const PLAYER_SPEED = 5;
 const BOT_SPEED = 3.5;
 const FRICTION = 0.95;
 const MINIMAP_SIZE = 100;
@@ -70,6 +70,7 @@ export default function ArenaPage() {
   const [introStep, setIntroStep] = useState(0);
   const [bounceFlash, setBounceFlash] = useState<string | null>(null);
   const [gameMode, setGameMode] = useState<'quiz' | 'free'>('quiz');
+  const gameModeRef = useRef<'quiz' | 'free'>('quiz');
 
   const rafRef = useRef<number>(0);
   const entitiesRef = useRef<ArenaEntity[]>([]);
@@ -79,6 +80,7 @@ export default function ArenaPage() {
 
   // Keep refs in sync
   useEffect(() => { collidedRef.current = collidedWith; }, [collidedWith]);
+  useEffect(() => { gameModeRef.current = gameMode; }, [gameMode]);
   useEffect(() => { battleRef.current = battle; }, [battle]);
 
   // Hide nav in arena
@@ -225,7 +227,7 @@ export default function ArenaPage() {
               const bot = a.isPlayer ? b : a;
               setBounceFlash(bot.id);
               setTimeout(() => setBounceFlash(null), 400);
-              if (gameMode === 'quiz' && !battleRef.current && !collidedRef.current.has(bot.id)) {
+              if (gameModeRef.current === 'quiz' && !battleRef.current && !collidedRef.current.has(bot.id)) {
                 setCollidedWith(prev => new Set([...prev, bot.id]));
                 collidedRef.current.add(bot.id);
                 triggerBattle(bot);
@@ -684,6 +686,17 @@ export default function ArenaPage() {
               animate={{ scale: 1, y: 0 }}
               style={{ maxWidth: 440, width: '100%' }}
             >
+              {/* X close button */}
+              <button onClick={closeBattle} style={{
+                position: 'absolute', top: 16, right: 16,
+                width: 32, height: 32, borderRadius: 8,
+                background: '#161616', border: '1px solid #222',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: '#555', zIndex: 10,
+              }}>
+                <X size={14} />
+              </button>
+
               {battleResult ? (
                 <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} style={{ textAlign: 'center' }}>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
@@ -692,7 +705,7 @@ export default function ArenaPage() {
                     <Byte mood="happy" size={100} equipment={battle.opponent.equipment} />
                   </div>
                   <h2 style={{ fontSize: 28, fontWeight: 800, color: battleResult === 'win' ? '#4ade80' : '#ff8080', marginBottom: 8 }}>
-                    {battleResult === 'win' ? (locale === 'sk' ? 'Výhra!' : 'You win!') : `${battle.opponent.name} ${locale === 'sk' ? 'vyhral' : 'wins'}`}
+                    {battleResult === 'win' ? (locale === 'sk' ? 'Výhra!' : 'You win!') : `${battle.opponent.name} ${locale === 'sk' ? 'vyhral!' : 'wins!'}`}
                   </h2>
                   <p style={{ fontSize: 14, color: '#888', marginBottom: 4 }}>{battleScore.player} - {battleScore.bot}</p>
                   {battleResult === 'win' && (() => {
@@ -727,7 +740,7 @@ export default function ArenaPage() {
 
                   <div style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: 14, padding: 20, marginBottom: 12 }}>
                     <h3 style={{ fontSize: 15, fontWeight: 700, color: '#eee', lineHeight: 1.4, margin: 0 }}>
-                      {battle.questions[battleIdx]?.question_text || ''}
+                      {(locale === 'sk' && (battle.questions[battleIdx] as any)?.question_text_sk) || battle.questions[battleIdx]?.question_text || ''}
                     </h3>
                     {battle.questions[battleIdx]?.code_snippet && (
                       <pre style={{ background: '#0a0a0a', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: '#ccc', marginTop: 10, overflow: 'auto', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1.6 }}>
@@ -743,7 +756,7 @@ export default function ArenaPage() {
                       const correctLabel = q.question_type === 'true_false' ? (q.correct_answer === 'True' ? 'T' : 'F') : q.correct_answer;
                       const opts = q.question_type === 'true_false'
                         ? [{ label: 'T', text: 'True' }, { label: 'F', text: 'False' }]
-                        : (q.options || []).sort((a, b) => a.option_label.localeCompare(b.option_label)).map(o => ({ label: o.option_label, text: o.option_text }));
+                        : (q.options || []).sort((a, b) => a.option_label.localeCompare(b.option_label)).map(o => ({ label: o.option_label, text: (locale === 'sk' && (o as any).option_text_sk) || o.option_text }));
                       return opts.map(opt => {
                         const sel = battleAnswer === opt.label;
                         const isCorrect = battleState !== 'idle' && opt.label === correctLabel;

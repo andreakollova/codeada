@@ -596,21 +596,20 @@ export default function TheoryLessonPage() {
                   const correctOpt = options.find(o => o.label === correctLabel);
                   if (!correctOpt) return null;
 
-                  // Build explanation based on question type
-                  let explanation = '';
-                  if (q.question_type === 'true_false') {
-                    explanation = correctLabel === 'T'
-                      ? (locale === 'sk' ? 'Toto tvrdenie je pravdivé.' : 'This statement is true.')
-                      : (locale === 'sk' ? 'Toto tvrdenie je nepravdivé.' : 'This statement is false.');
-                  } else if (q.question_type === 'fill_code' && q.code_snippet) {
-                    const filled = q.code_snippet.replace('___', correctOpt.text);
-                    explanation = locale === 'sk'
-                      ? `Správny kód je: ${filled}`
-                      : `The correct code is: ${filled}`;
-                  } else {
-                    explanation = locale === 'sk'
-                      ? `"${correctOpt.text}" je správna odpoveď, pretože to najlepšie zodpovedá tomu, čo sa pýta otázka.`
-                      : `"${correctOpt.text}" is correct because it best matches what the question is asking.`;
+                  // Use DB explanation if available, otherwise generate generic one
+                  const dbExpl = locale === 'sk' ? (q as any).explanation_sk : (q as any).explanation;
+                  let explanation = dbExpl || '';
+                  if (!explanation) {
+                    if (q.question_type === 'true_false') {
+                      explanation = correctLabel === 'T'
+                        ? (locale === 'sk' ? 'Toto tvrdenie je pravdivé.' : 'This statement is true.')
+                        : (locale === 'sk' ? 'Toto tvrdenie je nepravdivé.' : 'This statement is false.');
+                    } else if (q.question_type === 'fill_code' && q.code_snippet) {
+                      const filled = q.code_snippet.replace('___', correctOpt.text);
+                      explanation = locale === 'sk'
+                        ? `Správny kód je: ${filled}`
+                        : `The correct code is: ${filled}`;
+                    }
                   }
 
                   return (

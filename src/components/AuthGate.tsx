@@ -132,8 +132,19 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 24,
     }}>
-      <div style={{ maxWidth: 380, width: '100%', textAlign: 'left' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', height: 110, position: 'relative' }}>
+      <div className="auth-gate-content" style={{ maxWidth: 380, width: '100%' }}>
+        <style>{`
+          @media (max-width: 600px) {
+            .auth-gate-content { text-align: center !important; }
+            .auth-gate-content .auth-byte-wrap { justify-content: center !important; }
+            .auth-gate-content .auth-byte-wrap > div { left: 50% !important; transform: translateX(-50%) !important; }
+            .auth-gate-content .auth-logo-row { justify-content: center !important; }
+          }
+          @media (min-width: 601px) {
+            .auth-gate-content { text-align: left; }
+          }
+        `}</style>
+        <div className="auth-byte-wrap" style={{ display: 'flex', justifyContent: 'flex-start', height: 110, position: 'relative' }}>
           <AnimatePresence>
             <motion.div
               key={skinIndex}
@@ -149,7 +160,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         </div>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 4 }}>
+          <div className="auth-logo-row" style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 4 }}>
             <img src="/logocoduy.png" alt="Coduy" style={{ height: 28, objectFit: 'contain' }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.1em',
               background: 'rgba(74,222,128,0.1)', padding: '3px 8px', borderRadius: 6 }}>Beta</span>

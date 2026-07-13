@@ -3,7 +3,7 @@
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
-import { Flame, Zap, Heart, Wrench, Globe } from 'lucide-react';
+import { Flame, Zap, Heart, Wrench, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StatusBar() {
@@ -60,7 +60,7 @@ export default function StatusBar() {
             {locale === 'en' ? 'EN' : 'SK'}
           </button>
 
-          <Link href="/workshop">
+          <Link href="/settings">
             <div style={{
               width: 30, height: 30, borderRadius: 8,
               background: '#1C1C1C',
@@ -68,7 +68,7 @@ export default function StatusBar() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <Wrench size={13} color="#6E6E6E" />
+              <Settings size={13} color="#6E6E6E" />
             </div>
           </Link>
         </div>

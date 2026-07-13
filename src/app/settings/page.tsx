@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     const sb = getSupabase();
     if (sb) await sb.auth.signOut();
-    setAuthUser(null);
+    window.location.href = '/';
   };
 
   const handleDeleteData = () => {

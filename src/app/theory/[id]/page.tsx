@@ -169,6 +169,7 @@ export default function TheoryLessonPage() {
   const progress = totalSteps > 0 ? (currentStep / totalSteps) * 100 : 0;
 
   const handleNextSection = () => {
+    window.scrollTo(0, 0);
     if (sectionIndex + 1 < sections.length) {
       setSectionIndex(i => i + 1);
       setPhase(sections[sectionIndex + 1].phase);
@@ -764,10 +765,12 @@ export default function TheoryLessonPage() {
 function isCodeLine(line: string): boolean {
   const t = line.trimStart();
   if (line.startsWith('  ') || line.startsWith('\t')) return true;
-  if (/^(import |from |def |class |if |elif |else:|for |while |return |print\(|try:|except|finally:|raise |with |async |await |const |let |var |function |export )/.test(t)) return true;
+  if (/^(import |from |def |class |if |elif |else:|for |while |return |print\(|try:|except|finally:|raise |with |async |await |const |let |var |function |export |del |assert |yield |lambda )/.test(t)) return true;
   if (/^[a-zA-Z_]\w*\s*[=(]/.test(t) && (t.includes('(') || t.includes('=')) && !t.endsWith('.') && t.length < 120) return true;
+  if (/^[a-zA-Z_]\w*(\s*,\s*[a-zA-Z_]\w*)+\s*=/.test(t)) return true; // a, b = 5, 10
   if (/^(#|\/\/)/.test(t)) return true;
   if (/^\w+\.\w+\(/.test(t)) return true;
+  if (/^(print|len|type|str|int|float|list|dict|set|tuple|range|input|open|sorted|map|filter)\s*\(/.test(t)) return true;
   return false;
 }
 
@@ -780,10 +783,17 @@ function formatContent(text: string) {
     const trimmed = blocks[i].trim();
     if (!trimmed) continue;
 
+    // Skip GPT meta-lines like 'Lekcia "X" (Modul N: Y)' or 'Aktuálny obsah učenia'
+    if (/^Lekcia\s+[""].*Modul\s+\d/i.test(trimmed)) continue;
+    if (/^Lesson\s+[""].*Module\s+\d/i.test(trimmed)) continue;
+    if (/^Aktuálny obsah učenia$/i.test(trimmed)) continue;
+    if (/^Current learning content$/i.test(trimmed)) continue;
+    if (/^TEXT:?$/i.test(trimmed)) continue;
+
     const lines = trimmed.split('\n');
 
-    // Heading: single short line, no period, not code
-    if (lines.length === 1 && trimmed.length < 60 && !trimmed.endsWith('.') && !trimmed.startsWith('-') && !trimmed.startsWith('#') && !isCodeLine(trimmed)) {
+    // Heading: single short line, no period, not code, no = sign (code assignment)
+    if (lines.length === 1 && trimmed.length < 60 && !trimmed.endsWith('.') && !trimmed.startsWith('-') && !trimmed.startsWith('#') && !trimmed.includes(' = ') && !trimmed.includes('(') && !isCodeLine(trimmed)) {
       // Strip trailing colon for cleaner headings
       const heading = trimmed.endsWith(':') ? trimmed.slice(0, -1) : trimmed;
       result.push(

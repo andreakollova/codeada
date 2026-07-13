@@ -291,18 +291,31 @@ export default function CodingPath() {
       )}
 
       {!activePath && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Terminal size={16} color="#fff" />
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Terminal size={16} color="#fff" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
+                {locale === 'sk' ? 'Všetky moduly' : 'All modules'}
+              </h2>
+              <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
+                {doneCount} / {allLessons.length} {locale === 'sk' ? (doneCount === 1 ? 'lekcia hotová' : doneCount >= 2 && doneCount <= 4 ? 'lekcie hotové' : 'lekcií hotových') : 'lessons done'}
+              </p>
+            </div>
           </div>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
-              {locale === 'sk' ? 'Všetky moduly' : 'All modules'}
-            </h2>
-            <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
-              {doneCount} / {allLessons.length} {locale === 'sk' ? (doneCount === 1 ? 'lekcia hotová' : doneCount >= 2 && doneCount <= 4 ? 'lekcie hotové' : 'lekcií hotových') : 'lessons done'}
-            </p>
-          </div>
+          <button
+            onClick={() => { setSelectedPath(null); localStorage.removeItem('coduy-path'); }}
+            style={{
+              width: '100%', padding: '10px', borderRadius: 10,
+              background: '#161616', border: '1px solid #222', color: '#888',
+              fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            }}
+          >
+            {locale === 'sk' ? 'Zmeniť cestu' : 'Change path'}
+          </button>
         </div>
       )}
 
@@ -439,13 +452,16 @@ export default function CodingPath() {
                           const badgeColor = done ? '#888' : pathColor;
                           return (
                             <div style={{
-                              marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 3,
-                              padding: '2px 8px', borderRadius: 10,
-                              background: `${badgeColor}15`,
-                              border: `1px solid ${badgeColor}33`,
+                              marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 4,
+                              padding: '3px 10px', borderRadius: 20,
+                              background: `${badgeColor}12`,
+                              backdropFilter: 'blur(8px)',
+                              WebkitBackdropFilter: 'blur(8px)',
+                              border: `1px solid ${badgeColor}25`,
+                              boxShadow: done ? 'none' : `0 0 12px ${badgeColor}15, inset 0 1px 0 ${badgeColor}15`,
                             }}>
-                              <Gift size={10} color={badgeColor} />
-                              <span style={{ fontSize: 9, fontWeight: 600, color: badgeColor }}>
+                              <Gift size={10} color={badgeColor} strokeWidth={2.5} />
+                              <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, letterSpacing: '0.04em' }}>
                                 {locale === 'sk' ? 'Odmena' : 'Reward'}
                               </span>
                             </div>

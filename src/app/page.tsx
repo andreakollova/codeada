@@ -10,7 +10,7 @@ import { useLocaleStore } from '@/store/localeStore';
 import { s, skLessons, skStreak } from '@/data/strings';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Zap, Heart, Trophy, BookOpen } from 'lucide-react';
+import { Flame, Zap, Heart, Trophy, BookOpen, Coffee } from 'lucide-react';
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk') => {
   if (locale === 'sk') {
@@ -181,7 +181,7 @@ export default function HomePage() {
 
               {(coffees || 0) > 0 && (
                 <div className="stat-card">
-                  <div className="stat-card-icon" style={{ fontSize: 18 }}>☕</div>
+                  <div className="stat-card-icon"><Coffee size={18} color="#fff" /></div>
                   <div>
                     <div className="stat-card-value">{coffees}</div>
                     <div className="stat-card-label">{locale === 'sk' ? 'Káv vypitých' : 'Coffees enjoyed'}</div>

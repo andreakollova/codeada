@@ -33,6 +33,7 @@ export default function WorkshopPage() {
   const [activeTab, setActiveTab] = useState<ItemType | 'all'>('all');
   const [previewEquipment, setPreviewEquipment] = useState<ByteEquipment | null>(null);
   const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
+  const [equipFlash, setEquipFlash] = useState<string | null>(null);
 
   const filtered = activeTab === 'all'
     ? [...cosmeticItems]
@@ -56,8 +57,11 @@ export default function WorkshopPage() {
       const slot = item.type as keyof ByteEquipment;
       if (equipment[slot] === item.id) {
         equip(slot, undefined);
+        setEquipFlash(null);
       } else {
         equip(slot, item.id);
+        setEquipFlash(item.id);
+        setTimeout(() => setEquipFlash(null), 1500);
       }
       setPreviewEquipment(null);
       setSelectedItem(null);
@@ -132,6 +136,26 @@ export default function WorkshopPage() {
           }}
         >
           <Byte mood={byteMood} size={180} equipment={displayEquipment} />
+
+          {/* Equipped flash */}
+          <AnimatePresence>
+            {equipFlash && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                style={{
+                  position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
+                  padding: '6px 16px', borderRadius: 20,
+                  background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)',
+                  backdropFilter: 'blur(8px)',
+                  fontSize: 12, fontWeight: 700, color: '#4ade80', letterSpacing: '0.05em',
+                }}
+              >
+                {locale === 'sk' ? 'Equipped!' : 'Equipped!'}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Equipped / preview badges */}
           <div style={{ display: 'flex', gap: 6, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center' }}>

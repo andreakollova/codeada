@@ -358,38 +358,67 @@ export default function ArenaPage() {
   // Intro wizard
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const introSteps = locale === 'sk'
-    ? [isMobile ? 'Swipuj prstom po obrazovke' : 'Pohybuj sa sipkami. Space = boost!', 'Narazaj do dalsich Bytov', 'Odpovedaj na kviz otazky a zbieraj XP']
-    : [isMobile ? 'Swipe to move your Byte' : 'Move with arrow keys. Space = boost!', 'Bump into other Bytes', 'Answer quiz questions and collect XP'];
+    ? [isMobile ? 'Swipuj prstom po obrazovke' : 'Pohybuj sa šípkami', 'Narážaj do ďalších Bytov', 'Odpovedaj na kvíz otázky a zbieraj XP']
+    : [isMobile ? 'Swipe to move your Byte' : 'Use arrow keys to move', 'Bump into other Bytes', 'Answer quiz questions and collect XP'];
 
   const introVisuals = [
-    // Step 0: Controls
-    <div key="v0" style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+    // Step 0: Controls - keyboard layout
+    <div key="v0" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 20 }}>
       {isMobile ? (
         <motion.div animate={{ x: [0, 20, 0, -20, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
           <Byte mood="happy" size={64} equipment={equipment} animate={false} />
         </motion.div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
-          {[
-            { label: locale === 'sk' ? 'Hore' : 'Up', icon: <ArrowUp size={14} />, anim: { y: [0, -2, 0] }, delay: 0 },
-            { label: locale === 'sk' ? 'Dole' : 'Down', icon: <ArrowDown size={14} />, anim: { y: [0, 2, 0] }, delay: 0.3 },
-            { label: locale === 'sk' ? 'Vlavo' : 'Left', icon: <ArrowLeftIcon size={14} />, anim: { x: [0, -2, 0] }, delay: 0.6 },
-            { label: locale === 'sk' ? 'Vpravo' : 'Right', icon: <ArrowRightIcon size={14} />, anim: { x: [0, 2, 0] }, delay: 0.9 },
-          ].map((k, i) => (
+        <div style={{
+          padding: '16px 20px', borderRadius: 14,
+          background: 'rgba(255,255,255,0.03)', border: '1px solid #1a1a1a',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+        }}>
+          {/* Arrow row: up */}
+          <motion.div
+            animate={{ y: [0, -2, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ width: 44, height: 36, borderRadius: 8, background: '#161616', border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}
+          >
+            <ArrowUp size={16} />
+          </motion.div>
+          {/* Arrow row: left, down, right */}
+          <div style={{ display: 'flex', gap: 6 }}>
             <motion.div
-              key={i}
-              animate={k.anim}
-              transition={{ duration: 1.2, repeat: Infinity, delay: k.delay, ease: 'easeInOut' }}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                padding: '10px 14px', borderRadius: 10,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid #222',
-              }}
+              animate={{ x: [0, -2, 0] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.3, ease: 'easeInOut' }}
+              style={{ width: 44, height: 36, borderRadius: 8, background: '#161616', border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}
             >
-              <div style={{ color: '#4ade80' }}>{k.icon}</div>
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#555', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{k.label}</span>
+              <ArrowLeftIcon size={16} />
             </motion.div>
-          ))}
+            <motion.div
+              animate={{ y: [0, 2, 0] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.15, ease: 'easeInOut' }}
+              style={{ width: 44, height: 36, borderRadius: 8, background: '#161616', border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}
+            >
+              <ArrowDown size={16} />
+            </motion.div>
+            <motion.div
+              animate={{ x: [0, 2, 0] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.3, ease: 'easeInOut' }}
+              style={{ width: 44, height: 36, borderRadius: 8, background: '#161616', border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}
+            >
+              <ArrowRightIcon size={16} />
+            </motion.div>
+          </div>
+          {/* Space bar */}
+          <motion.div
+            animate={{ scale: [1, 0.97, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: 0.8, ease: 'easeInOut' }}
+            style={{
+              width: 144, height: 32, borderRadius: 8,
+              background: '#161616', border: '1px solid #2a2a2a',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 10, fontWeight: 700, color: '#4ade80', letterSpacing: '0.08em',
+            }}
+          >
+            SPACE = BOOST
+          </motion.div>
         </div>
       )}
     </div>,
@@ -467,14 +496,14 @@ export default function ArenaPage() {
                   }}
                 >
                   {introStep < introSteps.length - 1
-                    ? (locale === 'sk' ? 'Dalej' : 'Next')
-                    : (locale === 'sk' ? 'Hrat!' : 'Play!')}
+                    ? (locale === 'sk' ? 'Ďalej' : 'Next')
+                    : (locale === 'sk' ? 'Hrať!' : 'Play!')}
                 </button>
                 <button
                   onClick={() => setShowIntro(false)}
                   style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', fontWeight: 500 }}
                 >
-                  {locale === 'sk' ? 'Preskocit' : 'Skip'}
+                  {locale === 'sk' ? 'Preskočiť' : 'Skip'}
                 </button>
               </div>
             </motion.div>
@@ -663,7 +692,7 @@ export default function ArenaPage() {
                     <Byte mood="happy" size={100} equipment={battle.opponent.equipment} />
                   </div>
                   <h2 style={{ fontSize: 28, fontWeight: 800, color: battleResult === 'win' ? '#4ade80' : '#ff8080', marginBottom: 8 }}>
-                    {battleResult === 'win' ? (locale === 'sk' ? 'Vyhra!' : 'You win!') : (locale === 'sk' ? 'Prehral si' : 'You lose')}
+                    {battleResult === 'win' ? (locale === 'sk' ? 'Výhra!' : 'You win!') : `${battle.opponent.name} ${locale === 'sk' ? 'vyhral' : 'wins'}`}
                   </h2>
                   <p style={{ fontSize: 14, color: '#888', marginBottom: 4 }}>{battleScore.player} - {battleScore.bot}</p>
                   {battleResult === 'win' && (() => {
@@ -673,7 +702,7 @@ export default function ArenaPage() {
                     return <p style={{ fontSize: 13, color: '#4ade80', fontWeight: 600, marginBottom: 20 }}>+{xpR} XP  +{gemR} Gems</p>;
                   })()}
                   <button onClick={closeBattle} style={{ padding: '14px 40px', borderRadius: 12, background: '#EDEDED', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}>
-                    {locale === 'sk' ? 'Pokracovat' : 'Continue'}
+                    {locale === 'sk' ? 'Pokračovať' : 'Continue'}
                   </button>
                 </motion.div>
               ) : (

@@ -190,9 +190,9 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 </p>
                 <input
                   type="text"
-                  placeholder={locale === 'sk' ? '6-miestny kód' : '6-digit code'}
+                  placeholder={locale === 'sk' ? '8-miestny kód' : '8-digit code'}
                   value={otp}
-                  onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 8))}
                   onKeyDown={e => e.key === 'Enter' && handleVerifyOtp()}
                   autoFocus
                   style={{
@@ -204,11 +204,11 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 />
                 <button
                   onClick={handleVerifyOtp}
-                  disabled={loading || otp.length < 6}
+                  disabled={loading || otp.length < 8}
                   style={{
                     width: '100%', padding: '12px', borderRadius: 12,
-                    background: otp.length >= 6 ? '#fff' : '#222',
-                    color: otp.length >= 6 ? '#000' : '#555',
+                    background: otp.length >= 8 ? '#fff' : '#222',
+                    color: otp.length >= 8 ? '#000' : '#555',
                     fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   }}

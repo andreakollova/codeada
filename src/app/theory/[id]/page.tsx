@@ -63,7 +63,14 @@ export default function TheoryLessonPage() {
         if (l) {
           setLesson(l);
           setQuiz(q || []);
-          setPhase('coffee');
+          // Show coffee screen only for first lesson of the day
+          const today = new Date().toDateString();
+          const lastCoffee = localStorage.getItem('coduy-last-coffee');
+          if (lastCoffee === today) {
+            setPhase('intro');
+          } else {
+            setPhase('coffee');
+          }
           setByteMood('happy');
         }
       })
@@ -132,13 +139,8 @@ export default function TheoryLessonPage() {
           <p style={{ fontSize: 12, color: '#555', marginBottom: 28 }}>
             {safe(t(lesson, 'title', locale))}
           </p>
-          {(coffees || 0) > 0 && (
-            <p style={{ fontSize: 11, color: '#888', marginBottom: 20, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-              <d.Icon size={12} /> {coffees} {locale === 'sk' ? counterSk : d.counterEn}
-            </p>
-          )}
           <motion.button
-            onClick={() => { addCoffee(); setPhase('intro'); }}
+            onClick={() => { addCoffee(); localStorage.setItem('coduy-last-coffee', new Date().toDateString()); setPhase('intro'); }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             style={{ padding: '14px 40px', borderRadius: 12, background: '#fff', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}

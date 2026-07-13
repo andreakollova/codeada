@@ -12,9 +12,9 @@ import type { ByteEquipment } from '@/types';
 
 const WORLD_W = 2400;
 const WORLD_H = 2400;
-const BYTE_R = 30;
-const BOUNCE_FORCE = 6;
-const PLAYER_SPEED = 4;
+const BYTE_R = 38;
+const BOUNCE_FORCE = 7;
+const PLAYER_SPEED = 5.5;
 const BOT_SPEED = 1.2;
 const FRICTION = 0.94;
 const MINIMAP_SIZE = 100;
@@ -119,7 +119,7 @@ export default function ArenaPage() {
   // Keyboard controls
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'].includes(e.key)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
         e.preventDefault();
         keysRef.current.add(e.key);
       }
@@ -151,11 +151,22 @@ export default function ArenaPage() {
       if (keys.has('ArrowLeft') || keys.has('a')) player.vx -= 0.5;
       if (keys.has('ArrowRight') || keys.has('d')) player.vx += 0.5;
 
+      // Space boost
+      if (keys.has(' ')) {
+        const pDir = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+        if (pDir > 0.5) {
+          player.vx *= 1.15;
+          player.vy *= 1.15;
+        }
+        keys.delete(' ');
+      }
+
       // Speed cap
+      const maxSpeed = PLAYER_SPEED * 1.8;
       const pSpeed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
-      if (pSpeed > PLAYER_SPEED) {
-        player.vx = (player.vx / pSpeed) * PLAYER_SPEED;
-        player.vy = (player.vy / pSpeed) * PLAYER_SPEED;
+      if (pSpeed > maxSpeed) {
+        player.vx = (player.vx / pSpeed) * maxSpeed;
+        player.vy = (player.vy / pSpeed) * maxSpeed;
       }
 
       // Bot AI
@@ -242,13 +253,16 @@ export default function ArenaPage() {
   }, [showIntro]);
 
   const triggerBattle = async (opponent: ArenaEntity) => {
-    const ids = [86, 96, 103, 109, 126, 132, 147, 153, 86 + Math.floor(Math.random() * 100)];
-    const randomId = ids[Math.floor(Math.random() * ids.length)];
-    let questions = await fetchQuizForLesson(randomId);
-    if (questions.length < 3) {
-      const q2 = await fetchQuizForLesson(ids[Math.floor(Math.random() * ids.length)]);
-      questions = [...questions, ...q2];
+    // Fetch from multiple random lessons for variety
+    const ids = [86, 96, 103, 109, 126, 132, 147, 153, 95, 115, 119, 138];
+    const picks = [ids[Math.floor(Math.random() * ids.length)], ids[Math.floor(Math.random() * ids.length)], ids[Math.floor(Math.random() * ids.length)]];
+    let questions: DbQuizQuestion[] = [];
+    for (const id of picks) {
+      const q = await fetchQuizForLesson(id);
+      questions.push(...q);
     }
+    // Filter to mcq, true_false, fill_code (not write_code - too complex for battle)
+    questions = questions.filter(q => ['mcq', 'true_false', 'fill_code'].includes(q.question_type));
     const shuffled = questions.sort(() => Math.random() - 0.5).slice(0, 5);
     if (shuffled.length > 0) {
       setBattle({ opponent, questions: shuffled });
@@ -319,8 +333,48 @@ export default function ArenaPage() {
 
   // Intro wizard
   const introSteps = locale === 'sk'
-    ? ['Pohybuj sa sipkami alebo WASD', 'Narazaj do dalsich Bytov', 'Odpovedaj na kviz otazky', 'Vyber si mod hry']
-    : ['Move with arrow keys or WASD', 'Bump into other Bytes', 'Answer quiz questions', 'Choose your game mode'];
+    ? ['Pohybuj sa sipkami', 'Narazaj do dalsich Bytov', 'Odpovedaj na kviz otazky a zbieraj XP']
+    : ['Move with arrow keys', 'Bump into other Bytes', 'Answer quiz questions and collect XP'];
+
+  const introVisuals = [
+    // Step 0: Arrow keys
+    <div key="v0" style={{ display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
+        <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 16 }}>
+          <ArrowUp size={16} />
+        </div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <ArrowLeftIcon size={16} />
+          </div>
+          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <ArrowDown size={16} />
+          </div>
+          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <ArrowRightIcon size={16} />
+          </div>
+        </div>
+      </div>
+    </div>,
+    // Step 1: Two Bytes bumping
+    <div key="v1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 20 }}>
+      <div style={{ transform: 'translateX(8px)' }}>
+        <Byte mood="happy" size={56} equipment={equipment} animate={false} />
+      </div>
+      <div style={{ fontSize: 22, color: '#4ade80', fontWeight: 800, margin: '0 -4px', zIndex: 2 }}>*</div>
+      <div style={{ transform: 'translateX(-8px)' }}>
+        <Byte mood="happy" size={56} equipment={BOTS[3].equipment} animate={false} />
+      </div>
+    </div>,
+    // Step 2: Quiz check
+    <div key="v2" style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+      <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(74,222,128,0.1)', border: '2px solid rgba(74,222,128,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Check size={24} color="#4ade80" strokeWidth={3} />
+      </div>
+    </div>,
+    // Step 3: Mode selection (handled inline)
+    null,
+  ];
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#030303', overflow: 'hidden', touchAction: 'none' }}>
@@ -354,49 +408,32 @@ export default function ArenaPage() {
               <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 12 }}>
                 {introStep === 0 ? 'Arena' : ''}
               </h2>
-              <p style={{ fontSize: 16, color: '#ccc', lineHeight: 1.6, marginBottom: introStep === 3 ? 16 : 32 }}>
+              {introVisuals[introStep]}
+              <p style={{ fontSize: 16, color: '#ccc', lineHeight: 1.6, marginBottom: 32 }}>
                 {introSteps[introStep]}
               </p>
-              {introStep === 3 && (
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 24 }}>
-                  <button
-                    onClick={() => setGameMode('quiz')}
-                    style={{
-                      padding: '10px 20px', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                      background: gameMode === 'quiz' ? '#4ade80' : '#111',
-                      color: gameMode === 'quiz' ? '#000' : '#888',
-                      border: gameMode === 'quiz' ? 'none' : '1px solid #222',
-                    }}
-                  >
-                    {locale === 'sk' ? 'Kviz Battle' : 'Quiz Battle'}
-                  </button>
-                  <button
-                    onClick={() => setGameMode('free')}
-                    style={{
-                      padding: '10px 20px', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                      background: gameMode === 'free' ? '#4ade80' : '#111',
-                      color: gameMode === 'free' ? '#000' : '#888',
-                      border: gameMode === 'free' ? 'none' : '1px solid #222',
-                    }}
-                  >
-                    {locale === 'sk' ? 'Volna jazda' : 'Free Roam'}
-                  </button>
-                </div>
-              )}
-              <button
-                onClick={() => {
-                  if (introStep < introSteps.length - 1) setIntroStep(introStep + 1);
-                  else setShowIntro(false);
-                }}
-                style={{
-                  padding: '14px 40px', borderRadius: 12, background: '#EDEDED', color: '#000',
-                  fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
-                }}
-              >
-                {introStep < introSteps.length - 1
-                  ? (locale === 'sk' ? 'Dalej' : 'Next')
-                  : (locale === 'sk' ? 'Hrat!' : 'Play!')}
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+                <button
+                  onClick={() => {
+                    if (introStep < introSteps.length - 1) setIntroStep(introStep + 1);
+                    else setShowIntro(false);
+                  }}
+                  style={{
+                    padding: '14px 40px', borderRadius: 12, background: '#EDEDED', color: '#000',
+                    fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
+                  }}
+                >
+                  {introStep < introSteps.length - 1
+                    ? (locale === 'sk' ? 'Dalej' : 'Next')
+                    : (locale === 'sk' ? 'Hrat!' : 'Play!')}
+                </button>
+                <button
+                  onClick={() => setShowIntro(false)}
+                  style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', fontWeight: 500 }}
+                >
+                  {locale === 'sk' ? 'Preskocit' : 'Skip'}
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -429,13 +466,13 @@ export default function ArenaPage() {
                 key={e.id}
                 style={{
                   position: 'absolute',
-                  left: e.x - 30, top: e.y - 30,
+                  left: e.x - 38, top: e.y - 38,
                   transform: `rotate(${e.rotation}deg)`,
                   filter: isFlashing ? 'brightness(2) drop-shadow(0 0 20px rgba(255,255,255,0.8))' : e.isPlayer ? 'drop-shadow(0 0 12px rgba(74,222,128,0.25))' : 'none',
                   transition: 'filter 0.15s',
                 }}
               >
-                <Byte mood="happy" size={60} equipment={e.equipment} animate={false} />
+                <Byte mood="happy" size={76} equipment={e.equipment} animate={false} />
               </div>
             );
           })}
@@ -449,7 +486,7 @@ export default function ArenaPage() {
                 key={`label-${e.id}`}
                 style={{
                   position: 'absolute',
-                  left: e.x, top: e.y + 34,
+                  left: e.x, top: e.y + 42,
                   transform: 'translateX(-50%)',
                   textAlign: 'center',
                   textShadow: '0 1px 4px rgba(0,0,0,0.8)',
@@ -474,8 +511,8 @@ export default function ArenaPage() {
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               style={{
                 position: 'absolute',
-                left: player.x - 40, top: player.y - 40,
-                width: 80, height: 80, borderRadius: '50%',
+                left: player.x - 48, top: player.y - 48,
+                width: 96, height: 96, borderRadius: '50%',
                 border: '2px solid rgba(74,222,128,0.2)',
                 pointerEvents: 'none',
               }}
@@ -577,6 +614,18 @@ export default function ArenaPage() {
       }}>
         <div style={{ width: 6, height: 6, borderRadius: 3, background: '#4ade80' }} />
         {name || 'You'}
+        <div style={{ width: 1, height: 14, background: '#222' }} />
+        <button
+          onClick={() => setGameMode(gameMode === 'quiz' ? 'free' : 'quiz')}
+          style={{
+            background: gameMode === 'quiz' ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.05)',
+            border: `1px solid ${gameMode === 'quiz' ? 'rgba(74,222,128,0.3)' : '#222'}`,
+            borderRadius: 8, padding: '3px 10px', cursor: 'pointer',
+            fontSize: 10, fontWeight: 700, color: gameMode === 'quiz' ? '#4ade80' : '#555',
+          }}
+        >
+          {gameMode === 'quiz' ? 'Quiz' : 'Free'}
+        </button>
       </div>
 
       {/* BATTLE MODAL */}
@@ -600,9 +649,9 @@ export default function ArenaPage() {
               {battleResult ? (
                 <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} style={{ textAlign: 'center' }}>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
-                    <Byte mood={battleResult === 'win' ? 'celebrating' : 'worried'} size={80} equipment={equipment} />
+                    <Byte mood={battleResult === 'win' ? 'celebrating' : 'worried'} size={100} equipment={equipment} />
                     <div style={{ fontSize: 20, fontWeight: 800, color: '#333', alignSelf: 'center' }}>VS</div>
-                    <Byte mood="happy" size={80} equipment={battle.opponent.equipment} />
+                    <Byte mood="happy" size={100} equipment={battle.opponent.equipment} />
                   </div>
                   <h2 style={{ fontSize: 28, fontWeight: 800, color: battleResult === 'win' ? '#4ade80' : '#ff8080', marginBottom: 8 }}>
                     {battleResult === 'win' ? (locale === 'sk' ? 'Vyhra!' : 'You win!') : (locale === 'sk' ? 'Prehral si' : 'You lose')}
@@ -622,7 +671,7 @@ export default function ArenaPage() {
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Byte mood="happy" size={36} equipment={equipment} animate={false} />
+                      <Byte mood="happy" size={48} equipment={equipment} animate={false} />
                       <div>
                         <div style={{ fontSize: 12, fontWeight: 700, color: '#4ade80' }}>{name || 'You'}</div>
                         <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{battleScore.player}</div>
@@ -634,7 +683,7 @@ export default function ArenaPage() {
                         <div style={{ fontSize: 12, fontWeight: 700, color: '#888' }}>{battle.opponent.name}</div>
                         <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{battleScore.bot}</div>
                       </div>
-                      <Byte mood="happy" size={36} equipment={battle.opponent.equipment} animate={false} />
+                      <Byte mood="happy" size={48} equipment={battle.opponent.equipment} animate={false} />
                     </div>
                   </div>
 

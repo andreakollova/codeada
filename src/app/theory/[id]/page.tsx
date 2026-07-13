@@ -535,27 +535,63 @@ export default function TheoryLessonPage() {
 }
 
 /** Split content into paragraphs with basic formatting */
+function isCodeLine(line: string): boolean {
+  const t = line.trimStart();
+  if (line.startsWith('  ') || line.startsWith('\t')) return true;
+  if (/^(import |from |def |class |if |elif |else:|for |while |return |print\(|try:|except|finally:|raise |with |async |await |const |let |var |function |export )/.test(t)) return true;
+  if (/^[a-zA-Z_]\w*\s*[=(]/.test(t) && (t.includes('(') || t.includes('=')) && !t.endsWith('.') && t.length < 120) return true;
+  if (/^(#|\/\/)/.test(t)) return true;
+  if (/^\w+\.\w+\(/.test(t)) return true;
+  return false;
+}
+
 function formatContent(text: string) {
   if (!text) return null;
-  return text.split('\n\n').map((para, i) => {
-    const trimmed = para.trim();
-    if (!trimmed) return null;
+  const blocks = text.split('\n\n');
+  const result: React.ReactNode[] = [];
 
-    // Check if it looks like a heading (short line, no period at end)
+  for (let i = 0; i < blocks.length; i++) {
+    const trimmed = blocks[i].trim();
+    if (!trimmed) continue;
+
     const lines = trimmed.split('\n');
-    if (lines.length === 1 && trimmed.length < 60 && !trimmed.endsWith('.') && !trimmed.startsWith('-') && !trimmed.startsWith('•') && !trimmed.match(/^\d/)) {
-      return (
+
+    // Heading: single short line, no period, not code
+    if (lines.length === 1 && trimmed.length < 60 && !trimmed.endsWith('.') && !trimmed.startsWith('-') && !trimmed.startsWith('#') && !isCodeLine(trimmed)) {
+      // Strip trailing colon for cleaner headings
+      const heading = trimmed.endsWith(':') ? trimmed.slice(0, -1) : trimmed;
+      result.push(
         <h3 key={i} style={{ fontWeight: 700, fontSize: 16, color: '#EDEDED', marginTop: i > 0 ? 20 : 0, marginBottom: 8 }}>
-          {trimmed}
+          {heading}
         </h3>
       );
+      continue;
     }
 
-    return (
+    // Code block: most lines look like code
+    const codeLines = lines.filter(l => isCodeLine(l) || l.trim() === '');
+    if (codeLines.length > lines.length * 0.5 && lines.some(l => isCodeLine(l))) {
+      result.push(
+        <pre key={i} style={{
+          background: '#111', border: '1px solid #1a1a1a', borderRadius: 10,
+          padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
+          overflow: 'auto', marginBottom: 12, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+          whiteSpace: 'pre-wrap',
+        }}>
+          {trimmed}
+        </pre>
+      );
+      continue;
+    }
+
+    // Regular paragraph
+    result.push(
       <p key={i} style={{ margin: 0, marginBottom: 12 }}>
         {trimmed}
       </p>
     );
-  });
+  }
+
+  return result;
 }
 

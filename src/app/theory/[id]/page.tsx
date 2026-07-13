@@ -272,8 +272,12 @@ export default function TheoryLessonPage() {
               </div>
             ))}
           </div>
+        ) : sec.phase === 'facts' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {formatFacts(String(content))}
+          </div>
         ) : (
-          <div style={{ fontSize: 15, color: '#b0b0b0', lineHeight: 1.9, whiteSpace: 'pre-line' }}>
+          <div style={{ fontSize: 15, color: '#b0b0b0', lineHeight: 1.9 }}>
             {formatContent(String(content))}
           </div>
         )}
@@ -593,5 +597,34 @@ function formatContent(text: string) {
   }
 
   return result;
+}
+
+function formatFacts(text: string) {
+  if (!text) return null;
+  // Split by newlines, filter empties, treat each line as a fact
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+  return lines.map((line, i) => {
+    // Try to extract "Fun Fact #N:" or "Fact N:" prefix
+    const match = line.match(/^(Fun Fact #?\d+|Fact \d+|#\d+)\s*[:—-]\s*/i);
+    const label = match ? match[1] : `#${i + 1}`;
+    const content = match ? line.slice(match[0].length) : line;
+
+    return (
+      <div key={i} style={{
+        padding: '14px 16px', background: '#0a0a0a', border: '1px solid #1a1a1a',
+        borderRadius: 12, display: 'flex', gap: 12, alignItems: 'flex-start',
+      }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 8, background: '#161616',
+          border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0, fontSize: 11, fontWeight: 800, color: '#4ade80',
+        }}>
+          {i + 1}
+        </div>
+        <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{content}</p>
+      </div>
+    );
+  });
 }
 

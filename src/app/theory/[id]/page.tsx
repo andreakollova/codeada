@@ -591,6 +591,16 @@ export default function TheoryLessonPage() {
                     ? s('correct', locale)
                     : s('notQuite', locale)}
                 </p>
+                {answerState === 'wrong' && (() => {
+                  const correctOpt = options.find(o => o.label === correctLabel);
+                  if (!correctOpt) return null;
+                  return (
+                    <p style={{ fontSize: 12, color: '#aaa', margin: '8px 0 0', lineHeight: 1.5 }}>
+                      {locale === 'sk' ? 'Spravna odpoved: ' : 'Correct answer: '}
+                      <strong style={{ color: '#4ade80' }}>{safe(correctOpt.text)}</strong>
+                    </p>
+                  );
+                })()}
               </div>
               <motion.button
                 onClick={handleQuizNext}

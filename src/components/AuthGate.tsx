@@ -133,14 +133,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       padding: 24,
     }}>
       <div style={{ maxWidth: 380, width: '100%', textAlign: 'left' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', height: 110 }}>
-          <AnimatePresence mode="wait">
+        <div style={{ display: 'flex', justifyContent: 'flex-start', height: 110, position: 'relative' }}>
+          <AnimatePresence>
             <motion.div
               key={skinIndex}
-              initial={{ opacity: 0, filter: 'blur(12px)', scale: 0.92 }}
-              animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
-              exit={{ opacity: 0, filter: 'blur(12px)', scale: 1.05 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, position: 'absolute' as const }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              style={{ position: 'absolute', left: 0 }}
             >
               <Byte mood="happy" size={100} equipment={LOGIN_SKINS[skinIndex]} />
             </motion.div>
@@ -185,7 +186,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
-                {locale === 'sk' ? 'Pokracovat s Google' : 'Continue with Google'}
+                {locale === 'sk' ? 'Pokračovať s Google' : 'Continue with Google'}
               </button>
 
               {/* Divider */}
@@ -206,7 +207,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 }}
               >
                 <Mail size={16} />
-                {locale === 'sk' ? 'Pokracovat s emailom' : 'Continue with email'}
+                {locale === 'sk' ? 'Pokračovať s emailom' : 'Continue with email'}
               </button>
             </motion.div>
           )}
@@ -240,13 +241,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
               >
                 {loading
                   ? (locale === 'sk' ? 'Posielam...' : 'Sending...')
-                  : (locale === 'sk' ? 'Poslat prihlasovaci kod' : 'Send login code')}
+                  : (locale === 'sk' ? 'Poslať prihlasovací kód' : 'Send login code')}
               </button>
               <button
                 onClick={() => setStep('start')}
                 style={{ marginTop: 12, background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer' }}
               >
-                {locale === 'sk' ? 'Spat' : 'Back'}
+                {locale === 'sk' ? 'Späť' : 'Back'}
               </button>
             </motion.div>
           )}
@@ -284,7 +285,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 <ArrowRight size={16} />
                 {loading
                   ? (locale === 'sk' ? 'Overujem...' : 'Verifying...')
-                  : (locale === 'sk' ? 'Overit kod' : 'Verify code')}
+                  : (locale === 'sk' ? 'Overiť kód' : 'Verify code')}
               </button>
               <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <button
@@ -293,14 +294,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                   style={{ background: 'none', border: 'none', color: resendTimer > 0 ? '#333' : '#888', fontSize: 12, cursor: resendTimer > 0 ? 'default' : 'pointer' }}
                 >
                   {resendTimer > 0
-                    ? (locale === 'sk' ? `Poslat znova (${resendTimer}s)` : `Resend (${resendTimer}s)`)
-                    : (locale === 'sk' ? 'Neprisiel kod? Poslat znova' : "Didn't get the code? Resend")}
+                    ? (locale === 'sk' ? `Poslať znova (${resendTimer}s)` : `Resend (${resendTimer}s)`)
+                    : (locale === 'sk' ? 'Neprišiel kód? Poslať znova' : "Didn't get the code? Resend")}
                 </button>
                 <button
                   onClick={() => { setStep('email'); setOtp(''); setError(null); }}
                   style={{ background: 'none', border: 'none', color: '#555', fontSize: 11, cursor: 'pointer' }}
                 >
-                  {locale === 'sk' ? 'Zmenit email' : 'Change email'}
+                  {locale === 'sk' ? 'Zmeniť email' : 'Change email'}
                 </button>
               </div>
             </motion.div>

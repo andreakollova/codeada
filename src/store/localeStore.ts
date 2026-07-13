@@ -28,7 +28,6 @@ export const useLocaleStore = create<LocaleState>()(
       setLocale: (locale) => set({ locale }),
       toggle: () => set({ locale: get().locale === 'en' ? 'sk' : 'en' }),
       checkDomain: () => {
-        if (get()._domainChecked) return;
         const domainLocale = detectLocaleFromDomain();
         set({ locale: domainLocale, _domainChecked: true });
       },

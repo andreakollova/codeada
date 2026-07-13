@@ -10,12 +10,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: isSk ? 'Coduy - Nauč sa programovať zadarmo' : 'Coduy - Learn to Code for Free',
+      default: isSk ? 'Coduy - Nauč sa programovať' : 'Coduy - Learn to Code',
       template: isSk ? '%s - Coduy' : '%s - Coduy',
     },
     description: isSk
-      ? 'Interaktívna appka na učenie programovania. 200+ lekcií Pythonu, cvičenia, kvízy a projekty. Zadarmo na webe, App Store a Google Play.'
-      : 'Free interactive app for learning to code. 200+ Python lessons, exercises, quizzes and projects. Available on web, App Store and Google Play.',
+      ? 'Interaktívna appka na učenie programovania. 200+ lekcií Pythonu, cvičenia, kvízy a projekty. Web, App Store a Google Play.'
+      : 'Interactive app for learning to code. 200+ Python lessons, exercises, quizzes and projects. Web, App Store and Google Play.',
     keywords: isSk
       ? ['programovanie', 'python', 'kurz', 'lekcie', 'coduy', 'nauč sa programovať', 'zadarmo', 'slovensky', 'online kurz', 'appka']
       : ['programming', 'python', 'course', 'lessons', 'coduy', 'learn to code', 'free', 'online course', 'coding', 'app'],
@@ -28,10 +28,10 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: isSk ? 'Coduy - Nauč sa programovať zadarmo' : 'Coduy - Learn to Code for Free',
+      title: isSk ? 'Coduy - Nauč sa programovať' : 'Coduy - Learn to Code',
       description: isSk
-        ? '200+ lekcií Pythonu, cvičenia, kvízy a projekty. Zadarmo.'
-        : '200+ Python lessons, exercises, quizzes and projects. Free.',
+        ? '200+ lekcií Pythonu, cvičenia, kvízy a projekty.'
+        : '200+ Python lessons, exercises, quizzes and projects.',
       siteName: 'Coduy',
       type: 'website',
       url: baseUrl,
@@ -40,10 +40,10 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: isSk ? 'Coduy - Nauč sa programovať zadarmo' : 'Coduy - Learn to Code for Free',
+      title: isSk ? 'Coduy - Nauč sa programovať' : 'Coduy - Learn to Code',
       description: isSk
-        ? '200+ lekcií Pythonu, cvičenia a projekty. Zadarmo.'
-        : '200+ Python lessons, exercises and projects. Free.',
+        ? '200+ lekcií Pythonu, cvičenia a projekty.'
+        : '200+ Python lessons, exercises and projects.',
     },
     robots: {
       index: true,

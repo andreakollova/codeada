@@ -34,7 +34,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setSkinIndex(prev => (prev + 1) % LOGIN_SKINS.length);
-    }, 2500);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -133,14 +133,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       padding: 24,
     }}>
       <div style={{ maxWidth: 380, width: '100%', textAlign: 'left' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', height: 100 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', height: 110 }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={skinIndex}
-              initial={{ opacity: 0, scale: 0.8, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: -10 }}
-              transition={{ duration: 0.4 }}
+              initial={{ opacity: 0, rotateY: 90, scale: 0.7 }}
+              animate={{ opacity: 1, rotateY: 0, scale: 1 }}
+              exit={{ opacity: 0, rotateY: -90, scale: 0.7 }}
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              style={{ perspective: 600 }}
             >
               <Byte mood="happy" size={100} equipment={LOGIN_SKINS[skinIndex]} />
             </motion.div>
@@ -161,7 +162,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <p style={{ fontSize: 13, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
             {locale === 'sk'
               ? 'Prihlasenie je potrebne na ukladanie tvojho progressu.'
-              : 'Sign in to save your progress.'}
+              : 'Sign in to save your progress across all devices.'}
           </p>
         </motion.div>
 

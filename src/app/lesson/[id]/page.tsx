@@ -97,7 +97,7 @@ export default function LessonPage() {
       </div>
 
       {/* Exercise */}
-      <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 40px' }}>
+      <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 120px' }}>
         <AnimatePresence mode="wait">
           <motion.div key={exerciseIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.2 }}>
             {current.type === 'explain' && <ExplainCard exercise={current} onNext={handleCorrect} />}

@@ -33,6 +33,12 @@ html, body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+.page-shell {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 h1, h2, h3, h4 {
@@ -144,10 +150,11 @@ a { color: inherit; text-decoration: none; }
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
+  width: 100%;
   z-index: 100;
-  background: rgba(8,8,8,0.95);
+  background: rgba(8,8,8,0.98);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid #1a1a1a;
   display: flex;
   align-items: stretch;
@@ -252,4 +259,54 @@ a { color: inherit; text-decoration: none; }
 }
 .stat-info-trigger:hover .stat-info-tooltip {
   display: block;
+}
+
+/* ========== Mobile responsive fixes ========== */
+@media (max-width: 899px) {
+  /* Theory/lesson pages */
+  .page-shell {
+    padding-bottom: 80px;
+  }
+
+  /* Prevent horizontal overflow */
+  pre, code {
+    max-width: 100%;
+    overflow-x: auto;
+    word-break: break-word;
+  }
+
+  /* Code input full width on mobile */
+  .code-input {
+    font-size: 12px;
+    padding: 12px;
+  }
+
+  /* Stat cards compact on mobile (shown on topics page etc.) */
+  .stat-card {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .stat-card-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .stat-card-value {
+    font-size: 17px;
+  }
+
+  /* Headings scale down */
+  h1 { font-size: 20px !important; }
+
+  /* Touch targets min 44px */
+  button {
+    min-height: 40px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .dashboard-main {
+    padding: 16px 12px 100px;
+  }
+  h1 { font-size: 18px !important; }
 }

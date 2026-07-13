@@ -751,7 +751,7 @@ export default function TheoryLessonPage() {
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 40px' }}>
+      <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 120px' }}>
         <AnimatePresence mode="wait">
           {phase === 'quiz' ? renderQuiz() : renderTheorySection()}
         </AnimatePresence>

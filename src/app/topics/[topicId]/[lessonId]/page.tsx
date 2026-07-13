@@ -7,7 +7,7 @@ import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { projectTopics } from '@/data/myprojects-topics';
 import StatusBar from '@/components/StatusBar';
-import { ArrowLeft, Check, ChevronRight, Zap, BookOpen, Lightbulb, Code, X } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, Zap, BookOpen, Lightbulb, Code, X, Play, Loader2 } from 'lucide-react';
 import type { Exercise } from '@/types';
 
 export default function TopicLessonPage() {
@@ -35,7 +35,7 @@ export default function TopicLessonPage() {
   return (
     <div className="page-shell" style={{ minHeight: '100vh', background: '#0A0A0A', paddingBottom: 80 }}>
       <StatusBar />
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '20px 20px 40px' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '20px 20px 120px' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
           <button
@@ -121,10 +121,36 @@ function ExerciseView({ exercise, topicId, locale, onComplete, onNext, isLast, i
   const [showResult, setShowResult] = useState<'correct' | 'wrong' | null>(isDone ? 'correct' : null);
   const [showExplanation, setShowExplanation] = useState(isDone);
 
+  const [writeCode, setWriteCode] = useState(exercise.codeSnippet ?? '');
+  const [writeRun, setWriteRun] = useState<'idle' | 'running' | 'passed' | 'failed'>('idle');
+  const [writeMsg, setWriteMsg] = useState('');
+
   const typeIcon = exercise.type === 'explain' ? BookOpen : exercise.type === 'mcq' ? Lightbulb : Code;
   const typeLabel = exercise.type === 'explain' ? (locale === 'sk' ? 'Vysvetlenie' : 'Explanation')
     : exercise.type === 'mcq' ? 'Quiz'
+    : exercise.type === 'write' ? (locale === 'sk' ? 'Napíš kód' : 'Write code')
     : (locale === 'sk' ? 'Doplň kód' : 'Fill code');
+
+  const handleWriteRun = async () => {
+    if (writeRun === 'running') return;
+    setWriteRun('running'); setWriteMsg('');
+    await new Promise(r => setTimeout(r, 700));
+    const ok = exercise.testCases?.every(tc => {
+      if (tc.expected.startsWith('contains:')) {
+        return writeCode.includes(tc.expected.replace('contains:', '').trim());
+      }
+      return true;
+    }) ?? true;
+    if (ok) {
+      setWriteRun('passed');
+      setWriteMsg(locale === 'sk' ? 'Spravne!' : 'Correct!');
+      if (!isDone) setTimeout(onComplete, 800);
+    } else {
+      setWriteRun('failed');
+      const tc = exercise.testCases?.find(tc => tc.expected.startsWith('contains:') && !writeCode.includes(tc.expected.replace('contains:', '').trim()));
+      setWriteMsg(tc?.description || (locale === 'sk' ? 'Nespravne, skus znova' : 'Not quite, try again'));
+    }
+  };
 
   const handleSubmitMcq = () => {
     if (!selected) return;
@@ -366,8 +392,64 @@ function ExerciseView({ exercise, topicId, locale, onComplete, onNext, isLast, i
         </>
       )}
 
+      {/* WRITE type */}
+      {exercise.type === 'write' && (
+        <>
+          <div style={{ borderRadius: 14, overflow: 'hidden', border: `1px solid ${writeRun === 'passed' ? 'rgba(74,222,128,0.2)' : writeRun === 'failed' ? 'rgba(255,80,80,0.2)' : '#1a1a1a'}`, marginBottom: 16, transition: 'border-color 0.2s' }}>
+            <div style={{ background: '#111', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6, borderBottom: '1px solid #1a1a1a' }}>
+              {['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c, opacity: 0.7 }} />)}
+              <span style={{ marginLeft: 8, fontSize: 10, color: '#555', fontFamily: 'JetBrains Mono, monospace' }}>python</span>
+            </div>
+            <textarea
+              value={writeCode}
+              onChange={e => { setWriteCode(e.target.value); setWriteRun('idle'); }}
+              onKeyDown={e => {
+                if (e.key !== 'Tab') return;
+                e.preventDefault();
+                const s = e.currentTarget.selectionStart, en = e.currentTarget.selectionEnd;
+                setWriteCode(writeCode.substring(0, s) + '    ' + writeCode.substring(en));
+              }}
+              spellCheck={false} autoCapitalize="none" autoCorrect="off"
+              rows={Math.max(5, writeCode.split('\n').length + 1)}
+              style={{
+                width: '100%', padding: '14px 16px', background: '#0a0a0a', border: 'none', outline: 'none',
+                color: '#ccc', fontSize: 13, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                lineHeight: 1.7, resize: 'vertical', minHeight: 120,
+              }}
+            />
+          </div>
+
+          {writeMsg && (
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+              style={{
+                display: 'flex', gap: 8, padding: '12px 14px', borderRadius: 12, marginBottom: 12,
+                background: writeRun === 'passed' ? 'rgba(74,222,128,0.06)' : 'rgba(255,80,80,0.06)',
+                border: `1px solid ${writeRun === 'passed' ? 'rgba(74,222,128,0.2)' : 'rgba(255,80,80,0.15)'}`,
+              }}>
+              {writeRun === 'passed' ? <Check size={14} color="#4ade80" /> : <X size={14} color="#ff8080" />}
+              <span style={{ fontSize: 13, color: writeRun === 'passed' ? '#4ade80' : '#ff9090' }}>{writeMsg}</span>
+            </motion.div>
+          )}
+
+          {writeRun !== 'passed' && (
+            <button onClick={handleWriteRun} disabled={writeRun === 'running' || !writeCode.trim()}
+              style={{
+                width: '100%', padding: '14px', borderRadius: 12,
+                background: writeCode.trim() ? '#EDEDED' : '#1a1a1a',
+                color: writeCode.trim() ? '#000' : '#555',
+                fontWeight: 700, fontSize: 15, border: 'none',
+                cursor: writeCode.trim() ? 'pointer' : 'not-allowed',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              }}>
+              {writeRun === 'running' ? <><Loader2 size={16} className="animate-spin" />{locale === 'sk' ? 'Kontrolujem...' : 'Checking...'}</>
+                : <><Play size={16} />{locale === 'sk' ? 'Spustiť' : 'Run code'}</>}
+            </button>
+          )}
+        </>
+      )}
+
       {/* Success + Next */}
-      {showResult === 'correct' && (
+      {(showResult === 'correct' || writeRun === 'passed') && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}

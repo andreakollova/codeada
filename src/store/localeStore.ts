@@ -12,9 +12,11 @@ function detectLocaleFromDomain(): Locale {
   return 'en';
 }
 
+// Detect immediately on load (before any render) so first render is correct
+const domainLocale = detectLocaleFromDomain();
+
 interface LocaleState {
   locale: Locale;
-  _domainChecked: boolean;
   setLocale: (locale: Locale) => void;
   toggle: () => void;
   checkDomain: () => void;
@@ -23,18 +25,22 @@ interface LocaleState {
 export const useLocaleStore = create<LocaleState>()(
   persist(
     (set, get) => ({
-      locale: 'en',
-      _domainChecked: false,
+      locale: domainLocale,
       setLocale: (locale) => set({ locale }),
       toggle: () => set({ locale: get().locale === 'en' ? 'sk' : 'en' }),
       checkDomain: () => {
-        const domainLocale = detectLocaleFromDomain();
-        set({ locale: domainLocale, _domainChecked: true });
+        set({ locale: detectLocaleFromDomain() });
       },
     }),
     {
       name: 'coduy-locale',
-      partialize: (s) => ({ locale: s.locale, _domainChecked: s._domainChecked }),
+      partialize: (s) => ({ locale: s.locale }),
+      // Always override persisted locale with domain-detected one on hydration
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.locale = detectLocaleFromDomain();
+        }
+      },
     }
   )
 );

@@ -157,6 +157,39 @@ export default function SettingsPage() {
                 </button>
               )}
             </div>
+            {/* Drink preference */}
+            <div style={{ borderTop: '1px solid #111' }}>
+              <div style={{ padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                  <span style={{ fontSize: 14, color: '#ccc', fontWeight: 500 }}>
+                    {locale === 'sk' ? 'Obľúbený nápoj' : 'Favorite drink'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {([
+                    { id: 'coffee' as const, label: locale === 'sk' ? 'Kava' : 'Coffee' },
+                    { id: 'tea' as const, label: locale === 'sk' ? 'Caj' : 'Tea' },
+                    { id: 'energy' as const, label: 'Energy' },
+                    { id: 'juice' as const, label: locale === 'sk' ? 'Dzus' : 'Juice' },
+                    { id: 'water' as const, label: locale === 'sk' ? 'Voda' : 'Water' },
+                  ]).map(d => (
+                    <button
+                      key={d.id}
+                      onClick={() => setFavDrink(d.id)}
+                      style={{
+                        padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600,
+                        background: favDrink === d.id ? 'rgba(74,222,128,0.1)' : '#111',
+                        border: `1px solid ${favDrink === d.id ? 'rgba(74,222,128,0.4)' : '#1a1a1a'}`,
+                        color: favDrink === d.id ? '#4ade80' : '#888',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

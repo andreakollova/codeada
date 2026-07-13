@@ -110,15 +110,12 @@ export default function CodingPath() {
   const router = useRouter();
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
   const [openModules, setOpenModules] = useState<Record<number, boolean>>({});
-  const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const [selectedPath, setSelectedPath] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('coduy-path');
+    return null;
+  });
   const nextLessonRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
-
-  // Persist selected path
-  useEffect(() => {
-    const saved = localStorage.getItem('coduy-path');
-    if (saved) setSelectedPath(saved);
-  }, []);
 
   useEffect(() => {
     fetchModulesWithLessons().then(mods => {

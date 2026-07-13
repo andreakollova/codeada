@@ -96,35 +96,34 @@ export default function WorkshopPage() {
   return (
     <div className="page-shell" style={{ minHeight: '100vh', background: '#000', color: '#fff' }}>
       {/* Header */}
-      <div style={{ borderBottom: '1px solid #111', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(16px)', zIndex: 50 }}>
-        <Link href="/">
+      <div style={{ borderBottom: '1px solid #111', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', zIndex: 50 }}>
+        <Link href="/" onClick={() => window.scrollTo(0, 0)}>
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             style={{ width: 36, height: 36, borderRadius: 10, background: '#111', border: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
             <ArrowLeft size={18} color="#888" />
           </motion.div>
         </Link>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h1 style={{ fontWeight: 700, fontSize: 18, margin: 0 }}>{s('locker', locale)}</h1>
-          <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{ownedItems.length} / {cosmeticItems.length} {s('itemsUnlocked', locale)}</p>
+          <p style={{ fontSize: 11, color: '#888', margin: 0 }}>{ownedItems.length} / {cosmeticItems.length} {s('itemsUnlocked', locale)}</p>
         </div>
-        {/* Random button */}
         <motion.button
           onClick={handleRandom}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '8px 14px', borderRadius: 10,
+            display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0,
+            padding: '8px 12px', borderRadius: 10,
             background: '#111', border: '1px solid #2a2a2a',
-            color: '#aaa', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            color: '#aaa', fontSize: 12, fontWeight: 600, cursor: 'pointer',
           }}
         >
-          <Shuffle size={14} />
+          <Shuffle size={13} />
           {s('random', locale)}
         </motion.button>
       </div>
 
-      <div style={{ maxWidth: 580, margin: '0 auto', padding: '24px 20px 80px' }}>
+      <div style={{ maxWidth: 580, margin: '0 auto', padding: '24px 20px 120px' }}>
         {/* Byte preview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

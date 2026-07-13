@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { fetchQuizForLesson, DbQuizQuestion } from '@/lib/curriculum-api';
-import { ArrowLeft, Check, Zap, ArrowUp, ArrowDown, ArrowLeftIcon, ArrowRightIcon, X } from 'lucide-react';
+import { ArrowLeft, Check, Zap, ArrowUp, ArrowDown, ArrowLeftIcon, ArrowRightIcon, X, Trophy } from 'lucide-react';
 import Byte from '@/components/Byte';
 import { t } from '@/store/localeStore';
 import type { ByteEquipment } from '@/types';
@@ -13,9 +13,9 @@ import type { ByteEquipment } from '@/types';
 const WORLD_W = 2400;
 const WORLD_H = 2400;
 const BYTE_R = 44;
-const BOUNCE_FORCE = 8;
-const PLAYER_SPEED = 5;
-const BOT_SPEED = 3.5;
+const BOUNCE_FORCE = 12;
+const PLAYER_SPEED = 3;
+const BOT_SPEED = 2.5;
 const FRICTION = 0.95;
 const MINIMAP_SIZE = 100;
 
@@ -71,12 +71,16 @@ export default function ArenaPage() {
   const [bounceFlash, setBounceFlash] = useState<string | null>(null);
   const [gameMode, setGameMode] = useState<'quiz' | 'free'>('quiz');
   const gameModeRef = useRef<'quiz' | 'free'>('quiz');
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [arenaWins, setArenaWins] = useState<Record<string, number>>({});
 
   const rafRef = useRef<number>(0);
   const entitiesRef = useRef<ArenaEntity[]>([]);
   const keysRef = useRef<Set<string>>(new Set());
   const collidedRef = useRef<Set<string>>(new Set());
   const battleRef = useRef<any>(null);
+  // Bot movement intents: each bot picks a direction and holds it for a duration
+  const botIntentsRef = useRef<Record<string, { ax: number; ay: number; ticksLeft: number }>>({});
 
   // Keep refs in sync
   useEffect(() => { collidedRef.current = collidedWith; }, [collidedWith]);
@@ -148,17 +152,17 @@ export default function ArenaPage() {
 
       // Player input
       const keys = keysRef.current;
-      if (keys.has('ArrowUp') || keys.has('w')) player.vy -= 0.5;
-      if (keys.has('ArrowDown') || keys.has('s')) player.vy += 0.5;
-      if (keys.has('ArrowLeft') || keys.has('a')) player.vx -= 0.5;
-      if (keys.has('ArrowRight') || keys.has('d')) player.vx += 0.5;
+      if (keys.has('ArrowUp') || keys.has('w')) player.vy -= 0.35;
+      if (keys.has('ArrowDown') || keys.has('s')) player.vy += 0.35;
+      if (keys.has('ArrowLeft') || keys.has('a')) player.vx -= 0.35;
+      if (keys.has('ArrowRight') || keys.has('d')) player.vx += 0.35;
 
       // Space boost - big burst in current direction
       if (keys.has(' ')) {
         const pDir = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
         if (pDir > 0.3) {
-          player.vx = (player.vx / pDir) * PLAYER_SPEED * 2.5;
-          player.vy = (player.vy / pDir) * PLAYER_SPEED * 2.5;
+          player.vx = (player.vx / pDir) * PLAYER_SPEED * 4;
+          player.vy = (player.vy / pDir) * PLAYER_SPEED * 4;
         }
         keys.delete(' ');
       }
@@ -171,20 +175,65 @@ export default function ArenaPage() {
         player.vy = (player.vy / pSpeed) * maxSpeed;
       }
 
-      // Bot AI
-      if (botTimer % 40 === 0) {
-        updated.filter(e => !e.isPlayer).forEach(bot => {
-          // Sometimes move toward player, sometimes random
-          if (Math.random() < 0.3) {
-            const dx = player.x - bot.x, dy = player.y - bot.y;
-            const d = Math.sqrt(dx * dx + dy * dy);
-            if (d > 0) { bot.vx = (dx / d) * BOT_SPEED; bot.vy = (dy / d) * BOT_SPEED; }
-          } else {
-            bot.vx = (Math.random() - 0.5) * BOT_SPEED * 2;
-            bot.vy = (Math.random() - 0.5) * BOT_SPEED * 2;
+      // Bot AI - smooth movement: pick a direction, hold it for a few seconds
+      const intents = botIntentsRef.current;
+      updated.filter(e => !e.isPlayer).forEach(bot => {
+        const botDef = BOTS.find(b => b.name === bot.name);
+        const isHard = botDef?.difficulty === 'hard';
+        const isMedium = botDef?.difficulty === 'medium';
+        let intent = intents[bot.id];
+
+        // Pick new intent when current expires or doesn't exist
+        if (!intent || intent.ticksLeft <= 0) {
+          const dx = player.x - bot.x, dy = player.y - bot.y;
+          const distToPlayer = Math.sqrt(dx * dx + dy * dy);
+
+          let ax = 0, ay = 0;
+          // Duration: 90-240 ticks (~1.5-4 seconds at 60fps)
+          const duration = 90 + Math.floor(Math.random() * 150);
+
+          // Chance to pause (stop moving for a bit)
+          if (Math.random() < 0.15) {
+            // Idle pause - no acceleration
+            intents[bot.id] = { ax: 0, ay: 0, ticksLeft: 60 + Math.floor(Math.random() * 90) };
+            return;
           }
-        });
-      }
+
+          if (isHard && distToPlayer < 500 && Math.random() < 0.6) {
+            // Hard: charge toward player
+            const d = Math.max(distToPlayer, 1);
+            ax = (dx / d) * 0.12;
+            ay = (dy / d) * 0.12;
+          } else if (isMedium && distToPlayer < 700 && Math.random() < 0.4) {
+            // Medium: drift toward player gently
+            const d = Math.max(distToPlayer, 1);
+            ax = (dx / d) * 0.06;
+            ay = (dy / d) * 0.06;
+          } else {
+            // Wander: pick a random angle and go that direction
+            const angle = Math.random() * Math.PI * 2;
+            const strength = 0.03 + Math.random() * 0.06;
+            ax = Math.cos(angle) * strength;
+            ay = Math.sin(angle) * strength;
+          }
+
+          intents[bot.id] = { ax, ay, ticksLeft: duration };
+          intent = intents[bot.id];
+        }
+
+        // Apply the current intent's acceleration smoothly
+        bot.vx += intent.ax;
+        bot.vy += intent.ay;
+        intent.ticksLeft--;
+
+        // Soft speed cap for bots
+        const bSpeed = Math.sqrt(bot.vx * bot.vx + bot.vy * bot.vy);
+        const maxBotSpeed = BOT_SPEED * (isHard ? 1.8 : isMedium ? 1.4 : 1.1);
+        if (bSpeed > maxBotSpeed) {
+          bot.vx *= 0.97;
+          bot.vy *= 0.97;
+        }
+      });
 
       // Move + friction
       updated.forEach(e => {
@@ -197,11 +246,11 @@ export default function ArenaPage() {
         const speed = Math.sqrt(e.vx * e.vx + e.vy * e.vy);
         e.rotation += speed * 2 * (e.vx >= 0 ? 1 : -1);
 
-        // Boundary bounce
-        if (e.x < BYTE_R + 20) { e.x = BYTE_R + 20; e.vx = Math.abs(e.vx) * 0.6; }
-        if (e.x > WORLD_W - BYTE_R - 20) { e.x = WORLD_W - BYTE_R - 20; e.vx = -Math.abs(e.vx) * 0.6; }
-        if (e.y < BYTE_R + 20) { e.y = BYTE_R + 20; e.vy = Math.abs(e.vy) * 0.6; }
-        if (e.y > WORLD_H - BYTE_R - 20) { e.y = WORLD_H - BYTE_R - 20; e.vy = -Math.abs(e.vy) * 0.6; }
+        // Boundary bounce - strong elastic bounce
+        if (e.x < BYTE_R + 20) { e.x = BYTE_R + 20; e.vx = Math.abs(e.vx) * 0.9 + 2; }
+        if (e.x > WORLD_W - BYTE_R - 20) { e.x = WORLD_W - BYTE_R - 20; e.vx = -(Math.abs(e.vx) * 0.9 + 2); }
+        if (e.y < BYTE_R + 20) { e.y = BYTE_R + 20; e.vy = Math.abs(e.vy) * 0.9 + 2; }
+        if (e.y > WORLD_H - BYTE_R - 20) { e.y = WORLD_H - BYTE_R - 20; e.vy = -(Math.abs(e.vy) * 0.9 + 2); }
       });
 
       // Collisions
@@ -243,8 +292,10 @@ export default function ArenaPage() {
       if (player) {
         const vw = typeof window !== 'undefined' ? window.innerWidth : 800;
         const vh = typeof window !== 'undefined' ? window.innerHeight : 600;
-        setCameraX(player.x - vw / 2);
-        setCameraY(player.y - vh / 2);
+        // Zoom out on mobile: offset camera so player sees more around them
+        const zoom = vw < 768 ? 1.3 : 1;
+        setCameraX(player.x - (vw * zoom) / 2);
+        setCameraY(player.y - (vh * zoom) / 2);
       }
 
       rafRef.current = requestAnimationFrame(tick);
@@ -308,8 +359,8 @@ export default function ArenaPage() {
         if (won) {
           const xpReward = botDef?.difficulty === 'hard' ? 50 : botDef?.difficulty === 'medium' ? 30 : 15;
           addXp(xpReward);
-          // Add gems via store set
           useUserStore.setState(s => ({ gems: s.gems + (botDef?.difficulty === 'hard' ? 5 : botDef?.difficulty === 'medium' ? 3 : 1) }));
+          setArenaWins(prev => ({ ...prev, [battle.opponent.name]: (prev[battle.opponent.name] || 0) + 1 }));
         }
       }
     }, 1200);
@@ -323,7 +374,7 @@ export default function ArenaPage() {
     setBattle(null);
   };
 
-  // Mobile swipe controls
+  // Mobile touch controls - joystick-style: drag from touch point
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   useEffect(() => {
     const onStart = (e: TouchEvent) => {
@@ -333,12 +384,16 @@ export default function ArenaPage() {
       if (!touchStartRef.current) return;
       const dx = e.touches[0].clientX - touchStartRef.current.x;
       const dy = e.touches[0].clientY - touchStartRef.current.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
       keysRef.current.clear();
-      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-        if (dx > 15) keysRef.current.add('ArrowRight');
-        if (dx < -15) keysRef.current.add('ArrowLeft');
-        if (dy > 15) keysRef.current.add('ArrowDown');
-        if (dy < -15) keysRef.current.add('ArrowUp');
+      // Lower threshold, allow diagonal movement naturally
+      if (dist > 8) {
+        if (dx > 8) keysRef.current.add('ArrowRight');
+        if (dx < -8) keysRef.current.add('ArrowLeft');
+        if (dy > 8) keysRef.current.add('ArrowDown');
+        if (dy < -8) keysRef.current.add('ArrowUp');
+        // Double-tap / fast swipe = boost
+        if (dist > 80) keysRef.current.add(' ');
       }
     };
     const onEnd = () => {
@@ -467,26 +522,22 @@ export default function ArenaPage() {
           >
             <motion.div
               key={introStep}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              style={{ textAlign: 'center', maxWidth: 340 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              style={{ textAlign: 'center', maxWidth: 340, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
               <Byte mood="happy" size={100} equipment={equipment} />
               <div style={{ fontSize: 12, fontWeight: 700, color: '#4ade80', marginTop: 4, letterSpacing: '0.04em' }}>{name || 'You'}</div>
-              <div style={{ display: 'flex', gap: 6, justifyContent: 'center', margin: '24px 0 16px' }}>
-                {introSteps.map((_, i) => (
-                  <div key={i} style={{ width: 8, height: 8, borderRadius: 4, background: i === introStep ? '#4ade80' : '#222' }} />
-                ))}
-              </div>
-              <h2 style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 4, letterSpacing: '-0.03em' }}>
+              <h2 style={{ fontSize: 32, fontWeight: 800, color: '#fff', margin: '20px 0 4px', letterSpacing: '-0.03em' }}>
                 {introStep === 0 ? 'Arena' : ''}
               </h2>
               {introVisuals[introStep]}
-              <p style={{ fontSize: 16, color: '#ccc', lineHeight: 1.6, marginBottom: 32 }}>
+              <p style={{ fontSize: 16, color: '#ccc', lineHeight: 1.6, marginBottom: 28 }}>
                 {introSteps[introStep]}
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', width: '100%' }}>
                 <button
                   onClick={() => {
                     if (introStep < introSteps.length - 1) setIntroStep(introStep + 1);
@@ -508,6 +559,18 @@ export default function ArenaPage() {
                   {locale === 'sk' ? 'Preskočiť' : 'Skip'}
                 </button>
               </div>
+              {/* Pagination dots at bottom */}
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 28 }}>
+                {introSteps.map((_, i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ scale: i === introStep ? 1 : 0.8, opacity: i === introStep ? 1 : 0.4 }}
+                    transition={{ duration: 0.25 }}
+                    style={{ width: 10, height: 10, borderRadius: 5, background: i === introStep ? '#4ade80' : '#333', cursor: 'pointer' }}
+                    onClick={() => setIntroStep(i)}
+                  />
+                ))}
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -517,7 +580,8 @@ export default function ArenaPage() {
       <div ref={canvasRef} style={{ position: 'absolute', inset: 0 }}>
         <div style={{
           position: 'absolute',
-          transform: `translate(${-cameraX}px, ${-cameraY}px)`,
+          transform: `translate(${-cameraX}px, ${-cameraY}px)${isMobile ? ' scale(0.75)' : ''}`,
+          transformOrigin: '0 0',
           width: WORLD_W, height: WORLD_H,
         }}>
           {/* Grid */}
@@ -546,7 +610,7 @@ export default function ArenaPage() {
                   transition: 'filter 0.15s',
                 }}
               >
-                <Byte mood="happy" size={88} equipment={e.equipment} />
+                <Byte mood="happy" size={88} equipment={e.equipment} animate={true} />
               </div>
             );
           })}
@@ -619,7 +683,7 @@ export default function ArenaPage() {
 
       {/* BACK BUTTON */}
       <button
-        onClick={() => window.history.back()}
+        onClick={() => { window.scrollTo(0, 0); window.history.back(); }}
         style={{
           position: 'absolute', top: 16, left: 16,
           width: 36, height: 36, borderRadius: 10,
@@ -630,6 +694,60 @@ export default function ArenaPage() {
       >
         <ArrowLeft size={16} />
       </button>
+
+      {/* LEADERBOARD TOGGLE */}
+      <button
+        onClick={() => setShowLeaderboard(!showLeaderboard)}
+        style={{
+          position: 'absolute', top: 16, left: 60,
+          height: 36, borderRadius: 10, padding: '0 12px',
+          background: 'rgba(0,0,0,0.7)', border: '1px solid #1a1a1a',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          cursor: 'pointer', color: '#888', backdropFilter: 'blur(8px)',
+          fontSize: 10, fontWeight: 700,
+        }}
+      >
+        <Trophy size={12} />
+      </button>
+
+      {/* LEADERBOARD PANEL */}
+      <AnimatePresence>
+        {showLeaderboard && (
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            style={{
+              position: 'absolute', top: 60, left: 16,
+              width: 200, borderRadius: 14,
+              background: 'rgba(0,0,0,0.85)', border: '1px solid #1a1a1a',
+              backdropFilter: 'blur(12px)', padding: '14px 16px',
+              zIndex: 50,
+            }}
+          >
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+              {locale === 'sk' ? 'Rebricek' : 'Leaderboard'}
+            </div>
+            {[{ name: name || 'You', isPlayer: true, difficulty: undefined as string | undefined, wins: Object.values(arenaWins).reduce((a, b) => a + b, 0) },
+              ...BOTS.map(b => ({ name: b.name, isPlayer: false, difficulty: b.difficulty, wins: arenaWins[b.name] || 0 }))
+            ].sort((a, b) => b.wins - a.wins).map((entry, i) => (
+              <div key={entry.name} style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0',
+                borderTop: i > 0 ? '1px solid #111' : 'none',
+              }}>
+                <span style={{ fontSize: 10, fontWeight: 800, color: i === 0 ? '#4ade80' : '#555', width: 16 }}>#{i + 1}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: entry.isPlayer ? '#4ade80' : '#ccc', flex: 1 }}>{entry.name}</span>
+                {entry.difficulty && (
+                  <span style={{ fontSize: 8, fontWeight: 700, color: entry.difficulty === 'hard' ? '#f59e0b' : entry.difficulty === 'medium' ? '#60a5fa' : '#555' }}>
+                    {entry.difficulty.toUpperCase()}
+                  </span>
+                )}
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#888' }}>{entry.wins}W</span>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile hint */}
       {isMobile && (
@@ -677,69 +795,77 @@ export default function ArenaPage() {
             exit={{ opacity: 0 }}
             style={{
               position: 'fixed', inset: 0, zIndex: 100,
-              background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+              background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)',
+              display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+              padding: '60px 16px 24px', overflow: 'auto',
             }}
           >
             <motion.div
               initial={{ scale: 0.85, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              style={{ maxWidth: 440, width: '100%' }}
+              style={{ maxWidth: 440, width: '100%', margin: '0 auto' }}
             >
               {/* X close button */}
               <button onClick={closeBattle} style={{
-                position: 'absolute', top: 16, right: 16,
-                width: 32, height: 32, borderRadius: 8,
-                background: '#161616', border: '1px solid #222',
+                position: 'fixed', top: 20, right: 20,
+                width: 40, height: 40, borderRadius: 12,
+                background: '#1a1a1a', border: '1px solid #333',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: '#555', zIndex: 10,
+                cursor: 'pointer', color: '#888', zIndex: 110,
               }}>
-                <X size={14} />
+                <X size={18} />
               </button>
 
               {battleResult ? (
-                <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} style={{ textAlign: 'center' }}>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
-                    <Byte mood={battleResult === 'win' ? 'celebrating' : 'worried'} size={100} equipment={equipment} />
+                <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} style={{ textAlign: 'center', paddingTop: 40 }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 24 }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <Byte mood={battleResult === 'win' ? 'celebrating' : 'worried'} size={110} equipment={equipment} />
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#4ade80', marginTop: 6 }}>{name || 'You'}</div>
+                    </div>
                     <div style={{ fontSize: 20, fontWeight: 800, color: '#333', alignSelf: 'center' }}>VS</div>
-                    <Byte mood="happy" size={100} equipment={battle.opponent.equipment} />
+                    <div style={{ textAlign: 'center' }}>
+                      <Byte mood="happy" size={110} equipment={battle.opponent.equipment} />
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#888', marginTop: 6 }}>{battle.opponent.name}</div>
+                    </div>
                   </div>
                   <h2 style={{ fontSize: 28, fontWeight: 800, color: battleResult === 'win' ? '#4ade80' : '#ff8080', marginBottom: 8 }}>
                     {battleResult === 'win' ? (locale === 'sk' ? 'Výhra!' : 'You win!') : `${battle.opponent.name} ${locale === 'sk' ? 'vyhral!' : 'wins!'}`}
                   </h2>
-                  <p style={{ fontSize: 14, color: '#888', marginBottom: 4 }}>{battleScore.player} - {battleScore.bot}</p>
+                  <p style={{ fontSize: 16, color: '#888', marginBottom: 4, fontWeight: 700 }}>{battleScore.player} - {battleScore.bot}</p>
                   {battleResult === 'win' && (() => {
                     const bd = BOTS.find(b => b.name === battle.opponent.name);
                     const xpR = bd?.difficulty === 'hard' ? 50 : bd?.difficulty === 'medium' ? 30 : 15;
                     const gemR = bd?.difficulty === 'hard' ? 5 : bd?.difficulty === 'medium' ? 3 : 1;
-                    return <p style={{ fontSize: 13, color: '#4ade80', fontWeight: 600, marginBottom: 20 }}>+{xpR} XP  +{gemR} Gems</p>;
+                    return <p style={{ fontSize: 14, color: '#4ade80', fontWeight: 600, marginBottom: 24 }}>+{xpR} XP  +{gemR} Gems</p>;
                   })()}
-                  <button onClick={closeBattle} style={{ padding: '14px 40px', borderRadius: 12, background: '#EDEDED', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}>
+                  <button onClick={closeBattle} style={{ padding: '16px 40px', borderRadius: 14, background: '#EDEDED', color: '#000', fontWeight: 700, fontSize: 16, border: 'none', cursor: 'pointer', width: '100%', maxWidth: 300 }}>
                     {locale === 'sk' ? 'Pokračovať' : 'Continue'}
                   </button>
                 </motion.div>
               ) : (
                 <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Byte mood="happy" size={48} equipment={equipment} animate={false} />
+                  {/* VS header with bigger Bytes */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <Byte mood="happy" size={64} equipment={equipment} animate={false} />
                       <div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#4ade80' }}>{name || 'You'}</div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{battleScore.player}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#4ade80' }}>{name || 'You'}</div>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>{battleScore.player}</div>
                       </div>
                     </div>
-                    <div style={{ fontSize: 11, color: '#555', fontWeight: 700 }}>{battleIdx + 1}/{battle.questions.length}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontSize: 12, color: '#555', fontWeight: 700 }}>{battleIdx + 1}/{battle.questions.length}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#888' }}>{battle.opponent.name}</div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{battleScore.bot}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#888' }}>{battle.opponent.name}</div>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>{battleScore.bot}</div>
                       </div>
-                      <Byte mood="happy" size={48} equipment={battle.opponent.equipment} animate={false} />
+                      <Byte mood="happy" size={64} equipment={battle.opponent.equipment} animate={false} />
                     </div>
                   </div>
 
-                  <div style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: 14, padding: 20, marginBottom: 12 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, color: '#eee', lineHeight: 1.4, margin: 0 }}>
+                  <div style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: 14, padding: '16px 18px', marginBottom: 10 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: '#eee', lineHeight: 1.4, margin: 0 }}>
                       {(locale === 'sk' && (battle.questions[battleIdx] as any)?.question_text_sk) || battle.questions[battleIdx]?.question_text || ''}
                     </h3>
                     {battle.questions[battleIdx]?.code_snippet && (
@@ -764,20 +890,20 @@ export default function ArenaPage() {
                         return (
                           <button key={opt.label} onClick={() => handleBattleAnswer(opt.label)} disabled={battleState !== 'idle'}
                             style={{
-                              padding: '12px 14px', borderRadius: 10, textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10,
-                              fontSize: 13, fontWeight: 500, cursor: battleState !== 'idle' ? 'default' : 'pointer',
+                              padding: '14px 16px', borderRadius: 12, textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12,
+                              fontSize: 15, fontWeight: 500, cursor: battleState !== 'idle' ? 'default' : 'pointer',
                               background: isCorrect ? 'rgba(74,222,128,0.08)' : isWrong ? 'rgba(255,80,80,0.06)' : '#0a0a0a',
-                              border: `1px solid ${isCorrect ? 'rgba(74,222,128,0.4)' : isWrong ? 'rgba(255,80,80,0.3)' : '#1a1a1a'}`,
+                              border: `1.5px solid ${isCorrect ? 'rgba(74,222,128,0.4)' : isWrong ? 'rgba(255,80,80,0.3)' : '#1a1a1a'}`,
                               color: isCorrect ? '#4ade80' : isWrong ? '#ff8080' : '#ccc',
                             }}
                           >
                             <div style={{
-                              width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                              width: 28, height: 28, borderRadius: 8, flexShrink: 0,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               background: isCorrect ? '#4ade80' : isWrong ? '#ff8080' : '#161616',
-                              color: isCorrect || isWrong ? '#000' : '#888', fontSize: 10, fontWeight: 700,
+                              color: isCorrect || isWrong ? '#000' : '#888', fontSize: 12, fontWeight: 700,
                             }}>
-                              {isCorrect ? <Check size={10} strokeWidth={3} /> : opt.label}
+                              {isCorrect ? <Check size={12} strokeWidth={3} /> : opt.label}
                             </div>
                             {opt.text}
                           </button>

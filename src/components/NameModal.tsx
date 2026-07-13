@@ -51,12 +51,12 @@ export default function NameModal() {
   const handleDrinkSelect = (drinkId: 'coffee' | 'tea' | 'energy' | 'juice' | 'water') => {
     setFavDrink(drinkId);
     setStep('done');
-    setTimeout(() => setName(value.trim()), 600);
+    setTimeout(() => { setName(value.trim()); window.scrollTo(0, 0); }, 600);
   };
 
   const handleSkipDrink = () => {
     setStep('done');
-    setTimeout(() => setName(value.trim()), 600);
+    setTimeout(() => { setName(value.trim()); window.scrollTo(0, 0); }, 600);
   };
 
   return (

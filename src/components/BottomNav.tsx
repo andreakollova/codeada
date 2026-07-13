@@ -29,7 +29,7 @@ export default function BottomNav() {
           {tabDefs.map(({ href, labelKey, Icon }) => {
             const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
             return (
-              <Link key={href} href={href} className={`desktop-nav-item ${active ? 'active' : ''}`}>
+              <Link key={href} href={href} onClick={() => window.scrollTo(0, 0)} className={`desktop-nav-item ${active ? 'active' : ''}`}>
                 <Icon size={20} strokeWidth={active ? 2.2 : 1.6} />
                 <span>{s(labelKey, locale)}</span>
               </Link>
@@ -46,6 +46,7 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
+              onClick={() => window.scrollTo(0, 0)}
               style={{
                 flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
                 justifyContent: 'center', gap: 4, padding: '10px 4px 12px',

@@ -10,7 +10,7 @@ import { useLocaleStore } from '@/store/localeStore';
 import { s, skLessons, skStreak } from '@/data/strings';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Zap, Heart, Trophy, BookOpen, Coffee, Info } from 'lucide-react';
+import { Flame, Zap, Heart, Trophy, BookOpen, Info } from 'lucide-react';
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCount: number) => {
   const h = new Date().getHours();
@@ -168,21 +168,18 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {(coffees || 0) > 0 && (
-                <div className="stat-card">
-                  <div className="stat-card-icon"><Coffee size={18} color="#fff" /></div>
-                  <div>
-                    <div className="stat-card-value">{coffees}</div>
-                    <div className="stat-card-label">{locale === 'sk' ? 'Káv vypitých' : 'Coffees enjoyed'}</div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Byte character on desktop */}
             <div style={{ marginTop: 20, padding: 24, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, textAlign: 'center' }}>
               <Byte mood={byteMood} size={100} equipment={equipment} />
-              <p style={{ fontSize: 13, color: '#888', marginTop: 12 }}>
+              <div style={{ marginTop: 10, fontSize: 14, fontWeight: 800, color: '#4ade80' }}>
+                #{Math.max(1, Math.floor(10000 / Math.max(1, xp)))}
+              </div>
+              <div style={{ fontSize: 10, color: '#555', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                {locale === 'sk' ? 'Poradie' : 'Ranking'}
+              </div>
+              <p style={{ fontSize: 13, color: '#888', marginTop: 8 }}>
                 {byteMood === 'celebrating' ? s('greatJob', locale) : byteMood === 'worried' ? s('keepTrying', locale) : byteMood === 'proud' ? s('onFire', locale) : s('readyToLearn', locale)}
               </p>
             </div>

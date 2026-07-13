@@ -52,6 +52,17 @@ export const projectTopics: ProjectTopic[] = [
             blanks: [{ id: 'b1', options: ['FlatList', 'ScrollView', 'ListView', 'List'], correct: 'FlatList' }],
             xp: 15,
           },
+          {
+            id: 'rn-comp-5', type: 'write', conceptId: 'rn-component',
+            prompt: 'Napíš React Native komponent Button, ktorý zobrazí text "Klikni" vo View s TouchableOpacity',
+            codeSnippet: `import { View, Text, TouchableOpacity } from 'react-native';\n\nfunction Button({ onPress }) {\n  // TODO: vráť TouchableOpacity s Text\n}`,
+            testCases: [
+              { expected: 'contains:TouchableOpacity', description: 'Použi TouchableOpacity' },
+              { expected: 'contains:Text', description: 'Použi Text komponent' },
+              { expected: 'contains:onPress', description: 'Prepoj onPress prop' },
+            ],
+            xp: 20,
+          },
         ],
       },
       {
@@ -124,6 +135,17 @@ export const projectTopics: ProjectTopic[] = [
             correctAnswer: 'Nikto nemá prístup - tabuľka je úplne uzavretá',
             explanation: 'RLS bez politík = deny all. Musíš explicitne povedať kto smie čo robiť.',
             xp: 15,
+          },
+          {
+            id: 'rls-3', type: 'write', conceptId: 'rls-policy',
+            prompt: 'Napíš SQL politiku, ktorá povolí INSERT do tabuľky posts len prihláseným používateľom (auth.uid() IS NOT NULL)',
+            codeSnippet: `-- Vytvor politiku na tabuľke posts:\n-- TODO: napíš CREATE POLICY`,
+            testCases: [
+              { expected: 'contains:CREATE POLICY', description: 'Použi CREATE POLICY' },
+              { expected: 'contains:auth.uid()', description: 'Použi auth.uid()' },
+              { expected: 'contains:INSERT', description: 'Nastav pre INSERT operáciu' },
+            ],
+            xp: 20,
           },
         ],
       },

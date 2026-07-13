@@ -39,7 +39,7 @@ export default function GlossaryPage() {
   const [newExplanation, setNewExplanation] = useState('');
   const [newCode, setNewCode] = useState('');
 
-  useEffect(() => { setCustomEntries(loadCustomEntries()); }, []);
+  useEffect(() => { setCustomEntries(loadCustomEntries()); window.scrollTo(0, 0); }, []);
 
   const addCustomEntry = () => {
     if (!newTerm.trim() || !newExplanation.trim()) return;
@@ -109,19 +109,21 @@ export default function GlossaryPage() {
           )}
         </div>
 
-        {/* Category filter */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 20, flexWrap: 'wrap' }}>
+        {/* Category filter - horizontal scroll on mobile */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20, overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: 2 }}>
           {categories.map(cat => {
             const label = cat === 'všetko' ? (locale === 'sk' ? 'Všetko' : 'All')
               : cat === 'môj' ? (locale === 'sk' ? 'Môj slovník' : 'My glossary')
-              : categoryLabels[cat as GlossaryEntry['category']] || cat;
+              : locale === 'sk'
+                ? (categoryLabels[cat as GlossaryEntry['category']] || cat)
+                : cat === 'skratka' ? 'Abbreviations' : cat === 'symbol' ? 'Symbols' : cat === 'koncept' ? 'Concepts' : cat === 'nastroj' ? 'Tools' : cat;
             return (
               <button
                 key={cat}
                 onClick={() => setFilter(cat)}
                 style={{
-                  padding: '6px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                  whiteSpace: 'nowrap', cursor: 'pointer', border: 'none',
+                  padding: '8px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+                  whiteSpace: 'nowrap', cursor: 'pointer', border: 'none', flexShrink: 0,
                   background: filter === cat ? (cat === 'môj' ? '#4ade80' : '#fff') : '#111',
                   color: filter === cat ? '#000' : '#555',
                   transition: 'all 0.15s',
@@ -230,7 +232,10 @@ export default function GlossaryPage() {
                       background: entry.category === 'skratka' ? '#1a1a1a' : entry.category === 'symbol' ? '#161616' : entry.category === 'koncept' ? '#181818' : '#141414',
                       color: entry.category === 'skratka' ? '#888' : entry.category === 'symbol' ? '#777' : entry.category === 'koncept' ? '#666' : '#555',
                     }}>
-                      {entry.category === 'nastroj' ? 'nástroj' : entry.category}
+                      {locale === 'sk'
+                        ? (entry.category === 'nastroj' ? 'nástroj' : entry.category)
+                        : entry.category === 'skratka' ? 'abbr' : entry.category === 'symbol' ? 'symbol' : entry.category === 'koncept' ? 'concept' : 'tool'
+                      }
                     </span>
                   )}
 

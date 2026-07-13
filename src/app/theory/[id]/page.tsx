@@ -591,14 +591,36 @@ export default function TheoryLessonPage() {
                     ? s('correct', locale)
                     : s('notQuite', locale)}
                 </p>
-                {answerState === 'wrong' && (() => {
+                {(() => {
+                  const q = quiz[quizIndex];
                   const correctOpt = options.find(o => o.label === correctLabel);
                   if (!correctOpt) return null;
+
+                  // Build explanation based on question type
+                  let explanation = '';
+                  if (q.question_type === 'true_false') {
+                    explanation = correctLabel === 'T'
+                      ? (locale === 'sk' ? 'Toto tvrdenie je pravdivé.' : 'This statement is true.')
+                      : (locale === 'sk' ? 'Toto tvrdenie je nepravdivé.' : 'This statement is false.');
+                  } else if (q.question_type === 'fill_code' && q.code_snippet) {
+                    const filled = q.code_snippet.replace('___', correctOpt.text);
+                    explanation = locale === 'sk'
+                      ? `Správny kód je: ${filled}`
+                      : `The correct code is: ${filled}`;
+                  } else {
+                    explanation = locale === 'sk'
+                      ? `"${correctOpt.text}" je správna odpoveď, pretože to najlepšie zodpovedá tomu, čo sa pýta otázka.`
+                      : `"${correctOpt.text}" is correct because it best matches what the question is asking.`;
+                  }
+
                   return (
-                    <p style={{ fontSize: 12, color: '#aaa', margin: '8px 0 0', lineHeight: 1.5 }}>
-                      {locale === 'sk' ? 'Spravna odpoved: ' : 'Correct answer: '}
-                      <strong style={{ color: '#4ade80' }}>{safe(correctOpt.text)}</strong>
-                    </p>
+                    <div style={{ margin: '8px 0 0' }}>
+                      <p style={{ fontSize: 13, color: '#bbb', margin: '0 0 4px', lineHeight: 1.6 }}>
+                        <strong style={{ color: '#fff' }}>{safe(correctOpt.text)}</strong>
+                        {' - '}
+                        <span style={{ color: '#888' }}>{explanation}</span>
+                      </p>
+                    </div>
                   );
                 })()}
               </div>

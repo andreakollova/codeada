@@ -109,8 +109,8 @@ export default function GlossaryPage() {
           )}
         </div>
 
-        {/* Category filter - horizontal scroll on mobile */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20, overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: 2 }}>
+        {/* Category filter - horizontal scroll carousel */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 6, overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: 2 }}>
           {categories.map(cat => {
             const label = cat === 'všetko' ? (locale === 'sk' ? 'Všetko' : 'All')
               : cat === 'môj' ? (locale === 'sk' ? 'Môj slovník' : 'My glossary')
@@ -133,6 +133,15 @@ export default function GlossaryPage() {
               </button>
             );
           })}
+        </div>
+        {/* Scroll indicator bar */}
+        <div style={{ height: 3, borderRadius: 2, background: '#111', marginBottom: 18, overflow: 'hidden' }}>
+          <div style={{
+            height: '100%', borderRadius: 2, background: '#333',
+            width: `${100 / categories.length * 2}%`,
+            marginLeft: `${(categories.indexOf(filter) / categories.length) * 100}%`,
+            transition: 'margin-left 0.2s ease',
+          }} />
         </div>
 
         {/* Add custom entry button */}

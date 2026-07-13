@@ -19,7 +19,7 @@ const LOGIN_SKINS: ByteEquipment[] = [
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const { locale } = useLocaleStore();
-  const { setUserId } = useUserStore();
+  const { setUserId, userId } = useUserStore();
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
 
@@ -44,7 +44,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     sb.auth.getSession().then(({ data }) => {
       if (data.session?.user) {
-        setUserId(data.session.user.id);
+        const newId = data.session.user.id;
+        if (userId && userId !== newId) {
+          // Different user - reset store
+          localStorage.removeItem('coduy-store');
+          localStorage.removeItem('coduy-path');
+          window.location.reload();
+          return;
+        }
+        setUserId(newId);
         setAuthed(true);
       }
       setChecking(false);
@@ -52,7 +60,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = sb.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        setUserId(session.user.id);
+        const newId = session.user.id;
+        if (userId && userId !== newId) {
+          localStorage.removeItem('coduy-store');
+          localStorage.removeItem('coduy-path');
+          window.location.reload();
+          return;
+        }
+        setUserId(newId);
         setAuthed(true);
       }
     });

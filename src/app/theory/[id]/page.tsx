@@ -9,7 +9,9 @@ import { useLocaleStore, t, tArray } from '@/store/localeStore';
 import { s } from '@/data/strings';
 import Byte from '@/components/Byte';
 import { cosmeticItems } from '@/data/cosmetics';
-import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check } from 'lucide-react';
+import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check, Eye } from 'lucide-react';
+import dynamic from 'next/dynamic';
+const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
 import { Coffee, Droplets, Zap as ZapIcon, CupSoda, GlassWater } from 'lucide-react';
 type Phase = 'loading' | 'coffee' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
@@ -40,6 +42,16 @@ export default function TheoryLessonPage() {
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
   const [reward, setReward] = useState<string | null>(null);
   const [reelUrl, setReelUrl] = useState<string | null>(null);
+  const [writeCodeValue, setWriteCodeValue] = useState('');
+  const [writeCodeState, setWriteCodeState] = useState<'editing' | 'correct' | 'wrong'>('editing');
+  const [showWriteCodeAnswer, setShowWriteCodeAnswer] = useState(false);
+
+  // Initialize write_code editor with starter code when question changes
+  useEffect(() => {
+    if (quiz.length > 0 && quiz[quizIndex]?.question_type === 'write_code') {
+      setWriteCodeValue(quiz[quizIndex].code_snippet || '');
+    }
+  }, [quizIndex, quiz]);
 
   useEffect(() => {
     const idStr = Array.isArray(id) ? id[0] : id;
@@ -194,6 +206,9 @@ export default function TheoryLessonPage() {
   const handleQuizNext = () => {
     setSelectedAnswer(null);
     setAnswerState('idle');
+    setWriteCodeValue('');
+    setWriteCodeState('editing');
+    setShowWriteCodeAnswer(false);
     if (quizIndex + 1 < quiz.length) {
       setQuizIndex(i => i + 1);
     } else {
@@ -300,10 +315,184 @@ export default function TheoryLessonPage() {
     );
   };
 
+  // Normalize whitespace for write_code comparison
+  const normalizeCode = (s: string) => s.replace(/\s+/g, ' ').trim();
+
+  const handleWriteCodeCheck = () => {
+    const q = quiz[quizIndex];
+    if (!q) return;
+    const isCorrect = normalizeCode(writeCodeValue) === normalizeCode(q.correct_answer);
+    if (isCorrect) {
+      setWriteCodeState('correct');
+      setAnswerState('correct');
+      setScore(s => s + 1);
+      setByteMood('celebrating');
+      setTimeout(() => setByteMood('happy'), 1500);
+    } else {
+      setWriteCodeState('wrong');
+    }
+  };
+
+  const handleWriteCodeShowAnswer = () => {
+    setShowWriteCodeAnswer(true);
+    setWriteCodeState('correct'); // allow proceeding
+    setAnswerState('wrong');
+    setByteMood('worried');
+    loseHeart();
+    setTimeout(() => setByteMood('happy'), 1500);
+  };
+
+  const handleWriteCodeTryAgain = () => {
+    setWriteCodeState('editing');
+  };
+
+  // Render write_code quiz question
+  const renderWriteCode = () => {
+    const q = quiz[quizIndex];
+    if (!q) return null;
+
+    return (
+      <motion.div
+        key={`quiz-wc-${quizIndex}`}
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -30 }}
+        transition={{ duration: 0.25 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            {`${s('questionOf', locale)} ${quizIndex + 1} ${s('of', locale)} ${quiz.length}`}
+          </span>
+        </div>
+
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#EDEDED', lineHeight: 1.4 }}>
+          {safe(t(q, 'question_text', locale))}
+        </h2>
+
+        {/* Monaco Editor */}
+        <div style={{ borderRadius: 12, overflow: 'hidden', border: `1px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.5)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : 'rgba(255,255,255,0.08)'}` }}>
+          <MonacoEditor
+            height="180px"
+            defaultLanguage="javascript"
+            theme="vs-dark"
+            value={writeCodeValue}
+            onChange={(val) => { if (writeCodeState === 'editing') setWriteCodeValue(val || ''); }}
+            options={{
+              minimap: { enabled: false },
+              fontSize: 13,
+              lineNumbers: 'off',
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+              padding: { top: 12, bottom: 12 },
+              readOnly: writeCodeState === 'correct',
+              fontFamily: 'JetBrains Mono, Fira Code, monospace',
+              overviewRulerLanes: 0,
+              hideCursorInOverviewRuler: true,
+              renderLineHighlight: 'none',
+              scrollbar: { vertical: 'hidden', horizontal: 'auto' },
+            }}
+          />
+        </div>
+
+        {/* Action buttons based on state */}
+        {writeCodeState === 'editing' && (
+          <motion.button
+            onClick={handleWriteCodeCheck}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+          >
+            {locale === 'sk' ? 'Skontrolovať' : 'Check'}
+            <Check size={16} />
+          </motion.button>
+        )}
+
+        {writeCodeState === 'wrong' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{
+              padding: '12px 16px', borderRadius: 12,
+              background: 'rgba(255,80,80,0.05)',
+              border: '1px solid rgba(255,80,80,0.15)',
+            }}>
+              <p style={{ fontWeight: 700, fontSize: 13, color: '#ff8080', margin: 0 }}>
+                {locale === 'sk' ? 'Nie celkom správne' : 'Not quite right'}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <motion.button
+                onClick={handleWriteCodeTryAgain}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ flex: 1, padding: '14px', borderRadius: 12, background: '#161616', color: '#EDEDED', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+              >
+                {locale === 'sk' ? 'Skúsiť znova' : 'Try again'}
+              </motion.button>
+              <motion.button
+                onClick={handleWriteCodeShowAnswer}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ flex: 1, padding: '14px', borderRadius: 12, background: '#161616', color: '#888', fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+              >
+                <Eye size={14} />
+                {locale === 'sk' ? 'Ukázať odpoveď' : 'Show answer'}
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+
+        {writeCodeState === 'correct' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {showWriteCodeAnswer ? (
+              <>
+                <div style={{
+                  padding: '12px 16px', borderRadius: 12,
+                  background: 'rgba(255,80,80,0.05)',
+                  border: '1px solid rgba(255,80,80,0.15)',
+                }}>
+                  <p style={{ fontWeight: 700, fontSize: 13, color: '#ff8080', margin: '0 0 8px' }}>
+                    {locale === 'sk' ? 'Správna odpoveď:' : 'Correct answer:'}
+                  </p>
+                  <pre style={{ background: '#0A0A0A', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#4ade80', overflow: 'auto', lineHeight: 1.7, margin: 0, fontFamily: 'JetBrains Mono, Fira Code, monospace' }}>
+                    {safe(q.correct_answer)}
+                  </pre>
+                </div>
+              </>
+            ) : (
+              <div style={{
+                padding: '12px 16px', borderRadius: 12,
+                background: 'rgba(74,222,128,0.06)',
+                border: '1px solid rgba(74,222,128,0.25)',
+              }}>
+                <p style={{ fontWeight: 700, fontSize: 13, color: '#4ade80', margin: 0 }}>
+                  {s('correct', locale)}
+                </p>
+              </div>
+            )}
+            <motion.button
+              onClick={handleQuizNext}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+            >
+              {quizIndex + 1 < quiz.length
+                ? s('nextQuestion', locale)
+                : s('finish', locale)}
+              <ArrowRight size={16} />
+            </motion.button>
+          </motion.div>
+        )}
+      </motion.div>
+    );
+  };
+
   // Render quiz question
   const renderQuiz = () => {
     const q = quiz[quizIndex];
     if (!q) return null;
+
+    // Delegate write_code questions to dedicated renderer
+    if (q.question_type === 'write_code') return renderWriteCode();
 
     // Build options list
     let options: { label: string; text: string }[];

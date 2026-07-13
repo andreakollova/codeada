@@ -159,17 +159,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="stat-card" title={s('heartsTooltip', locale)}>
-                <div className="stat-card-icon">
-                  <Heart size={18} color={hearts > 2 ? '#fff' : '#888'} />
-                </div>
-                <div>
-                  <div className="stat-card-value">{hearts}/{maxHearts}</div>
-                  <div className="stat-card-label">{s('hearts', locale)}</div>
-                </div>
-              </div>
-
-              <div className="stat-card" title={s('gemsTooltip', locale)}>
+<div className="stat-card" title={s('gemsTooltip', locale)}>
                 <div className="stat-card-icon">
                   <Trophy size={18} color="#fff" />
                 </div>

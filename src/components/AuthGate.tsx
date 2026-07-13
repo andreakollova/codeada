@@ -160,7 +160,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           </p>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
             {locale === 'sk'
-              ? 'Prihlasenie je potrebne na ukladanie tvojho progressu.'
+              ? 'Prihlásenie je potrebné na ukladanie tvojho progressu.'
               : 'Sign in to save your progress across all devices.'}
           </p>
         </motion.div>

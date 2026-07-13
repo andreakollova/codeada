@@ -34,7 +34,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setSkinIndex(prev => (prev + 1) % LOGIN_SKINS.length);
-    }, 4000);
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
 

@@ -12,11 +12,11 @@ import type { ByteEquipment } from '@/types';
 
 const WORLD_W = 2400;
 const WORLD_H = 2400;
-const BYTE_R = 38;
-const BOUNCE_FORCE = 7;
-const PLAYER_SPEED = 5.5;
-const BOT_SPEED = 1.2;
-const FRICTION = 0.94;
+const BYTE_R = 44;
+const BOUNCE_FORCE = 8;
+const PLAYER_SPEED = 7;
+const BOT_SPEED = 2.5;
+const FRICTION = 0.95;
 const MINIMAP_SIZE = 100;
 
 interface ArenaEntity {
@@ -170,7 +170,7 @@ export default function ArenaPage() {
       }
 
       // Bot AI
-      if (botTimer % 120 === 0) {
+      if (botTimer % 60 === 0) {
         updated.filter(e => !e.isPlayer).forEach(bot => {
           // Sometimes move toward player, sometimes random
           if (Math.random() < 0.3) {
@@ -321,56 +321,98 @@ export default function ArenaPage() {
     setBattle(null);
   };
 
-  // Mobile touch controls
-  const [touchDir, setTouchDir] = useState<string | null>(null);
-  const handleTouchDir = (dir: string | null) => {
-    if (dir) keysRef.current.add(dir);
-    if (touchDir && touchDir !== dir) keysRef.current.delete(touchDir);
-    setTouchDir(dir);
-  };
+  // Mobile swipe controls
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    const onStart = (e: TouchEvent) => {
+      touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    };
+    const onMove = (e: TouchEvent) => {
+      if (!touchStartRef.current) return;
+      const dx = e.touches[0].clientX - touchStartRef.current.x;
+      const dy = e.touches[0].clientY - touchStartRef.current.y;
+      keysRef.current.clear();
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        if (dx > 15) keysRef.current.add('ArrowRight');
+        if (dx < -15) keysRef.current.add('ArrowLeft');
+        if (dy > 15) keysRef.current.add('ArrowDown');
+        if (dy < -15) keysRef.current.add('ArrowUp');
+      }
+    };
+    const onEnd = () => {
+      touchStartRef.current = null;
+      keysRef.current.clear();
+    };
+    window.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('touchmove', onMove, { passive: true });
+    window.addEventListener('touchend', onEnd);
+    return () => {
+      window.removeEventListener('touchstart', onStart);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
+    };
+  }, []);
 
   const player = entities.find(e => e.isPlayer);
 
   // Intro wizard
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const introSteps = locale === 'sk'
-    ? ['Pohybuj sa sipkami', 'Narazaj do dalsich Bytov', 'Odpovedaj na kviz otazky a zbieraj XP']
-    : ['Move with arrow keys', 'Bump into other Bytes', 'Answer quiz questions and collect XP'];
+    ? [isMobile ? 'Swipuj prstom po obrazovke' : 'Pohybuj sa sipkami', 'Narazaj do dalsich Bytov', 'Odpovedaj na kviz otazky a zbieraj XP']
+    : [isMobile ? 'Swipe to move your Byte' : 'Move with arrow keys', 'Bump into other Bytes', 'Answer quiz questions and collect XP'];
 
   const introVisuals = [
-    // Step 0: Arrow keys
-    <div key="v0" style={{ display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 20 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
-        <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 16 }}>
-          <ArrowUp size={16} />
+    // Step 0: Controls
+    <div key="v0" style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+      {isMobile ? (
+        <motion.div animate={{ x: [0, 20, 0, -20, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+          <Byte mood="happy" size={64} equipment={equipment} animate={false} />
+        </motion.div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
+          <motion.div animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity }}>
+            <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <ArrowUp size={16} />
+            </div>
+          </motion.div>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <motion.div animate={{ x: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                <ArrowLeftIcon size={16} />
+              </div>
+            </motion.div>
+            <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <ArrowDown size={16} />
+            </div>
+            <motion.div animate={{ x: [0, 3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                <ArrowRightIcon size={16} />
+              </div>
+            </motion.div>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 4 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-            <ArrowLeftIcon size={16} />
-          </div>
-          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-            <ArrowDown size={16} />
-          </div>
-          <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-            <ArrowRightIcon size={16} />
-          </div>
-        </div>
-      </div>
+      )}
     </div>,
-    // Step 1: Two Bytes bumping
+    // Step 1: Two Bytes bumping with animation
     <div key="v1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 20 }}>
-      <div style={{ transform: 'translateX(8px)' }}>
+      <motion.div animate={{ x: [0, 12, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
         <Byte mood="happy" size={56} equipment={equipment} animate={false} />
-      </div>
-      <div style={{ fontSize: 22, color: '#4ade80', fontWeight: 800, margin: '0 -4px', zIndex: 2 }}>*</div>
-      <div style={{ transform: 'translateX(-8px)' }}>
+      </motion.div>
+      <motion.div animate={{ scale: [0, 1.2, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+        style={{ width: 12, height: 12, borderRadius: 6, background: '#4ade80', margin: '0 -2px', zIndex: 2 }} />
+      <motion.div animate={{ x: [0, -12, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
         <Byte mood="happy" size={56} equipment={BOTS[3].equipment} animate={false} />
-      </div>
+      </motion.div>
     </div>,
-    // Step 2: Quiz check
+    // Step 2: Quiz check with pulse
     <div key="v2" style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-      <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(74,222,128,0.1)', border: '2px solid rgba(74,222,128,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Check size={24} color="#4ade80" strokeWidth={3} />
-      </div>
+      <motion.div
+        animate={{ scale: [1, 1.1, 1], boxShadow: ['0 0 0 rgba(74,222,128,0)', '0 0 20px rgba(74,222,128,0.3)', '0 0 0 rgba(74,222,128,0)'] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+        style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(74,222,128,0.1)', border: '2px solid rgba(74,222,128,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <Check size={28} color="#4ade80" strokeWidth={3} />
+      </motion.div>
     </div>,
     // Step 3: Mode selection (handled inline)
     null,
@@ -466,13 +508,13 @@ export default function ArenaPage() {
                 key={e.id}
                 style={{
                   position: 'absolute',
-                  left: e.x - 38, top: e.y - 38,
+                  left: e.x - 44, top: e.y - 44,
                   transform: `rotate(${e.rotation}deg)`,
                   filter: isFlashing ? 'brightness(2) drop-shadow(0 0 20px rgba(255,255,255,0.8))' : e.isPlayer ? 'drop-shadow(0 0 12px rgba(74,222,128,0.25))' : 'none',
                   transition: 'filter 0.15s',
                 }}
               >
-                <Byte mood="happy" size={76} equipment={e.equipment} animate={false} />
+                <Byte mood="happy" size={88} equipment={e.equipment} />
               </div>
             );
           })}
@@ -511,8 +553,8 @@ export default function ArenaPage() {
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               style={{
                 position: 'absolute',
-                left: player.x - 48, top: player.y - 48,
-                width: 96, height: 96, borderRadius: '50%',
+                left: player.x - 54, top: player.y - 54,
+                width: 108, height: 108, borderRadius: '50%',
                 border: '2px solid rgba(74,222,128,0.2)',
                 pointerEvents: 'none',
               }}
@@ -557,51 +599,17 @@ export default function ArenaPage() {
         <ArrowLeft size={16} />
       </button>
 
-      {/* MOBILE D-PAD */}
-      <div style={{
-        position: 'absolute', bottom: 30, left: 30,
-        display: 'grid', gridTemplateColumns: '48px 48px 48px', gridTemplateRows: '48px 48px 48px', gap: 4,
-      }}>
-        <div />
-        <button
-          onPointerDown={() => handleTouchDir('ArrowUp')}
-          onPointerUp={() => handleTouchDir(null)}
-          onPointerLeave={() => handleTouchDir(null)}
-          style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888' }}
-        >
-          <ArrowUp size={18} />
-        </button>
-        <div />
-        <button
-          onPointerDown={() => handleTouchDir('ArrowLeft')}
-          onPointerUp={() => handleTouchDir(null)}
-          onPointerLeave={() => handleTouchDir(null)}
-          style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888' }}
-        >
-          <ArrowLeftIcon size={18} />
-        </button>
-        <div style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 8, height: 8, borderRadius: 4, background: '#4ade80' }} />
+      {/* Mobile hint */}
+      {isMobile && (
+        <div style={{
+          position: 'absolute', bottom: 30, left: 30,
+          padding: '6px 14px', borderRadius: 10,
+          background: 'rgba(0,0,0,0.6)', border: '1px solid #1a1a1a',
+          fontSize: 10, color: '#555', fontWeight: 600,
+        }}>
+          {locale === 'sk' ? 'Swipuj na pohyb' : 'Swipe to move'}
         </div>
-        <button
-          onPointerDown={() => handleTouchDir('ArrowRight')}
-          onPointerUp={() => handleTouchDir(null)}
-          onPointerLeave={() => handleTouchDir(null)}
-          style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888' }}
-        >
-          <ArrowRightIcon size={18} />
-        </button>
-        <div />
-        <button
-          onPointerDown={() => handleTouchDir('ArrowDown')}
-          onPointerUp={() => handleTouchDir(null)}
-          onPointerLeave={() => handleTouchDir(null)}
-          style={{ width: 48, height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888' }}
-        >
-          <ArrowDown size={18} />
-        </button>
-        <div />
-      </div>
+      )}
 
       {/* BOTTOM INFO */}
       <div style={{

@@ -12,14 +12,20 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Zap, Heart, Trophy, BookOpen, Coffee, Info } from 'lucide-react';
 
-const greetings = (name: string, streak: number, locale: 'en' | 'sk') => {
+const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCount: number) => {
+  const h = new Date().getHours();
+  const timeEn = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const timeSk = h < 12 ? 'Dobré ráno' : h < 18 ? 'Ahoj' : 'Dobrý večer';
+
   if (locale === 'sk') {
-    if (streak === 0) return `Vitaj späť, ${name}.`;
-    if (streak === 1) return `Ahoj ${name}. 1-dňový streak.`;
-    return `Ahoj ${name}. ${streak}-dňový streak.`;
+    if (lessonsCount === 0) return `${timeSk}, ${name}.`;
+    if (streak === 0) return `${timeSk}, ${name}.`;
+    if (streak === 1) return `${timeSk}, ${name}. 1-dňový streak.`;
+    return `${timeSk}, ${name}. ${streak}-dňový streak.`;
   }
-  if (streak === 0) return `Welcome back, ${name}.`;
-  if (streak === 1) return `Hey ${name}. Day one.`;
+  if (lessonsCount === 0) return `${timeEn}, ${name}.`;
+  if (streak === 0) return `${timeEn}, ${name}.`;
+  if (streak === 1) return `${timeEn}, ${name}. Day one.`;
   if (streak < 7) return `Hey ${name}. ${streak}-day streak.`;
   return `Hey ${name}. ${streak}-day streak - impressive.`;
 };
@@ -104,7 +110,7 @@ export default function HomePage() {
               <Byte mood={byteMood} size={72} equipment={equipment} />
               <div>
                 <h1 style={{ fontWeight: 700, fontSize: 24, color: '#EDEDED', marginBottom: 4, letterSpacing: '-0.03em' }}>
-                  {name ? greetings(name, streak, locale) : 'Coduy'}
+                  {name ? greetings(name, streak, locale, completedLessons.length) : 'Coduy'}
                 </h1>
                 <p style={{ fontSize: 14, color: '#999', lineHeight: 1.5 }}>
                   {completedLessons.length === 0

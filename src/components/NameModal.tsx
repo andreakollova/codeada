@@ -222,7 +222,7 @@ export default function NameModal() {
                         borderRadius: 14, cursor: 'pointer',
                       }}
                     >
-                      <motion.div animate={{ y: [0, -2, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: DRINKS.indexOf(drink) * 0.3 }}>
+                      <motion.div animate={{ y: [0, -1, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: DRINKS.indexOf(drink) * 0.4 }}>
                         <drink.Icon size={28} color="#fff" strokeWidth={1.5} />
                       </motion.div>
                       <span style={{ fontSize: 12, fontWeight: 600, color: '#ccc' }}>

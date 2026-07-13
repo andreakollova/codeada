@@ -71,7 +71,7 @@ export default function SettingsPage() {
                   width: '100%', padding: '12px 16px', borderTop: '1px solid #111',
                   display: 'flex', alignItems: 'center', gap: 10,
                   background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
-                  color: '#ef4444', fontSize: 13, fontWeight: 600,
+                  color: '#888', fontSize: 13, fontWeight: 600,
                 }}
               >
                 <LogOut size={16} />
@@ -157,24 +157,20 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Danger zone */}
-        <div>
-          <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
-            {locale === 'sk' ? 'Nebezpečná zóna' : 'Danger zone'}
-          </h3>
-          <button
-            onClick={handleDeleteData}
-            style={{
-              width: '100%', padding: '14px 16px', borderRadius: 14,
-              background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.15)',
-              display: 'flex', alignItems: 'center', gap: 12,
-              cursor: 'pointer', color: '#ef4444', fontSize: 13, fontWeight: 600,
-            }}
-          >
-            <Trash2 size={16} />
-            {locale === 'sk' ? 'Vymazať všetky dáta' : 'Delete all data'}
-          </button>
-        </div>
+        {/* Delete data */}
+        <button
+          onClick={handleDeleteData}
+          style={{
+            padding: '10px 14px', borderRadius: 10,
+            background: 'none', border: '1px solid #1a1a1a',
+            display: 'flex', alignItems: 'center', gap: 8,
+            cursor: 'pointer', color: '#555', fontSize: 11, fontWeight: 500,
+            opacity: 0.6,
+          }}
+        >
+          <Trash2 size={12} />
+          {locale === 'sk' ? 'Vymazať všetky dáta' : 'Delete all data'}
+        </button>
       </div>
     </div>
   );

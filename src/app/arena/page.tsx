@@ -292,10 +292,10 @@ export default function ArenaPage() {
       if (player) {
         const vw = typeof window !== 'undefined' ? window.innerWidth : 800;
         const vh = typeof window !== 'undefined' ? window.innerHeight : 600;
-        // Zoom out on mobile: offset camera so player sees more around them
-        const zoom = vw < 768 ? 1.3 : 1;
-        setCameraX(player.x - (vw * zoom) / 2);
-        setCameraY(player.y - (vh * zoom) / 2);
+        const sc = vw < 768 ? 0.85 : 1;
+        // Offset camera so player is centered, accounting for scale
+        setCameraX(player.x - vw / (2 * sc));
+        setCameraY(player.y - vh / (2 * sc));
       }
 
       rafRef.current = requestAnimationFrame(tick);
@@ -374,39 +374,43 @@ export default function ArenaPage() {
     setBattle(null);
   };
 
-  // Mobile touch controls - joystick-style: drag from touch point
+  // Mobile touch controls - virtual joystick
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     const onStart = (e: TouchEvent) => {
+      e.preventDefault();
       touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     };
     const onMove = (e: TouchEvent) => {
+      e.preventDefault();
       if (!touchStartRef.current) return;
       const dx = e.touches[0].clientX - touchStartRef.current.x;
       const dy = e.touches[0].clientY - touchStartRef.current.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       keysRef.current.clear();
-      // Lower threshold, allow diagonal movement naturally
-      if (dist > 8) {
-        if (dx > 8) keysRef.current.add('ArrowRight');
-        if (dx < -8) keysRef.current.add('ArrowLeft');
-        if (dy > 8) keysRef.current.add('ArrowDown');
-        if (dy < -8) keysRef.current.add('ArrowUp');
-        // Double-tap / fast swipe = boost
+      if (dist > 6) {
+        if (dx > 6) keysRef.current.add('ArrowRight');
+        if (dx < -6) keysRef.current.add('ArrowLeft');
+        if (dy > 6) keysRef.current.add('ArrowDown');
+        if (dy < -6) keysRef.current.add('ArrowUp');
         if (dist > 80) keysRef.current.add(' ');
       }
     };
-    const onEnd = () => {
+    const onEnd = (e: TouchEvent) => {
+      e.preventDefault();
       touchStartRef.current = null;
       keysRef.current.clear();
     };
-    window.addEventListener('touchstart', onStart, { passive: true });
-    window.addEventListener('touchmove', onMove, { passive: true });
-    window.addEventListener('touchend', onEnd);
+    // Use non-passive to allow preventDefault (stops browser scroll)
+    canvas.addEventListener('touchstart', onStart, { passive: false });
+    canvas.addEventListener('touchmove', onMove, { passive: false });
+    canvas.addEventListener('touchend', onEnd, { passive: false });
     return () => {
-      window.removeEventListener('touchstart', onStart);
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onEnd);
+      canvas.removeEventListener('touchstart', onStart);
+      canvas.removeEventListener('touchmove', onMove);
+      canvas.removeEventListener('touchend', onEnd);
     };
   }, []);
 
@@ -580,7 +584,7 @@ export default function ArenaPage() {
       <div ref={canvasRef} style={{ position: 'absolute', inset: 0 }}>
         <div style={{
           position: 'absolute',
-          transform: `translate(${-cameraX}px, ${-cameraY}px)${isMobile ? ' scale(0.75)' : ''}`,
+          transform: `translate(${-cameraX}px, ${-cameraY}px)${isMobile ? ' scale(0.85)' : ''}`,
           transformOrigin: '0 0',
           width: WORLD_W, height: WORLD_H,
         }}>
@@ -795,25 +799,31 @@ export default function ArenaPage() {
             exit={{ opacity: 0 }}
             style={{
               position: 'fixed', inset: 0, zIndex: 100,
-              background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)',
-              display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-              padding: '60px 16px 24px', overflow: 'auto',
+              background: 'rgba(0,0,0,0.6)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 16,
             }}
           >
             <motion.div
-              initial={{ scale: 0.85, y: 20 }}
+              initial={{ scale: 0.85, y: 30 }}
               animate={{ scale: 1, y: 0 }}
-              style={{ maxWidth: 440, width: '100%', margin: '0 auto' }}
+              style={{
+                maxWidth: 420, width: '100%',
+                background: '#111', border: '1px solid #222',
+                borderRadius: 20, padding: '24px 20px',
+                position: 'relative', maxHeight: '90vh', overflowY: 'auto',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
+              }}
             >
               {/* X close button */}
               <button onClick={closeBattle} style={{
-                position: 'fixed', top: 20, right: 20,
-                width: 40, height: 40, borderRadius: 12,
-                background: '#1a1a1a', border: '1px solid #333',
+                position: 'absolute', top: 12, right: 12,
+                width: 32, height: 32, borderRadius: 8,
+                background: '#1a1a1a', border: '1px solid #2a2a2a',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: '#888', zIndex: 110,
+                cursor: 'pointer', color: '#888', zIndex: 10,
               }}>
-                <X size={18} />
+                <X size={14} />
               </button>
 
               {battleResult ? (

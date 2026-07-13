@@ -6,14 +6,14 @@ import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
 import Byte from './Byte';
-import { ArrowRight, Coffee } from 'lucide-react';
+import { ArrowRight, Coffee, Zap, CupSoda, GlassWater } from 'lucide-react';
 
 const DRINKS = [
-  { id: 'coffee' as const, icon: '☕', en: 'Coffee', sk: 'Káva', descEn: 'The classic coder fuel', descSk: 'Klasické palivo programátora' },
-  { id: 'tea' as const, icon: '🍵', en: 'Tea', sk: 'Čaj', descEn: 'Calm focus energy', descSk: 'Pokojná sústredená energia' },
-  { id: 'energy' as const, icon: '⚡', en: 'Energy Drink', sk: 'Energy Drink', descEn: 'Maximum power mode', descSk: 'Maximálny výkon' },
-  { id: 'juice' as const, icon: '🧃', en: 'Juice', sk: 'Džús', descEn: 'Fresh and healthy', descSk: 'Čerstvé a zdravé' },
-  { id: 'water' as const, icon: '💧', en: 'Water', sk: 'Voda', descEn: 'Pure hydration', descSk: 'Čistá hydratácia' },
+  { id: 'coffee' as const, Icon: Coffee, en: 'Coffee', sk: 'Káva', descEn: 'The classic coder fuel', descSk: 'Klasické palivo programátora' },
+  { id: 'tea' as const, Icon: Coffee, en: 'Tea', sk: 'Čaj', descEn: 'Calm focus energy', descSk: 'Pokojná sústredená energia' },
+  { id: 'energy' as const, Icon: Zap, en: 'Energy Drink', sk: 'Energy Drink', descEn: 'Maximum power mode', descSk: 'Maximálny výkon' },
+  { id: 'juice' as const, Icon: CupSoda, en: 'Juice', sk: 'Džús', descEn: 'Fresh and healthy', descSk: 'Čerstvé a zdravé' },
+  { id: 'water' as const, Icon: GlassWater, en: 'Water', sk: 'Voda', descEn: 'Pure hydration', descSk: 'Čistá hydratácia' },
 ];
 
 const PATHS = [
@@ -221,7 +221,7 @@ export default function NameModal() {
                         borderRadius: 14, cursor: 'pointer',
                       }}
                     >
-                      <span style={{ fontSize: 28 }}>{drink.icon}</span>
+                      <drink.Icon size={28} color="#fff" strokeWidth={1.5} />
                       <span style={{ fontSize: 12, fontWeight: 600, color: '#ccc' }}>
                         {locale === 'sk' ? drink.sk : drink.en}
                       </span>

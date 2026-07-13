@@ -10,7 +10,7 @@ import { useLocaleStore } from '@/store/localeStore';
 import { s, skLessons, skStreak } from '@/data/strings';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Zap, Heart, Trophy, BookOpen, Coffee } from 'lucide-react';
+import { Flame, Zap, Heart, Trophy, BookOpen, Coffee, Info } from 'lucide-react';
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk') => {
   if (locale === 'sk') {
@@ -129,43 +129,37 @@ export default function HomePage() {
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div className="stat-card" title={s('streakTooltip', locale)}>
-                <div className="stat-card-icon">
-                  <Flame size={18} color={streak > 0 ? '#fff' : '#555'} />
+              {[
+                { icon: Flame, value: skStreak(streak, locale), label: s('dayStreakLabel', locale), tooltip: s('streakTooltip', locale), iconColor: streak > 0 ? '#fff' : '#555' },
+                { icon: Zap, value: xp.toLocaleString(), label: s('totalXp', locale), tooltip: s('xpTooltip', locale), iconColor: '#fff' },
+                { icon: BookOpen, value: completedLessons.length, label: s('lessonsDone', locale), tooltip: s('lessonsTooltip', locale), iconColor: '#fff' },
+              ].map(({ icon: Icon, value, label, tooltip, iconColor }) => (
+                <div className="stat-card" key={label} style={{ position: 'relative' }}>
+                  <div className="stat-card-icon">
+                    <Icon size={18} color={iconColor} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div className="stat-card-value">{value}</div>
+                    <div className="stat-card-label">{label}</div>
+                  </div>
+                  <div className="stat-info-trigger" style={{ position: 'relative', cursor: 'pointer' }}>
+                    <Info size={13} color="#333" />
+                    <div className="stat-info-tooltip">{tooltip}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="stat-card-value">{skStreak(streak, locale)}</div>
-                  <div className="stat-card-label">{s('dayStreakLabel', locale)}</div>
-                </div>
-              </div>
+              ))}
 
-              <div className="stat-card" title={s('xpTooltip', locale)}>
-                <div className="stat-card-icon">
-                  <Zap size={18} color="#fff" />
-                </div>
-                <div>
-                  <div className="stat-card-value">{xp.toLocaleString()}</div>
-                  <div className="stat-card-label">{s('totalXp', locale)}</div>
-                </div>
-              </div>
-
-              <div className="stat-card" title={s('lessonsTooltip', locale)}>
-                <div className="stat-card-icon">
-                  <BookOpen size={18} color="#fff" />
-                </div>
-                <div>
-                  <div className="stat-card-value">{completedLessons.length}</div>
-                  <div className="stat-card-label">{s('lessonsDone', locale)}</div>
-                </div>
-              </div>
-
-<div className="stat-card" title={s('gemsTooltip', locale)}>
+              <div className="stat-card" style={{ position: 'relative' }}>
                 <div className="stat-card-icon">
                   <Trophy size={18} color="#fff" />
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div className="stat-card-value">{gems}</div>
                   <div className="stat-card-label">{s('gems', locale)}</div>
+                </div>
+                <div className="stat-info-trigger" style={{ position: 'relative', cursor: 'pointer' }}>
+                  <Info size={13} color="#333" />
+                  <div className="stat-info-tooltip">{s('gemsTooltip', locale)}</div>
                 </div>
               </div>
 

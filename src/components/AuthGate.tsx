@@ -7,6 +7,15 @@ import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { Mail, ArrowRight } from 'lucide-react';
 import Byte from './Byte';
+import type { ByteEquipment } from '@/types';
+
+const LOGIN_SKINS: ByteEquipment[] = [
+  {},
+  { hat: 'hat-graduation', glasses: 'glasses-cool', accessory: 'acc-crystal', aura: 'aura-green' },
+  { hat: 'hat-galaxy', glasses: 'glasses-laser', antenna: 'ant-lightning', aura: 'aura-galaxy' },
+  { hat: 'hat-samurai', glasses: 'glasses-frost', accessory: 'acc-chain', aura: 'aura-blue' },
+  { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold', aura: 'aura-golden' },
+];
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const { locale } = useLocaleStore();
@@ -20,6 +29,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
+  const [skinIndex, setSkinIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSkinIndex(prev => (prev + 1) % LOGIN_SKINS.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const sb = getSupabase();
@@ -115,14 +132,33 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 24,
     }}>
-      <div style={{ maxWidth: 380, width: '100%', textAlign: 'center' }}>
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200 }}>
-          <Byte mood="happy" size={120} />
-        </motion.div>
+      <div style={{ maxWidth: 380, width: '100%', textAlign: 'left' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', height: 100 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={skinIndex}
+              initial={{ opacity: 0, scale: 0.8, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -10 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Byte mood="happy" size={100} equipment={LOGIN_SKINS[skinIndex]} />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <img src="/logocoduy.png" alt="Coduy" style={{ height: 28, objectFit: 'contain', marginTop: 20, marginBottom: 8 }} />
-          <p style={{ fontSize: 14, color: '#888', marginBottom: 32, lineHeight: 1.6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 4 }}>
+            <img src="/logocoduy.png" alt="Coduy" style={{ height: 28, objectFit: 'contain' }} />
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.1em',
+              background: 'rgba(74,222,128,0.1)', padding: '3px 8px', borderRadius: 6 }}>Beta</span>
+          </div>
+          <p style={{ fontSize: 15, color: '#fff', fontWeight: 700, marginBottom: 4, marginTop: 12 }}>
+            {locale === 'sk'
+              ? 'Registruj sa teraz zadarmo.'
+              : 'Register now for free.'}
+          </p>
+          <p style={{ fontSize: 13, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
             {locale === 'sk'
               ? 'Prihlasenie je potrebne na ukladanie tvojho progressu.'
               : 'Sign in to save your progress.'}

@@ -10,15 +10,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: isSk ? 'Coduy - Nauč sa programovať' : 'Coduy - Learn to Code',
+      default: isSk ? 'Coduy - Nauč sa programovať zadarmo' : 'Coduy - Learn to Code for Free',
       template: isSk ? '%s - Coduy' : '%s - Coduy',
     },
     description: isSk
-      ? 'Nauč sa programovať s interaktívnymi lekciami, teóriou a praktickými cvičeniami. Python, web development a viac - zadarmo.'
-      : 'Learn programming with interactive lessons, theory, and hands-on coding exercises. Python, web development and more - for free.',
+      ? 'Interaktívna appka na učenie programovania. 200+ lekcií Pythonu, cvičenia, kvízy a projekty. Zadarmo na webe, App Store a Google Play.'
+      : 'Free interactive app for learning to code. 200+ Python lessons, exercises, quizzes and projects. Available on web, App Store and Google Play.',
     keywords: isSk
-      ? ['programovanie', 'python', 'kurz', 'lekcie', 'coduy', 'nauč sa programovať', 'zadarmo', 'slovensky', 'online kurz']
-      : ['programming', 'python', 'course', 'lessons', 'coduy', 'learn to code', 'free', 'online course', 'coding'],
+      ? ['programovanie', 'python', 'kurz', 'lekcie', 'coduy', 'nauč sa programovať', 'zadarmo', 'slovensky', 'online kurz', 'appka']
+      : ['programming', 'python', 'course', 'lessons', 'coduy', 'learn to code', 'free', 'online course', 'coding', 'app'],
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical: baseUrl,
@@ -28,10 +28,10 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: isSk ? 'Coduy - Nauč sa programovať' : 'Coduy - Learn to Code',
+      title: isSk ? 'Coduy - Nauč sa programovať zadarmo' : 'Coduy - Learn to Code for Free',
       description: isSk
-        ? 'Interaktívne lekcie programovania - Python, web development a viac.'
-        : 'Interactive programming lessons - Python, web development and more.',
+        ? '200+ lekcií Pythonu, cvičenia, kvízy a projekty. Zadarmo.'
+        : '200+ Python lessons, exercises, quizzes and projects. Free.',
       siteName: 'Coduy',
       type: 'website',
       url: baseUrl,
@@ -40,10 +40,10 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: isSk ? 'Coduy - Nauč sa programovať' : 'Coduy - Learn to Code',
+      title: isSk ? 'Coduy - Nauč sa programovať zadarmo' : 'Coduy - Learn to Code for Free',
       description: isSk
-        ? 'Interaktívne lekcie programovania zadarmo.'
-        : 'Free interactive programming lessons.',
+        ? '200+ lekcií Pythonu, cvičenia a projekty. Zadarmo.'
+        : '200+ Python lessons, exercises and projects. Free.',
     },
     robots: {
       index: true,
@@ -51,8 +51,12 @@ export async function generateMetadata(): Promise<Metadata> {
       googleBot: { index: true, follow: true },
     },
     icons: {
-      icon: '/favicon.png',
-      apple: '/favicon.png',
+      icon: [
+        { url: '/favicon.png', type: 'image/png', sizes: '180x180' },
+        { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
+      ],
+      apple: { url: '/favicon.png', sizes: '180x180' },
+      shortcut: '/favicon.png',
     },
     other: {
       'geo.region': isSk ? 'SK' : 'US',

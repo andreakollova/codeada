@@ -38,7 +38,7 @@ const auraColors: Record<string, { c1: string; c2: string; c3?: string }> = {
 export default function Byte({ mood, size = 120, className = '', animate = true, equipment = {} }: ByteProps) {
   const eye = eyes[mood];
 
-  const floatAnim = animate ? { animate: { y: [0, -5, 0] }, transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' as const } } : {};
+  const floatAnim = animate ? { animate: { y: [0, -2, 0] }, transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' as const } } : {};
   const celebAnim = animate && mood === 'celebrating' ? { animate: { rotate: [-3, 3, -3], y: [0, -8, 0] }, transition: { duration: 0.45, repeat: Infinity } } : {};
   const wobbleAnim = animate && mood === 'worried' ? { animate: { rotate: [-2, 2, -2] }, transition: { duration: 0.8, repeat: Infinity } } : {};
   const mainAnim = mood === 'celebrating' ? celebAnim : mood === 'worried' ? wobbleAnim : floatAnim;

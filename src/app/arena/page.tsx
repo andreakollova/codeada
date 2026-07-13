@@ -153,18 +153,18 @@ export default function ArenaPage() {
       if (keys.has('ArrowLeft') || keys.has('a')) player.vx -= 0.5;
       if (keys.has('ArrowRight') || keys.has('d')) player.vx += 0.5;
 
-      // Space boost
+      // Space boost - big burst in current direction
       if (keys.has(' ')) {
         const pDir = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
-        if (pDir > 0.5) {
-          player.vx *= 1.15;
-          player.vy *= 1.15;
+        if (pDir > 0.3) {
+          player.vx = (player.vx / pDir) * PLAYER_SPEED * 2.5;
+          player.vy = (player.vy / pDir) * PLAYER_SPEED * 2.5;
         }
         keys.delete(' ');
       }
 
       // Speed cap
-      const maxSpeed = PLAYER_SPEED * 1.8;
+      const maxSpeed = PLAYER_SPEED * 3;
       const pSpeed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
       if (pSpeed > maxSpeed) {
         player.vx = (player.vx / pSpeed) * maxSpeed;

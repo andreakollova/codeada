@@ -273,7 +273,7 @@ export default function TheoryLessonPage() {
             ))}
           </div>
         ) : (
-          <div style={{ fontSize: 14, color: '#b0b0b0', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
+          <div style={{ fontSize: 15, color: '#b0b0b0', lineHeight: 1.9, whiteSpace: 'pre-line' }}>
             {formatContent(String(content))}
           </div>
         )}
@@ -561,7 +561,7 @@ function formatContent(text: string) {
       // Strip trailing colon for cleaner headings
       const heading = trimmed.endsWith(':') ? trimmed.slice(0, -1) : trimmed;
       result.push(
-        <h3 key={i} style={{ fontWeight: 700, fontSize: 16, color: '#EDEDED', marginTop: i > 0 ? 20 : 0, marginBottom: 8 }}>
+        <h3 key={i} style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', marginTop: i > 0 ? 24 : 0, marginBottom: 10 }}>
           {heading}
         </h3>
       );
@@ -575,7 +575,7 @@ function formatContent(text: string) {
         <pre key={i} style={{
           background: '#111', border: '1px solid #1a1a1a', borderRadius: 10,
           padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
-          overflow: 'auto', marginBottom: 12, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+          overflow: 'auto', marginBottom: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
           whiteSpace: 'pre-wrap',
         }}>
           {trimmed}
@@ -586,7 +586,7 @@ function formatContent(text: string) {
 
     // Regular paragraph
     result.push(
-      <p key={i} style={{ margin: 0, marginBottom: 12 }}>
+      <p key={i} style={{ margin: 0, marginBottom: 16 }}>
         {trimmed}
       </p>
     );

@@ -15,7 +15,7 @@ import {
   FileCode, FolderOpen, Bug, Gauge, Lock, Package, Wrench,
   Puzzle, PenTool, Search, Filter, Clock, Bell, Settings,
   RefreshCw, Box, Lightbulb, Star, Heart, Eye, Sparkles,
-  ArrowDownCircle, Gift,
+  ArrowDownCircle, ArrowUpCircle, Gift,
 } from 'lucide-react';
 
 // Rotating icon set for lesson nodes (uniform lucide style)
@@ -475,28 +475,33 @@ export default function CodingPath() {
       })()}
 
       {/* Scroll to next lesson button */}
-      {nextLessonRef.current && !hasScrolled && (
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          onClick={() => {
-            nextLessonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setHasScrolled(true);
-          }}
-          style={{
-            position: 'fixed', bottom: 90, left: '50%', transform: 'translateX(-50%)', zIndex: 50,
-            padding: '10px 20px', borderRadius: 20,
-            background: '#fff', color: '#000', fontWeight: 700, fontSize: 13,
-            border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 6,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-          }}
-        >
-          <ArrowDownCircle size={16} />
-          {locale === 'sk' ? 'Pokračovať' : 'Continue'}
-        </motion.button>
-      )}
+      {nextLessonRef.current && !hasScrolled && (() => {
+        const rect = nextLessonRef.current?.getBoundingClientRect();
+        const isBelow = rect ? rect.top > window.innerHeight : true;
+        const ArrowIcon = isBelow ? ArrowDownCircle : ArrowUpCircle;
+        return (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            onClick={() => {
+              nextLessonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              setHasScrolled(true);
+            }}
+            style={{
+              position: 'fixed', bottom: 90, left: '50%', transform: 'translateX(-50%)', zIndex: 50,
+              padding: '10px 20px', borderRadius: 20,
+              background: '#fff', color: '#000', fontWeight: 700, fontSize: 13,
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 6,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            <ArrowIcon size={16} />
+            {locale === 'sk' ? 'Pokračovať' : 'Continue'}
+          </motion.button>
+        );
+      })()}
     </div>
   );
 }

@@ -140,7 +140,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
               initial={{ opacity: 0, filter: 'blur(12px)', scale: 0.92 }}
               animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
               exit={{ opacity: 0, filter: 'blur(12px)', scale: 1.05 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
               <Byte mood="happy" size={100} equipment={LOGIN_SKINS[skinIndex]} />
             </motion.div>

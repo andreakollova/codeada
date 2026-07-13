@@ -24,10 +24,9 @@ const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCou
     return `${timeSk}, ${name}. ${streak}-dňový streak.`;
   }
   if (lessonsCount === 0) return `${timeEn}, ${name}.`;
-  if (streak === 0) return `${timeEn}, ${name}.`;
-  if (streak === 1) return `${timeEn}, ${name}. Day one.`;
-  if (streak < 7) return `Hey ${name}. ${streak}-day streak.`;
-  return `Hey ${name}. ${streak}-day streak - impressive.`;
+  if (streak <= 1) return `${timeEn}, ${name}.`;
+  if (streak < 7) return `${timeEn}, ${name}. ${streak}-day streak.`;
+  return `${timeEn}, ${name}. ${streak}-day streak - impressive.`;
 };
 
 const COUNTDOWN_ENABLED = false;

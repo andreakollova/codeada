@@ -15,7 +15,7 @@ const WORLD_H = 2400;
 const BYTE_R = 44;
 const BOUNCE_FORCE = 8;
 const PLAYER_SPEED = 7;
-const BOT_SPEED = 2.5;
+const BOT_SPEED = 3.5;
 const FRICTION = 0.95;
 const MINIMAP_SIZE = 100;
 
@@ -170,7 +170,7 @@ export default function ArenaPage() {
       }
 
       // Bot AI
-      if (botTimer % 60 === 0) {
+      if (botTimer % 40 === 0) {
         updated.filter(e => !e.isPlayer).forEach(bot => {
           // Sometimes move toward player, sometimes random
           if (Math.random() < 0.3) {
@@ -358,8 +358,8 @@ export default function ArenaPage() {
   // Intro wizard
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const introSteps = locale === 'sk'
-    ? [isMobile ? 'Swipuj prstom po obrazovke' : 'Pohybuj sa sipkami', 'Narazaj do dalsich Bytov', 'Odpovedaj na kviz otazky a zbieraj XP']
-    : [isMobile ? 'Swipe to move your Byte' : 'Move with arrow keys', 'Bump into other Bytes', 'Answer quiz questions and collect XP'];
+    ? [isMobile ? 'Swipuj prstom po obrazovke' : 'Pohybuj sa sipkami. Space = boost!', 'Narazaj do dalsich Bytov', 'Odpovedaj na kviz otazky a zbieraj XP']
+    : [isMobile ? 'Swipe to move your Byte' : 'Move with arrow keys. Space = boost!', 'Bump into other Bytes', 'Answer quiz questions and collect XP'];
 
   const introVisuals = [
     // Step 0: Controls
@@ -369,27 +369,27 @@ export default function ArenaPage() {
           <Byte mood="happy" size={64} equipment={equipment} animate={false} />
         </motion.div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
-          <motion.div animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity }}>
-            <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-              <ArrowUp size={16} />
-            </div>
-          </motion.div>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <motion.div animate={{ x: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                <ArrowLeftIcon size={16} />
-              </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
+          {[
+            { label: locale === 'sk' ? 'Hore' : 'Up', icon: <ArrowUp size={14} />, anim: { y: [0, -2, 0] }, delay: 0 },
+            { label: locale === 'sk' ? 'Dole' : 'Down', icon: <ArrowDown size={14} />, anim: { y: [0, 2, 0] }, delay: 0.3 },
+            { label: locale === 'sk' ? 'Vlavo' : 'Left', icon: <ArrowLeftIcon size={14} />, anim: { x: [0, -2, 0] }, delay: 0.6 },
+            { label: locale === 'sk' ? 'Vpravo' : 'Right', icon: <ArrowRightIcon size={14} />, anim: { x: [0, 2, 0] }, delay: 0.9 },
+          ].map((k, i) => (
+            <motion.div
+              key={i}
+              animate={k.anim}
+              transition={{ duration: 1.2, repeat: Infinity, delay: k.delay, ease: 'easeInOut' }}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                padding: '10px 14px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.04)', border: '1px solid #222',
+              }}
+            >
+              <div style={{ color: '#4ade80' }}>{k.icon}</div>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#555', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{k.label}</span>
             </motion.div>
-            <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-              <ArrowDown size={16} />
-            </div>
-            <motion.div animate={{ x: [0, 3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 8, background: '#161616', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                <ArrowRightIcon size={16} />
-              </div>
-            </motion.div>
-          </div>
+          ))}
         </div>
       )}
     </div>,
@@ -442,12 +442,13 @@ export default function ArenaPage() {
               style={{ textAlign: 'center', maxWidth: 340 }}
             >
               <Byte mood="happy" size={100} equipment={equipment} />
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#4ade80', marginTop: 4, letterSpacing: '0.04em' }}>{name || 'You'}</div>
               <div style={{ display: 'flex', gap: 6, justifyContent: 'center', margin: '24px 0 16px' }}>
                 {introSteps.map((_, i) => (
                   <div key={i} style={{ width: 8, height: 8, borderRadius: 4, background: i === introStep ? '#4ade80' : '#222' }} />
                 ))}
               </div>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 12 }}>
+              <h2 style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 4, letterSpacing: '-0.03em' }}>
                 {introStep === 0 ? 'Arena' : ''}
               </h2>
               {introVisuals[introStep]}
@@ -624,7 +625,7 @@ export default function ArenaPage() {
         {name || 'You'}
         <div style={{ width: 1, height: 14, background: '#222' }} />
         <button
-          onClick={() => setGameMode(gameMode === 'quiz' ? 'free' : 'quiz')}
+          onClick={() => { setGameMode(gameMode === 'quiz' ? 'free' : 'quiz'); setCollidedWith(new Set()); collidedRef.current = new Set(); }}
           style={{
             background: gameMode === 'quiz' ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.05)',
             border: `1px solid ${gameMode === 'quiz' ? 'rgba(74,222,128,0.3)' : '#222'}`,

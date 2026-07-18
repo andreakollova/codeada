@@ -62,7 +62,13 @@ export default function TheoryLessonPage() {
       .then(([l, q]) => {
         if (l) {
           setLesson(l);
-          setQuiz(q || []);
+          // Shuffle quiz, put write_code at end, limit to ~8 questions
+          const allQ = q || [];
+          const mcq = allQ.filter(x => x.question_type !== 'write_code').sort(() => Math.random() - 0.5);
+          const write = allQ.filter(x => x.question_type === 'write_code').sort(() => Math.random() - 0.5);
+          const maxMcq = Math.min(mcq.length, 6);
+          const maxWrite = Math.min(write.length, 2);
+          setQuiz([...mcq.slice(0, maxMcq), ...write.slice(0, maxWrite)]);
           // Show coffee screen only for first lesson of the day
           const today = new Date().toDateString();
           const lastCoffee = localStorage.getItem('coduy-last-coffee');

@@ -18,6 +18,24 @@ const iconMap: Record<string, string> = {
   'hard-drive': '💾', sparkles: '✦',
 };
 
+// EN translations for SK topic titles/descriptions
+const topicEN: Record<string, { title: string; desc: string }> = {
+  'react-native': { title: 'React Native', desc: 'Mobile apps for iOS and Android' },
+  'supabase-advanced': { title: 'Supabase Database', desc: 'Advanced queries, RLS, real-time, storage' },
+  'auth': { title: 'Authentication', desc: 'Login, OAuth, session management' },
+  'stripe': { title: 'Stripe Payments', desc: 'Accepting payments, webhooks, subscriptions' },
+  'discord': { title: 'Discord API', desc: 'Bots, webhooks, slash commands, embeds' },
+  'instagram': { title: 'Instagram / Meta API', desc: 'Automated posts, Graph API, media' },
+  'nextjs': { title: 'Next.js', desc: 'App Router, Server Actions, API routes, middleware' },
+  'git-deploy': { title: 'Git & Deployment', desc: 'GitHub, Vercel, GitHub Actions, CI/CD' },
+  'typescript': { title: 'TypeScript', desc: 'Generics, utility types, type guards, enums' },
+  'state': { title: 'State Management', desc: 'Zustand, Context API, optimization' },
+  'notifications': { title: 'Push Notifications', desc: 'Expo Notifications, tokens, scheduling' },
+  'maps': { title: 'Maps & Location', desc: 'MapLibre, react-native-maps, GPS, geolocation' },
+  'storage': { title: 'File Storage', desc: 'Supabase Storage, upload, CDN, policies' },
+  'animations': { title: 'Animations', desc: 'Framer Motion, Remotion, Reanimated' },
+};
+
 const typeIcons: Record<string, any> = {
   explain: BookOpen, mcq: Lightbulb, fill: Code, write: PenTool,
 };
@@ -488,10 +506,10 @@ export default function TopicsPage() {
                 </div>
 
                 <div style={{ fontWeight: 700, fontSize: 13, color: '#ccc', marginBottom: 4 }}>
-                  {topic.title}
+                  {locale === 'en' && topicEN[topic.id] ? topicEN[topic.id].title : topic.title}
                 </div>
                 <div style={{ fontSize: 11, color: '#777', lineHeight: 1.4, marginBottom: 10 }}>
-                  {topic.description}
+                  {locale === 'en' && topicEN[topic.id] ? topicEN[topic.id].desc : topic.description}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>

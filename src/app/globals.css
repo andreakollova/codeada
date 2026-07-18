@@ -45,8 +45,6 @@ body {
 
 .page-shell {
   overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
 }
 
 h1, h2, h3, h4 {

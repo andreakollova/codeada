@@ -18,7 +18,7 @@ export default function StatusBar() {
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
     }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 0, padding: '0 24px', height: 52 }}>
+      <div style={{ margin: '0 auto', display: 'flex', alignItems: 'center', gap: 0, padding: '0 16px', height: 52 }}>
 
         {/* Streak */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>

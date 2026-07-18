@@ -11,6 +11,11 @@ import { s, skLessons, skStreak } from '@/data/strings';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Zap, Heart, Trophy, BookOpen, Info } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface LeaderboardEntry { display_name: string; xp: number; }
+
+const BOT_NAMES = ['Byte', 'Pixel', 'Nova', 'Echo', 'Spark', 'Luna', 'Atlas', 'Kai', 'Milo', 'Zara'];
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCount: number) => {
   const h = new Date().getHours();
@@ -83,7 +88,26 @@ export default function HomePage() {
   const { checkStreak, name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems, coffees } = useUserStore();
   const { locale } = useLocaleStore();
 
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+
   useEffect(() => { checkStreak(); }, []);
+
+  // Fetch real leaderboard from Supabase
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.from('user_state').select('display_name, xp').order('xp', { ascending: false }).limit(50);
+        const realUsers: LeaderboardEntry[] = (data || []).filter((u: any) => u.display_name && u.xp > 0);
+        // Fill with bots if less than 15 users
+        const botXps = [2800, 2100, 1500, 980, 750, 520, 340, 210, 130, 60];
+        const bots: LeaderboardEntry[] = BOT_NAMES.map((n, i) => ({ display_name: n, xp: botXps[i] || 50 }));
+        const combined = [...realUsers, ...bots].sort((a, b) => b.xp - a.xp);
+        // Deduplicate by name
+        const seen = new Set<string>();
+        setLeaderboard(combined.filter(u => { if (seen.has(u.display_name)) return false; seen.add(u.display_name); return true; }));
+      } catch { }
+    })();
+  }, []);
 
   if (COUNTDOWN_ENABLED && Date.now() < COUNTDOWN_TARGET.getTime()) {
     return <CountdownOverlay />;
@@ -177,31 +201,43 @@ export default function HomePage() {
                 {byteMood === 'celebrating' ? s('greatJob', locale) : byteMood === 'worried' ? s('keepTrying', locale) : byteMood === 'proud' ? s('onFire', locale) : s('readyToLearn', locale)}
               </p>
 
-              {/* Mini leaderboard */}
-              {(() => {
-                const rank = Math.max(1, Math.floor(10000 / Math.max(1, xp)));
-                const fakeUsers = [
-                  { name: 'Matej', xp: Math.floor(xp * 1.4), rank: Math.max(1, rank - 2) },
-                  { name: 'Sofia', xp: Math.floor(xp * 1.15), rank: Math.max(1, rank - 1) },
-                  { name: name || 'You', xp, rank, isYou: true },
-                  { name: 'Lukáš', xp: Math.floor(xp * 0.85), rank: rank + 1 },
-                  { name: 'Emma', xp: Math.floor(xp * 0.7), rank: rank + 2 },
-                ];
+              {/* Leaderboard — real users + bots */}
+              {leaderboard.length > 0 && (() => {
+                // Find current user's rank
+                const myIdx = leaderboard.findIndex(u => u.display_name === name);
+                const myRank = myIdx >= 0 ? myIdx + 1 : leaderboard.length + 1;
+                // Show 2 above + user + 2 below
+                const startIdx = Math.max(0, (myIdx >= 0 ? myIdx : leaderboard.length) - 2);
+                const slice = leaderboard.slice(startIdx, startIdx + 5);
+                // If user not in leaderboard, insert them
+                if (myIdx < 0 && name) {
+                  slice.splice(2, 0, { display_name: name, xp });
+                }
                 return (
                   <div style={{ textAlign: 'left' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#555', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
                       {locale === 'sk' ? 'Rebríček' : 'Leaderboard'}
                     </div>
-                    {fakeUsers.map((u, i) => (
-                      <div key={i} style={{
-                        display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0',
-                        borderTop: i > 0 ? '1px solid #111' : 'none',
-                      }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: u.isYou ? '#4ade80' : '#444', width: 24 }}>#{u.rank}</span>
-                        <span style={{ fontSize: 12, fontWeight: u.isYou ? 700 : 500, color: u.isYou ? '#4ade80' : '#888', flex: 1 }}>{u.name}</span>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: '#555' }}>{u.xp.toLocaleString()} XP</span>
-                      </div>
-                    ))}
+                    {slice.map((u, i) => {
+                      const actualRank = myIdx < 0 && u.display_name === name ? myRank : startIdx + i + 1;
+                      const isYou = u.display_name === name;
+                      return (
+                        <div key={i} style={{
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          padding: isYou ? '8px 8px' : '8px 0',
+                          borderTop: i > 0 ? '1px solid #111' : 'none',
+                          background: isYou ? 'rgba(74,222,128,0.04)' : 'transparent',
+                          margin: isYou ? '0 -8px' : 0,
+                          borderRadius: isYou ? 8 : 0,
+                        }}>
+                          <span style={{ fontSize: 11, fontWeight: 800, color: isYou ? '#4ade80' : '#444', width: 28 }}>#{actualRank}</span>
+                          <span style={{ fontSize: 12, fontWeight: isYou ? 700 : 500, color: isYou ? '#4ade80' : '#888', flex: 1 }}>
+                            {u.display_name}
+                          </span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: '#555' }}>{u.xp.toLocaleString()} XP</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })()}

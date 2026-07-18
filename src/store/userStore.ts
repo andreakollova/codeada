@@ -141,6 +141,7 @@ export const useUserStore = create<UserState & UserActions>()(
         try {
           await supabase.from('user_state').upsert({
             user_id: s.userId,
+            display_name: s.name || 'User',
             xp: s.xp, gems: s.gems, hearts: s.hearts, streak: s.streak,
             last_active_date: s.lastActiveDate, byte_mood: s.byteMood,
             byte_battery: s.byteBattery, completed_lessons: s.completedLessons,

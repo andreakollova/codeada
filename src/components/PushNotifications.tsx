@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react';
 import { useUserStore } from '@/store/userStore';
+import { useLocaleStore } from '@/store/localeStore';
 
 export default function PushNotificationHandler() {
   const { userId } = useUserStore();
+  const { locale } = useLocaleStore();
 
   useEffect(() => {
     if (typeof window === 'undefined' || !(window as any).Capacitor || !userId) return;
@@ -31,7 +33,7 @@ export default function PushNotificationHandler() {
             await fetch('/api/push/register', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId, token: token.value }),
+              body: JSON.stringify({ userId, token: token.value, locale }),
             });
           } catch (e) {
             console.log('Failed to save push token:', e);

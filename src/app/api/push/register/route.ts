@@ -8,11 +8,11 @@ const sb = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, token } = await req.json();
+    const { userId, token, locale } = await req.json();
     if (!userId || !token) return NextResponse.json({ error: 'Missing data' }, { status: 400 });
 
-    // Save push token to user_state
-    await sb.from('user_state').update({ push_token: token }).eq('user_id', userId);
+    // Save push token and locale to user_state
+    await sb.from('user_state').update({ push_token: token, locale: locale || 'en' }).eq('user_id', userId);
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

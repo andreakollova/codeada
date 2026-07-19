@@ -44,18 +44,20 @@ const GLOSSARY_TERMS = [
 
 const REMINDER_MESSAGES = {
   en: [
-    "Your streak is waiting! Just 3 minutes today.",
-    "Don't break your streak! Open a quick lesson.",
-    "Hey! Your Byte misses you. Time to learn?",
-    "Quick coding session? It only takes 3 minutes.",
-    "Keep the momentum going! One lesson today.",
+    "Learn something new today. Just 3 minutes.",
+    "Spend a few minutes coding. You got this.",
+    "We have a new lesson for you. Check it out!",
+    "Continue where you left off. Keep going!",
+    "Discover something new about programming today.",
+    "3 minutes a day is all it takes.",
   ],
   sk: [
-    "Tvoj streak čaká! Stačia 3 minúty dnes.",
-    "Neprerušuj svoj streak! Otvor si rýchlu lekciu.",
-    "Hej! Tvoj Byte sa nudí. Čas na učenie?",
-    "Rýchla lekcia? Zaberie len 3 minúty.",
-    "Pokračuj v tempe! Jedna lekcia dnes.",
+    "Dnes sa nauč niečo nové. Stačia 3 minúty.",
+    "Venuj si pár minút programovaniu. Zvládneš to!",
+    "Máme pre teba novú lekciu. Pozri sa na ňu!",
+    "Pokračuj tam, kde si skončil. Nevzdávaj sa!",
+    "Objav niečo nové z programovania.",
+    "Stačia 3 minúty denne. Začni teraz.",
   ],
 };
 
@@ -121,22 +123,28 @@ export async function POST(req: NextRequest) {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
 
     if (type === 'glossary') {
-      // Pick term based on day (rotates through all terms)
       const term = GLOSSARY_TERMS[dayOfYear % GLOSSARY_TERMS.length];
 
       for (const user of users) {
         try {
-          // TODO: detect user locale from DB, for now send EN
-          const ok = await sendPush(user.push_token, '📚 Word of the Day', term.en);
+          // Detect locale from display_name heuristic or default EN
+          const isSk = user.locale === 'sk' || (user.display_name && /[áéíóúýžščťďľňŕ]/i.test(user.display_name));
+          const title = isSk ? '📚 Slovo dňa' : '📚 Word of the Day';
+          const body = `${term.term}${term.full ? ' - ' + term.full : ''}\n${isSk ? term.sk : term.en}`;
+          const ok = await sendPush(user.push_token, title, body);
           if (ok) sent++;
         } catch {}
       }
     } else if (type === 'reminder') {
+      const emojis = ['🚀', '💥', '🔥', '⚡', '✨', '🎯'];
+      const emoji = emojis[dayOfYear % emojis.length];
+
       for (const user of users) {
-        const name = user.display_name || 'there';
-        const msg = REMINDER_MESSAGES.en[dayOfYear % REMINDER_MESSAGES.en.length];
         try {
-          const ok = await sendPush(user.push_token, '🔥 Coduy', msg);
+          const isSk = user.locale === 'sk' || (user.display_name && /[áéíóúýžščťďľňŕ]/i.test(user.display_name));
+          const msgs = isSk ? REMINDER_MESSAGES.sk : REMINDER_MESSAGES.en;
+          const msg = msgs[dayOfYear % msgs.length];
+          const ok = await sendPush(user.push_token, `${emoji} Coduy`, msg);
           if (ok) sent++;
         } catch {}
       }

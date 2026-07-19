@@ -39,7 +39,7 @@ export default function ScreenshotsPage() {
   return (
     <div style={{ background: '#000', padding: 20, display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'center' }}>
       <p style={{ width: '100%', textAlign: 'center', color: '#555', fontSize: 12 }}>
-        Right-click each → Save Image As (or screenshot on iPhone: 1290x2796)
+        Click Download under each screenshot
       </p>
       {screens.map((s, i) => (
         <div key={i} style={{
@@ -83,7 +83,7 @@ export default function ScreenshotsPage() {
 
             {/* Title */}
             <h1 style={{
-              fontSize: 38, fontWeight: 800, color: '#fff',
+              fontSize: 32, fontWeight: 700, color: '#fff',
               textAlign: 'center', lineHeight: 1.1,
               letterSpacing: '-0.03em', margin: 0,
               whiteSpace: 'pre-line',
@@ -93,7 +93,7 @@ export default function ScreenshotsPage() {
 
             {/* Subtitle */}
             <p style={{
-              fontSize: 15, color: 'rgba(255,255,255,0.5)',
+              fontSize: 13, color: 'rgba(255,255,255,0.5)',
               textAlign: 'center', lineHeight: 1.5,
               maxWidth: 260, margin: 0,
             }}>
@@ -112,6 +112,10 @@ export default function ScreenshotsPage() {
           </div>
         </div>
       ))}
+      <p style={{ width: '100%', textAlign: 'center', color: '#888', fontSize: 13, marginTop: 20 }}>
+        Na Mac: pravý klik na obrázok → "Save Image As"<br/>
+        Na iPhone: dlho drž na obrázku → "Save to Photos"
+      </p>
     </div>
   );
 }

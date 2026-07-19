@@ -131,6 +131,9 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         </div>
 
         {/* Plan selector */}
+        <p style={{ fontSize: 11, color: '#555', marginBottom: 10, lineHeight: 1.5, fontStyle: 'italic' }}>
+          {sk ? 'Za 3.99 EUR pozveš náš tím na kávu tento mesiac.' : 'For 3.99 EUR you buy our team a coffee this month.'}
+        </p>
         <div style={{ display: 'flex', gap: 6, marginBottom: 16, width: '100%' }}>
           {[
             { id: 'trial', label: sk ? '1 EUR' : '1 EUR', sub: sk ? 'prvý mesiac' : 'first month' },

@@ -193,6 +193,21 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Legal */}
+        <div style={{ marginBottom: 28 }}>
+          <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+            {locale === 'sk' ? 'Právne' : 'Legal'}
+          </h3>
+          <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
+            <a href="/privacy" style={{ display: 'block', padding: '14px 16px', color: '#ccc', fontSize: 14, fontWeight: 500, textDecoration: 'none', borderBottom: '1px solid #111' }}>
+              {locale === 'sk' ? 'Zásady ochrany súkromia' : 'Privacy Policy'}
+            </a>
+            <a href="/terms" style={{ display: 'block', padding: '14px 16px', color: '#ccc', fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>
+              {locale === 'sk' ? 'Podmienky používania' : 'Terms of Use'}
+            </a>
+          </div>
+        </div>
+
         {/* Delete data */}
         <button
           onClick={handleDeleteData}

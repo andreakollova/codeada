@@ -215,21 +215,25 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
             const { userId } = useUserStore.getState();
 
-            if (isApp && (window as any).Capacitor?.Plugins?.CoduyStore) {
-              // In-app purchase via Apple StoreKit
+            if (isApp) {
+              // In native app - open Stripe checkout in browser
+              // Apple IAP will be handled natively after App Store approval
               try {
-                const productId = plan === 'yearly' ? 'coduy_pro_yearly' : 'coduy_pro_monthly';
-                const result = await (window as any).Capacitor.Plugins.CoduyStore.purchase({ productId });
-                if (result?.success) {
-                  await fetch('/api/iap/verify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, receipt: result.receipt, productId }),
-                  });
-                  window.location.replace('/');
+                const sb = getSupabase();
+                const session = await sb?.auth.getSession();
+                const email = session?.data?.session?.user?.email;
+                const res = await fetch('/api/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ plan, userId, email }),
+                });
+                const data = await res.json();
+                if (data.url) {
+                  const { Browser } = await import('@capacitor/browser');
+                  await Browser.open({ url: data.url, presentationStyle: 'popover' });
                 }
               } catch (e) {
-                console.log('IAP error:', e);
+                console.log('Checkout error:', e);
               }
             } else {
               // Web - Stripe checkout

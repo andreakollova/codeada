@@ -63,6 +63,9 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const { equipment } = useUserStore();
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<'trial' | 'monthly' | 'yearly'>('trial');
+  const [showPromo, setShowPromo] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoError, setPromoError] = useState('');
   const sk = locale === 'sk';
 
   const features = sk
@@ -159,6 +162,52 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           <Crown size={16} />
           {sk ? 'Získať Coduy Pro' : 'Get Coduy Pro'}
         </button>
+
+        {/* Promo code */}
+        {!showPromo ? (
+          <button
+            onClick={() => setShowPromo(true)}
+            style={{ background: 'none', border: 'none', color: '#555', fontSize: 11, cursor: 'pointer', marginBottom: 8 }}
+          >
+            {sk ? 'Máš promo kód?' : 'Have a promo code?'}
+          </button>
+        ) : (
+          <div style={{ display: 'flex', gap: 6, width: '100%', marginBottom: 8 }}>
+            <input
+              value={promoCode}
+              onChange={e => setPromoCode(e.target.value)}
+              placeholder={sk ? 'Zadaj kód' : 'Enter code'}
+              style={{
+                flex: 1, padding: '8px 12px', borderRadius: 8,
+                background: '#0a0a0a', border: '1px solid #222',
+                color: '#fff', fontSize: 13, fontFamily: 'monospace',
+                outline: 'none', textTransform: 'uppercase',
+              }}
+            />
+            <button
+              onClick={async () => {
+                if (!promoCode.trim()) return;
+                const { userId } = useUserStore.getState();
+                const res = await fetch('/api/promo', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ code: promoCode, userId }),
+                });
+                const data = await res.json();
+                if (data.success) window.location.replace('/');
+                else setPromoError(data.error || 'Invalid code');
+              }}
+              style={{
+                padding: '8px 14px', borderRadius: 8,
+                background: '#fff', color: '#000',
+                fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer',
+              }}
+            >
+              OK
+            </button>
+          </div>
+        )}
+        {promoError && <p style={{ fontSize: 11, color: '#ff8080', marginBottom: 4 }}>{promoError}</p>}
 
         <button
           onClick={() => router.back()}

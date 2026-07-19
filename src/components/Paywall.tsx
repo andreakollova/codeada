@@ -58,7 +58,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const { locale } = useLocaleStore();
   const { equipment } = useUserStore();
   const router = useRouter();
-  const [plan, setPlan] = useState<'monthly' | 'yearly'>('monthly');
+  const [plan, setPlan] = useState<'trial' | 'monthly' | 'yearly'>('trial');
   const [showPromo, setShowPromo] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [promoError, setPromoError] = useState('');
@@ -127,7 +127,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         {([
           { id: 'trial' as const, title: sk ? 'Vyskúšaj' : 'Try it', price: '1', period: sk ? '/prvý mes.' : '/first mo.', desc: sk ? 'Potom 3.99 EUR/mesiac' : 'Then 3.99 EUR/month', badge: null },
           { id: 'monthly' as const, title: sk ? 'Mesačné' : 'Monthly', price: '3.99', period: sk ? '/mesiac' : '/month', desc: sk ? 'Bez záväzkov' : 'No commitment', badge: null },
-          { id: 'yearly' as const, title: sk ? 'Ročné' : 'Yearly', price: '3.39', period: sk ? '/mesiac' : '/month', desc: sk ? '40.69 EUR ročne' : '40.69 EUR/year', badge: sk ? 'UŠETRI 15%' : 'SAVE 15%' },
+          { id: 'yearly' as const, title: sk ? 'Ročné' : 'Yearly', price: '1', period: sk ? ' EUR teraz' : ' EUR now', desc: sk ? '1 EUR teraz, zvyšok 39.69 EUR neskôr' : '1 EUR now, remaining 39.69 EUR later', badge: sk ? 'UŠETRI 15%' : 'SAVE 15%' },
         ]).map(p => (
           <button key={p.id} onClick={() => setPlan(p.id)} style={{
             width: '100%', padding: '14px 16px', borderRadius: 14, border: 'none', cursor: 'pointer',

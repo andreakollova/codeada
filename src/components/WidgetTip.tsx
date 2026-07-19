@@ -3,22 +3,25 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocaleStore } from '@/store/localeStore';
+import { useUserStore } from '@/store/userStore';
 import { X } from 'lucide-react';
 
 export default function WidgetTip() {
   const { locale } = useLocaleStore();
+  const { name } = useUserStore();
   const [show, setShow] = useState(false);
   const sk = locale === 'sk';
 
   useEffect(() => {
-    // Show only in native app, once, after a delay
+    // Show only in native app, after login (has name), once, after a delay
     if (typeof window === 'undefined' || !(window as any).Capacitor) return;
+    if (!name) return;
     const shown = localStorage.getItem('coduy-widget-tip');
     if (shown) return;
 
     const timer = setTimeout(() => setShow(true), 3000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [name]);
 
   const dismiss = () => {
     setShow(false);

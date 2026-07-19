@@ -395,30 +395,53 @@ export default function TheoryLessonPage() {
           {safe(t(q, 'question_text', locale))}
         </h2>
 
-        {/* Monaco Editor */}
-        <div style={{ borderRadius: 12, overflow: 'hidden', border: `1px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.5)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : 'rgba(255,255,255,0.08)'}` }}>
-          <MonacoEditor
-            height="180px"
-            defaultLanguage="javascript"
-            theme="vs-dark"
-            value={writeCodeValue}
-            onChange={(val) => { if (writeCodeState === 'editing') setWriteCodeValue(val || ''); }}
-            options={{
-              minimap: { enabled: false },
-              fontSize: 13,
-              lineNumbers: 'off',
-              scrollBeyondLastLine: false,
-              automaticLayout: true,
-              padding: { top: 12, bottom: 12 },
-              readOnly: writeCodeState === 'correct',
-              fontFamily: 'JetBrains Mono, Fira Code, monospace',
-              overviewRulerLanes: 0,
-              hideCursorInOverviewRuler: true,
-              renderLineHighlight: 'none',
-              scrollbar: { vertical: 'hidden', horizontal: 'auto' },
-            }}
-          />
-        </div>
+        {/* Code snippet (readonly) + input for missing line */}
+        {(() => {
+          const snippet = q.code_snippet || '';
+          const lines = snippet.split('\n');
+          const todoIdx = lines.findIndex((l: string) => l.includes('# TODO') || l.includes('___'));
+          const beforeLines = todoIdx >= 0 ? lines.slice(0, todoIdx) : lines;
+          const afterLines = todoIdx >= 0 ? lines.slice(todoIdx + 1) : [];
+          const borderColor = writeCodeState === 'correct' ? 'rgba(74,222,128,0.5)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#1a1a1a';
+
+          return (
+            <div style={{ borderRadius: 12, overflow: 'hidden', border: `1px solid ${borderColor}` }}>
+              {/* Readonly code before TODO */}
+              {beforeLines.length > 0 && (
+                <pre style={{ background: '#111', padding: '12px 16px 4px', margin: 0, fontSize: 13, color: '#888', fontFamily: 'JetBrains Mono, Fira Code, monospace', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                  {beforeLines.join('\n')}
+                </pre>
+              )}
+              {/* Editable input for the missing line */}
+              <div style={{ background: '#111', padding: '4px 16px' }}>
+                <input
+                  value={writeCodeValue}
+                  onChange={e => { if (writeCodeState === 'editing') setWriteCodeValue(e.target.value); }}
+                  placeholder={locale === 'sk' ? 'Napíš chýbajúci kód...' : 'Type the missing code...'}
+                  disabled={writeCodeState === 'correct'}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  style={{
+                    width: '100%', padding: '10px 12px', borderRadius: 8,
+                    background: writeCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
+                    border: `1.5px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
+                    color: writeCodeState === 'correct' ? '#4ade80' : '#fff',
+                    fontSize: 14, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                    outline: 'none', boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              {/* Readonly code after TODO */}
+              {afterLines.length > 0 && (
+                <pre style={{ background: '#111', padding: '4px 16px 12px', margin: 0, fontSize: 13, color: '#888', fontFamily: 'JetBrains Mono, Fira Code, monospace', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                  {afterLines.join('\n')}
+                </pre>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Action buttons based on state */}
         {writeCodeState === 'editing' && (

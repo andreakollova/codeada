@@ -10,16 +10,16 @@ struct GlossaryEntry: Codable {
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> GlossaryTimelineEntry {
-        GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.")
+        GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.", isPro: true)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (GlossaryTimelineEntry) -> ()) {
-        completion(GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other."))
+        completion(GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.", isPro: true))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GlossaryTimelineEntry>) -> ()) {
         guard let url = URL(string: "https://www.coduy.sk/api/widget") else {
-            let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code")
+            let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code", isPro: true)
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600))))
             return
         }
@@ -30,9 +30,11 @@ struct Provider: TimelineProvider {
             if let data = data, let glossary = try? JSONDecoder().decode(GlossaryEntry.self, from: data) {
                 let lang = Locale.current.language.languageCode?.identifier ?? "en"
                 let detail = lang == "sk" ? glossary.sk : glossary.en
-                entry = GlossaryTimelineEntry(date: Date(), term: glossary.term, definition: glossary.full, detail: detail)
+                entry = GlossaryTimelineEntry(date: Date(), term: glossary.term, definition: glossary.full, detail: detail, isPro: true)
             } else {
-                entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code")
+                let lang = Locale.current.language.languageCode?.identifier ?? "en"
+                let msg = lang == "sk" ? "Získaj Coduy Pro pre widget" : "Get Coduy Pro for widget"
+                entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "Pro", detail: msg, isPro: false)
             }
 
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(6 * 3600))))
@@ -45,6 +47,7 @@ struct GlossaryTimelineEntry: TimelineEntry {
     let term: String
     let definition: String
     let detail: String
+    let isPro: Bool
 }
 
 struct ByteView: View {

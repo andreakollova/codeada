@@ -168,7 +168,7 @@ struct CoduyWidgetEntryView: View {
                 // Description
                 Text(entry.detail)
                     .font(.system(size: family == .systemSmall ? 10 : 12))
-                    .foregroundColor(.white.opacity(0.5))
+                    .foregroundColor(.white.opacity(0.7))
                     .lineLimit(family == .systemSmall ? 2 : 3)
 
                 // Footer

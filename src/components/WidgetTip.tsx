@@ -65,11 +65,21 @@ export default function WidgetTip() {
               <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>
                 {sk ? 'Pridaj si widget' : 'Add widget to Home Screen'}
               </p>
-              <p style={{ fontSize: 11, color: '#888', lineHeight: 1.5, margin: 0 }}>
-                {sk
-                  ? 'Dlho drž na ploche → klikni + → hľadaj Coduy → pridaj Widget.'
-                  : 'Long press Home Screen → tap + → search Coduy → add Widget.'}
-              </p>
+              <div style={{ fontSize: 11, color: '#888', lineHeight: 1.6, margin: 0 }}>
+                {sk ? (
+                  <>
+                    <span style={{ color: '#ccc' }}>1.</span> Dlho drž na ploche iPhonu<br/>
+                    <span style={{ color: '#ccc' }}>2.</span> Klikni <span style={{ color: '#fff', fontWeight: 600 }}>Upraviť</span> → <span style={{ color: '#fff', fontWeight: 600 }}>Pridať widget</span><br/>
+                    <span style={{ color: '#ccc' }}>3.</span> Hľadaj <span style={{ color: '#4ade80', fontWeight: 600 }}>Coduy</span> → vyber veľkosť → pridaj
+                  </>
+                ) : (
+                  <>
+                    <span style={{ color: '#ccc' }}>1.</span> Long press on iPhone Home Screen<br/>
+                    <span style={{ color: '#ccc' }}>2.</span> Tap <span style={{ color: '#fff', fontWeight: 600 }}>Edit</span> → <span style={{ color: '#fff', fontWeight: 600 }}>Add Widget</span><br/>
+                    <span style={{ color: '#ccc' }}>3.</span> Search <span style={{ color: '#4ade80', fontWeight: 600 }}>Coduy</span> → pick size → add
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>

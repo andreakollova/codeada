@@ -17,7 +17,7 @@ export default function StatusBar() {
       background: '#0F0F0F',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      paddingTop: 'env(safe-area-inset-top, 0px)',
+      paddingTop: 'max(env(safe-area-inset-top, 0px), 50px)',
     }}>
       <div style={{ margin: '0 auto', display: 'flex', alignItems: 'center', gap: 0, padding: '0 12px', height: 48 }}>
 

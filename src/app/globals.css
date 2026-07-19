@@ -164,7 +164,7 @@ a { color: inherit; text-decoration: none; }
 /* Mobile bottom nav - liquid glass */
 .mobile-nav {
   position: fixed;
-  bottom: 8px;
+  bottom: 20px;
   left: 12px;
   right: 12px;
   width: auto;

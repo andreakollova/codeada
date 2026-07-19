@@ -190,6 +190,8 @@ export default function TheoryLessonPage() {
 
   const handleNextSection = () => {
     window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
     if (sectionIndex + 1 < sections.length) {
       setSectionIndex(i => i + 1);
       setPhase(sections[sectionIndex + 1].phase);

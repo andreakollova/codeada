@@ -100,21 +100,20 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       const { data } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'coduy://auth/callback',
+          redirectTo: 'https://www.coduy.sk/auth/callback?from=app',
           skipBrowserRedirect: true,
         },
       });
       if (data?.url) {
-        // Open in actual external Safari - the ONLY way Google allows OAuth
-        // Capacitor Browser with toolbarColor opens SFSafariViewController
-        // which Google also allows (it's not a WebView)
         const { Browser } = await import('@capacitor/browser');
-        // SFSafariViewController IS allowed by Google - the 403 error
-        // means it's still opening in WKWebView. Force SFSafariViewController:
-        await Browser.open({
-          url: data.url,
-          presentationStyle: 'popover',
-          toolbarColor: '#000000',
+        await Browser.open({ url: data.url, presentationStyle: 'popover' });
+        // Listen for browser close - check if auth succeeded
+        Browser.addListener('browserFinished', async () => {
+          const { data: s } = await sb.auth.getSession();
+          if (s?.session) {
+            setUserId(s.session.user.id);
+            setAuthed(true);
+          }
         });
       }
     } else {

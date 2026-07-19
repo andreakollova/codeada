@@ -122,13 +122,31 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         ))}
       </div>
 
+      {/* Monthly / Yearly toggle */}
+      <div style={{ padding: '0 24px 10px' }}>
+        <div style={{ display: 'flex', background: '#0a0a0a', borderRadius: 12, padding: 3 }}>
+          {(['monthly', 'yearly'] as const).map(tab => {
+            const active = (tab === 'monthly' && (plan === 'trial' || plan === 'monthly')) || (tab === 'yearly' && plan === 'yearly');
+            return (
+              <button key={tab} onClick={() => setPlan(tab === 'monthly' ? 'trial' : 'yearly')} style={{
+                flex: 1, padding: '9px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                background: active ? '#1a1a1a' : 'transparent',
+                fontSize: 13, fontWeight: 700, color: active ? '#fff' : '#555',
+              }}>
+                {tab === 'monthly' ? (sk ? 'Mesačne' : 'Monthly') : (sk ? 'Ročne' : 'Yearly')}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Two plan cards side by side */}
       <div style={{ padding: '0 24px 14px', display: 'flex', gap: 8 }}>
         {/* Free Trial */}
-        <button onClick={() => setPlan('trial')} style={{
-          flex: 1, padding: '16px 12px', borderRadius: 16, border: 'none', cursor: 'pointer',
-          background: plan === 'trial' ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
-          outline: plan === 'trial' ? '2px solid #4ade80' : '1px solid #1a1a1a',
+        <button onClick={() => setPlan(plan === 'yearly' ? 'yearly' : 'trial')} style={{
+          flex: 1, padding: '14px 10px', borderRadius: 14, border: 'none', cursor: 'pointer',
+          background: (plan === 'trial' || plan === 'yearly') ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
+          outline: (plan === 'trial' || plan === 'yearly') ? '2px solid #4ade80' : '1px solid #1a1a1a',
           textAlign: 'center', position: 'relative',
         }}>
           <div style={{
@@ -137,31 +155,37 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 5,
             letterSpacing: '0.04em', whiteSpace: 'nowrap',
           }}>FREE TRIAL</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: plan === 'trial' ? '#fff' : '#666', marginTop: 4 }}>
-            1<span style={{ fontSize: 14, fontWeight: 600 }}> EUR</span>
+          <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginTop: 4 }}>
+            1 <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
           </div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
-            {sk ? 'prvý mesiac' : 'first month'}
+          <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>
+            {plan === 'yearly' || plan === 'trial'
+              ? (plan === 'yearly'
+                ? (sk ? 'prvý mesiac' : 'first month')
+                : (sk ? 'prvý mesiac' : 'first month'))
+              : ''}
           </div>
-          <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
-            {sk ? 'potom 3.99/mes' : 'then 3.99/mo'}
+          <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>
+            {plan === 'yearly'
+              ? (sk ? 'potom 40.69/rok' : 'then 40.69/yr')
+              : (sk ? 'potom 3.99/mes' : 'then 3.99/mo')}
           </div>
         </button>
 
-        {/* Monthly */}
+        {/* Full price */}
         <button onClick={() => setPlan('monthly')} style={{
-          flex: 1, padding: '16px 12px', borderRadius: 16, border: 'none', cursor: 'pointer',
+          flex: 1, padding: '14px 10px', borderRadius: 14, border: 'none', cursor: 'pointer',
           background: plan === 'monthly' ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
           outline: plan === 'monthly' ? '2px solid #4ade80' : '1px solid #1a1a1a',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: plan === 'monthly' ? '#fff' : '#666', marginTop: 12 }}>
-            3.99<span style={{ fontSize: 14, fontWeight: 600 }}> EUR</span>
+          <div style={{ fontSize: 24, fontWeight: 800, color: plan === 'monthly' ? '#fff' : '#555', marginTop: 12 }}>
+            {plan === 'yearly' ? '40.69' : '3.99'} <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
           </div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
-            {sk ? '/ mesiac' : '/ month'}
+          <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>
+            {plan === 'yearly' ? (sk ? '/ rok' : '/ year') : (sk ? '/ mesiac' : '/ month')}
           </div>
-          <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
+          <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>
             {sk ? 'bez záväzkov' : 'no commitment'}
           </div>
         </button>
@@ -180,7 +204,9 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           }}
         >
           <Sparkles size={16} />
-          {plan === 'trial' ? (sk ? 'Vyskúšaj za 1 EUR' : 'Try for 1 EUR') : (sk ? 'Získať Pro' : 'Get Pro')}
+          {plan === 'trial' || plan === 'yearly'
+            ? (sk ? 'Vyskúšaj za 1 EUR' : 'Try for 1 EUR')
+            : (sk ? 'Získať Pro' : 'Get Pro')}
         </motion.button>
         <p style={{ fontSize: 10, color: '#444', textAlign: 'center', marginTop: 6 }}>
           {sk ? 'Zrušíš kedykoľvek' : 'Cancel anytime'}

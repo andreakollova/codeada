@@ -135,37 +135,49 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               }, 300);
             });
             // Handle deep link from Google OAuth callback
-            // Supabase redirects to coduy://auth/callback#access_token=...&refresh_token=...
             import('@capacitor/app').then(function(mod) {
               mod.App.addListener('appUrlOpen', function(event) {
-                if (event.url && event.url.indexOf('coduy://auth') === 0) {
+                console.log('Deep link received:', event.url);
+                if (event.url && event.url.indexOf('coduy://') === 0) {
                   try {
-                    // Supabase puts tokens in hash fragment OR query params
                     var url = event.url.replace('coduy://', 'https://x/');
                     var hash = url.split('#')[1] || '';
                     var hashParams = new URLSearchParams(hash);
                     var queryParams = new URL(url).searchParams;
+                    var code = queryParams.get('code') || hashParams.get('code');
                     var at = hashParams.get('access_token') || queryParams.get('access_token');
                     var rt = hashParams.get('refresh_token') || queryParams.get('refresh_token');
-                    if (at && rt && window.__supabase) {
-                      window.__supabase.auth.setSession({ access_token: at, refresh_token: rt }).then(function() {
-                        location.reload();
-                      });
-                    } else {
-                      // Might have a code param instead (PKCE flow)
-                      var code = queryParams.get('code') || hashParams.get('code');
-                      if (code && window.__supabase) {
-                        window.__supabase.auth.exchangeCodeForSession(code).then(function() {
+                    console.log('Deep link params - code:', !!code, 'at:', !!at);
+
+                    function waitForSupabase(cb, retries) {
+                      if (window.__supabase) return cb(window.__supabase);
+                      if (retries <= 0) { location.reload(); return; }
+                      setTimeout(function() { waitForSupabase(cb, retries - 1); }, 200);
+                    }
+
+                    waitForSupabase(function(sb) {
+                      if (at && rt) {
+                        sb.auth.setSession({ access_token: at, refresh_token: rt }).then(function() {
+                          console.log('Session set from tokens');
                           location.reload();
+                        }).catch(function(e) { console.log('setSession error:', e); location.reload(); });
+                      } else if (code) {
+                        sb.auth.exchangeCodeForSession(code).then(function() {
+                          console.log('Code exchanged for session');
+                          location.reload();
+                        }).catch(function(e) {
+                          console.log('exchangeCode error:', e);
+                          // PKCE verifier mismatch - try loading callback URL in WebView
+                          location.href = 'https://www.coduy.sk/auth/callback?code=' + code;
                         });
                       } else {
                         location.reload();
                       }
-                    }
-                  } catch(e) { location.reload(); }
+                    }, 15);
+                  } catch(e) { console.log('Deep link error:', e); location.reload(); }
                 }
               });
-            }).catch(function() {});
+            }).catch(function(e) { console.log('App plugin error:', e); });
           }
         `}} />
       </body>

@@ -18,7 +18,9 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GlossaryTimelineEntry>) -> ()) {
-        guard let url = URL(string: "https://www.coduy.sk/api/widget") else {
+        let isPro = true
+        let urlStr = isPro ? "https://www.coduy.sk/api/widget?pro=true" : "https://www.coduy.sk/api/widget"
+        guard let url = URL(string: urlStr) else {
             let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code", isPro: true)
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600))))
             return
@@ -33,8 +35,8 @@ struct Provider: TimelineProvider {
                 entry = GlossaryTimelineEntry(date: Date(), term: glossary.term, definition: glossary.full, detail: detail, isPro: true)
             } else {
                 let lang = Locale.current.language.languageCode?.identifier ?? "en"
-                let msg = lang == "sk" ? "Získaj Coduy Pro pre widget" : "Get Coduy Pro for widget"
-                entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "Pro", detail: msg, isPro: false)
+                let msg = lang == "sk" ? "0 EUR - 7 dní zadarmo. Získaj Pro pre denné slovíčka." : "0 EUR - 7 days free. Get Pro for daily terms."
+                entry = GlossaryTimelineEntry(date: Date(), term: "Coduy Pro", definition: lang == "sk" ? "Získaj widget" : "Get widget", detail: msg, isPro: false)
             }
 
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(6 * 3600))))
@@ -55,36 +57,45 @@ struct ByteView: View {
 
     var body: some View {
         ZStack {
-            // Head
+            // Head - filled dark circle with white stroke
             Circle()
-                .stroke(Color.white, lineWidth: 1.5)
+                .fill(Color(red: 0.04, green: 0.04, blue: 0.04))
                 .frame(width: size, height: size)
-            // Left eye
+            Circle()
+                .stroke(Color.white, lineWidth: size * 0.06)
+                .frame(width: size, height: size)
+            // Left eye - bigger, rounder
             Ellipse()
                 .fill(Color.white)
-                .frame(width: size * 0.12, height: size * 0.15)
-                .offset(x: -size * 0.14, y: -size * 0.03)
+                .frame(width: size * 0.15, height: size * 0.18)
+                .offset(x: -size * 0.15, y: -size * 0.02)
             // Right eye
             Ellipse()
                 .fill(Color.white)
-                .frame(width: size * 0.12, height: size * 0.15)
-                .offset(x: size * 0.14, y: -size * 0.03)
+                .frame(width: size * 0.15, height: size * 0.18)
+                .offset(x: size * 0.15, y: -size * 0.02)
             // Smile
             Path { path in
-                path.addArc(center: CGPoint(x: size/2, y: size * 0.55), radius: size * 0.18, startAngle: .degrees(10), endAngle: .degrees(170), clockwise: true)
+                path.addArc(
+                    center: CGPoint(x: size / 2, y: size * 0.52),
+                    radius: size * 0.2,
+                    startAngle: .degrees(15),
+                    endAngle: .degrees(165),
+                    clockwise: true
+                )
             }
-            .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+            .stroke(Color.white.opacity(0.6), style: StrokeStyle(lineWidth: size * 0.05, lineCap: .round))
             .frame(width: size, height: size)
-            .offset(y: size * 0.05)
-            // Antenna
+            // Antenna dot
             Circle()
                 .fill(Color.white)
-                .frame(width: size * 0.08, height: size * 0.08)
-                .offset(y: -size * 0.55)
+                .frame(width: size * 0.12, height: size * 0.12)
+                .offset(y: -size * 0.58)
+            // Antenna line
             Rectangle()
                 .fill(Color.white.opacity(0.5))
-                .frame(width: 1.5, height: size * 0.12)
-                .offset(y: -size * 0.47)
+                .frame(width: size * 0.04, height: size * 0.14)
+                .offset(y: -size * 0.48)
         }
     }
 }
@@ -99,25 +110,22 @@ struct CoduyWidgetEntryView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            LinearGradient(
-                colors: [Color(red: 0.04, green: 0.04, blue: 0.04), Color(red: 0.08, green: 0.08, blue: 0.08)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            // Pure black background
+            Color.black
 
             VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 6) {
-                // Header
+                // Header - logo + byte
                 HStack(alignment: .center) {
                     Image("CoduyLogo")
                         .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.white)
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 14)
-                        .opacity(0.5)
 
                     Spacer()
 
-                    ByteView(size: family == .systemSmall ? 22 : 26)
+                    ByteView(size: family == .systemSmall ? 24 : 28)
                 }
 
                 Spacer()
@@ -143,9 +151,9 @@ struct CoduyWidgetEntryView: View {
                     .lineLimit(family == .systemSmall ? 2 : 3)
 
                 // Footer
-                Text(isSk ? "Slovo dna" : "Word of the Day")
+                Text(isSk ? "Slovo dňa" : "Word of the Day")
                     .font(.system(size: 8, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.2))
+                    .foregroundColor(.white.opacity(0.25))
                     .textCase(.uppercase)
                     .tracking(1)
             }

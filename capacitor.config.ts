@@ -5,19 +5,20 @@ const config: CapacitorConfig = {
   appName: 'Coduy',
   webDir: 'public',
   server: {
-    // In production: load the deployed web app
-    url: 'https://coduy.sk',
+    url: 'https://www.coduy.sk',
     cleartext: false,
   },
   ios: {
     scheme: 'Coduy',
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
+    scrollEnabled: false,
+    allowsLinkPreview: false,
   },
   plugins: {
     SplashScreen: {
-      launchAutoHide: true,
-      launchShowDuration: 1500,
+      launchAutoHide: false,
+      launchShowDuration: 0,
       backgroundColor: '#0F0F0F',
       showSpinner: false,
       splashFullScreen: true,

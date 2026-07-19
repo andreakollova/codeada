@@ -125,6 +125,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
         </AuthGate>
         <Analytics />
+        <script dangerouslySetInnerHTML={{ __html: `
+          if (window.Capacitor) {
+            window.addEventListener('load', function() {
+              setTimeout(function() {
+                if (window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
+                  window.Capacitor.Plugins.SplashScreen.hide();
+                }
+              }, 300);
+            });
+          }
+        `}} />
       </body>
     </html>
   );

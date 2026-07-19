@@ -28,7 +28,12 @@
 html {
   overflow-x: hidden;
   width: 100%;
+  /* iOS app: hide scrollbar, prevent overscroll bounce */
+  -webkit-overflow-scrolling: touch;
 }
+
+html::-webkit-scrollbar { display: none; }
+body::-webkit-scrollbar { display: none; }
 
 body {
   background-color: #0F0F0F;

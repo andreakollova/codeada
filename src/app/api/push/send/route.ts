@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
           // Detect locale from display_name heuristic or default EN
           const isSk = user.locale === 'sk' || (user.display_name && /[áéíóúýžščťďľňŕ]/i.test(user.display_name));
           const title = isSk ? '📚 Slovo dňa' : '📚 Word of the Day';
-          const body = `${term.term}${term.full ? ' - ' + term.full : ''}\n${isSk ? term.sk : term.en}`;
+          const body = isSk ? term.sk : term.en;
           const ok = await sendPush(user.push_token, title, body);
           if (ok) sent++;
         } catch {}

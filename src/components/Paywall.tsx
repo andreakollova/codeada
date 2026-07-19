@@ -130,23 +130,65 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           ))}
         </div>
 
-        {/* Plan selector */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 16, width: '100%' }}>
-          {[
-            { id: 'trial', label: sk ? '1 EUR' : '1 EUR', sub: sk ? 'prvý mesiac' : 'first month' },
-            { id: 'monthly', label: '3.99 EUR', sub: sk ? '/ mesiac' : '/ month' },
-            { id: 'yearly', label: '40.69 EUR', sub: sk ? '/ rok (-15%)' : '/ year (-15%)' },
-          ].map(p => (
-            <button key={p.id} onClick={() => setSelectedPlan(p.id as any)} style={{
-              flex: 1, padding: '10px 6px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: selectedPlan === p.id ? '#1a1a1a' : '#0a0a0a',
-              outline: selectedPlan === p.id ? '2px solid #4ade80' : '1px solid #222',
-              textAlign: 'center',
+        {/* Monthly / Yearly toggle */}
+        <div style={{ display: 'flex', background: '#0a0a0a', borderRadius: 14, padding: 3, marginBottom: 16, width: '100%' }}>
+          {(['monthly', 'yearly'] as const).map(p => (
+            <button key={p} onClick={() => setSelectedPlan(p === 'monthly' ? 'trial' : 'yearly')} style={{
+              flex: 1, padding: '10px 8px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: (p === 'monthly' && selectedPlan === 'trial') || (p === 'yearly' && selectedPlan === 'yearly') ? '#1a1a1a' : 'transparent',
+              textAlign: 'center', position: 'relative',
             }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: selectedPlan === p.id ? '#fff' : '#555' }}>{p.label}</div>
-              <div style={{ fontSize: 9, color: selectedPlan === p.id ? '#888' : '#444', marginTop: 2 }}>{p.sub}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: (p === 'monthly' && selectedPlan === 'trial') || (p === 'yearly' && selectedPlan === 'yearly') ? '#fff' : '#555' }}>
+                {p === 'monthly' ? (sk ? 'Mesačne' : 'Monthly') : (sk ? 'Ročne' : 'Yearly')}
+              </div>
             </button>
           ))}
+        </div>
+
+        {/* Selected plan details */}
+        <div style={{
+          padding: '16px', borderRadius: 14, marginBottom: 16, width: '100%',
+          background: '#0a0a0a', border: '1.5px solid rgba(74,222,128,0.3)',
+          textAlign: 'left', position: 'relative',
+        }}>
+          {selectedPlan === 'yearly' && (
+            <div style={{
+              position: 'absolute', top: -10, right: 14,
+              background: 'linear-gradient(135deg, #4ade80, #22d3ee)', color: '#000',
+              fontSize: 9, fontWeight: 800, padding: '3px 10px', borderRadius: 6,
+              letterSpacing: '0.05em', textTransform: 'uppercase',
+            }}>
+              {sk ? 'Odporúčané' : 'Recommended'}
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+            <div>
+              <span style={{ fontSize: 28, fontWeight: 800, color: '#fff' }}>
+                {selectedPlan === 'trial' ? '1' : '40.69'}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#888', marginLeft: 4 }}>EUR</span>
+            </div>
+            {selectedPlan === 'trial' && (
+              <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
+                {sk ? 'Prvý mesiac' : 'First month'}
+              </span>
+            )}
+            {selectedPlan === 'yearly' && (
+              <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
+                {sk ? 'Ušetríš 15%' : 'Save 15%'}
+              </span>
+            )}
+          </div>
+          <div style={{ fontSize: 12, color: '#666' }}>
+            {selectedPlan === 'trial'
+              ? (sk ? 'Potom 3.99 EUR / mesiac. Zrušíš kedykoľvek.' : 'Then 3.99 EUR / month. Cancel anytime.')
+              : (sk ? '3.39 EUR / mesiac. Zrušíš kedykoľvek.' : '3.39 EUR / month. Cancel anytime.')}
+          </div>
+          {selectedPlan === 'trial' && (
+            <div style={{ fontSize: 11, color: '#4ade80', marginTop: 6, fontWeight: 600 }}>
+              {sk ? 'Zahŕňa 7-dňový free trial' : 'Includes 7-day free trial'}
+            </div>
+          )}
         </div>
 
         <button

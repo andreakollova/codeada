@@ -8,6 +8,8 @@ import { getSupabase } from '@/lib/supabase';
 import Byte from './Byte';
 import { Check, Crown, X, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+const StripeCheckout = dynamic(() => import('./StripeCheckout'), { ssr: false });
 
 const FREE_LESSON_LIMIT = 1;
 
@@ -76,6 +78,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const [showPromo, setShowPromo] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [promoError, setPromoError] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
+  const [showCheckout, setShowCheckout] = useState(false);
   const sk = locale === 'sk';
 
   const accentGradient = 'linear-gradient(135deg, #4ade80, #22c55e)';
@@ -109,8 +113,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
 
       {/* Hero */}
       <div style={{
-        textAlign: 'center', padding: '80px 24px 12px',
-        background: 'radial-gradient(ellipse at center top, rgba(74,222,128,0.06) 0%, transparent 60%)',
+        textAlign: 'center', padding: '60px 24px 12px',
+        background: 'radial-gradient(ellipse at center top, rgba(74,222,128,0.08) 0%, rgba(34,197,94,0.03) 40%, transparent 70%)',
       }}>
         <Byte mood="celebrating" size={60} equipment={equipment} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8 }}>
@@ -216,38 +220,58 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             const { userId } = useUserStore.getState();
 
             if (isApp) {
-              // In native app - open Stripe checkout in browser
-              // Apple IAP will be handled natively after App Store approval
+              // Native app - try Apple IAP first, fallback to Stripe browser
               try {
-                const sb = getSupabase();
-                const session = await sb?.auth.getSession();
-                const email = session?.data?.session?.user?.email;
-                const res = await fetch('/api/checkout', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ plan, userId, email }),
-                });
-                const data = await res.json();
-                if (data.url) {
-                  const { Browser } = await import('@capacitor/browser');
-                  await Browser.open({ url: data.url, presentationStyle: 'popover' });
+                const cap = (window as any).Capacitor;
+                if (cap?.Plugins?.CoduyStore) {
+                  const productId = plan === 'yearly' ? 'coduy_pro_yearly' : 'coduy_pro_monthly';
+                  const result = await cap.Plugins.CoduyStore.purchase({ productId });
+                  if (result?.success) {
+                    await fetch('/api/iap/verify', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId, receipt: result.receipt, productId }),
+                    });
+                    window.location.replace('/');
+                    return;
+                  }
+                } else {
+                  // Fallback: Stripe in browser overlay
+                  const sb = getSupabase();
+                  const session = await sb?.auth.getSession();
+                  const email = session?.data?.session?.user?.email;
+                  const res = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan, userId, email }),
+                  });
+                  const data = await res.json();
+                  if (data.url) {
+                    const { Browser } = await import('@capacitor/browser');
+                    await Browser.open({ url: data.url, presentationStyle: 'popover' });
+                  }
                 }
               } catch (e) {
-                console.log('Checkout error:', e);
+                console.log('Purchase error:', e);
               }
             } else {
-              // Web - Stripe checkout
+              // Web - Stripe Embedded Elements
               try {
                 const sb = getSupabase();
                 const session = await sb?.auth.getSession();
                 const email = session?.data?.session?.user?.email;
-                const res = await fetch('/api/checkout', {
+                const res = await fetch('/api/create-subscription', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ plan, userId, email }),
                 });
                 const data = await res.json();
-                if (data.url) window.location.href = data.url;
+                if (data.clientSecret) {
+                  setClientSecret(data.clientSecret);
+                  setShowCheckout(true);
+                } else if (data.error) {
+                  console.log('Subscription error:', data.error);
+                }
               } catch {}
             }
           }}
@@ -269,7 +293,18 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         </p>
       </div>
 
-      {/* Promo + Not now */}
+      {/* Embedded Stripe Checkout */}
+      {showCheckout && clientSecret && (
+        <div style={{ padding: '0 24px 16px' }}>
+          <StripeCheckout
+            clientSecret={clientSecret}
+            onSuccess={() => window.location.replace('/')}
+            onCancel={() => { setShowCheckout(false); setClientSecret(''); }}
+          />
+        </div>
+      )}
+
+      {/* Promo */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '0 24px 40px' }}>
         {!showPromo ? (
           <button
@@ -318,12 +353,6 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           </>
         )}
 
-        <button
-          onClick={() => router.back()}
-          style={{ background: 'none', border: 'none', color: '#444', fontSize: 12, cursor: 'pointer' }}
-        >
-          {sk ? 'Nie teraz' : 'Not now'}
-        </button>
       </div>
     </motion.div>
   );

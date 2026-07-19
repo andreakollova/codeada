@@ -80,7 +80,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     if (!sb) return;
     await sb.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/auth/callback' },
+      options: { redirectTo: 'https://www.coduy.sk/auth/callback' },
     });
   };
 

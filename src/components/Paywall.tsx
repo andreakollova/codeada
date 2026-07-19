@@ -64,6 +64,17 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const [promoError, setPromoError] = useState('');
   const sk = locale === 'sk';
 
+  // Path-based gradient colors
+  const userPath = typeof window !== 'undefined' ? localStorage.getItem('coduy-path') : null;
+  const gradients: Record<string, string> = {
+    builder: 'linear-gradient(135deg, #4ade80, #22d3ee)',
+    'ai-pilot': 'linear-gradient(135deg, #a855f7, #ec4899)',
+    mechanic: 'linear-gradient(135deg, #60a5fa, #818cf8)',
+    master: 'linear-gradient(135deg, #f59e0b, #f97316)',
+  };
+  const accentGradient = gradients[userPath || 'builder'] || gradients.builder;
+  const accentColor = userPath === 'ai-pilot' ? '#a855f7' : userPath === 'mechanic' ? '#60a5fa' : userPath === 'master' ? '#f59e0b' : '#4ade80';
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -92,7 +103,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
 
       {/* Hero */}
       <div style={{
-        textAlign: 'center', padding: '56px 24px 12px',
+        textAlign: 'center', padding: '80px 24px 12px',
         background: 'radial-gradient(ellipse at center top, rgba(74,222,128,0.06) 0%, transparent 60%)',
       }}>
         <Byte mood="celebrating" size={60} equipment={equipment} />
@@ -100,7 +111,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>Coduy</h1>
           <span style={{
             fontSize: 11, fontWeight: 800, color: '#000',
-            background: 'linear-gradient(135deg, #4ade80, #22d3ee)',
+            background: accentGradient,
             padding: '3px 10px', borderRadius: 7, letterSpacing: '0.06em',
           }}>PRO</span>
         </div>
@@ -116,8 +127,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           : ['Unlimited lessons and modules', 'Interactive projects and exercises', 'Arena - quiz battles', 'Daily notifications with new terms', 'Ad-free experience']
         ).map((f, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
-            <Check size={14} color="#4ade80" strokeWidth={3} />
-            <span style={{ fontSize: 13, color: '#bbb', fontWeight: 500 }}>{f}</span>
+            <Check size={14} color={accentColor} strokeWidth={3} />
+            <span style={{ fontSize: 13, color: '#eee', fontWeight: 500 }}>{f}</span>
           </div>
         ))}
       </div>
@@ -151,7 +162,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         }}>
           <div style={{
             position: 'absolute', top: -9, left: '50%', transform: 'translateX(-50%)',
-            background: 'linear-gradient(135deg, #4ade80, #22d3ee)', color: '#000',
+            background: accentGradient, color: '#000',
             fontSize: 9, fontWeight: 800, padding: '3px 10px', borderRadius: 6,
             letterSpacing: '0.04em', whiteSpace: 'nowrap',
           }}>FREE TRIAL</div>
@@ -159,11 +170,12 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             <span style={{ fontSize: 14, color: '#555', textDecoration: 'line-through', marginRight: 6 }}>
               {plan === 'yearly' ? '40.99' : '3.99'} EUR
             </span>
-            <span style={{ fontSize: 22, fontWeight: 700, color: '#4ade80' }}>0 EUR</span>
+            <span style={{ fontSize: 22, fontWeight: 700, color: accentColor }}>0 EUR</span>
           </div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+          <div style={{ fontSize: 11, color: '#fff', marginTop: 4 }}>
             {sk ? '7 dní zadarmo' : '7 days free'}
           </div>
+
           <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
             {plan === 'yearly'
               ? (sk ? 'potom 40.99 EUR/rok' : 'then 40.99 EUR/yr')
@@ -181,7 +193,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           <div style={{ fontSize: 22, fontWeight: 600, color: plan === 'monthly' ? '#fff' : '#555', marginTop: 14 }}>
             {plan === 'yearly' ? '40.99' : '3.99'} <span style={{ fontSize: 12, fontWeight: 500, color: '#888' }}>EUR</span>
           </div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+          <div style={{ fontSize: 11, color: plan === 'monthly' ? '#fff' : '#888', marginTop: 4 }}>
             {plan === 'yearly' ? (sk ? '/ rok' : '/ year') : (sk ? '/ mesiac' : '/ month')}
           </div>
           <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
@@ -197,7 +209,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           whileTap={{ scale: 0.98 }}
           style={{
             width: '100%', padding: '16px', borderRadius: 14,
-            background: 'linear-gradient(135deg, #4ade80, #22d3ee)',
+            background: accentGradient,
             color: '#000', fontWeight: 800, fontSize: 15, border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}

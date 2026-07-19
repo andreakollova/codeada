@@ -668,7 +668,7 @@ export default function ArenaPage() {
 
       {/* MINIMAP */}
       <div style={{
-        position: 'absolute', top: 16, right: 16,
+        position: 'absolute', top: 60, right: 16,
         width: MINIMAP_SIZE, height: MINIMAP_SIZE,
         background: 'rgba(0,0,0,0.7)', border: '1px solid #1a1a1a',
         borderRadius: 10, overflow: 'hidden',
@@ -692,7 +692,7 @@ export default function ArenaPage() {
       <button
         onClick={() => { window.scrollTo(0, 0); window.history.back(); }}
         style={{
-          position: 'absolute', top: 16, left: 16,
+          position: 'absolute', top: 60, left: 16,
           width: 36, height: 36, borderRadius: 10,
           background: 'rgba(0,0,0,0.7)', border: '1px solid #1a1a1a',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -706,7 +706,7 @@ export default function ArenaPage() {
       <button
         onClick={() => setShowLeaderboard(!showLeaderboard)}
         style={{
-          position: 'absolute', top: 16, left: 60,
+          position: 'absolute', top: 60, left: 60,
           height: 36, borderRadius: 10, padding: '0 12px',
           background: 'rgba(0,0,0,0.7)', border: '1px solid #1a1a1a',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -725,7 +725,7 @@ export default function ArenaPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             style={{
-              position: 'absolute', top: 60, left: 16,
+              position: 'absolute', top: 104, left: 16,
               width: 200, borderRadius: 14,
               background: 'rgba(0,0,0,0.85)', border: '1px solid #1a1a1a',
               backdropFilter: 'blur(12px)', padding: '14px 16px',
@@ -756,17 +756,6 @@ export default function ArenaPage() {
         )}
       </AnimatePresence>
 
-      {/* Mobile hint */}
-      {isMobile && (
-        <div style={{
-          position: 'absolute', bottom: 30, left: 30,
-          padding: '6px 14px', borderRadius: 10,
-          background: 'rgba(0,0,0,0.6)', border: '1px solid #1a1a1a',
-          fontSize: 10, color: '#555', fontWeight: 600,
-        }}>
-          {locale === 'sk' ? 'Swipuj na pohyb' : 'Swipe to move'}
-        </div>
-      )}
 
       {/* BOTTOM INFO */}
       <div style={{

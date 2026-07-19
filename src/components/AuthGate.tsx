@@ -184,7 +184,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       <button
         onClick={toggle}
         style={{
-          position: 'absolute', top: 16, right: 16,
+          position: 'absolute', top: 60, right: 16,
           width: 36, height: 36, borderRadius: 10,
           background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',

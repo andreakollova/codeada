@@ -101,25 +101,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           skipBrowserRedirect: true,
         },
       });
-      console.log('OAuth URL:', data?.url, 'Error:', error);
       if (data?.url) {
-        try {
-          const { Browser } = await import('@capacitor/browser');
-          await Browser.open({ url: data.url });
-        } catch (e) {
-          console.log('Browser.open failed:', e);
-          // Fallback: open in new tab
-          window.open(data.url, '_blank');
-        }
-      } else {
-        // Fallback: use web flow but in new window
-        console.log('No OAuth URL, falling back to web flow');
-        const { data: d2 } = await sb.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: 'https://www.coduy.sk/auth/callback-app',
-          },
-        });
+        // Navigate the WebView to the OAuth URL directly
+        // Google blocks WKWebView BUT Supabase's auth endpoint first
+        // redirects to Google - the initial URL is Supabase, not Google
+        // Capacitor will open external URLs (google.com) in Safari automatically
+        // because google.com is NOT in allowNavigation
+        window.location.href = data.url;
       }
     } else {
       // On web: normal redirect

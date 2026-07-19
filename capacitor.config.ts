@@ -8,8 +8,6 @@ const config: CapacitorConfig = {
     url: 'https://www.coduy.sk',
     cleartext: false,
     allowNavigation: [
-      'accounts.google.com',
-      '*.google.com',
       '*.supabase.co',
       'coduy.sk',
       '*.coduy.sk',

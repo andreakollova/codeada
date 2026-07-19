@@ -94,6 +94,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         position: 'fixed', inset: 0, zIndex: 300,
         background: '#000',
         display: 'flex', flexDirection: 'column',
+        justifyContent: 'center',
         overflow: 'auto',
       }}
     >

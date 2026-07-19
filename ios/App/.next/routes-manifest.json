@@ -33,7 +33,7 @@
   "dataRoutes": [
     {
       "page": "/_global-error",
-      "dataRouteRegex": "^/_next/data/AcWKcClbxBPSwfeOaGcZu/_global-error\\.json$"
+      "dataRouteRegex": "^/_next/data/W4Iq66xo72iUmtQyj17X1/_global-error\\.json$"
     }
   ],
   "rsc": {

@@ -145,9 +145,16 @@ export default function TheoryLessonPage() {
             {locale === 'sk' ? d.sk : d.en}
           </h2>
           <p style={{ fontSize: 14, color: '#888', lineHeight: 1.6, marginBottom: 6 }}>
-            {locale === 'sk'
-              ? `Sadni si na ${readTime} minút a uži si čítanie.`
-              : `Take ${readTime} minutes and enjoy this read.`}
+            {(() => {
+              if (locale !== 'sk') return `Take ${readTime} minutes and enjoy this read.`;
+              const m = readTime === 1 ? 'minútu' : readTime <= 4 ? 'minúty' : 'minút';
+              return [
+                `Daj si ${readTime} ${m} pre seba a prečítaj si toto.`,
+                `${readTime} ${m}, ktoré ti rozšíria obzory.`,
+                `Pohodlne sa usaď a prečítaj si toto za ${readTime} ${m}.`,
+                `Sadni si na ${readTime} ${m} a zisti, ako to funguje.`,
+              ][Math.floor(Math.random() * 4)];
+            })()}
           </p>
           <p style={{ fontSize: 12, color: '#555', marginBottom: 28 }}>
             {safe(t(lesson, 'title', locale))}

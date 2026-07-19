@@ -51,6 +51,17 @@ export function useSubscription() {
   const isPro = status === 'active' || status === 'admin';
   const needsUpgrade = !isPro && status !== 'loading' && completedLessons.length >= FREE_LESSON_LIMIT;
 
+  // Auto-grant Pro Glow aura when user becomes Pro
+  useEffect(() => {
+    if (isPro) {
+      const { ownedItems, addItem, equip } = useUserStore.getState();
+      if (!ownedItems.includes('aura-pro')) {
+        addItem('aura-pro');
+        equip('aura', 'aura-pro');
+      }
+    }
+  }, [isPro]);
+
   return { status, isPro, needsUpgrade, trialEnds, completedLessons: completedLessons.length, limit: FREE_LESSON_LIMIT };
 }
 

@@ -85,6 +85,8 @@ export const cosmeticItems: CosmeticItem[] = [
   // Mythic
   { id: 'aura-void',       name: 'Void Aura',        description: 'Reality bends around you',         type: 'aura', rarity: 'mythic',   element: 'void' },
   { id: 'aura-cosmic',     name: 'Cosmic Storm',     description: 'The universe in motion',           type: 'aura', rarity: 'mythic',   element: 'galaxy' },
+  // Pro exclusive
+  { id: 'aura-pro',        name: 'Pro Glow',         description: 'Exclusive aura for Coduy Pro members', type: 'aura', rarity: 'mythic', element: 'golden' },
 ];
 
 export function getItemById(id: string): CosmeticItem | undefined {

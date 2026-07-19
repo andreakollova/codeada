@@ -33,6 +33,7 @@ const auraColors: Record<string, { c1: string; c2: string; c3?: string }> = {
   'aura-galaxy':  { c1: 'rgba(168,85,247,0.18)',   c2: 'rgba(59,130,246,0.1)',  c3: 'rgba(236,72,153,0.08)' },
   'aura-void':    { c1: 'rgba(255,51,102,0.35)',    c2: 'rgba(168,85,247,0.25)', c3: 'rgba(0,0,0,0.3)' },
   'aura-cosmic':  { c1: 'rgba(168,85,247,0.4)',    c2: 'rgba(255,51,102,0.25)', c3: 'rgba(59,130,246,0.2)' },
+  'aura-pro':     { c1: 'rgba(74,222,128,0.4)',   c2: 'rgba(34,211,238,0.3)',  c3: 'rgba(168,85,247,0.25)' },
 };
 
 export default function Byte({ mood, size = 120, className = '', animate = true, equipment = {} }: ByteProps) {

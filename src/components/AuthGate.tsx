@@ -94,8 +94,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
 
     if (isApp) {
-      // In native app: redirect Supabase directly to coduy:// URL scheme
-      // This bypasses the web callback entirely - tokens come via deep link
+      // In native app: open in REAL Safari app (not WebView, not SFSafariViewController)
+      // Google allows OAuth from real Safari. After auth, Supabase redirects
+      // to coduy://auth/callback which opens the app via URL scheme.
       const { data } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -104,9 +105,17 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         },
       });
       if (data?.url) {
-        // Open in system Safari (not SFSafariViewController)
-        // Safari will handle Google OAuth, then redirect to coduy:// which opens the app
-        window.location.href = data.url;
+        // Open in actual external Safari - the ONLY way Google allows OAuth
+        // Capacitor Browser with toolbarColor opens SFSafariViewController
+        // which Google also allows (it's not a WebView)
+        const { Browser } = await import('@capacitor/browser');
+        // SFSafariViewController IS allowed by Google - the 403 error
+        // means it's still opening in WKWebView. Force SFSafariViewController:
+        await Browser.open({
+          url: data.url,
+          presentationStyle: 'popover',
+          toolbarColor: '#000000',
+        });
       }
     } else {
       // On web: normal redirect

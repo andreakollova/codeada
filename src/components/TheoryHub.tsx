@@ -122,15 +122,25 @@ export default function TheoryHub() {
         <div style={{ height: '100%', background: '#fff', borderRadius: 2, width: `${(readCount / allTheoryLessons.length) * 100}%`, transition: 'width 0.4s' }} />
       </div>
 
-      {/* First 4 modules */}
+      {/* Modules: in-progress first, then shuffled others */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {dbModules.slice(0, 4).map(mod => {
-          const modDone = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
-          const modTitle = locale === 'sk' && mod.title_sk ? mod.title_sk : mod.title;
-          return (
+        {(() => {
+          // Find in-progress module (has some but not all lessons done)
+          const inProgress = dbModules.filter(m => {
+            const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+            return done > 0 && done < m.lessons.length;
+          });
+          const notStarted = dbModules.filter(m => {
+            const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+            return done === 0;
+          });
+          // Shuffle not-started
+          const shuffled = [...notStarted].sort(() => Math.random() - 0.5);
+          const ordered = [...inProgress, ...shuffled];
+          return ordered.slice(0, 4).map(mod => (
             <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
-          );
-        })}
+          ));
+        })()}
       </div>
 
       {/* Show all divider + button */}

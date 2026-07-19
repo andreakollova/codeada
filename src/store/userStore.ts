@@ -101,7 +101,8 @@ export const useUserStore = create<UserState & UserActions>()(
             return { streak, hearts, byteBattery: Math.min(100, streak * 15), byteMood: streak >= 7 ? 'proud' : 'happy', lastActiveDate: todayStr };
           }
           if (!s.lastActiveDate) {
-            return { lastActiveDate: todayStr };
+            // First time ever - start streak at 1
+            return { streak: 1, lastActiveDate: todayStr, byteMood: 'happy' };
           }
           // Missed days → reset streak, lose hearts based on days missed
           const lastDate = new Date(s.lastActiveDate);

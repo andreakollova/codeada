@@ -292,10 +292,8 @@ export default function ArenaPage() {
       if (player) {
         const vw = typeof window !== 'undefined' ? window.innerWidth : 800;
         const vh = typeof window !== 'undefined' ? window.innerHeight : 600;
-        const sc = vw < 768 ? 0.85 : 1;
-        // Offset camera so player is centered, accounting for scale
-        setCameraX(player.x - vw / (2 * sc));
-        setCameraY(player.y - vh / (2 * sc));
+        setCameraX(player.x - vw / 2);
+        setCameraY(player.y - vh / 2);
       }
 
       rafRef.current = requestAnimationFrame(tick);
@@ -509,7 +507,7 @@ export default function ArenaPage() {
   ];
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: '#030303', overflow: 'hidden', touchAction: 'none' }}>
+    <div style={{ position: 'fixed', inset: 0, background: '#030303', overflow: 'hidden', touchAction: 'none', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       {/* INTRO WIZARD */}
       <AnimatePresence>
         {showIntro && (
@@ -584,8 +582,7 @@ export default function ArenaPage() {
       <div ref={canvasRef} style={{ position: 'absolute', inset: 0 }}>
         <div style={{
           position: 'absolute',
-          transform: `translate(${-cameraX}px, ${-cameraY}px)${isMobile ? ' scale(0.85)' : ''}`,
-          transformOrigin: '0 0',
+          transform: `translate(${-cameraX}px, ${-cameraY}px)`,
           width: WORLD_W, height: WORLD_H,
         }}>
           {/* Grid */}

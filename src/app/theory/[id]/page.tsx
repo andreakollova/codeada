@@ -146,7 +146,7 @@ export default function TheoryLessonPage() {
           </h2>
           <p style={{ fontSize: 14, color: '#888', lineHeight: 1.6, marginBottom: 6 }}>
             {locale === 'sk'
-              ? `Vezmi si ${readTime} minút a prečítaj si toto v pohode.`
+              ? `Sadni si na ${readTime} minút a uži si čítanie.`
               : `Take ${readTime} minutes and enjoy this read.`}
           </p>
           <p style={{ fontSize: 12, color: '#555', marginBottom: 28 }}>
@@ -736,7 +736,7 @@ export default function TheoryLessonPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 20px', paddingTop: 'max(12px, env(safe-area-inset-top, 0px))', background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #0f0f0f' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 20px', paddingTop: 'max(12px, 50px)', background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid #0f0f0f' }}>
         <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
           <button onClick={() => router.push('/')} style={{ color: '#777', cursor: 'pointer', padding: 4, background: 'none', border: 'none' }}>
             <X size={20} />

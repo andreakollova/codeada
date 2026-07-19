@@ -30,11 +30,14 @@ struct Provider: TimelineProvider {
             var entry: GlossaryTimelineEntry
 
             if let data = data, let glossary = try? JSONDecoder().decode(GlossaryEntry.self, from: data) {
-                let lang = Locale.current.language.languageCode?.identifier ?? "en"
+                // Read language from shared App Group (set by main app), fallback to device locale
+                let shared = UserDefaults(suiteName: "group.sk.coduy.app")
+                let lang = shared?.string(forKey: "coduy-locale") ?? Locale.current.language.languageCode?.identifier ?? "en"
                 let detail = lang == "sk" ? glossary.sk : glossary.en
                 entry = GlossaryTimelineEntry(date: Date(), term: glossary.term, definition: glossary.full, detail: detail, isPro: true)
             } else {
-                let lang = Locale.current.language.languageCode?.identifier ?? "en"
+                let shared2 = UserDefaults(suiteName: "group.sk.coduy.app")
+                let lang = shared2?.string(forKey: "coduy-locale") ?? Locale.current.language.languageCode?.identifier ?? "en"
                 let msg = lang == "sk" ? "0 EUR - 7 dní zadarmo. Získaj Pro pre denné slovíčka." : "0 EUR - 7 days free. Get Pro for daily terms."
                 entry = GlossaryTimelineEntry(date: Date(), term: "Coduy Pro", definition: lang == "sk" ? "Získaj widget" : "Get widget", detail: msg, isPro: false)
             }

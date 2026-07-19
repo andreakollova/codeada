@@ -167,7 +167,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           </div>
           <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>
             {plan === 'yearly'
-              ? (sk ? 'potom 40.69/rok' : 'then 40.69/yr')
+              ? (sk ? 'potom 40.99/rok' : 'then 40.99/yr')
               : (sk ? 'potom 3.99/mes' : 'then 3.99/mo')}
           </div>
         </button>
@@ -180,7 +180,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           textAlign: 'center',
         }}>
           <div style={{ fontSize: 24, fontWeight: 800, color: plan === 'monthly' ? '#fff' : '#555', marginTop: 12 }}>
-            {plan === 'yearly' ? '40.69' : '3.99'} <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
+            {plan === 'yearly' ? '40.99' : '3.99'} <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
           </div>
           <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>
             {plan === 'yearly' ? (sk ? '/ rok' : '/ year') : (sk ? '/ mesiac' : '/ month')}

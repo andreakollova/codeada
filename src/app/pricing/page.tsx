@@ -181,7 +181,7 @@ export default function PricingPage() {
                 </div>
               )}
               <div style={{ fontSize: 22, fontWeight: 800, color: plan === p ? '#fff' : '#555' }}>
-                {p === 'monthly' ? '3.99' : '40.69'} <span style={{ fontSize: 13, fontWeight: 600 }}>EUR</span>
+                {p === 'monthly' ? '3.99' : '40.99'} <span style={{ fontSize: 13, fontWeight: 600 }}>EUR</span>
               </div>
               <div style={{ fontSize: 11, color: plan === p ? '#888' : '#444', fontWeight: 600, marginTop: 4 }}>
                 {p === 'monthly'

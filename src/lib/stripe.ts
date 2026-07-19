@@ -6,8 +6,8 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_place
 
 export const PRICES = {
   monthly: 'price_1TufJmLBp6R6umD2ZlWDBngx',
-  yearly: 'price_1TufJmLBp6R6umD2JnprfO1m',
+  yearly: 'price_1TuqcKLBp6R6umD2PFAb17Mi', // 40.99 EUR/year
 } as const;
 
 export const FIRST_MONTH_COUPON = '7FzJvpui';
-export const FIRST_YEAR_COUPON = 'oRjZptx0';
+export const FIRST_YEAR_COUPON = 'QpQLHwTf';

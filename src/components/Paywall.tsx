@@ -9,7 +9,7 @@ import Byte from './Byte';
 import { Crown, Check, Gift, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-const FREE_LESSON_LIMIT = 5;
+const FREE_LESSON_LIMIT = 3;
 
 export function useSubscription() {
   const { userId, completedLessons } = useUserStore();

@@ -18,7 +18,7 @@ const LOGIN_SKINS: ByteEquipment[] = [
 ];
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
-  const { locale } = useLocaleStore();
+  const { locale, toggle } = useLocaleStore();
   const { setUserId, userId } = useUserStore();
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
@@ -141,7 +141,6 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   if (authed) return <>{children}</>;
 
   // Login screen
-  const { toggle } = useLocaleStore();
   return (
     <div style={{
       minHeight: '100vh', background: '#0A0A0A',

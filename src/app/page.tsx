@@ -128,7 +128,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 40 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 40, marginTop: 16 }}
             >
               <Byte mood={byteMood} size={72} equipment={equipment} />
               <div>

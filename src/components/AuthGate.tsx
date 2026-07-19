@@ -141,12 +141,27 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   if (authed) return <>{children}</>;
 
   // Login screen
+  const { toggle } = useLocaleStore();
   return (
     <div style={{
       minHeight: '100vh', background: '#0A0A0A',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 24,
+      padding: 24, position: 'relative',
     }}>
+      {/* Language toggle */}
+      <button
+        onClick={toggle}
+        style={{
+          position: 'absolute', top: 16, right: 16,
+          width: 36, height: 36, borderRadius: 10,
+          background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#aaa',
+          zIndex: 10,
+        }}
+      >
+        {locale === 'en' ? 'EN' : 'SK'}
+      </button>
       <div className="auth-gate-content" style={{ maxWidth: 380, width: '100%' }}>
         <style>{`
           @media (max-width: 600px) {

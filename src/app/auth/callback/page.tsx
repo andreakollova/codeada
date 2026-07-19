@@ -12,37 +12,30 @@ export default function AuthCallback() {
     const sb = getSupabase();
     if (!sb) { router.push('/'); return; }
 
-    sb.auth.getSession().then(async ({ data }) => {
-      const fromApp = searchParams.get('from') === 'app';
+    const fromApp = searchParams.get('from') === 'app';
 
+    // Get the session from URL hash (Supabase puts tokens in hash fragment)
+    sb.auth.getSession().then(({ data }) => {
       if (fromApp && data.session) {
-        // Close the Capacitor browser and redirect to app via URL scheme
-        const accessToken = data.session.access_token;
-        const refreshToken = data.session.refresh_token;
-
-        // Try to close Capacitor Browser
-        try {
-          const { Browser } = await import('@capacitor/browser');
-          await Browser.close();
-        } catch {}
-
-        // Redirect to app via custom URL scheme
-        window.location.href = `coduy://auth?access_token=${accessToken}&refresh_token=${refreshToken}`;
-
-        // Fallback: if URL scheme doesn't work after 2s, redirect to web
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
+        // Redirect immediately to app via custom URL scheme
+        // This will open the app and Safari browser will dismiss
+        window.location.replace(
+          `coduy://auth?access_token=${data.session.access_token}&refresh_token=${data.session.refresh_token}`
+        );
         return;
       }
-
       router.push('/');
     });
   }, []);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#888' }}>Signing you in...</p>
+    <div style={{
+      minHeight: '100vh', background: '#000',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: 12,
+    }}>
+      <p style={{ color: '#888', fontSize: 14 }}>Signing you in...</p>
+      <p style={{ color: '#555', fontSize: 11 }}>Returning to Coduy app...</p>
     </div>
   );
 }

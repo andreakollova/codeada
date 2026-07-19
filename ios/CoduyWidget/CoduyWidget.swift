@@ -106,9 +106,11 @@ struct CoduyWidgetEntryView: View {
             VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 6) {
                 // Header
                 HStack(alignment: .center) {
-                    Text("coduy")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundColor(.white.opacity(0.4))
+                    Image("CoduyLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 14)
+                        .opacity(0.5)
 
                     Spacer()
 

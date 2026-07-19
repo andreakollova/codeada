@@ -190,7 +190,7 @@ struct CoduyWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             CoduyWidgetEntryView(entry: entry)
-                .containerBackground(.black, for: .widget)
+                .containerBackground(Color(red: 0.11, green: 0.11, blue: 0.12), for: .widget)
         }
         .configurationDisplayName("Word of the Day")
         .description("Learn a new programming term every day.")

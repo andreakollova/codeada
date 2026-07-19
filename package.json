@@ -18,6 +18,8 @@
     "@capacitor/ios": "^8.4.1",
     "@capacitor/push-notifications": "^8.1.2",
     "@monaco-editor/react": "^4.7.0",
+    "@stripe/react-stripe-js": "^6.8.0",
+    "@stripe/stripe-js": "^9.10.0",
     "@supabase/supabase-js": "^2.106.1",
     "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.40.0",

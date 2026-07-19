@@ -14,15 +14,13 @@ struct Provider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (GlossaryTimelineEntry) -> ()) {
-        let entry = GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.")
-        completion(entry)
+        completion(GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other."))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GlossaryTimelineEntry>) -> ()) {
         guard let url = URL(string: "https://www.coduy.sk/api/widget") else {
             let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code")
-            let timeline = Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600)))
-            completion(timeline)
+            completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600))))
             return
         }
 
@@ -37,10 +35,7 @@ struct Provider: TimelineProvider {
                 entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code")
             }
 
-            // Refresh every 6 hours
-            let nextUpdate = Date().addingTimeInterval(6 * 3600)
-            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-            completion(timeline)
+            completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(6 * 3600))))
         }.resume()
     }
 }
@@ -52,41 +47,104 @@ struct GlossaryTimelineEntry: TimelineEntry {
     let detail: String
 }
 
-struct CoduyWidgetEntryView: View {
-    var entry: Provider.Entry
-
-    @Environment(\.widgetFamily) var family
+struct ByteView: View {
+    let size: CGFloat
 
     var body: some View {
         ZStack {
-            Color.black
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
+            // Head
+            Circle()
+                .stroke(Color.white, lineWidth: 1.5)
+                .frame(width: size, height: size)
+            // Left eye
+            Ellipse()
+                .fill(Color.white)
+                .frame(width: size * 0.12, height: size * 0.15)
+                .offset(x: -size * 0.14, y: -size * 0.03)
+            // Right eye
+            Ellipse()
+                .fill(Color.white)
+                .frame(width: size * 0.12, height: size * 0.15)
+                .offset(x: size * 0.14, y: -size * 0.03)
+            // Smile
+            Path { path in
+                path.addArc(center: CGPoint(x: size/2, y: size * 0.55), radius: size * 0.18, startAngle: .degrees(10), endAngle: .degrees(170), clockwise: true)
+            }
+            .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+            .frame(width: size, height: size)
+            .offset(y: size * 0.05)
+            // Antenna
+            Circle()
+                .fill(Color.white)
+                .frame(width: size * 0.08, height: size * 0.08)
+                .offset(y: -size * 0.55)
+            Rectangle()
+                .fill(Color.white.opacity(0.5))
+                .frame(width: 1.5, height: size * 0.12)
+                .offset(y: -size * 0.47)
+        }
+    }
+}
+
+struct CoduyWidgetEntryView: View {
+    var entry: Provider.Entry
+    @Environment(\.widgetFamily) var family
+
+    var isSk: Bool {
+        Locale.current.language.languageCode?.identifier == "sk"
+    }
+
+    var body: some View {
+        ZStack {
+            // Background
+            LinearGradient(
+                colors: [Color(red: 0.04, green: 0.04, blue: 0.04), Color(red: 0.08, green: 0.08, blue: 0.08)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 6) {
+                // Header
+                HStack(alignment: .center) {
                     Text("coduy")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.white.opacity(0.5))
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.white.opacity(0.4))
+
                     Spacer()
-                    Text("📚")
-                        .font(.system(size: 10))
+
+                    ByteView(size: family == .systemSmall ? 22 : 26)
                 }
 
-                Text(entry.term)
-                    .font(.system(size: family == .systemSmall ? 22 : 28, weight: .heavy))
-                    .foregroundColor(.white)
+                Spacer()
 
+                // Term
+                Text(entry.term)
+                    .font(.system(size: family == .systemSmall ? 24 : 30, weight: .heavy, design: .rounded))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+
+                // Full name
                 if !entry.definition.isEmpty {
                     Text(entry.definition)
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: family == .systemSmall ? 10 : 12, weight: .semibold))
                         .foregroundColor(Color(red: 0.29, green: 0.87, blue: 0.5))
                         .lineLimit(1)
                 }
 
+                // Description
                 Text(entry.detail)
-                    .font(.system(size: family == .systemSmall ? 11 : 13))
-                    .foregroundColor(.white.opacity(0.6))
+                    .font(.system(size: family == .systemSmall ? 10 : 12))
+                    .foregroundColor(.white.opacity(0.5))
                     .lineLimit(family == .systemSmall ? 2 : 3)
+
+                // Footer
+                Text(isSk ? "Slovo dna" : "Word of the Day")
+                    .font(.system(size: 8, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.2))
+                    .textCase(.uppercase)
+                    .tracking(1)
             }
-            .padding(14)
+            .padding(family == .systemSmall ? 14 : 16)
         }
     }
 }

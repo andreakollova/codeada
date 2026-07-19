@@ -105,14 +105,20 @@ export default function ArenaPage() {
   // Init entities
   useEffect(() => {
     const px = WORLD_W / 2, py = WORLD_H / 2;
-    const bots: ArenaEntity[] = BOTS.map((b, i) => ({
-      id: `bot-${i}`, name: b.name, equipment: b.equipment,
-      x: 300 + Math.random() * (WORLD_W - 600),
-      y: 300 + Math.random() * (WORLD_H - 600),
-      vx: (Math.random() - 0.5) * BOT_SPEED,
-      vy: (Math.random() - 0.5) * BOT_SPEED,
-      rotation: 0,
-    }));
+    const bots: ArenaEntity[] = BOTS.map((b, i) => {
+      // First 2 bots spawn near player (within 300px), rest random
+      const nearPlayer = i < 2;
+      const angle = (i / 2) * Math.PI + Math.random() * 0.5;
+      const dist = nearPlayer ? 150 + Math.random() * 200 : 400 + Math.random() * (WORLD_W / 2 - 400);
+      return {
+        id: `bot-${i}`, name: b.name, equipment: b.equipment,
+        x: nearPlayer ? px + Math.cos(angle) * dist : 300 + Math.random() * (WORLD_W - 600),
+        y: nearPlayer ? py + Math.sin(angle) * dist : 300 + Math.random() * (WORLD_H - 600),
+        vx: (Math.random() - 0.5) * BOT_SPEED,
+        vy: (Math.random() - 0.5) * BOT_SPEED,
+        rotation: 0,
+      };
+    });
     const player: ArenaEntity = {
       id: 'player', name: name || 'You', equipment, isPlayer: true,
       x: px, y: py, vx: 0, vy: 0, rotation: 0,

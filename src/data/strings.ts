@@ -23,10 +23,10 @@ const strings = {
   readyToLearn: { en: 'Ready to learn?', sk: 'Pripravený/á učiť sa?' },
 
   // BottomNav
-  courses: { en: 'Courses', sk: 'Kurzy' },
+  courses: { en: 'Course', sk: 'Kurz' },
   reels: { en: 'Reels', sk: 'Reels' },
   settings: { en: 'Settings', sk: 'Nastavenia' },
-  projects: { en: 'Projects', sk: 'Projekty' },
+  projects: { en: 'Project', sk: 'Projekt' },
   arena: { en: 'Arena', sk: 'Aréna' },
   glossary: { en: 'Glossary', sk: 'Slovník' },
   workshop: { en: 'Workshop', sk: 'Šatník' },

@@ -2,18 +2,20 @@
 
 const screens = [
   {
-    bg: 'linear-gradient(180deg, #0a0a0a 0%, #111 100%)',
+    bg: 'linear-gradient(180deg, #0a0a0a 0%, #0a1a10 100%)',
     badge: 'Learn to Code',
     title: 'Master Python\nStep by Step',
     subtitle: '290+ interactive lessons from beginner to advanced.',
     accent: '#4ade80',
+    byte: '/byte-builder.png',
   },
   {
-    bg: 'linear-gradient(180deg, #0a0a0a 0%, #0a1a10 100%)',
+    bg: 'linear-gradient(180deg, #0a0a0a 0%, #0a1020 100%)',
     badge: 'Quiz Arena',
     title: 'Battle Other\nCoders',
     subtitle: 'Test your skills in real-time quiz battles.',
     accent: '#22d3ee',
+    byte: '/byte-mechanic.png',
   },
   {
     bg: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 100%)',
@@ -21,6 +23,7 @@ const screens = [
     title: 'Type Real\nCode',
     subtitle: 'Fill-in-the-blank and write-code exercises.',
     accent: '#a855f7',
+    byte: '/byte-ai.png',
   },
   {
     bg: 'linear-gradient(180deg, #0a0a0a 0%, #1a1200 100%)',
@@ -28,6 +31,7 @@ const screens = [
     title: 'Learn a New\nTerm Every Day',
     subtitle: 'Home screen widget with programming glossary.',
     accent: '#f59e0b',
+    byte: '/byte-master.png',
   },
 ];
 
@@ -46,55 +50,51 @@ export default function ScreenshotsPage() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          padding: '60px 32px',
+          justifyContent: 'space-between',
+          padding: '50px 32px 40px',
           position: 'relative',
         }}>
-          {/* Coduy logo */}
-          <div style={{ position: 'absolute', top: 50, left: 32, display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Logo top */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <img src="/logocoduy.png" alt="Coduy" style={{ height: 24 }} />
+          </div>
+
+          {/* Center - Byte + text */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            {/* Byte character */}
+            <img src={s.byte} alt="Byte" style={{ width: 140, height: 140, objectFit: 'contain' }} />
+
+            {/* Badge */}
             <div style={{
-              width: 32, height: 32, borderRadius: 10, border: '2px solid #fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              position: 'relative',
+              background: s.accent, color: '#000',
+              fontSize: 11, fontWeight: 800, padding: '4px 14px',
+              borderRadius: 20, letterSpacing: '0.05em', textTransform: 'uppercase',
             }}>
-              <div style={{ width: 5, height: 6, borderRadius: '50%', background: '#fff', position: 'absolute', left: 7, top: 11 }} />
-              <div style={{ width: 5, height: 6, borderRadius: '50%', background: '#fff', position: 'absolute', right: 7, top: 11 }} />
-              <div style={{ width: 3, height: 3, borderRadius: '50%', background: '#fff', position: 'absolute', top: -5 }} />
+              {s.badge}
             </div>
-            <span style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>coduy</span>
+
+            {/* Title */}
+            <h1 style={{
+              fontSize: 38, fontWeight: 800, color: '#fff',
+              textAlign: 'center', lineHeight: 1.1,
+              letterSpacing: '-0.03em', margin: 0,
+              whiteSpace: 'pre-line',
+            }}>
+              {s.title}
+            </h1>
+
+            {/* Subtitle */}
+            <p style={{
+              fontSize: 15, color: 'rgba(255,255,255,0.5)',
+              textAlign: 'center', lineHeight: 1.5,
+              maxWidth: 260, margin: 0,
+            }}>
+              {s.subtitle}
+            </p>
           </div>
 
-          {/* Badge */}
-          <div style={{
-            background: s.accent, color: '#000',
-            fontSize: 11, fontWeight: 800, padding: '4px 14px',
-            borderRadius: 20, letterSpacing: '0.05em', textTransform: 'uppercase',
-            marginBottom: 20,
-          }}>
-            {s.badge}
-          </div>
-
-          {/* Title */}
-          <h1 style={{
-            fontSize: 42, fontWeight: 800, color: '#fff',
-            textAlign: 'center', lineHeight: 1.1,
-            letterSpacing: '-0.03em', marginBottom: 16,
-            whiteSpace: 'pre-line',
-          }}>
-            {s.title}
-          </h1>
-
-          {/* Subtitle */}
-          <p style={{
-            fontSize: 16, color: 'rgba(255,255,255,0.6)',
-            textAlign: 'center', lineHeight: 1.5,
-            maxWidth: 280,
-          }}>
-            {s.subtitle}
-          </p>
-
-          {/* Decorative dots */}
-          <div style={{ position: 'absolute', bottom: 60, display: 'flex', gap: 6 }}>
+          {/* Bottom dots */}
+          <div style={{ display: 'flex', gap: 6 }}>
             {[0, 1, 2, 3].map(j => (
               <div key={j} style={{
                 width: 8, height: 8, borderRadius: 4,
@@ -102,12 +102,6 @@ export default function ScreenshotsPage() {
               }} />
             ))}
           </div>
-
-          {/* Bottom accent line */}
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: 3,
-            background: s.accent, opacity: 0.5,
-          }} />
         </div>
       ))}
     </div>

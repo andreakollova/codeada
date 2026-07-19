@@ -19,8 +19,8 @@ const BOT_NAMES = ['Byte', 'Pixel', 'Nova', 'Echo', 'Spark', 'Luna', 'Atlas', 'K
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCount: number) => {
   const h = new Date().getHours();
-  const timeEn = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-  const timeSk = h < 12 ? 'Dobré ráno' : h < 18 ? 'Ahoj' : 'Dobrý večer';
+  const timeEn = h < 12 ? 'Good morning' : h < 17 ? 'Hey' : 'Good evening';
+  const timeSk = h < 12 ? 'Dobré ránko' : h < 17 ? 'Čauko' : 'Pekný večer';
 
   if (locale === 'sk') {
     if (lessonsCount === 0) return `${timeSk}, ${name}.`;

@@ -140,8 +140,11 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           {sk ? 'Ziskat Coduy Pro' : 'Get Coduy Pro'}
         </button>
 
+        <p style={{ fontSize: 13, color: '#4ade80', fontWeight: 600, marginBottom: 4 }}>
+          {sk ? '1 EUR za prvý mesiac' : '1 EUR for the first month'}
+        </p>
         <p style={{ fontSize: 11, color: '#555', marginBottom: 12 }}>
-          {sk ? 'Od 3.39 EUR / mesiac' : 'From 3.39 EUR / month'}
+          {sk ? 'Potom 3.99 EUR / mesiac' : 'Then 3.99 EUR / month'}
         </p>
 
         <button

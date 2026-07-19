@@ -96,7 +96,7 @@ export default function WorkshopPage() {
   return (
     <div className="page-shell" style={{ minHeight: '100vh', background: '#000', color: '#fff' }}>
       {/* Header */}
-      <div style={{ borderBottom: '1px solid #111', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', zIndex: 50 }}>
+      <div style={{ borderBottom: '1px solid #111', padding: '14px 16px', paddingTop: 'max(14px, 50px)', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', zIndex: 50 }}>
         <Link href="/" onClick={() => window.scrollTo(0, 0)}>
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             style={{ width: 36, height: 36, borderRadius: 10, background: '#111', border: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>

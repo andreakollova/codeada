@@ -75,6 +75,9 @@ export default function WidgetTip() {
               <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>
                 {sk ? 'Pridaj si widget' : 'Add widget to Home Screen'}
               </p>
+              <p style={{ fontSize: 10, color: '#4ade80', margin: '0 0 4px', fontWeight: 600 }}>
+                {sk ? 'Free: 1 pojem / mesiac · Pro: nový pojem každý deň' : 'Free: 1 term / month · Pro: new term every day'}
+              </p>
               <div style={{ fontSize: 11, color: '#888', lineHeight: 1.6, margin: 0 }}>
                 {sk ? (
                   <>

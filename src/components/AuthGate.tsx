@@ -24,6 +24,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false);
 
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'start' | 'email' | 'otp'>('start');
   const [loading, setLoading] = useState(false);
@@ -294,8 +295,34 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 placeholder="Email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSendOtp()}
                 autoFocus
+                style={{
+                  width: '100%', padding: '14px', borderRadius: 12,
+                  background: '#111', border: '1px solid #222', color: '#fff',
+                  fontSize: 14, fontFamily: 'inherit', outline: 'none', marginBottom: 8,
+                  boxSizing: 'border-box',
+                }}
+              />
+              <input
+                type="password"
+                placeholder={locale === 'sk' ? 'Heslo (voliteľné)' : 'Password (optional)'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    if (password.trim()) {
+                      // Try password login
+                      const sb = getSupabase();
+                      if (sb) {
+                        setLoading(true);
+                        sb.auth.signInWithPassword({ email: email.trim(), password: password.trim() })
+                          .then(({ error }) => { if (error) { setError(error.message); setLoading(false); } });
+                      }
+                    } else {
+                      handleSendOtp();
+                    }
+                  }
+                }}
                 style={{
                   width: '100%', padding: '14px', borderRadius: 12,
                   background: '#111', border: '1px solid #222', color: '#fff',
@@ -304,7 +331,17 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 }}
               />
               <button
-                onClick={handleSendOtp}
+                onClick={async () => {
+                  if (password.trim()) {
+                    const sb = getSupabase();
+                    if (!sb) return;
+                    setLoading(true); setError(null);
+                    const { error: err } = await sb.auth.signInWithPassword({ email: email.trim(), password: password.trim() });
+                    if (err) { setError(err.message); setLoading(false); }
+                  } else {
+                    handleSendOtp();
+                  }
+                }}
                 disabled={loading || !email.trim()}
                 style={{
                   width: '100%', padding: '14px', borderRadius: 12,
@@ -315,8 +352,10 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 }}
               >
                 {loading
-                  ? (locale === 'sk' ? 'Posielam...' : 'Sending...')
-                  : (locale === 'sk' ? 'Poslať prihlasovací kód' : 'Send login code')}
+                  ? (locale === 'sk' ? 'Prihlasujem...' : 'Signing in...')
+                  : password.trim()
+                    ? (locale === 'sk' ? 'Prihlásiť sa' : 'Sign in')
+                    : (locale === 'sk' ? 'Poslať prihlasovací kód' : 'Send login code')}
               </button>
               <button
                 onClick={() => setStep('start')}

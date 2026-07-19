@@ -8,3 +8,5 @@ export const PRICES = {
   monthly: 'price_1TufJmLBp6R6umD2ZlWDBngx',
   yearly: 'price_1TufJmLBp6R6umD2JnprfO1m',
 } as const;
+
+export const FIRST_MONTH_COUPON = '7FzJvpui';

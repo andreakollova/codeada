@@ -137,8 +137,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
       {/* Features - vertical list */}
       <div style={{ padding: '0 28px 16px' }}>
         {(sk
-          ? ['Neobmedzené lekcie a moduly', 'Interaktívne projekty a cvičenia', 'Aréna - kvízové bitky', 'Denné notifikácie s novým výrazom', 'Bez reklám']
-          : ['Unlimited lessons and modules', 'Interactive projects and exercises', 'Arena - quiz battles', 'Daily notifications with new terms', 'Ad-free experience']
+          ? ['Neobmedzené lekcie a moduly', 'Interaktívne projekty a cvičenia', 'Aréna - kvízové súboje s hráčmi', 'Denné notifikácie s novým výrazom', 'Widgety na ploche']
+          : ['Unlimited lessons and modules', 'Interactive projects and exercises', 'Arena - quiz battles with players', 'Daily notifications with new terms', 'Home screen widgets']
         ).map((f, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
             <Check size={14} color={accentColor} strokeWidth={3} />

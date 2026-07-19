@@ -205,7 +205,21 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
       {/* CTA */}
       <div style={{ padding: '0 24px 10px' }}>
         <motion.button
-          onClick={() => router.push(`/pricing?plan=${plan}`)}
+          onClick={async () => {
+            try {
+              const sb = getSupabase();
+              const session = await sb?.auth.getSession();
+              const email = session?.data?.session?.user?.email;
+              const { userId } = useUserStore.getState();
+              const res = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan, userId, email }),
+              });
+              const data = await res.json();
+              if (data.url) window.location.href = data.url;
+            } catch {}
+          }}
           whileTap={{ scale: 0.98 }}
           style={{
             width: '100%', padding: '16px', borderRadius: 14,

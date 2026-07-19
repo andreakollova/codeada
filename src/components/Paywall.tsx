@@ -122,35 +122,49 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         ))}
       </div>
 
-      {/* Plan cards */}
-      <div style={{ padding: '0 24px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {([
-          { id: 'trial' as const, title: sk ? 'Vyskúšaj' : 'Try it', price: '1', period: sk ? '/prvý mes.' : '/first mo.', desc: sk ? 'Potom 3.99 EUR/mesiac' : 'Then 3.99 EUR/month', badge: null },
-          { id: 'monthly' as const, title: sk ? 'Mesačné' : 'Monthly', price: '3.99', period: sk ? '/mesiac' : '/month', desc: sk ? 'Bez záväzkov' : 'No commitment', badge: null },
-          { id: 'yearly' as const, title: sk ? 'Ročné' : 'Yearly', price: '1', period: sk ? ' EUR teraz' : ' EUR now', desc: sk ? '1 EUR teraz, zvyšok 39.69 EUR neskôr' : '1 EUR now, remaining 39.69 EUR later', badge: sk ? 'UŠETRI 15%' : 'SAVE 15%' },
-        ]).map(p => (
-          <button key={p.id} onClick={() => setPlan(p.id)} style={{
-            width: '100%', padding: '14px 16px', borderRadius: 14, border: 'none', cursor: 'pointer',
-            background: plan === p.id ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
-            outline: plan === p.id ? '2px solid #4ade80' : '1px solid #1a1a1a',
-            textAlign: 'left', position: 'relative',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          }}>
-            {p.badge && <div style={{
-              position: 'absolute', top: -8, right: 14,
-              background: 'linear-gradient(135deg, #4ade80, #22d3ee)', color: '#000',
-              fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 5, letterSpacing: '0.04em',
-            }}>{p.badge}</div>}
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: plan === p.id ? '#fff' : '#aaa' }}>{p.title}</div>
-              <div style={{ fontSize: 11, color: '#666', marginTop: 1 }}>{p.desc}</div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ fontSize: 20, fontWeight: 800, color: plan === p.id ? '#fff' : '#888' }}>{p.price}</span>
-              <span style={{ fontSize: 11, color: '#666', marginLeft: 2 }}>EUR{p.period}</span>
-            </div>
-          </button>
-        ))}
+      {/* Two plan cards side by side */}
+      <div style={{ padding: '0 24px 14px', display: 'flex', gap: 8 }}>
+        {/* Free Trial */}
+        <button onClick={() => setPlan('trial')} style={{
+          flex: 1, padding: '16px 12px', borderRadius: 16, border: 'none', cursor: 'pointer',
+          background: plan === 'trial' ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
+          outline: plan === 'trial' ? '2px solid #4ade80' : '1px solid #1a1a1a',
+          textAlign: 'center', position: 'relative',
+        }}>
+          <div style={{
+            position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)',
+            background: 'linear-gradient(135deg, #4ade80, #22d3ee)', color: '#000',
+            fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 5,
+            letterSpacing: '0.04em', whiteSpace: 'nowrap',
+          }}>FREE TRIAL</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: plan === 'trial' ? '#fff' : '#666', marginTop: 4 }}>
+            1<span style={{ fontSize: 14, fontWeight: 600 }}> EUR</span>
+          </div>
+          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+            {sk ? 'prvý mesiac' : 'first month'}
+          </div>
+          <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
+            {sk ? 'potom 3.99/mes' : 'then 3.99/mo'}
+          </div>
+        </button>
+
+        {/* Monthly */}
+        <button onClick={() => setPlan('monthly')} style={{
+          flex: 1, padding: '16px 12px', borderRadius: 16, border: 'none', cursor: 'pointer',
+          background: plan === 'monthly' ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
+          outline: plan === 'monthly' ? '2px solid #4ade80' : '1px solid #1a1a1a',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: plan === 'monthly' ? '#fff' : '#666', marginTop: 12 }}>
+            3.99<span style={{ fontSize: 14, fontWeight: 600 }}> EUR</span>
+          </div>
+          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+            {sk ? '/ mesiac' : '/ month'}
+          </div>
+          <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
+            {sk ? 'bez záväzkov' : 'no commitment'}
+          </div>
+        </button>
       </div>
 
       {/* CTA */}
@@ -166,9 +180,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           }}
         >
           <Sparkles size={16} />
-          {plan === 'trial' ? (sk ? 'Vyskúšaj za 1 EUR' : 'Try for 1 EUR')
-            : plan === 'yearly' ? (sk ? 'Získať ročné Pro' : 'Get yearly Pro')
-            : (sk ? 'Získať mesačné Pro' : 'Get monthly Pro')}
+          {plan === 'trial' ? (sk ? 'Vyskúšaj za 1 EUR' : 'Try for 1 EUR') : (sk ? 'Získať Pro' : 'Get Pro')}
         </motion.button>
         <p style={{ fontSize: 10, color: '#444', textAlign: 'center', marginTop: 6 }}>
           {sk ? 'Zrušíš kedykoľvek' : 'Cancel anytime'}

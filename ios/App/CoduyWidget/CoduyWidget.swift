@@ -130,11 +130,7 @@ struct CoduyWidgetEntryView: View {
     }
 
     var body: some View {
-        ZStack {
-            // Dark background matching iOS widget style
-            Color(red: 0.11, green: 0.11, blue: 0.12)
-
-            VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 6) {
+        VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 6) {
                 // Header - logo + byte
                 HStack(alignment: .center) {
                     Image("CoduyLogo")
@@ -146,7 +142,11 @@ struct CoduyWidgetEntryView: View {
 
                     Spacer()
 
-                    ByteView(size: family == .systemSmall ? 24 : 28, variant: Calendar.current.component(.day, from: Date()))
+                    // Rotate Byte variants daily
+                    Image(["ByteBuilder", "ByteAi", "ByteMechanic", "ByteMaster"][Calendar.current.component(.day, from: Date()) % 4])
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: family == .systemSmall ? 28 : 34, height: family == .systemSmall ? 28 : 34)
                 }
 
                 Spacer()
@@ -179,7 +179,6 @@ struct CoduyWidgetEntryView: View {
                     .tracking(1)
             }
             .padding(family == .systemSmall ? 14 : 16)
-        }
     }
 }
 

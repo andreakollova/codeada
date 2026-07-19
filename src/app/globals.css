@@ -25,15 +25,21 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
+html, body {
   overflow-x: hidden;
   width: 100%;
-  /* iOS app: hide scrollbar, prevent overscroll bounce */
+  overscroll-behavior-x: none;
   -webkit-overflow-scrolling: touch;
 }
 
-html::-webkit-scrollbar { display: none; }
-body::-webkit-scrollbar { display: none; }
+html {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
 
 body {
   background-color: #0F0F0F;
@@ -43,13 +49,21 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
   overflow-x: hidden;
-  width: 100%;
-  position: relative;
+  -webkit-overflow-scrolling: touch;
 }
+
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
 .page-shell {
   overflow-x: hidden;
+  min-height: 100%;
 }
 
 h1, h2, h3, h4 {

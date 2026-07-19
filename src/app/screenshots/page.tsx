@@ -37,7 +37,7 @@ const screens = [
 
 export default function ScreenshotsPage() {
   return (
-    <div style={{ background: '#000', padding: 20, display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'center' }}>
+    <div style={{ background: '#000', padding: 20, display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'center', position: 'fixed', inset: 0, zIndex: 999, overflow: 'auto' }}>
       <p style={{ width: '100%', textAlign: 'center', color: '#555', fontSize: 12 }}>
         Click Download under each screenshot
       </p>

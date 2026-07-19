@@ -94,12 +94,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
 
     if (isApp) {
-      // In native app: use Capacitor Browser (SFSafariViewController)
-      // Google allows this unlike WKWebView
+      // In native app: open Google OAuth in SFSafariViewController
+      // Then poll for session - when user completes auth, Supabase cookie
+      // is shared with the WebView, so we detect the session and close browser
       const { data } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://www.coduy.sk/auth/callback?from=app',
+          redirectTo: 'https://www.coduy.sk/auth/callback',
           skipBrowserRedirect: true,
         },
       });
@@ -107,6 +108,32 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         try {
           const { Browser } = await import('@capacitor/browser');
           await Browser.open({ url: data.url, presentationStyle: 'popover' });
+
+          // Poll for session every 1.5s - when Google auth completes,
+          // Supabase sets the session cookie which we can read
+          const pollInterval = setInterval(async () => {
+            const { data: sessionData } = await sb.auth.getSession();
+            if (sessionData?.session) {
+              clearInterval(pollInterval);
+              try { await Browser.close(); } catch {}
+              setUserId(sessionData.session.user.id);
+              setAuthed(true);
+            }
+          }, 1500);
+
+          // Stop polling after 2 minutes
+          setTimeout(() => clearInterval(pollInterval), 120000);
+
+          // Also close browser when it's dismissed manually
+          Browser.addListener('browserFinished', () => {
+            clearInterval(pollInterval);
+            sb.auth.getSession().then(({ data: s }) => {
+              if (s?.session) {
+                setUserId(s.session.user.id);
+                setAuthed(true);
+              }
+            });
+          });
         } catch {
           window.open(data.url, '_blank');
         }

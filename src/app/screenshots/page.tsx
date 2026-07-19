@@ -72,11 +72,16 @@ export default function ScreenshotsPage() {
               <img src={s.byte} alt="Byte" style={{ width: 140, height: 140, objectFit: 'contain', position: 'relative', zIndex: 1 }} />
             </div>
 
-            {/* Badge */}
+            {/* Badge - liquid glass */}
             <div style={{
-              background: s.accent, color: '#000',
-              fontSize: 11, fontWeight: 800, padding: '4px 14px',
-              borderRadius: 20, letterSpacing: '0.05em', textTransform: 'uppercase',
+              background: 'rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: `1px solid ${s.accent}44`,
+              color: s.accent,
+              fontSize: 11, fontWeight: 700, padding: '6px 18px',
+              borderRadius: 24, letterSpacing: '0.06em', textTransform: 'uppercase',
+              boxShadow: `0 2px 12px ${s.accent}20`,
             }}>
               {s.badge}
             </div>

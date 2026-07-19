@@ -58,7 +58,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       setChecking(false);
     });
 
-    const { data: { subscription } } = sb.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         const newId = session.user.id;
         if (userId && userId !== newId) {
@@ -69,6 +69,18 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         }
         setUserId(newId);
         setAuthed(true);
+        // Notify Slack on new sign-up
+        if (event === 'SIGNED_IN') {
+          const notified = localStorage.getItem('coduy-slack-notified');
+          if (!notified) {
+            localStorage.setItem('coduy-slack-notified', 'true');
+            fetch('/api/notify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ event: 'new_user', email: session.user.email }),
+            }).catch(() => {});
+          }
+        }
       }
     });
 

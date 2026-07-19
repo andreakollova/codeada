@@ -322,7 +322,25 @@ export default function TheoryLessonPage() {
           </div>
         )}
 
-        {/* Next button */}
+        {/* Back + Next buttons */}
+        {sectionIndex > 0 && (
+          <button
+            onClick={() => {
+              window.scrollTo(0, 0);
+              document.body.scrollTop = 0;
+              setSectionIndex(i => i - 1);
+              setPhase(sections[sectionIndex - 1].phase);
+            }}
+            style={{
+              width: '100%', padding: '12px', borderRadius: 12,
+              background: 'none', border: '1px solid #222', color: '#888',
+              fontWeight: 600, fontSize: 13, cursor: 'pointer',
+              marginBottom: 8,
+            }}
+          >
+            {locale === 'sk' ? 'Späť' : 'Back'}
+          </button>
+        )}
         <motion.button
           onClick={handleNextSection}
           whileHover={{ scale: 1.01 }}

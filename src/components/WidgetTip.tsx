@@ -49,16 +49,26 @@ export default function WidgetTip() {
           </button>
 
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            {/* Mini widget preview */}
+            {/* Mini widget preview - matches real widget design */}
             <div style={{
-              width: 56, height: 56, borderRadius: 14, flexShrink: 0,
-              background: '#0a0a0a', border: '1px solid #222',
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-              padding: '6px 8px',
+              width: 64, height: 64, borderRadius: 16, flexShrink: 0,
+              background: 'linear-gradient(135deg, #0a0a0a, #111)',
+              border: '1px solid #222',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+              padding: '7px 8px',
+              overflow: 'hidden',
             }}>
-              <div style={{ fontSize: 6, color: '#555', fontWeight: 700 }}>coduy</div>
-              <div style={{ fontSize: 11, fontWeight: 800, color: '#fff', marginTop: 2 }}>API</div>
-              <div style={{ fontSize: 5, color: '#4ade80' }}>Application...</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <img src="/logocoduy.png" alt="" style={{ height: 8, opacity: 0.4 }} />
+                <div style={{ width: 12, height: 12, borderRadius: 6, border: '1px solid rgba(255,255,255,0.6)', position: 'relative' }}>
+                  <div style={{ width: 2, height: 2, borderRadius: 1, background: '#fff', position: 'absolute', left: 3, top: 4 }} />
+                  <div style={{ width: 2, height: 2, borderRadius: 1, background: '#fff', position: 'absolute', right: 3, top: 4 }} />
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', lineHeight: 1 }}>API</div>
+                <div style={{ fontSize: 5, color: '#4ade80', marginTop: 1 }}>Application Programming...</div>
+              </div>
             </div>
 
             <div style={{ flex: 1 }}>

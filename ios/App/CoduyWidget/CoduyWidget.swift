@@ -18,7 +18,11 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GlossaryTimelineEntry>) -> ()) {
-        guard let url = URL(string: "https://www.coduy.sk/api/widget") else {
+        // Pro users get daily terms, free users get monthly
+        // TODO: check Pro status via shared UserDefaults/App Group
+        let isPro = true // For now treat all widget users as Pro
+        let urlStr = isPro ? "https://www.coduy.sk/api/widget?pro=true" : "https://www.coduy.sk/api/widget"
+        guard let url = URL(string: urlStr) else {
             let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code", isPro: true)
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600))))
             return

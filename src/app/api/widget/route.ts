@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const TERMS = [
   { term: 'API', full: 'Application Programming Interface', en: 'A set of rules that lets apps talk to each other.', sk: 'Pravidlá, ktoré umožňujú appkám komunikovať.' },
@@ -33,11 +33,18 @@ const TERMS = [
   { term: 'OOP', full: 'Object Oriented Programming', en: 'Organizing code into objects with data and behavior.', sk: 'Organizovanie kódu do objektov s dátami a správaním.' },
 ];
 
-export async function GET() {
-  const day = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-  const term = TERMS[day % TERMS.length];
+export async function GET(req: NextRequest) {
+  const pro = req.nextUrl.searchParams.get('pro');
 
-  return NextResponse.json(term, {
-    headers: { 'Cache-Control': 'public, max-age=3600' },
-  });
+  if (pro === 'true') {
+    // Pro: daily rotation
+    const day = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    const term = TERMS[day % TERMS.length];
+    return NextResponse.json(term, { headers: { 'Cache-Control': 'public, max-age=3600' } });
+  } else {
+    // Free: one term per month
+    const month = new Date().getMonth();
+    const term = TERMS[month % TERMS.length];
+    return NextResponse.json(term, { headers: { 'Cache-Control': 'public, max-age=86400' } });
+  }
 }

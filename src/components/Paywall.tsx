@@ -51,6 +51,8 @@ export function useSubscription() {
   const isPro = status === 'active' || status === 'admin';
   const needsUpgrade = !isPro && status !== 'loading' && completedLessons.length >= FREE_LESSON_LIMIT;
 
+  const [showProReward, setShowProReward] = useState(false);
+
   // Auto-grant Pro Glow aura when user becomes Pro
   useEffect(() => {
     if (isPro) {
@@ -58,11 +60,12 @@ export function useSubscription() {
       if (!ownedItems.includes('aura-pro')) {
         addItem('aura-pro');
         equip('aura', 'aura-pro');
+        setShowProReward(true);
       }
     }
   }, [isPro]);
 
-  return { status, isPro, needsUpgrade, trialEnds, completedLessons: completedLessons.length, limit: FREE_LESSON_LIMIT };
+  return { status, isPro, needsUpgrade, trialEnds, showProReward, dismissProReward: () => setShowProReward(false), completedLessons: completedLessons.length, limit: FREE_LESSON_LIMIT };
 }
 
 export default function Paywall({ onClose }: { onClose?: () => void }) {

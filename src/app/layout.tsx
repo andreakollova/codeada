@@ -70,6 +70,7 @@ import BottomNav from '@/components/BottomNav';
 import LocaleInit from '@/components/LocaleInit';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
 import PushNotificationHandler from '@/components/PushNotifications';
+import ProRewardModal from '@/components/ProRewardModal';
 import AuthGate from '@/components/AuthGate';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -129,6 +130,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Analytics />
         <DeepLinkHandler />
         <PushNotificationHandler />
+        <ProRewardModal />
         <script dangerouslySetInnerHTML={{ __html: `
           if (window.Capacitor) {
             window.addEventListener('load', function() {

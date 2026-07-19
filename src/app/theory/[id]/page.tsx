@@ -789,8 +789,34 @@ function isCodeLine(line: string): boolean {
 
 function formatContent(text: string) {
   if (!text) return null;
-  const blocks = text.split('\n\n');
+
+  // First pass: handle markdown ``` code blocks
+  // Split by ``` and alternate between text and code
+  const parts = text.split(/```(?:python|py|javascript|js|sql|html|css|tsx?|json|bash|sh)?\s*\n?/);
   const result: React.ReactNode[] = [];
+  let keyCounter = 0;
+
+  for (let p = 0; p < parts.length; p++) {
+    if (p % 2 === 1) {
+      // Code block (between ```)
+      const code = parts[p].trim();
+      if (code) {
+        result.push(
+          <pre key={`code-${keyCounter++}`} style={{
+            background: '#111', border: '1px solid #1a1a1a', borderRadius: 10,
+            padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
+            overflow: 'auto', marginBottom: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+            whiteSpace: 'pre-wrap',
+          }}>
+            {code}
+          </pre>
+        );
+      }
+      continue;
+    }
+
+    // Text block - process paragraphs
+    const blocks = parts[p].split('\n\n');
 
   for (let i = 0; i < blocks.length; i++) {
     const trimmed = blocks[i].trim();
@@ -810,7 +836,7 @@ function formatContent(text: string) {
       // Strip trailing colon for cleaner headings
       const heading = trimmed.endsWith(':') ? trimmed.slice(0, -1) : trimmed;
       result.push(
-        <h3 key={i} style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', marginTop: i > 0 ? 24 : 0, marginBottom: 10 }}>
+        <h3 key={`h-${keyCounter++}`} style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', marginTop: i > 0 ? 24 : 0, marginBottom: 10 }}>
           {heading}
         </h3>
       );
@@ -821,7 +847,7 @@ function formatContent(text: string) {
     const codeLines = lines.filter(l => isCodeLine(l) || l.trim() === '');
     if (codeLines.length > lines.length * 0.5 && lines.some(l => isCodeLine(l))) {
       result.push(
-        <pre key={i} style={{
+        <pre key={`pre-${keyCounter++}`} style={{
           background: '#111', border: '1px solid #1a1a1a', borderRadius: 10,
           padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
           overflow: 'auto', marginBottom: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
@@ -835,11 +861,12 @@ function formatContent(text: string) {
 
     // Regular paragraph
     result.push(
-      <p key={i} style={{ margin: 0, marginBottom: 16 }}>
+      <p key={`p-${keyCounter++}`} style={{ margin: 0, marginBottom: 16 }}>
         {trimmed}
       </p>
     );
   }
+  } // end parts loop
 
   return result;
 }

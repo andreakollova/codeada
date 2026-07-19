@@ -220,7 +220,19 @@ a { color: inherit; text-decoration: none; }
     display: none;
   }
   .dashboard-main {
-    padding: 24px 16px 100px;
+    padding: 16px 16px 100px;
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Mobile bottom nav centering + safe area */
+@media (max-width: 899px) {
+  .mobile-nav {
+    justify-content: center;
+  }
+  .mobile-nav > a {
+    flex: 1;
+    max-width: 80px;
   }
 }
 

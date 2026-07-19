@@ -11,7 +11,7 @@ import { ArrowRight, Coffee, Zap, CupSoda, GlassWater, Leaf, Ban } from 'lucide-
 const DRINKS = [
   { id: 'coffee' as const, Icon: Coffee, en: 'Coffee', sk: 'Káva' },
   { id: 'tea' as const, Icon: Leaf, en: 'Tea', sk: 'Čaj' },
-  { id: 'energy' as const, Icon: Zap, en: 'Energy Drink', sk: 'Energy Drink' },
+  { id: 'energy' as const, Icon: Zap, en: 'Energy', sk: 'Energy' },
   { id: 'juice' as const, Icon: CupSoda, en: 'Juice', sk: 'Džús' },
   { id: 'water' as const, Icon: GlassWater, en: 'Water', sk: 'Voda' },
   { id: 'water' as const, Icon: Ban, en: 'Nothing', sk: 'Nič' },
@@ -70,7 +70,7 @@ export default function NameModal() {
             position: 'fixed', inset: 0, zIndex: 200,
             background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(20px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: 24, overflow: 'auto',
+            padding: '0 24px', overflow: 'auto',
           }}
         >
           <AnimatePresence mode="wait">

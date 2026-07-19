@@ -25,20 +25,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-  overscroll-behavior-x: none;
-  -webkit-overflow-scrolling: touch;
-}
-
 html {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   overflow: hidden;
+  width: 100vw;
+  height: 100%;
 }
 
 body {
@@ -49,21 +39,20 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
+  width: 100vw;
+  height: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
 }
 
 html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
-.page-shell {
-  overflow-x: hidden;
-  min-height: 100%;
+/* Clip everything to viewport - prevents aura/animation overflow */
+#__next, .page-shell {
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 h1, h2, h3, h4 {

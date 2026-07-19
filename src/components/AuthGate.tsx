@@ -145,7 +145,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     <div style={{
       minHeight: '100vh', background: '#0A0A0A',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 24, position: 'relative',
+      padding: '24px 16px', position: 'relative',
+      overflow: 'hidden', maxWidth: '100vw', boxSizing: 'border-box',
     }}>
       {/* Language toggle */}
       <button

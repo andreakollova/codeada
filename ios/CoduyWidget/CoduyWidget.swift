@@ -113,8 +113,8 @@ struct CoduyWidgetEntryView: View {
 
     var body: some View {
         ZStack {
-            // Pure black background
-            Color.black
+            // Dark background matching iOS widget style
+            Color(red: 0.11, green: 0.11, blue: 0.12)
 
             VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 6) {
                 // Header - logo + byte

@@ -71,6 +71,7 @@ import LocaleInit from '@/components/LocaleInit';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
 import PushNotificationHandler from '@/components/PushNotifications';
 import ProRewardModal from '@/components/ProRewardModal';
+import WidgetTip from '@/components/WidgetTip';
 import AuthGate from '@/components/AuthGate';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -131,6 +132,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <DeepLinkHandler />
         <PushNotificationHandler />
         <ProRewardModal />
+        <WidgetTip />
         <script dangerouslySetInnerHTML={{ __html: `
           if (window.Capacitor) {
             window.addEventListener('load', function() {

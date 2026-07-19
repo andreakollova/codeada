@@ -135,19 +135,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               }, 300);
             });
             // Handle deep link from Google OAuth callback
+            // Supabase redirects to coduy://auth/callback#access_token=...&refresh_token=...
             import('@capacitor/app').then(function(mod) {
               mod.App.addListener('appUrlOpen', function(event) {
-                if (event.url && event.url.startsWith('coduy://auth')) {
+                if (event.url && event.url.indexOf('coduy://auth') === 0) {
                   try {
-                    var params = new URL(event.url.replace('coduy://', 'https://x/')).searchParams;
-                    var at = params.get('access_token');
-                    var rt = params.get('refresh_token');
+                    // Supabase puts tokens in hash fragment OR query params
+                    var url = event.url.replace('coduy://', 'https://x/');
+                    var hash = url.split('#')[1] || '';
+                    var hashParams = new URLSearchParams(hash);
+                    var queryParams = new URL(url).searchParams;
+                    var at = hashParams.get('access_token') || queryParams.get('access_token');
+                    var rt = hashParams.get('refresh_token') || queryParams.get('refresh_token');
                     if (at && rt && window.__supabase) {
                       window.__supabase.auth.setSession({ access_token: at, refresh_token: rt }).then(function() {
                         location.reload();
                       });
                     } else {
-                      location.reload();
+                      // Might have a code param instead (PKCE flow)
+                      var code = queryParams.get('code') || hashParams.get('code');
+                      if (code && window.__supabase) {
+                        window.__supabase.auth.exchangeCodeForSession(code).then(function() {
+                          location.reload();
+                        });
+                      } else {
+                        location.reload();
+                      }
                     }
                   } catch(e) { location.reload(); }
                 }

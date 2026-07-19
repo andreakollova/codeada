@@ -94,49 +94,19 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
 
     if (isApp) {
-      // In native app: open Google OAuth in SFSafariViewController
-      // Then poll for session - when user completes auth, Supabase cookie
-      // is shared with the WebView, so we detect the session and close browser
+      // In native app: redirect Supabase directly to coduy:// URL scheme
+      // This bypasses the web callback entirely - tokens come via deep link
       const { data } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://www.coduy.sk/auth/callback',
+          redirectTo: 'coduy://auth/callback',
           skipBrowserRedirect: true,
         },
       });
       if (data?.url) {
-        try {
-          const { Browser } = await import('@capacitor/browser');
-          await Browser.open({ url: data.url, presentationStyle: 'popover' });
-
-          // Poll for session every 1.5s - when Google auth completes,
-          // Supabase sets the session cookie which we can read
-          const pollInterval = setInterval(async () => {
-            const { data: sessionData } = await sb.auth.getSession();
-            if (sessionData?.session) {
-              clearInterval(pollInterval);
-              try { await Browser.close(); } catch {}
-              setUserId(sessionData.session.user.id);
-              setAuthed(true);
-            }
-          }, 1500);
-
-          // Stop polling after 2 minutes
-          setTimeout(() => clearInterval(pollInterval), 120000);
-
-          // Also close browser when it's dismissed manually
-          Browser.addListener('browserFinished', () => {
-            clearInterval(pollInterval);
-            sb.auth.getSession().then(({ data: s }) => {
-              if (s?.session) {
-                setUserId(s.session.user.id);
-                setAuthed(true);
-              }
-            });
-          });
-        } catch {
-          window.open(data.url, '_blank');
-        }
+        // Open in system Safari (not SFSafariViewController)
+        // Safari will handle Google OAuth, then redirect to coduy:// which opens the app
+        window.location.href = data.url;
       }
     } else {
       // On web: normal redirect

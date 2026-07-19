@@ -94,7 +94,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
 
     if (isApp) {
-      // In native app: open in system Safari, redirect back via custom URL scheme
+      // In native app: use Capacitor Browser (SFSafariViewController)
+      // Google allows this unlike WKWebView
       const { data } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -103,7 +104,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         },
       });
       if (data?.url) {
-        window.open(data.url, '_blank');
+        try {
+          const { Browser } = await import('@capacitor/browser');
+          await Browser.open({ url: data.url, presentationStyle: 'popover' });
+        } catch {
+          window.open(data.url, '_blank');
+        }
       }
     } else {
       // On web: normal redirect

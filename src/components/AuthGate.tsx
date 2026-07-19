@@ -94,21 +94,32 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
 
     if (isApp) {
-      // In native app: open in REAL Safari app (not WebView, not SFSafariViewController)
-      // Google allows OAuth from real Safari. After auth, Supabase redirects
-      // to coduy://auth/callback which opens the app via URL scheme.
-      // Use /auth/callback-app route which does 302 redirect to coduy://
-      // This closes SFSafariViewController and opens the app
-      const { data } = await sb.auth.signInWithOAuth({
+      const { data, error } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: 'https://www.coduy.sk/auth/callback-app',
           skipBrowserRedirect: true,
         },
       });
+      console.log('OAuth URL:', data?.url, 'Error:', error);
       if (data?.url) {
-        const { Browser } = await import('@capacitor/browser');
-        await Browser.open({ url: data.url, presentationStyle: 'popover' });
+        try {
+          const { Browser } = await import('@capacitor/browser');
+          await Browser.open({ url: data.url });
+        } catch (e) {
+          console.log('Browser.open failed:', e);
+          // Fallback: open in new tab
+          window.open(data.url, '_blank');
+        }
+      } else {
+        // Fallback: use web flow but in new window
+        console.log('No OAuth URL, falling back to web flow');
+        const { data: d2 } = await sb.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: 'https://www.coduy.sk/auth/callback-app',
+          },
+        });
       }
     } else {
       // On web: normal redirect

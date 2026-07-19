@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { fetchModulesWithLessons, ModuleWithLessons, DbLessonSummary } from '@/lib/curriculum-api';
 import { useRouter } from 'next/navigation';
-import { BookOpen, ChevronRight, Check, ArrowRight, Library, Coffee } from 'lucide-react';
+import { BookOpen, ChevronRight, Check, ArrowRight, Library, Coffee, Cpu, Monitor, HardDrive, Binary, Braces, Variable, FunctionSquare, GitBranch, Database, Shield, Layers, Zap, Bug, Globe, Terminal, Code } from 'lucide-react';
 import { useLocaleStore, t } from '@/store/localeStore';
 import { s } from '@/data/strings';
 
@@ -210,6 +210,13 @@ function ReadCard({ lesson, index, router, locale }: { lesson: DbLessonSummary &
   );
 }
 
+const MODULE_ICONS: Record<number, any> = {
+  1: Terminal, 2: Monitor, 3: HardDrive, 4: Cpu, 5: Binary,
+  6: Globe, 7: Variable, 8: Braces, 9: FunctionSquare, 10: GitBranch,
+  11: Database, 12: Shield, 13: Layers, 14: Zap, 15: Bug,
+  16: Code, 17: Globe, 18: Terminal,
+};
+
 function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: ModuleWithLessons; completedLessons: string[]; router: any; locale: 'en' | 'sk'; favDrink: DrinkType | null }) {
   const [open, setOpen] = useState(false);
   const doneCount = mod.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
@@ -231,7 +238,7 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
         }}>
           {allDone
             ? <span>{drinkReward.icon}</span>
-            : <BookOpen size={14} color="#777" />
+            : (() => { const Icon = MODULE_ICONS[mod.module_number] || BookOpen; return <Icon size={14} color="#777" />; })()
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>

@@ -62,6 +62,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const { locale } = useLocaleStore();
   const { equipment } = useUserStore();
   const router = useRouter();
+  const [selectedPlan, setSelectedPlan] = useState<'trial' | 'monthly' | 'yearly'>('trial');
   const sk = locale === 'sk';
 
   const features = sk
@@ -126,6 +127,25 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           ))}
         </div>
 
+        {/* Plan selector */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 16, width: '100%' }}>
+          {[
+            { id: 'trial', label: sk ? '1 EUR' : '1 EUR', sub: sk ? 'prvý mesiac' : 'first month' },
+            { id: 'monthly', label: '3.99 EUR', sub: sk ? '/ mesiac' : '/ month' },
+            { id: 'yearly', label: '40.69 EUR', sub: sk ? '/ rok (-15%)' : '/ year (-15%)' },
+          ].map(p => (
+            <button key={p.id} onClick={() => setSelectedPlan(p.id as any)} style={{
+              flex: 1, padding: '10px 6px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: selectedPlan === p.id ? '#1a1a1a' : '#0a0a0a',
+              outline: selectedPlan === p.id ? '2px solid #4ade80' : '1px solid #222',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: selectedPlan === p.id ? '#fff' : '#555' }}>{p.label}</div>
+              <div style={{ fontSize: 9, color: selectedPlan === p.id ? '#888' : '#444', marginTop: 2 }}>{p.sub}</div>
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={() => router.push('/pricing')}
           style={{
@@ -137,15 +157,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           }}
         >
           <Crown size={16} />
-          {sk ? 'Ziskat Coduy Pro' : 'Get Coduy Pro'}
+          {sk ? 'Získať Coduy Pro' : 'Get Coduy Pro'}
         </button>
-
-        <p style={{ fontSize: 13, color: '#4ade80', fontWeight: 600, marginBottom: 4 }}>
-          {sk ? '1 EUR za prvý mesiac' : '1 EUR for the first month'}
-        </p>
-        <p style={{ fontSize: 11, color: '#555', marginBottom: 12 }}>
-          {sk ? 'Potom 3.99 EUR / mesiac' : 'Then 3.99 EUR / month'}
-        </p>
 
         <button
           onClick={() => router.back()}

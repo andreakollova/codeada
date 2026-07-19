@@ -156,7 +156,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             letterSpacing: '0.04em', whiteSpace: 'nowrap',
           }}>FREE TRIAL</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginTop: 4 }}>
-            1 <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
+            0.99 <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
           </div>
           <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>
             {plan === 'yearly' || plan === 'trial'
@@ -205,7 +205,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         >
           <Sparkles size={16} />
           {plan === 'trial' || plan === 'yearly'
-            ? (sk ? 'Vyskúšaj za 1 EUR' : 'Try for 1 EUR')
+            ? (sk ? 'Vyskúšaj za 0.99 EUR' : 'Try for 0.99 EUR')
             : (sk ? 'Získať Pro' : 'Get Pro')}
         </motion.button>
         <p style={{ fontSize: 10, color: '#444', textAlign: 'center', marginTop: 6 }}>

@@ -9,5 +9,5 @@ export const PRICES = {
   yearly: 'price_1TuqcKLBp6R6umD2PFAb17Mi', // 40.99 EUR/year
 } as const;
 
-export const FIRST_MONTH_COUPON = '7FzJvpui';
-export const FIRST_YEAR_COUPON = 'QpQLHwTf';
+export const FIRST_MONTH_COUPON = 'pTUCnlJU'; // 3.00 off → 0.99 EUR first month
+export const FIRST_YEAR_COUPON = 'AjZk4z4m'; // 40.00 off → 0.99 EUR first year

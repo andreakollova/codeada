@@ -7,6 +7,15 @@ async function processDeepLink(url: string) {
   console.log('Processing deep link:', url);
   if (!url || !url.startsWith('coduy://')) return;
 
+  // Prevent infinite loop - only process each URL once
+  const processedKey = 'coduy-deeplink-processed';
+  const lastProcessed = sessionStorage.getItem(processedKey);
+  if (lastProcessed === url.substring(0, 100)) {
+    console.log('Deep link already processed, skipping');
+    return;
+  }
+  sessionStorage.setItem(processedKey, url.substring(0, 100));
+
   const sb = getSupabase();
   if (!sb) { console.log('No supabase client'); return; }
 

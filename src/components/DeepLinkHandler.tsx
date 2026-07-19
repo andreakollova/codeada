@@ -3,77 +3,89 @@
 import { useEffect } from 'react';
 import { getSupabase } from '@/lib/supabase';
 
-async function processDeepLink(url: string) {
-  console.log('Processing deep link:', url);
-  if (!url || !url.startsWith('coduy://')) return;
+let isProcessingAuthCallback = false;
+let deepLinkListenerRegistered = false;
 
-  // Prevent infinite loop - only process each URL once
-  const processedKey = 'coduy-deeplink-processed';
-  const lastProcessed = sessionStorage.getItem(processedKey);
-  if (lastProcessed === url.substring(0, 100)) {
-    console.log('Deep link already processed, skipping');
-    return;
-  }
-  sessionStorage.setItem(processedKey, url.substring(0, 100));
+async function processAuthCallback(url: string) {
+  if (!url.startsWith('coduy://auth/callback')) return;
+  if (isProcessingAuthCallback) return;
 
-  const sb = getSupabase();
-  if (!sb) { console.log('No supabase client'); return; }
+  isProcessingAuthCallback = true;
 
   try {
-    const fakeUrl = url.replace('coduy://', 'https://x/');
-    const parsed = new URL(fakeUrl);
-    const code = parsed.searchParams.get('code');
-    const hash = fakeUrl.split('#')[1] || '';
-    const hashParams = new URLSearchParams(hash);
-    const accessToken = hashParams.get('access_token') || parsed.searchParams.get('access_token');
-    const refreshToken = hashParams.get('refresh_token') || parsed.searchParams.get('refresh_token');
+    const hash = url.split('#')[1] ?? '';
+    const params = new URLSearchParams(hash);
 
-    console.log('Deep link params:', { code: !!code, accessToken: !!accessToken });
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
 
-    if (accessToken && refreshToken) {
-      const { error } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
-      console.log('setSession:', error ? error.message : 'OK');
-      if (!error) location.reload();
-    } else if (code) {
-      // Try PKCE exchange first
-      const { error } = await sb.auth.exchangeCodeForSession(code);
-      console.log('exchangeCode:', error ? error.message : 'OK');
-      if (!error) {
-        location.reload();
-      } else {
-        // PKCE verifier lost (WebView navigated away) - load callback in WebView
-        console.log('PKCE failed, loading callback in WebView');
-        location.href = `https://www.coduy.sk/auth/callback?code=${code}`;
-      }
+    if (!accessToken || !refreshToken) {
+      throw new Error('OAuth callback missing tokens');
     }
-  } catch (e) {
-    console.log('Deep link error:', e);
+
+    const sb = getSupabase();
+    if (!sb) throw new Error('Supabase not initialized');
+
+    const { error } = await sb.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    if (error) throw error;
+
+    console.log('setSession: OK');
+
+    // Close the Safari/SFSafariViewController browser window
+    try {
+      const { Browser } = await import('@capacitor/browser');
+      await Browser.close();
+    } catch {}
+
+    // Navigate in the main WebView - NOT location.reload()
+    window.location.replace('/');
+  } catch (error) {
+    console.log('OAuth callback error:', error);
+    try {
+      const { Browser } = await import('@capacitor/browser');
+      await Browser.close();
+    } catch {}
+  } finally {
+    isProcessingAuthCallback = false;
   }
 }
 
 export default function DeepLinkHandler() {
   useEffect(() => {
     if (typeof window === 'undefined' || !(window as any).Capacitor) return;
+    if (deepLinkListenerRegistered) return;
 
-    (async () => {
+    deepLinkListenerRegistered = true;
+
+    let listener: any;
+
+    const initialize = async () => {
       try {
         const { App } = await import('@capacitor/app');
 
-        // Check if app was LAUNCHED via deep link (event already fired before mount)
-        const launchUrl = await App.getLaunchUrl();
-        console.log('Launch URL:', launchUrl?.url || 'none');
-        if (launchUrl?.url) {
-          await processDeepLink(launchUrl.url);
-        }
-
-        // Listen for future deep links
-        App.addListener('appUrlOpen', (event) => {
-          processDeepLink(event.url);
+        listener = await App.addListener('appUrlOpen', ({ url }) => {
+          void processAuthCallback(url);
         });
+
+        const launchUrl = await App.getLaunchUrl();
+        if (launchUrl?.url) {
+          void processAuthCallback(launchUrl.url);
+        }
       } catch (e) {
-        console.log('DeepLinkHandler error:', e);
+        console.log('DeepLinkHandler init error:', e);
       }
-    })();
+    };
+
+    void initialize();
+
+    return () => {
+      listener?.remove();
+      deepLinkListenerRegistered = false;
+    };
   }, []);
 
   return null;

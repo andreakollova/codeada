@@ -97,17 +97,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       const { data, error } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://www.coduy.sk/auth/callback-app',
+          redirectTo: 'coduy://auth/callback',
           skipBrowserRedirect: true,
         },
       });
       if (data?.url) {
-        // Open in SFSafariViewController - keeps WebView alive so deep link
-        // listener stays active. Don't use window.location.href which
-        // navigates WebView away and destroys React/listeners.
         try {
           const { Browser } = await import('@capacitor/browser');
-          await Browser.open({ url: data.url, windowName: '_blank' });
+          await Browser.open({ url: data.url, presentationStyle: 'popover' });
         } catch (e) {
           console.log('Browser.open error:', e);
         }

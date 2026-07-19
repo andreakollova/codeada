@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, PRICES, FIRST_MONTH_COUPON } from '@/lib/stripe';
+import { stripe, PRICES, FIRST_MONTH_COUPON, FIRST_YEAR_COUPON } from '@/lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
       sessionParams.discounts = [{ coupon: FIRST_MONTH_COUPON }];
       sessionParams.allow_promotion_codes = false;
     } else if (plan === 'yearly') {
-      sessionParams.subscription_data = { trial_period_days: 7 };
+      sessionParams.discounts = [{ coupon: FIRST_YEAR_COUPON }];
+      sessionParams.allow_promotion_codes = false;
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);

@@ -10,3 +10,4 @@ export const PRICES = {
 } as const;
 
 export const FIRST_MONTH_COUPON = '7FzJvpui';
+export const FIRST_YEAR_COUPON = 'oRjZptx0';

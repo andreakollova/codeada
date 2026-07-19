@@ -1,0 +1,35 @@
+name: Daily Push Notifications
+
+on:
+  schedule:
+    # Glossary term at 9:00 UTC (11:00 CEST)
+    - cron: '0 9 * * *'
+    # Coding reminder at 17:00 UTC (19:00 CEST)
+    - cron: '0 17 * * 1,3,5'
+  workflow_dispatch:
+    inputs:
+      type:
+        description: 'Notification type: glossary or reminder'
+        required: true
+        default: 'glossary'
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send push notification
+        run: |
+          # Determine type based on schedule
+          HOUR=$(date -u +%H)
+          if [ "${{ inputs.type }}" != "" ]; then
+            TYPE="${{ inputs.type }}"
+          elif [ "$HOUR" = "09" ]; then
+            TYPE="glossary"
+          else
+            TYPE="reminder"
+          fi
+
+          curl -s -X POST "https://www.coduy.sk/api/push/send" \
+            -H "Content-Type: application/json" \
+            -d "{\"type\": \"$TYPE\"}" \
+            | jq .

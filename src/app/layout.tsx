@@ -69,6 +69,7 @@ export async function generateMetadata(): Promise<Metadata> {
 import BottomNav from '@/components/BottomNav';
 import LocaleInit from '@/components/LocaleInit';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
+import PushNotificationHandler from '@/components/PushNotifications';
 import AuthGate from '@/components/AuthGate';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -127,6 +128,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </AuthGate>
         <Analytics />
         <DeepLinkHandler />
+        <PushNotificationHandler />
         <script dangerouslySetInnerHTML={{ __html: `
           if (window.Capacitor) {
             window.addEventListener('load', function() {

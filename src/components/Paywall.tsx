@@ -220,19 +220,40 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
       <div style={{ padding: '0 24px 10px' }}>
         <motion.button
           onClick={async () => {
-            try {
-              const sb = getSupabase();
-              const session = await sb?.auth.getSession();
-              const email = session?.data?.session?.user?.email;
-              const { userId } = useUserStore.getState();
-              const res = await fetch('/api/checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plan, userId, email }),
-              });
-              const data = await res.json();
-              if (data.url) window.location.href = data.url;
-            } catch {}
+            const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
+            const { userId } = useUserStore.getState();
+
+            if (isApp && (window as any).Capacitor?.Plugins?.CoduyStore) {
+              // In-app purchase via Apple StoreKit
+              try {
+                const productId = plan === 'yearly' ? 'coduy_pro_yearly' : 'coduy_pro_monthly';
+                const result = await (window as any).Capacitor.Plugins.CoduyStore.purchase({ productId });
+                if (result?.success) {
+                  await fetch('/api/iap/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, receipt: result.receipt, productId }),
+                  });
+                  window.location.replace('/');
+                }
+              } catch (e) {
+                console.log('IAP error:', e);
+              }
+            } else {
+              // Web - Stripe checkout
+              try {
+                const sb = getSupabase();
+                const session = await sb?.auth.getSession();
+                const email = session?.data?.session?.user?.email;
+                const res = await fetch('/api/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ plan, userId, email }),
+                });
+                const data = await res.json();
+                if (data.url) window.location.href = data.url;
+              } catch {}
+            }
           }}
           whileTap={{ scale: 0.98 }}
           style={{

@@ -182,19 +182,19 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       padding: '24px 16px', position: 'relative',
       overflow: 'hidden', maxWidth: '100vw', boxSizing: 'border-box',
     }}>
-      {/* Language selector - bottom */}
+      {/* Language toggle */}
       <button
         onClick={toggle}
         style={{
-          position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '8px 16px', borderRadius: 20,
-          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
-          cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#888',
+          position: 'absolute', top: 60, right: 16,
+          width: 36, height: 36, borderRadius: 10,
+          background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#aaa',
           zIndex: 10,
         }}
       >
-        🌐 {locale === 'sk' ? 'Slovenčina' : 'English'}
+        {locale === 'en' ? 'EN' : 'SK'}
       </button>
       <div className="auth-gate-content" style={{ maxWidth: 380, width: '100%' }}>
         <style>{`

@@ -90,13 +90,13 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         <X size={16} />
       </button>
 
-      {/* Hero - compact */}
+      {/* Hero */}
       <div style={{
-        textAlign: 'center', padding: '60px 24px 16px',
+        textAlign: 'center', padding: '56px 24px 12px',
         background: 'radial-gradient(ellipse at center top, rgba(74,222,128,0.06) 0%, transparent 60%)',
       }}>
-        <Byte mood="celebrating" size={70} equipment={equipment} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 10 }}>
+        <Byte mood="celebrating" size={60} equipment={equipment} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>Coduy</h1>
           <span style={{
             fontSize: 11, fontWeight: 800, color: '#000',
@@ -104,34 +104,34 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             padding: '3px 10px', borderRadius: 7, letterSpacing: '0.06em',
           }}>PRO</span>
         </div>
-        <p style={{ fontSize: 13, color: '#666', marginTop: 6 }}>
+        <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
           {sk ? 'Odomkni plný prístup ku všetkému' : 'Unlock full access to everything'}
         </p>
       </div>
 
-      {/* Features - compact */}
-      <div style={{ padding: '0 24px 14px', display: 'flex', flexWrap: 'wrap', gap: '6px 16px' }}>
+      {/* Features - vertical list */}
+      <div style={{ padding: '0 28px 16px' }}>
         {(sk
-          ? ['Neobmedzené lekcie', 'Interaktívne projekty', 'Aréna bitky', 'Písanie kódu', 'Denné notifikácie', 'Bez reklám']
-          : ['Unlimited lessons', 'Interactive projects', 'Arena battles', 'Write code', 'Daily notifications', 'Ad-free']
+          ? ['Neobmedzené lekcie a moduly', 'Interaktívne projekty a cvičenia', 'Aréna - kvízové bitky', 'Denné notifikácie s novým výrazom', 'Bez reklám']
+          : ['Unlimited lessons and modules', 'Interactive projects and exercises', 'Arena - quiz battles', 'Daily notifications with new terms', 'Ad-free experience']
         ).map((f, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0' }}>
-            <Check size={12} color="#4ade80" strokeWidth={3} />
-            <span style={{ fontSize: 12, color: '#aaa', fontWeight: 500 }}>{f}</span>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
+            <Check size={14} color="#4ade80" strokeWidth={3} />
+            <span style={{ fontSize: 13, color: '#bbb', fontWeight: 500 }}>{f}</span>
           </div>
         ))}
       </div>
 
-      {/* Monthly / Yearly toggle */}
-      <div style={{ padding: '0 24px 10px' }}>
-        <div style={{ display: 'flex', background: '#0a0a0a', borderRadius: 12, padding: 3 }}>
+      {/* Monthly / Yearly toggle - small */}
+      <div style={{ padding: '0 60px 14px' }}>
+        <div style={{ display: 'flex', background: '#0a0a0a', borderRadius: 10, padding: 2 }}>
           {(['monthly', 'yearly'] as const).map(tab => {
             const active = (tab === 'monthly' && (plan === 'trial' || plan === 'monthly')) || (tab === 'yearly' && plan === 'yearly');
             return (
               <button key={tab} onClick={() => setPlan(tab === 'monthly' ? 'trial' : 'yearly')} style={{
-                flex: 1, padding: '9px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                flex: 1, padding: '7px', borderRadius: 8, border: 'none', cursor: 'pointer',
                 background: active ? '#1a1a1a' : 'transparent',
-                fontSize: 13, fontWeight: 700, color: active ? '#fff' : '#555',
+                fontSize: 12, fontWeight: 700, color: active ? '#fff' : '#555',
               }}>
                 {tab === 'monthly' ? (sk ? 'Mesačne' : 'Monthly') : (sk ? 'Ročne' : 'Yearly')}
               </button>
@@ -141,51 +141,50 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Two plan cards side by side */}
-      <div style={{ padding: '0 24px 14px', display: 'flex', gap: 8 }}>
+      <div style={{ padding: '0 24px 18px', display: 'flex', gap: 10 }}>
         {/* Free Trial */}
         <button onClick={() => setPlan(plan === 'yearly' ? 'yearly' : 'trial')} style={{
-          flex: 1, padding: '14px 10px', borderRadius: 14, border: 'none', cursor: 'pointer',
+          flex: 1, padding: '16px 10px', borderRadius: 16, border: 'none', cursor: 'pointer',
           background: (plan === 'trial' || plan === 'yearly') ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
           outline: (plan === 'trial' || plan === 'yearly') ? '2px solid #4ade80' : '1px solid #1a1a1a',
           textAlign: 'center', position: 'relative',
         }}>
           <div style={{
-            position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)',
+            position: 'absolute', top: -9, left: '50%', transform: 'translateX(-50%)',
             background: 'linear-gradient(135deg, #4ade80, #22d3ee)', color: '#000',
-            fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 5,
+            fontSize: 9, fontWeight: 800, padding: '3px 10px', borderRadius: 6,
             letterSpacing: '0.04em', whiteSpace: 'nowrap',
           }}>FREE TRIAL</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginTop: 4 }}>
-            0.99 <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
+          <div style={{ marginTop: 6 }}>
+            <span style={{ fontSize: 14, color: '#555', textDecoration: 'line-through', marginRight: 6 }}>
+              {plan === 'yearly' ? '40.99' : '3.99'} EUR
+            </span>
+            <span style={{ fontSize: 22, fontWeight: 700, color: '#4ade80' }}>0 EUR</span>
           </div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>
-            {plan === 'yearly' || plan === 'trial'
-              ? (plan === 'yearly'
-                ? (sk ? 'prvý mesiac' : 'first month')
-                : (sk ? 'prvý mesiac' : 'first month'))
-              : ''}
+          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+            {sk ? '7 dní zadarmo' : '7 days free'}
           </div>
-          <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>
+          <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
             {plan === 'yearly'
-              ? (sk ? 'potom 40.99/rok' : 'then 40.99/yr')
-              : (sk ? 'potom 3.99/mes' : 'then 3.99/mo')}
+              ? (sk ? 'potom 40.99 EUR/rok' : 'then 40.99 EUR/yr')
+              : (sk ? 'potom 3.99 EUR/mes' : 'then 3.99 EUR/mo')}
           </div>
         </button>
 
         {/* Full price */}
         <button onClick={() => setPlan('monthly')} style={{
-          flex: 1, padding: '14px 10px', borderRadius: 14, border: 'none', cursor: 'pointer',
+          flex: 1, padding: '16px 10px', borderRadius: 16, border: 'none', cursor: 'pointer',
           background: plan === 'monthly' ? 'rgba(74,222,128,0.05)' : '#0a0a0a',
           outline: plan === 'monthly' ? '2px solid #4ade80' : '1px solid #1a1a1a',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: 24, fontWeight: 800, color: plan === 'monthly' ? '#fff' : '#555', marginTop: 12 }}>
-            {plan === 'yearly' ? '40.99' : '3.99'} <span style={{ fontSize: 13, fontWeight: 600, color: '#888' }}>EUR</span>
+          <div style={{ fontSize: 22, fontWeight: 600, color: plan === 'monthly' ? '#fff' : '#555', marginTop: 14 }}>
+            {plan === 'yearly' ? '40.99' : '3.99'} <span style={{ fontSize: 12, fontWeight: 500, color: '#888' }}>EUR</span>
           </div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>
+          <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
             {plan === 'yearly' ? (sk ? '/ rok' : '/ year') : (sk ? '/ mesiac' : '/ month')}
           </div>
-          <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>
+          <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
             {sk ? 'bez záväzkov' : 'no commitment'}
           </div>
         </button>
@@ -205,11 +204,11 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         >
           <Sparkles size={16} />
           {plan === 'trial' || plan === 'yearly'
-            ? (sk ? 'Vyskúšaj za 0.99 EUR' : 'Try for 0.99 EUR')
+            ? (sk ? 'Začať free trial' : 'Start free trial')
             : (sk ? 'Získať Pro' : 'Get Pro')}
         </motion.button>
-        <p style={{ fontSize: 10, color: '#444', textAlign: 'center', marginTop: 6 }}>
-          {sk ? 'Zrušíš kedykoľvek' : 'Cancel anytime'}
+        <p style={{ fontSize: 12, color: '#888', textAlign: 'center', marginTop: 8, fontWeight: 500 }}>
+          {sk ? 'Zrušíš kedykoľvek. Bez záväzkov.' : 'Cancel anytime. No strings attached.'}
         </p>
       </div>
 

@@ -18,14 +18,11 @@ export async function POST(req: NextRequest) {
       allow_promotion_codes: true,
     };
 
-    // Apply first month discount for trial plan (monthly only)
-    // Yearly gets 7-day free trial instead
+    // Free trial: 7 days free, then full price
     if (plan === 'trial') {
-      sessionParams.discounts = [{ coupon: FIRST_MONTH_COUPON }];
-      sessionParams.allow_promotion_codes = false;
+      sessionParams.subscription_data = { trial_period_days: 7 };
     } else if (plan === 'yearly') {
-      sessionParams.discounts = [{ coupon: FIRST_YEAR_COUPON }];
-      sessionParams.allow_promotion_codes = false;
+      sessionParams.subscription_data = { trial_period_days: 7 };
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);

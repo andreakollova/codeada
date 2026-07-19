@@ -47,3 +47,4 @@ add-sk-columns.sql
 supabase-arena-schema.sql
 __pycache__/
 AuthKey_*.p8
+ios/App/.next/

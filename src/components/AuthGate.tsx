@@ -102,12 +102,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         },
       });
       if (data?.url) {
-        // Navigate the WebView to the OAuth URL directly
-        // Google blocks WKWebView BUT Supabase's auth endpoint first
-        // redirects to Google - the initial URL is Supabase, not Google
-        // Capacitor will open external URLs (google.com) in Safari automatically
-        // because google.com is NOT in allowNavigation
-        window.location.href = data.url;
+        // Open in SFSafariViewController - keeps WebView alive so deep link
+        // listener stays active. Don't use window.location.href which
+        // navigates WebView away and destroys React/listeners.
+        try {
+          const { Browser } = await import('@capacitor/browser');
+          await Browser.open({ url: data.url, windowName: '_blank' });
+        } catch (e) {
+          console.log('Browser.open error:', e);
+        }
       }
     } else {
       // On web: normal redirect

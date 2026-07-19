@@ -9,6 +9,8 @@ const config: CapacitorConfig = {
     cleartext: false,
     allowNavigation: [
       '*.supabase.co',
+      '*.google.com',
+      'accounts.google.com',
       'coduy.sk',
       '*.coduy.sk',
       'coduy.com',

@@ -14,6 +14,7 @@ import Byte from '@/components/Byte';
 import { X, Heart } from 'lucide-react';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
+import Paywall, { useSubscription } from '@/components/Paywall';
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,11 +22,14 @@ export default function LessonPage() {
   const lesson = getLessonById(id);
   const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment } = useUserStore();
   const { locale } = useLocaleStore();
+  const { needsUpgrade } = useSubscription();
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [showHeartLost, setShowHeartLost] = useState(false);
 
   useEffect(() => { setByteMood('happy'); }, []);
+
+  if (needsUpgrade) return <Paywall />;
 
   if (!lesson) return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

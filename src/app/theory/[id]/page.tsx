@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
 import { Coffee, Droplets, Zap as ZapIcon, CupSoda, GlassWater } from 'lucide-react';
+import Paywall, { useSubscription } from '@/components/Paywall';
 type Phase = 'loading' | 'coffee' | 'intro' | 'learning' | 'facts' | 'real_world' | 'takeaways' | 'quiz' | 'done';
 
 const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: string; labelSk: string }[] = [
@@ -29,6 +30,7 @@ export default function TheoryLessonPage() {
   const router = useRouter();
   const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees, favDrink } = useUserStore();
   const { locale } = useLocaleStore();
+  const { needsUpgrade } = useSubscription();
 
   const [lesson, setLesson] = useState<DbLesson | null>(null);
   const [quiz, setQuiz] = useState<DbQuizQuestion[]>([]);
@@ -95,6 +97,11 @@ export default function TheoryLessonPage() {
       })
       .catch(() => {});
   }, [id, locale]);
+
+  // Paywall: after 5 free lessons, show upgrade prompt
+  if (needsUpgrade) {
+    return <Paywall />;
+  }
 
   if (phase === 'loading' || !lesson) {
     return (

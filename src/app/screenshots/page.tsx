@@ -61,8 +61,16 @@ export default function ScreenshotsPage() {
 
           {/* Center - Byte + text */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            {/* Byte character */}
-            <img src={s.byte} alt="Byte" style={{ width: 140, height: 140, objectFit: 'contain' }} />
+            {/* Byte character with glow */}
+            <div style={{ position: 'relative' }}>
+              <div style={{
+                position: 'absolute', inset: -30,
+                background: `radial-gradient(circle, ${s.accent}40 0%, ${s.accent}15 40%, transparent 70%)`,
+                borderRadius: '50%',
+                filter: 'blur(20px)',
+              }} />
+              <img src={s.byte} alt="Byte" style={{ width: 140, height: 140, objectFit: 'contain', position: 'relative', zIndex: 1 }} />
+            </div>
 
             {/* Badge */}
             <div style={{

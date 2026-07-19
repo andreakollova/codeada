@@ -817,7 +817,7 @@ export default function ArenaPage() {
             >
               {/* X close button */}
               <button onClick={closeBattle} style={{
-                position: 'absolute', top: 12, right: 12,
+                position: 'absolute', top: -44, right: 0,
                 width: 32, height: 32, borderRadius: 8,
                 background: '#1a1a1a', border: '1px solid #2a2a2a',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

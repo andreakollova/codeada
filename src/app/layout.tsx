@@ -134,6 +134,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 }
               }, 300);
             });
+            // Handle deep link from Google OAuth callback
+            if (window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+              window.Capacitor.Plugins.App.addListener('appUrlOpen', function(event) {
+                if (event.url && event.url.startsWith('coduy://auth')) {
+                  var params = new URL(event.url.replace('coduy://', 'https://x/')).searchParams;
+                  var at = params.get('access_token');
+                  var rt = params.get('refresh_token');
+                  if (at && rt) {
+                    // Set Supabase session from tokens
+                    var sb = window.__supabase;
+                    if (sb) sb.auth.setSession({ access_token: at, refresh_token: rt });
+                    else location.reload();
+                  }
+                }
+              });
+            }
           }
         `}} />
       </body>

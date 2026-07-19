@@ -94,18 +94,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
 
     if (isApp) {
-      // In native app: get OAuth URL and open in system browser (Safari)
-      // which Google allows, then redirect back to the app
-      const { data, error } = await sb.auth.signInWithOAuth({
+      // In native app: open in system Safari, redirect back via custom URL scheme
+      const { data } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://www.coduy.sk/auth/callback',
+          redirectTo: 'https://www.coduy.sk/auth/callback?from=app',
           skipBrowserRedirect: true,
         },
       });
       if (data?.url) {
-        // Open in system Safari browser
-        window.open(data.url, '_system');
+        window.open(data.url, '_blank');
       }
     } else {
       // On web: normal redirect

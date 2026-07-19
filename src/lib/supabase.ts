@@ -11,6 +11,8 @@ export function getSupabase(): SupabaseClient | null {
   if (!url || !key) return null;
 
   _client = createClient(url, key);
+  // Expose for Capacitor deep link handler
+  if (typeof window !== 'undefined') (window as any).__supabase = _client;
   return _client;
 }
 

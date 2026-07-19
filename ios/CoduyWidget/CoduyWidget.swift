@@ -57,22 +57,33 @@ struct GlossaryTimelineEntry: TimelineEntry {
 
 struct ByteView: View {
     let size: CGFloat
+    let variant: Int // 0-3 for different looks
+
+    // Variant colors
+    var accentColor: Color {
+        switch variant % 4 {
+        case 0: return Color(red: 0.29, green: 0.87, blue: 0.5)  // green (builder)
+        case 1: return Color(red: 0.66, green: 0.33, blue: 0.97) // purple (ai pilot)
+        case 2: return Color(red: 0.38, green: 0.65, blue: 0.98) // blue (mechanic)
+        case 3: return Color(red: 0.96, green: 0.62, blue: 0.04) // golden (master)
+        default: return .white
+        }
+    }
 
     var body: some View {
         ZStack {
-            // Head - filled dark circle with white stroke
+            // Head
             Circle()
-                .fill(Color(red: 0.04, green: 0.04, blue: 0.04))
+                .fill(Color(red: 0.06, green: 0.06, blue: 0.06))
                 .frame(width: size, height: size)
             Circle()
                 .stroke(Color.white, lineWidth: size * 0.06)
                 .frame(width: size, height: size)
-            // Left eye - bigger, rounder
+            // Eyes
             Ellipse()
                 .fill(Color.white)
                 .frame(width: size * 0.15, height: size * 0.18)
                 .offset(x: -size * 0.15, y: -size * 0.02)
-            // Right eye
             Ellipse()
                 .fill(Color.white)
                 .frame(width: size * 0.15, height: size * 0.18)
@@ -89,16 +100,23 @@ struct ByteView: View {
             }
             .stroke(Color.white.opacity(0.6), style: StrokeStyle(lineWidth: size * 0.05, lineCap: .round))
             .frame(width: size, height: size)
-            // Antenna dot
+            // Antenna dot - colored by variant
             Circle()
-                .fill(Color.white)
+                .fill(accentColor)
                 .frame(width: size * 0.12, height: size * 0.12)
                 .offset(y: -size * 0.58)
-            // Antenna line
             Rectangle()
                 .fill(Color.white.opacity(0.5))
                 .frame(width: size * 0.04, height: size * 0.14)
                 .offset(y: -size * 0.48)
+            // Variant accessories
+            if variant == 1 {
+                // AI Pilot - small lightning bolt
+                Text("⚡").font(.system(size: size * 0.2)).offset(x: size * 0.35, y: -size * 0.35)
+            } else if variant == 3 {
+                // Master - small star
+                Text("★").font(.system(size: size * 0.18)).foregroundColor(accentColor).offset(x: size * 0.35, y: -size * 0.35)
+            }
         }
     }
 }
@@ -128,7 +146,7 @@ struct CoduyWidgetEntryView: View {
 
                     Spacer()
 
-                    ByteView(size: family == .systemSmall ? 24 : 28)
+                    ByteView(size: family == .systemSmall ? 24 : 28, variant: Calendar.current.component(.day, from: Date()))
                 }
 
                 Spacer()

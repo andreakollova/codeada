@@ -54,7 +54,7 @@ export default function StatusBar() {
               border: '1px solid rgba(255,255,255,0.08)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', fontSize: 10, fontWeight: 600, color: '#999',
-              letterSpacing: '0.02em',
+              letterSpacing: '0.02em', padding: 0, boxSizing: 'border-box',
             }}
             title={s('switchLang', locale)}
           >

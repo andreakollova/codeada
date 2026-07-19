@@ -9,8 +9,10 @@ import Byte from './Byte';
 import { Crown, Check, Gift, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+const FREE_LESSON_LIMIT = 5;
+
 export function useSubscription() {
-  const { userId } = useUserStore();
+  const { userId, completedLessons } = useUserStore();
   const [status, setStatus] = useState<'loading' | 'free' | 'trial' | 'active' | 'admin' | 'expired'>('loading');
   const [trialEnds, setTrialEnds] = useState<Date | null>(null);
 
@@ -20,7 +22,7 @@ export function useSubscription() {
       const sb = getSupabase();
       if (!sb) { setStatus('free'); return; }
       try {
-        const { data } = await sb.from('user_state')
+        const { data, error } = await sb.from('user_state')
           .select('subscription_status, subscription_expires_at, created_at')
           .eq('user_id', userId).single();
 
@@ -28,7 +30,6 @@ export function useSubscription() {
         if (data?.subscription_status === 'active') {
           const expires = new Date(data.subscription_expires_at);
           if (expires > new Date()) { setStatus('active'); return; }
-          // Expired subscription
           setStatus('expired'); return;
         }
 
@@ -38,20 +39,23 @@ export function useSubscription() {
           const trialEnd = new Date(created.getTime() + 30 * 86400000);
           setTrialEnds(trialEnd);
           if (trialEnd > new Date()) { setStatus('trial'); return; }
+          setStatus('expired'); return;
         }
 
-        setStatus('expired');
+        // No created_at or no row = new user = trial
+        setStatus('trial');
       } catch {
-        // No user_state row = new user, give trial
+        // No user_state row or table = new user, give trial
         setStatus('trial');
       }
     })();
   }, [userId]);
 
-  const isPro = status === 'active' || status === 'admin' || status === 'trial';
-  const needsUpgrade = status === 'expired';
+  const isPro = status === 'active' || status === 'admin';
+  // Free users can do 5 lessons, after that need to upgrade
+  const needsUpgrade = !isPro && status !== 'loading' && completedLessons.length >= FREE_LESSON_LIMIT;
 
-  return { status, isPro, needsUpgrade, trialEnds };
+  return { status, isPro, needsUpgrade, trialEnds, completedLessons: completedLessons.length, limit: FREE_LESSON_LIMIT };
 }
 
 export default function Paywall({ onClose }: { onClose?: () => void }) {
@@ -61,8 +65,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const sk = locale === 'sk';
 
   const features = sk
-    ? ['Neobmedzene lekcie a moduly', 'Interaktivne projekty', 'Arena kviz bitky', 'Write-code cvicenia', 'Bez reklam']
-    : ['Unlimited lessons and modules', 'Interactive projects', 'Arena quiz battles', 'Write-code exercises', 'Ad-free experience'];
+    ? ['Neobmedzené lekcie a moduly', 'Interaktívne projekty', 'Aréna - kvízové bitky', 'Cvičenia s písaním kódu', 'Bez reklám']
+    : ['Unlimited lessons and modules', 'Interactive projects', 'Arena - quiz battles', 'Write-code exercises', 'Ad-free experience'];
 
   return (
     <motion.div
@@ -100,13 +104,17 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
 
         <Byte mood="proud" size={80} equipment={equipment} />
 
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginTop: 16, marginBottom: 6 }}>
-          {sk ? 'Odomkni Coduy Pro' : 'Unlock Coduy Pro'}
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginTop: 16, marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          {sk ? 'Odomkni Coduy' : 'Unlock Coduy'}
+          <span style={{
+            fontSize: 12, fontWeight: 800, color: '#000', background: 'linear-gradient(135deg, #4ade80, #22d3ee)',
+            padding: '3px 10px', borderRadius: 8, letterSpacing: '0.05em',
+          }}>PRO</span>
         </h2>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.5 }}>
           {sk
-            ? 'Tvoja skusobna doba skoncila. Pokracuj s neobmedzenym pristupom.'
-            : 'Your free trial has ended. Continue with unlimited access.'}
+            ? `Dokoncil si ${FREE_LESSON_LIMIT} bezplatnych lekcii. Pokracuj s neobmedzenym pristupom.`
+            : `You completed ${FREE_LESSON_LIMIT} free lessons. Continue with unlimited access.`}
         </p>
 
         <div style={{ textAlign: 'left', marginBottom: 20 }}>
@@ -132,9 +140,19 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           {sk ? 'Ziskat Coduy Pro' : 'Get Coduy Pro'}
         </button>
 
-        <p style={{ fontSize: 11, color: '#555' }}>
+        <p style={{ fontSize: 11, color: '#555', marginBottom: 12 }}>
           {sk ? 'Od 3.39 EUR / mesiac' : 'From 3.39 EUR / month'}
         </p>
+
+        <button
+          onClick={() => router.back()}
+          style={{
+            background: 'none', border: 'none', color: '#555',
+            fontSize: 13, cursor: 'pointer', fontWeight: 500,
+          }}
+        >
+          {sk ? 'Nie teraz' : 'Not now'}
+        </button>
       </motion.div>
     </motion.div>
   );

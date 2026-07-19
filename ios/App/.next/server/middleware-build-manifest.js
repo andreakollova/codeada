@@ -5,9 +5,9 @@ globalThis.__BUILD_MANIFEST = {
   "devFiles": [],
   "polyfillFiles": [],
   "lowPriorityFiles": [
-    "static/Yrp4G-uJKvCt03sBx4ZGA/_buildManifest.js",
-    "static/Yrp4G-uJKvCt03sBx4ZGA/_ssgManifest.js",
-    "static/Yrp4G-uJKvCt03sBx4ZGA/_clientMiddlewareManifest.js"
+    "static/QZG41G-TXm1PbqyYf5pnz/_buildManifest.js",
+    "static/QZG41G-TXm1PbqyYf5pnz/_ssgManifest.js",
+    "static/QZG41G-TXm1PbqyYf5pnz/_clientMiddlewareManifest.js"
   ],
   "rootMainFiles": []
 };

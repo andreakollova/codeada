@@ -78,16 +78,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const [promoError, setPromoError] = useState('');
   const sk = locale === 'sk';
 
-  // Path-based gradient colors
-  const userPath = typeof window !== 'undefined' ? localStorage.getItem('coduy-path') : null;
-  const gradients: Record<string, string> = {
-    builder: 'linear-gradient(135deg, #4ade80, #22d3ee)',
-    'ai-pilot': 'linear-gradient(135deg, #a855f7, #ec4899)',
-    mechanic: 'linear-gradient(135deg, #60a5fa, #818cf8)',
-    master: 'linear-gradient(135deg, #f59e0b, #f97316)',
-  };
-  const accentGradient = gradients[userPath || 'builder'] || gradients.builder;
-  const accentColor = userPath === 'ai-pilot' ? '#a855f7' : userPath === 'mechanic' ? '#60a5fa' : userPath === 'master' ? '#f59e0b' : '#4ade80';
+  const accentGradient = 'linear-gradient(135deg, #4ade80, #22c55e)';
+  const accentColor = '#4ade80';
 
   return (
     <motion.div

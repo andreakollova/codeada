@@ -1045,6 +1045,82 @@ function ByteFootball({ items, locale, equipment }: { items: { name: string; des
   );
 }
 
+/** Byte tap-to-reveal - tap Byte, he jumps and reveals next item */
+function ByteReveal({ items, locale, equipment }: { items: { name: string; desc: string; color: string }[]; locale: string; equipment: any }) {
+  const [current, setCurrent] = useState(-1);
+  const [jumping, setJumping] = useState(false);
+
+  const reveal = () => {
+    if (jumping || current >= items.length - 1) return;
+    setJumping(true);
+    setTimeout(() => {
+      setCurrent(c => c + 1);
+      setJumping(false);
+    }, 400);
+  };
+
+  const done = current >= items.length - 1;
+  const item = current >= 0 ? items[current] : null;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '8px 0' }}>
+      {/* Counter */}
+      <p style={{ fontSize: 11, color: '#555', fontWeight: 600, margin: 0 }}>
+        {done
+          ? (locale === 'sk' ? 'Všetko odkryté!' : 'All revealed!')
+          : `${current + 1} / ${items.length}`}
+      </p>
+
+      {/* Speech bubble */}
+      <AnimatePresence mode="wait">
+        {item && (
+          <motion.div
+            key={current}
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.25 }}
+            style={{
+              padding: '14px 16px', borderRadius: 14, width: '100%',
+              background: item.color + '11', border: `1px solid ${item.color}33`,
+            }}
+          >
+            <div style={{ fontWeight: 700, fontSize: 15, color: item.color, marginBottom: 6 }}>
+              {item.name}
+            </div>
+            <p style={{ fontSize: 13, color: '#bbb', lineHeight: 1.6, margin: 0 }}>
+              {item.desc}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Byte */}
+      {!done && (
+        <motion.div
+          animate={jumping ? { y: [0, -30, 0], rotate: [0, 15, -15, 0] } : { y: [0, -3, 0] }}
+          transition={jumping ? { duration: 0.4 } : { repeat: Infinity, duration: 2 }}
+          onClick={reveal}
+          style={{ cursor: 'pointer', userSelect: 'none' }}
+        >
+          <Byte mood={jumping ? 'celebrating' : 'happy'} size={64} equipment={equipment} />
+        </motion.div>
+      )}
+
+      {/* Tap hint */}
+      {!done && !jumping && (
+        <motion.p
+          animate={{ opacity: [0.3, 0.8, 0.3] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          style={{ fontSize: 11, color: '#555', fontWeight: 500, margin: 0 }}
+        >
+          {locale === 'sk' ? 'Klikni na Byte!' : 'Tap Byte!'}
+        </motion.p>
+      )}
+    </div>
+  );
+}
+
 const LANG_BUBBLES_SK = [
   { name: 'Python', desc: 'Jednoduchý a čitateľný. Používa sa na AI, automatizáciu, webové aplikácie a analýzu dát. Práve tento jazyk sa budeš učiť!', color: '#3b82f6' },
   { name: 'JavaScript', desc: 'Poháňa takmer každú modernú webovú stránku. Interaktívne weby, aplikácie aj hry v prehliadači.', color: '#eab308' },

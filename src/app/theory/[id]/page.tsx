@@ -320,13 +320,13 @@ export default function TheoryLessonPage() {
           <PaginatedContent text={String(content)} locale={locale} equipment={equipment} onComplete={handleNextSection} />
         ) : sec.phase === 'real_world' ? (
           <div>
-            <div style={{ marginBottom: 16, borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>
+            <div style={{ marginTop: 12, marginBottom: 16, borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>
               <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
               </div>
-              <pre style={{ background: '#0a0a0a', margin: 0, padding: '10px 14px', fontSize: 13, color: '#4ade80', fontFamily: 'JetBrains Mono, monospace' }}>
+              <pre style={{ background: '#0a0a0a', margin: 0, padding: '10px 14px', fontSize: 15, color: '#4ade80', fontFamily: 'JetBrains Mono, monospace' }}>
                 {locale === 'sk' ? '# Použitie v praxi' : '# Real-world use'}
               </pre>
             </div>
@@ -599,7 +599,7 @@ export default function TheoryLessonPage() {
         style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8 }}
       >
         {/* Byte reacts to answers */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, paddingBottom: 0 }}>
           <motion.div
             animate={
               answerState === 'correct' ? { y: [0, -12, 0], rotate: [0, 10, -10, 0] }

@@ -32,8 +32,7 @@ export default function PracticePage() {
 
   useEffect(() => {
     if (!wrongQuestionIds?.length) { setLoading(false); return; }
-    const sb = getSupabase();
-    if (!sb) { setLoading(false); return; }
+    const sb = getSupabase()!;
     sb.from('cb_quiz_questions').select('*, options:cb_quiz_options(*)').in('id', wrongQuestionIds).then(({ data }) => {
       setQuestions((data || []) as PracticeQuestion[]);
       setLoading(false);

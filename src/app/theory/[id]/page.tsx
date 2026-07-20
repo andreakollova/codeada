@@ -865,7 +865,7 @@ function isCodeLine(line: string): boolean {
 /** Byte tip bubble at top of sections */
 function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; locale: string; equipment: any; sectionIndex: number }) {
   const tipsSk: Record<string, string[]> = {
-    intro: ['Pripravený? Poďme na to!', 'Toto bude super.', 'Dnes sa naučíš niečo nové!', 'Pustime sa do toho.'],
+    intro: ['Toto ti zmení pohľad na technológie.', 'Za každou appkou je kód.', 'Programovanie je všade okolo nás.', 'Každá veľká vec začala malým krokom.'],
     learning: [
       'Vedel/a si, že prvý program napísala žena? Ada Lovelace v roku 1843.',
       'Google spracuje denne viac ako 8.5 miliardy vyhľadávaní.',
@@ -881,7 +881,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
     takeaways: ['Rýchle zhrnutie!', 'Toto si zapamätaj.'],
   };
   const tipsEn: Record<string, string[]> = {
-    intro: ['Ready? Let\'s go!', 'This is going to be great.', 'You will learn something new today!', 'Let\'s get into it.'],
+    intro: ['This will change how you see technology.', 'Behind every app is code.', 'Programming is all around us.', 'Every big thing started with a small step.'],
     learning: [
       'Did you know the first program was written by a woman? Ada Lovelace in 1843.',
       'Google processes over 8.5 billion searches per day.',
@@ -901,7 +901,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tip = pool[sectionIndex % pool.length];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '20px 0 12px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: `${phase === 'intro' ? 32 : 20}px 0 12px` }}>
       <div style={{
         background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
         padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 260, textAlign: 'center',
@@ -912,7 +912,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
         animate={{ y: [0, -5, 0], rotate: [0, 2, -2, 0] }}
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
       >
-        <Byte mood={phase === 'intro' ? 'happy' : phase === 'facts' ? 'celebrating' : 'proud'} size={88} equipment={equipment} />
+        <Byte mood={phase === 'intro' ? 'happy' : phase === 'facts' ? 'celebrating' : 'proud'} size={phase === 'intro' ? 100 : 88} equipment={equipment} />
       </motion.div>
     </div>
   );

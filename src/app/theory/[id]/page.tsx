@@ -1316,25 +1316,30 @@ function renderInline(text: string, keyBase: string = 'il'): React.ReactNode {
   });
 }
 
-const BULLET_COLORS = ['#4ade80', '#3b82f6', '#a855f7', '#f97316', '#eab308', '#06b6d4', '#ef4444', '#f472b6'];
-const BULLET_MARKS = ['●', '#', '◆', '●', '#', '◆', '●', '#'];
-const STEP_MARK = '>';
+// Rotate marker style per bullet list instance
+let bulletListCounter = 0;
+const MARKER_STYLES = [
+  { mark: '>', color: '#4ade80' },
+  { mark: '#', color: '#3b82f6' },
+  { mark: '◆', color: '#a855f7' },
+  { mark: '●', color: '#f97316' },
+  { mark: '>', color: '#06b6d4' },
+  { mark: '#', color: '#eab308' },
+  { mark: '◆', color: '#ef4444' },
+  { mark: '●', color: '#f472b6' },
+];
 
 function BulletList({ lines, keyBase }: { lines: string[]; keyBase: number }) {
-  const totalChars = lines.reduce((s, l) => s + l.trim().length, 0);
-  const isSteps = totalChars / lines.length < 35;
+  const styleIdx = bulletListCounter++ % MARKER_STYLES.length;
+  const { mark, color } = MARKER_STYLES[styleIdx];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: '10px 14px' }}>
-      {lines.map((bl, bi) => {
-        const c = BULLET_COLORS[bi % BULLET_COLORS.length];
-        const m = isSteps ? STEP_MARK : BULLET_MARKS[bi % BULLET_MARKS.length];
-        return (
-          <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
-            <span style={{ color: c, fontWeight: 700, fontSize: isSteps ? 13 : 11, lineHeight: isSteps ? 1.85 : 2.2, flexShrink: 0, textShadow: `0 0 8px ${c}88, 0 0 16px ${c}44` }}>{m}</span>
-            <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyBase}-${bi}`)}</span>
-          </div>
-        );
-      })}
+      {lines.map((bl, bi) => (
+        <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
+          <span style={{ color, fontWeight: 700, fontSize: 12, lineHeight: 2, flexShrink: 0, textShadow: `0 0 8px ${color}88, 0 0 16px ${color}44` }}>{mark}</span>
+          <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyBase}-${bi}`)}</span>
+        </div>
+      ))}
     </div>
   );
 }

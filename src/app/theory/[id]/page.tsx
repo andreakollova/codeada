@@ -823,19 +823,13 @@ export default function TheoryLessonPage() {
         </div>
       </div>
 
-      {/* Lesson title */}
-      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '16px 20px 4px' }}>
+      {/* Lesson title + Byte */}
+      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '10px 20px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
+        {sectionIndex === 0 && <Byte mood={byteMood} size={48} equipment={equipment} />}
         <p style={{ fontSize: 11, color: '#777', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
           {safe(t(lesson, 'title', locale))}
         </p>
       </div>
-
-      {/* Byte - only on first section */}
-      {sectionIndex === 0 && (
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
-          <Byte mood={byteMood} size={64} equipment={equipment} />
-        </div>
-      )}
 
       {/* Content */}
       <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 120px' }}>

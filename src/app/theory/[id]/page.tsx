@@ -869,8 +869,8 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tipsSk: Record<string, string[]> = {
     intro: ['Toto ti zmení pohľad na technológie.', 'Za každou appkou je kód.', 'Programovanie je všade okolo nás.', 'Každá veľká vec začala malým krokom.'],
     learning: [
-      'Vedel/a si, že prvý program napísala žena? Ada Lovelace v roku 1843.',
-      'Google spracuje denne viac ako 8.5 miliardy vyhľadávaní.',
+      'ChatGPT dosiahol 100 miliónov používateľov za 2 mesiace. Žiadna appka v histórii to nedokázala rýchlejšie.',
+      'AI dokáže napísať kód, ale stále potrebuje programátora, ktorý vie čo chce vytvoriť.',
       'Python je pomenovaný po Monty Python, nie po hadovi.',
       'Minecraft sa predalo viac ako 300 miliónov kópií.',
       'V jednej appke na telefóne je priemerne 50 000 riadkov kódu.',
@@ -885,8 +885,8 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tipsEn: Record<string, string[]> = {
     intro: ['This will change how you see technology.', 'Behind every app is code.', 'Programming is all around us.', 'Every big thing started with a small step.'],
     learning: [
-      'Did you know the first program was written by a woman? Ada Lovelace in 1843.',
-      'Google processes over 8.5 billion searches per day.',
+      'ChatGPT reached 100 million users in 2 months. No app in history grew faster.',
+      'AI can write code, but it still needs a programmer who knows what to build.',
       'Python is named after Monty Python, not the snake.',
       'Minecraft has sold over 300 million copies worldwide.',
       'A typical phone app has about 50,000 lines of code.',
@@ -1170,8 +1170,8 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
 
   const isLast = page >= pages.length - 1;
   const byteTips = locale === 'sk'
-    ? ['Prvý programátor bol žena - Ada Lovelace.', 'YouTube má viac ako 2 miliardy riadkov kódu.', 'Spotify analyzuje tvoj vkus pomocou AI.', 'Minecraft bol napísaný v Jave za 6 dní.', 'NASA používa Python na riadenie Mars roverov.', 'Git vytvoril Linus Torvalds za 2 týždne.', 'ChatGPT bol trénovaný na miliardách textov.']
-    : ['The first programmer was a woman - Ada Lovelace.', 'YouTube has over 2 billion lines of code.', 'Spotify analyzes your taste using AI.', 'Minecraft was written in Java in 6 days.', 'NASA uses Python to control Mars rovers.', 'Git was created by Linus Torvalds in 2 weeks.', 'ChatGPT was trained on billions of texts.'];
+    ? ['ChatGPT dosiahol 100 miliónov používateľov za 2 mesiace.', 'AI generuje obrázky, hudbu aj kód.', 'Spotify používa AI na odporúčanie hudby.', 'Tesla autopilot spracuje 2300 snímkov za sekundu.', 'GitHub Copilot napíše až 40% kódu za teba.', 'OpenAI trénuje modely na tisícoch GPU naraz.', 'AI preloží text do 100+ jazykov v reálnom čase.']
+    : ['ChatGPT reached 100 million users in just 2 months.', 'AI generates images, music and code.', 'Spotify uses AI to recommend your music.', 'Tesla autopilot processes 2300 frames per second.', 'GitHub Copilot writes up to 40% of code for you.', 'OpenAI trains models on thousands of GPUs at once.', 'AI translates text into 100+ languages in real time.'];
   const byteMoods: Array<'happy' | 'celebrating' | 'proud'> = ['happy', 'celebrating', 'proud'];
 
   return (

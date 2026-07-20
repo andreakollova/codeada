@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
-import { Flame, Zap, Settings } from 'lucide-react';
+import { Flame, Zap, Settings, Globe, Check } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StatusBar() {
@@ -28,7 +28,7 @@ export default function StatusBar() {
       background: '#0F0F0F',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      paddingTop: 'max(env(safe-area-inset-top, 0px), 50px)',
+      paddingTop: 'env(safe-area-inset-top, 0px)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 44 }}>
 
@@ -58,10 +58,10 @@ export default function StatusBar() {
                 background: '#1C1C1C',
                 border: '1px solid rgba(255,255,255,0.08)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1,
+                cursor: 'pointer', padding: 0,
               }}
             >
-              {locale === 'en' ? '🇬🇧' : '🇸🇰'}
+              <Globe size={14} color="#6E6E6E" />
             </button>
             {langOpen && (
               <div style={{
@@ -71,8 +71,8 @@ export default function StatusBar() {
                 boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
               }}>
                 {[
-                  { code: 'sk' as const, flag: '🇸🇰', label: 'Slovenčina' },
-                  { code: 'en' as const, flag: '🇬🇧', label: 'English' },
+                  { code: 'sk' as const, label: 'Slovenčina', sub: 'SK' },
+                  { code: 'en' as const, label: 'English', sub: 'EN' },
                 ].map(lang => (
                   <button
                     key={lang.code}
@@ -80,14 +80,14 @@ export default function StatusBar() {
                     style={{
                       width: '100%', padding: '10px 14px', border: 'none',
                       background: locale === lang.code ? '#2a2a2a' : 'transparent',
-                      color: '#ccc', fontSize: 13, fontWeight: 500,
+                      color: locale === lang.code ? '#fff' : '#999', fontSize: 13, fontWeight: 500,
                       display: 'flex', alignItems: 'center', gap: 10,
                       cursor: 'pointer', textAlign: 'left',
                     }}
                   >
-                    <span style={{ fontSize: 18 }}>{lang.flag}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: locale === lang.code ? '#4ade80' : '#555', width: 20 }}>{lang.sub}</span>
                     <span>{lang.label}</span>
-                    {locale === lang.code && <span style={{ marginLeft: 'auto', color: '#4ade80', fontSize: 12 }}>✓</span>}
+                    {locale === lang.code && <Check size={14} color="#4ade80" style={{ marginLeft: 'auto' }} />}
                   </button>
                 ))}
               </div>

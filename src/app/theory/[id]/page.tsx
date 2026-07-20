@@ -903,6 +903,27 @@ function formatContent(text: string) {
       continue;
     }
 
+    // Check if block contains bullet points (lines starting with "- ")
+    const bulletLines = lines.filter(l => l.trimStart().startsWith('- '));
+    if (bulletLines.length >= 2) {
+      const nonBulletLines = lines.filter(l => !l.trimStart().startsWith('- '));
+      const intro = nonBulletLines.filter(l => l.trim()).join(' ');
+      result.push(
+        <div key={`bl-${keyCounter++}`} style={{ marginBottom: 16 }}>
+          {intro && <p style={{ margin: 0, marginBottom: 8 }}>{intro}</p>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {bulletLines.map((bl, bi) => (
+              <div key={bi} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <span style={{ color: '#4ade80', fontWeight: 700, fontSize: 14, lineHeight: 1.7, flexShrink: 0 }}>-</span>
+                <span style={{ color: '#ccc', lineHeight: 1.7 }}>{bl.trimStart().slice(2)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+      continue;
+    }
+
     // Regular paragraph
     result.push(
       <p key={`p-${keyCounter++}`} style={{ margin: 0, marginBottom: 16 }}>

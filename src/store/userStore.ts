@@ -23,6 +23,8 @@ interface UserActions {
   toggleTopic: (topicId: string) => void;
   addCoffee: () => void;
   setFavDrink: (drink: 'coffee' | 'tea' | 'energy' | 'juice' | 'water') => void;
+  addWrongQuestion: (questionId: number) => void;
+  removeWrongQuestion: (questionId: number) => void;
 }
 
 const initialState: UserState = {
@@ -45,6 +47,7 @@ const initialState: UserState = {
   selectedTopics: [],
   coffees: 0,
   favDrink: null,
+  wrongQuestionIds: [],
 };
 
 export const useUserStore = create<UserState & UserActions>()(
@@ -135,6 +138,13 @@ export const useUserStore = create<UserState & UserActions>()(
 
       addCoffee: () => set((s) => ({ coffees: (s.coffees || 0) + 1 })),
       setFavDrink: (drink) => set({ favDrink: drink }),
+
+      addWrongQuestion: (questionId) => set((s) => ({
+        wrongQuestionIds: s.wrongQuestionIds?.includes(questionId) ? s.wrongQuestionIds : [...(s.wrongQuestionIds || []), questionId],
+      })),
+      removeWrongQuestion: (questionId) => set((s) => ({
+        wrongQuestionIds: (s.wrongQuestionIds || []).filter(id => id !== questionId),
+      })),
 
       syncToSupabase: async () => {
         const s = get();

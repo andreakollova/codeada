@@ -107,7 +107,7 @@ const SYLLABUS = [
 const ALL_CODING_MODULES = SYLLABUS.flatMap(g => g.modules);
 
 export default function CodingPath() {
-  const { completedLessons } = useUserStore();
+  const { completedLessons, wrongQuestionIds } = useUserStore();
   const { locale } = useLocaleStore();
   const router = useRouter();
   const [dbModules, setDbModules] = useState<ModuleWithLessons[]>([]);
@@ -286,6 +286,19 @@ export default function CodingPath() {
           >
             {locale === 'sk' ? 'Zmeniť cestu' : 'Change path'}
           </button>
+          {wrongQuestionIds.length > 0 && (
+            <button
+              onClick={() => router.push('/practice')}
+              style={{
+                padding: '10px 20px', borderRadius: 10,
+                background: '#1a0a0a', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
+              {locale === 'sk' ? `Precvičiť chyby (${wrongQuestionIds.length})` : `Practice mistakes (${wrongQuestionIds.length})`}
+            </button>
+          )}
         </div>
       )}
 

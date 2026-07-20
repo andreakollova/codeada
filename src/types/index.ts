@@ -87,6 +87,7 @@ export interface UserState {
   selectedTopics: string[];
   coffees: number;
   favDrink: 'coffee' | 'tea' | 'energy' | 'juice' | 'water' | null;
+  wrongQuestionIds: number[];
 }
 
 export interface GlossaryEntry {

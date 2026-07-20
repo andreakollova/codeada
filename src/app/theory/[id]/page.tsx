@@ -27,7 +27,7 @@ const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: st
 export default function TheoryLessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees, favDrink } = useUserStore();
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees, favDrink, addWrongQuestion } = useUserStore();
   const { locale } = useLocaleStore();
   const { needsUpgrade } = useSubscription();
 
@@ -229,6 +229,7 @@ export default function TheoryLessonPage() {
       setAnswerState('wrong');
       setByteMood('worried');
       loseHeart();
+      addWrongQuestion(q.id);
       setTimeout(() => setByteMood('happy'), 1500);
     }
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 500);

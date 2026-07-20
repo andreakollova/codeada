@@ -188,10 +188,16 @@ export default function TheoryLessonPage() {
     : sectionIndex;
   const progress = totalSteps > 0 ? (currentStep / totalSteps) * 100 : 0;
 
-  const handleNextSection = () => {
-    window.scrollTo(0, 0);
+  const scrollTop = () => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
+    // Fallback for Capacitor WebView
+    setTimeout(() => { window.scrollTo(0, 0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }, 50);
+  };
+
+  const handleNextSection = () => {
+    scrollTop();
     if (sectionIndex + 1 < sections.length) {
       setSectionIndex(i => i + 1);
       setPhase(sections[sectionIndex + 1].phase);

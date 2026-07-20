@@ -16,6 +16,14 @@ export default function SettingsPage() {
   const [showAuth, setShowAuth] = useState(false);
   const [editName, setEditName] = useState(false);
   const [nameVal, setNameVal] = useState(name || '');
+  const [notifOn, setNotifOn] = useState(true);
+  const [isApp, setIsApp] = useState(false);
+
+  useEffect(() => {
+    setNotifOn(localStorage.getItem('coduy-notifications') !== 'off');
+    // Detect Capacitor app
+    setIsApp(!!(window as any).Capacitor?.isNativePlatform?.());
+  }, []);
 
   useEffect(() => {
     const sb = getSupabase();
@@ -131,7 +139,7 @@ export default function SettingsPage() {
                     value={nameVal}
                     onChange={e => setNameVal(e.target.value)}
                     autoFocus
-                    style={{ flex: 1, padding: '8px 12px', borderRadius: 8, background: '#111', border: '1px solid #222', color: '#fff', fontSize: 14, fontFamily: 'inherit', outline: 'none' }}
+                    style={{ flex: 1, padding: '8px 12px', borderRadius: 8, background: '#111', border: '1px solid #222', color: '#fff', fontSize: 16, fontFamily: 'inherit', outline: 'none' }}
                   />
                   <button
                     onClick={() => { if (nameVal.trim()) setName(nameVal.trim()); setEditName(false); }}
@@ -153,9 +161,30 @@ export default function SettingsPage() {
                   <span style={{ flex: 1, fontSize: 14, color: '#ccc', fontWeight: 500 }}>
                     {locale === 'sk' ? 'Meno' : 'Name'}
                   </span>
-                  <span style={{ fontSize: 13, color: '#888' }}>{name || '-'}</span>
+                  <span style={{ fontSize: 13, color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {name || '-'}
+                    <ChevronRight size={14} color="#555" />
+                  </span>
                 </button>
               )}
+            </div>
+            {/* Language */}
+            <div style={{ borderTop: '1px solid #111' }}>
+              <button
+                onClick={toggle}
+                style={{
+                  width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 14, color: '#ccc', fontWeight: 500 }}>
+                  {locale === 'sk' ? 'Jazyk' : 'Language'}
+                </span>
+                <span style={{ fontSize: 13, color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {locale === 'sk' ? 'Slovenčina' : 'English'}
+                  <ChevronRight size={14} color="#555" />
+                </span>
+              </button>
             </div>
             {/* Drink preference */}
             <div style={{ borderTop: '1px solid #111' }}>
@@ -193,44 +222,40 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Notifications */}
-        <div style={{ marginBottom: 28 }}>
-          <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
-            {locale === 'sk' ? 'Notifikácie' : 'Notifications'}
-          </h3>
-          <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
-            <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 14, color: '#ccc', fontWeight: 500 }}>
-                {locale === 'sk' ? 'Push notifikácie' : 'Push notifications'}
-              </span>
-              <button
-                onClick={() => {
-                  if (typeof window !== 'undefined' && 'Notification' in window) {
-                    if (Notification.permission === 'granted') {
-                      // Already granted - toggle local preference
-                      const current = localStorage.getItem('coduy-notifications') !== 'off';
-                      localStorage.setItem('coduy-notifications', current ? 'off' : 'on');
-                      window.location.reload();
-                    } else {
-                      Notification.requestPermission();
-                    }
-                  }
-                }}
-                style={{
-                  width: 44, height: 26, borderRadius: 13, border: 'none', cursor: 'pointer', position: 'relative',
-                  background: (typeof window !== 'undefined' && localStorage.getItem('coduy-notifications') !== 'off') ? '#4ade80' : '#333',
-                  transition: 'background 0.2s',
-                }}
-              >
-                <div style={{
-                  width: 20, height: 20, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3,
-                  left: (typeof window !== 'undefined' && localStorage.getItem('coduy-notifications') !== 'off') ? 21 : 3,
-                  transition: 'left 0.2s',
-                }} />
-              </button>
+        {/* Notifications - only in app */}
+        {isApp && (
+          <div style={{ marginBottom: 28 }}>
+            <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+              {locale === 'sk' ? 'Notifikácie' : 'Notifications'}
+            </h3>
+            <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 14, color: '#ccc', fontWeight: 500 }}>
+                  {locale === 'sk' ? 'Push notifikácie' : 'Push notifications'}
+                </span>
+                <div
+                  onClick={() => {
+                    const next = !notifOn;
+                    setNotifOn(next);
+                    localStorage.setItem('coduy-notifications', next ? 'on' : 'off');
+                  }}
+                  style={{
+                    width: 48, height: 28, borderRadius: 14, cursor: 'pointer', position: 'relative',
+                    background: notifOn ? '#4ade80' : '#333',
+                    transition: 'background 0.2s',
+                  }}
+                >
+                  <div style={{
+                    width: 22, height: 22, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3,
+                    left: notifOn ? 23 : 3,
+                    transition: 'left 0.2s',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                  }} />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Legal */}
         <div style={{ marginBottom: 28 }}>

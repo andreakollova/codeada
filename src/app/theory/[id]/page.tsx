@@ -310,7 +310,7 @@ export default function TheoryLessonPage() {
             {formatFacts(String(content))}
           </div>
         ) : sec.phase === 'learning' ? (
-          <PaginatedContent text={String(content)} locale={locale} equipment={equipment} />
+          <PaginatedContent text={String(content)} locale={locale} equipment={equipment} onComplete={handleNextSection} />
         ) : (
           <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
             {formatContent(String(content), sec.phase)}
@@ -353,7 +353,7 @@ export default function TheoryLessonPage() {
           </motion.div>
         )}
 
-        <motion.button
+        {sec.phase !== 'learning' && <motion.button
           onClick={handleNextSection}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
@@ -365,8 +365,8 @@ export default function TheoryLessonPage() {
               ? s('startQuiz', locale)
               : s('finish', locale)}
           <ArrowRight size={16} />
-        </motion.button>
-        {sectionIndex > 0 && (
+        </motion.button>}
+        {sectionIndex > 0 && sec.phase !== 'learning' && (
           <button
             onClick={() => {
               window.scrollTo(0, 0);
@@ -964,22 +964,18 @@ const LANG_BUBBLES_EN = [
 ];
 
 /** Paginated learning content - splits by # headings */
-function PaginatedContent({ text, locale, equipment }: { text: string; locale: string; equipment: any }) {
+function PaginatedContent({ text, locale, equipment, onComplete }: { text: string; locale: string; equipment: any; onComplete: () => void }) {
   const [page, setPage] = useState(0);
 
-  // Split content into pages by # headings
+  // Split content into pages by # headings, group into larger chunks
   const sections = text.split(/(?=^# )/m).filter(s => s.trim());
-  // Group small sections together (min ~200 chars per page)
   const pages: string[] = [];
   let current = '';
   for (const sec of sections) {
-    if (current && (current.length + sec.length > 800 || sec.startsWith('# '))) {
-      if (current.length > 100) {
-        pages.push(current.trim());
-        current = sec;
-      } else {
-        current += '\n\n' + sec;
-      }
+    // Keep grouping until we have ~1500+ chars per page (longer pages)
+    if (current && current.length > 1500 && sec.startsWith('# ')) {
+      pages.push(current.trim());
+      current = sec;
     } else {
       current += (current ? '\n\n' : '') + sec;
     }
@@ -1058,20 +1054,27 @@ function PaginatedContent({ text, locale, equipment }: { text: string; locale: s
         </div>
       </motion.div>
 
-      {!isLast && (
-        <button
-          onClick={() => { setPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          style={{
-            width: '100%', padding: '12px', borderRadius: 10,
-            background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)',
-            color: '#ccc', fontWeight: 600, fontSize: 14,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          }}
-        >
-          {locale === 'sk' ? 'Pokračovať' : 'Continue'}
-          <ArrowRight size={14} />
-        </button>
-      )}
+      <button
+        onClick={() => {
+          if (isLast) {
+            onComplete();
+          } else {
+            setPage(p => p + 1);
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        style={{
+          width: '100%', padding: isLast ? '14px' : '12px', borderRadius: isLast ? 12 : 10,
+          background: isLast ? '#EDEDED' : '#1C1C1C',
+          border: isLast ? 'none' : '1px solid rgba(255,255,255,0.08)',
+          color: isLast ? '#0F0F0F' : '#ccc',
+          fontWeight: isLast ? 700 : 600, fontSize: isLast ? 15 : 14,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        }}
+      >
+        {locale === 'sk' ? 'Pokračovať' : 'Continue'}
+        <ArrowRight size={isLast ? 16 : 14} />
+      </button>
     </div>
   );
 }
@@ -1221,12 +1224,9 @@ function formatContent(text: string, phase: string = '') {
       // Strip trailing colon for cleaner headings
       const heading = trimmed.endsWith(':') ? trimmed.slice(0, -1) : trimmed;
       result.push(
-        <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
-          <div style={{ width: 24, height: 3, borderRadius: 2, background: '#4ade80', marginBottom: 10, opacity: 0.6 }} />
-          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0 }}>
-            {renderInline(heading, `h-${keyCounter}`)}
-          </h3>
-        </div>
+        <h3 key={`h-${keyCounter++}`} style={{ fontWeight: 700, fontSize: 16, color: '#EDEDED', margin: 0, marginTop: i > 0 ? 24 : 0, marginBottom: 10 }}>
+          {renderInline(heading, `h-${keyCounter}`)}
+        </h3>
       );
       continue;
     }

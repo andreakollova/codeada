@@ -280,8 +280,10 @@ export default function TheoryLessonPage() {
         style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
       >
 
-        {/* Byte with speech bubble - top of section */}
-        <ByteTip phase={sec.phase} locale={locale} equipment={equipment} sectionIndex={sectionIndex} />
+        {/* Byte with speech bubble - not on facts (has sparkles instead) */}
+        {sec.phase !== 'facts' && (
+          <ByteTip phase={sec.phase} locale={locale} equipment={equipment} sectionIndex={sectionIndex} />
+        )}
 
         {/* Reel video - shown in intro section */}
         {sec.phase === 'intro' && reelUrl && (
@@ -817,15 +819,15 @@ export default function TheoryLessonPage() {
       </div>
 
       {/* Lesson title + current section */}
-      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '6px 20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <p style={{ fontSize: 10, color: '#555', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>
+      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '6px 20px 0' }}>
+        <p style={{ fontSize: 10, color: '#555', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {safe(t(lesson, 'title', locale))}
+          {sections[sectionIndex] && (
+            <span style={{ color: '#444' }}>
+              {' · '}{locale === 'sk' ? sections[sectionIndex].labelSk : sections[sectionIndex].label}
+            </span>
+          )}
         </p>
-        {sections[sectionIndex] && (
-          <span style={{ fontSize: 10, color: '#444', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            {locale === 'sk' ? sections[sectionIndex].labelSk : sections[sectionIndex].label}
-          </span>
-        )}
       </div>
 
       {/* Content */}

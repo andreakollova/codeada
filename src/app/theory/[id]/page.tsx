@@ -280,8 +280,8 @@ export default function TheoryLessonPage() {
         style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
       >
 
-        {/* Byte with speech bubble - not on facts (has sparkles instead) */}
-        {sec.phase !== 'facts' && (
+        {/* Byte with speech bubble - not on facts or real_world */}
+        {sec.phase !== 'facts' && sec.phase !== 'real_world' && (
           <ByteTip phase={sec.phase} locale={locale} equipment={equipment} sectionIndex={sectionIndex} />
         )}
 

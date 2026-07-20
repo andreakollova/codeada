@@ -291,7 +291,12 @@ export default function TheoryLessonPage() {
 
         {/* Byte with speech bubble - top of section */}
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-          <Byte mood={sec.phase === 'intro' ? 'happy' : sec.phase === 'facts' ? 'celebrating' : 'proud'} size={44} equipment={equipment} />
+          <motion.div
+            animate={{ y: [0, -4, 0], rotate: [0, 2, -2, 0] }}
+            transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+          >
+            <Byte mood={sec.phase === 'intro' ? 'happy' : sec.phase === 'facts' ? 'celebrating' : 'proud'} size={44} equipment={equipment} />
+          </motion.div>
           <div style={{
             background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
             padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 220,
@@ -610,7 +615,20 @@ export default function TheoryLessonPage() {
       >
         {/* Byte reacts to answers */}
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Byte mood={answerState === 'correct' ? 'celebrating' : answerState === 'wrong' ? 'worried' : byteMood} size={48} equipment={equipment} />
+          <motion.div
+            animate={
+              answerState === 'correct' ? { y: [0, -12, 0], rotate: [0, 10, -10, 0] }
+              : answerState === 'wrong' ? { x: [-4, 4, -4, 4, 0] }
+              : { y: [0, -5, 0], rotate: [0, 3, -3, 0] }
+            }
+            transition={
+              answerState === 'idle'
+                ? { repeat: Infinity, duration: 3, ease: 'easeInOut' }
+                : { duration: 0.5 }
+            }
+          >
+            <Byte mood={answerState === 'correct' ? 'celebrating' : answerState === 'wrong' ? 'worried' : byteMood} size={48} equipment={equipment} />
+          </motion.div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

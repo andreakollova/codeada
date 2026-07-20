@@ -907,81 +907,122 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   );
 }
 
-/** Interactive language bubbles - tap to pop and learn */
-function LanguageBubbles({ items, locale }: { items: { name: string; desc: string; color: string }[]; locale: string }) {
-  const [popped, setPopped] = useState<Set<number>>(new Set());
-  const [active, setActive] = useState<number | null>(null);
+/** Byte football - flick Byte into goal to reveal languages */
+function ByteFootball({ items, locale, equipment }: { items: { name: string; desc: string; color: string }[]; locale: string; equipment: any }) {
+  const [current, setCurrent] = useState(0);
+  const [phase, setPhase] = useState<'ready' | 'flying' | 'goal'>('ready');
+  const [revealed, setRevealed] = useState(0);
+  const touchY = useRef(0);
 
-  const pop = (i: number) => {
-    setPopped(p => new Set(p).add(i));
-    setActive(i);
-    setTimeout(() => setActive(null), 3000);
+  const shoot = () => {
+    if (phase !== 'ready' || current >= items.length) return;
+    setPhase('flying');
+    setTimeout(() => {
+      setPhase('goal');
+      setRevealed(r => r + 1);
+    }, 500);
   };
 
+  const next = () => {
+    setCurrent(c => c + 1);
+    setPhase('ready');
+  };
+
+  const lang = items[current] || items[items.length - 1];
+  const done = revealed >= items.length;
+
   return (
-    <div>
-      <p style={{ fontSize: 13, color: '#666', textAlign: 'center', marginBottom: 16 }}>
-        {locale === 'sk' ? '👆 Klikni na bublinu!' : '👆 Tap a bubble!'}
-      </p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', padding: '8px 0' }}>
-        {items.map((lang, i) => (
-          <motion.button
-            key={i}
-            onClick={() => pop(i)}
-            animate={{
-              y: popped.has(i) ? 0 : [0, -6, 0],
-              scale: active === i ? [1, 1.2, 1] : 1,
-            }}
-            transition={{
-              y: { repeat: Infinity, duration: 1.5 + (i % 3) * 0.5, delay: i * 0.2 },
-              scale: { duration: 0.3 },
-            }}
-            style={{
-              padding: '8px 16px', borderRadius: 20,
-              background: popped.has(i) ? lang.color + '22' : lang.color + '33',
-              border: `1.5px solid ${lang.color}`,
-              color: popped.has(i) ? lang.color : '#ccc',
-              fontSize: 13, fontWeight: 700, cursor: 'pointer',
-              opacity: popped.has(i) ? 1 : 0.85,
-              boxShadow: popped.has(i) ? `0 0 12px ${lang.color}44` : 'none',
-            }}
-          >
-            {lang.name} {popped.has(i) ? '✓' : ''}
-          </motion.button>
-        ))}
+    <div style={{ position: 'relative', minHeight: 320, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+      {/* Goal */}
+      <div style={{ position: 'relative', width: 160, height: 80, marginBottom: 16 }}>
+        <svg width="160" height="80" viewBox="0 0 160 80">
+          {/* Goal frame */}
+          <rect x="10" y="10" width="140" height="65" rx="4" fill="none" stroke="#333" strokeWidth="2.5" />
+          {/* Net lines */}
+          {[30, 50, 70, 90, 110, 130].map(x => <line key={`v${x}`} x1={x} y1="10" x2={x} y2="75" stroke="#1a1a1a" strokeWidth="1" />)}
+          {[25, 40, 55, 70].map(y => <line key={`h${y}`} x1="10" y1={y} x2="150" y2={y} stroke="#1a1a1a" strokeWidth="1" />)}
+          {/* Posts */}
+          <line x1="10" y1="10" x2="10" y2="78" stroke="#555" strokeWidth="3" strokeLinecap="round" />
+          <line x1="150" y1="10" x2="150" y2="78" stroke="#555" strokeWidth="3" strokeLinecap="round" />
+          <line x1="10" y1="10" x2="150" y2="10" stroke="#555" strokeWidth="3" strokeLinecap="round" />
+        </svg>
       </div>
 
+      {/* Score */}
+      <p style={{ fontSize: 11, color: '#555', fontWeight: 600, marginBottom: 12 }}>
+        {done
+          ? (locale === 'sk' ? 'Všetky jazyky odkryté!' : 'All languages revealed!')
+          : `${revealed} / ${items.length}`}
+      </p>
+
+      {/* Byte */}
+      {!done && (
+        <motion.div
+          animate={
+            phase === 'flying' ? { y: -200, scale: 0.5, opacity: 0 }
+            : phase === 'goal' ? { y: 0, scale: 1, opacity: 1 }
+            : { y: [0, -3, 0] }
+          }
+          transition={
+            phase === 'flying' ? { duration: 0.4, ease: 'easeIn' }
+            : phase === 'ready' ? { repeat: Infinity, duration: 1.5 }
+            : { duration: 0.3 }
+          }
+          onTouchStart={e => { touchY.current = e.touches[0].clientY; }}
+          onTouchEnd={e => {
+            if (touchY.current - e.changedTouches[0].clientY > 30) shoot();
+          }}
+          onClick={shoot}
+          style={{ cursor: 'pointer', userSelect: 'none' }}
+        >
+          <Byte mood={phase === 'goal' ? 'celebrating' : 'happy'} size={56} equipment={equipment} />
+        </motion.div>
+      )}
+
+      {/* Instruction */}
+      {phase === 'ready' && !done && (
+        <motion.p
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          style={{ fontSize: 12, color: '#555', marginTop: 8, fontWeight: 500 }}
+        >
+          {locale === 'sk' ? '↑ Flickni Byte do brány!' : '↑ Flick Byte into the goal!'}
+        </motion.p>
+      )}
+
+      {/* Language card after goal */}
       <AnimatePresence>
-        {active !== null && (
+        {phase === 'goal' && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
             style={{
-              marginTop: 14, padding: '14px 16px', borderRadius: 12,
-              background: items[active].color + '11',
-              border: `1px solid ${items[active].color}33`,
+              marginTop: 12, padding: '14px 16px', borderRadius: 12, width: '100%',
+              background: lang.color + '11', border: `1px solid ${lang.color}33`,
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: 15, color: items[active].color, marginBottom: 6 }}>
-              {items[active].name}
+            <div style={{ fontWeight: 700, fontSize: 16, color: lang.color, marginBottom: 6 }}>
+              {lang.name}
             </div>
-            <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.6, margin: 0 }}>
-              {items[active].desc}
+            <p style={{ fontSize: 13, color: '#bbb', lineHeight: 1.6, margin: 0 }}>
+              {lang.desc}
             </p>
+            {current < items.length - 1 && (
+              <button
+                onClick={next}
+                style={{
+                  marginTop: 12, padding: '8px 16px', borderRadius: 8,
+                  background: '#1C1C1C', border: '1px solid #2a2a2a',
+                  color: '#ccc', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {locale === 'sk' ? 'Ďalší jazyk' : 'Next language'} →
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
-
-      {popped.size === items.length && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          style={{ textAlign: 'center', fontSize: 12, color: '#4ade80', marginTop: 12, fontWeight: 600 }}
-        >
-          {locale === 'sk' ? '🎉 Všetky jazyky preskúmané!' : '🎉 All languages explored!'}
-        </motion.p>
-      )}
     </div>
   );
 }
@@ -1061,7 +1102,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
               <div style={{ marginBottom: 16 }}>
                 {formatContent(pages[page].split('**Python**')[0], 'learning')}
               </div>
-              <LanguageBubbles items={locale === 'sk' ? LANG_BUBBLES_SK : LANG_BUBBLES_EN} locale={locale} />
+              <ByteFootball items={locale === 'sk' ? LANG_BUBBLES_SK : LANG_BUBBLES_EN} locale={locale} equipment={equipment} />
             </div>
           ) : (
             formatContent(pages[page], 'learning')

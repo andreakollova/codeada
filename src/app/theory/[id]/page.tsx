@@ -1398,10 +1398,10 @@ function formatContent(text: string, phase: string = '') {
       const heading = trimmed.replace(/^#+\s*/, '');
       result.push(
         <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
-          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0, marginBottom: 6 }}>
+          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0, marginBottom: 10 }}>
             {renderInline(heading, `mh-${keyCounter}`)}
           </h3>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: '#444', marginTop: 2 }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: '#444' }} />
         </div>
       );
       continue;

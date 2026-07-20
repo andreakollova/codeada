@@ -3,11 +3,11 @@
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
-import { Flame, Zap, Heart, Wrench, Settings } from 'lucide-react';
+import { Flame, Zap, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StatusBar() {
-  const { streak, xp, hearts, maxHearts } = useUserStore();
+  const { streak, xp } = useUserStore();
   const { locale, toggle } = useLocaleStore();
 
   return (
@@ -37,14 +37,8 @@ export default function StatusBar() {
           </span>
         </div>
 
-        {/* Hearts + locale + workshop */}
+        {/* Locale + settings */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' }}>
-          <div style={{ display: 'flex', gap: 3 }}>
-            {Array.from({ length: maxHearts }).map((_, i) => (
-              <Heart key={i} size={13} fill={i < hearts ? '#EDEDED' : 'none'} color={i < hearts ? '#EDEDED' : '#3A3A3A'} />
-            ))}
-          </div>
-
           {/* Language toggle */}
           <button
             onClick={toggle}
@@ -55,6 +49,7 @@ export default function StatusBar() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', fontSize: 10, fontWeight: 600, color: '#999',
               letterSpacing: '0.02em', padding: 0, boxSizing: 'border-box',
+              lineHeight: 1,
             }}
             title={s('switchLang', locale)}
           >

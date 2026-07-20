@@ -193,6 +193,45 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Notifications */}
+        <div style={{ marginBottom: 28 }}>
+          <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+            {locale === 'sk' ? 'Notifikácie' : 'Notifications'}
+          </h3>
+          <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 14, color: '#ccc', fontWeight: 500 }}>
+                {locale === 'sk' ? 'Push notifikácie' : 'Push notifications'}
+              </span>
+              <button
+                onClick={() => {
+                  if (typeof window !== 'undefined' && 'Notification' in window) {
+                    if (Notification.permission === 'granted') {
+                      // Already granted - toggle local preference
+                      const current = localStorage.getItem('coduy-notifications') !== 'off';
+                      localStorage.setItem('coduy-notifications', current ? 'off' : 'on');
+                      window.location.reload();
+                    } else {
+                      Notification.requestPermission();
+                    }
+                  }
+                }}
+                style={{
+                  width: 44, height: 26, borderRadius: 13, border: 'none', cursor: 'pointer', position: 'relative',
+                  background: (typeof window !== 'undefined' && localStorage.getItem('coduy-notifications') !== 'off') ? '#4ade80' : '#333',
+                  transition: 'background 0.2s',
+                }}
+              >
+                <div style={{
+                  width: 20, height: 20, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3,
+                  left: (typeof window !== 'undefined' && localStorage.getItem('coduy-notifications') !== 'off') ? 21 : 3,
+                  transition: 'left 0.2s',
+                }} />
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Legal */}
         <div style={{ marginBottom: 28 }}>
           <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>

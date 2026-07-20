@@ -323,7 +323,7 @@ export default function TheoryLessonPage() {
             transition={{ delay: 0.3, duration: 0.5 }}
             style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}
           >
-            <Byte mood={sec.phase === 'intro' ? 'happy' : 'thinking'} size={64} equipment={equipment} />
+            <Byte mood={sec.phase === 'intro' ? 'happy' : 'proud'} size={64} equipment={equipment} />
           </motion.div>
         )}
 

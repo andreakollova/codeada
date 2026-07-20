@@ -281,24 +281,7 @@ export default function TheoryLessonPage() {
       >
 
         {/* Byte with speech bubble - top of section */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-          <motion.div
-            animate={{ y: [0, -4, 0], rotate: [0, 2, -2, 0] }}
-            transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-          >
-            <Byte mood={sec.phase === 'intro' ? 'happy' : sec.phase === 'facts' ? 'celebrating' : 'proud'} size={44} equipment={equipment} />
-          </motion.div>
-          <div style={{
-            background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
-            padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 220,
-          }}>
-            {sec.phase === 'intro' && (locale === 'sk' ? 'Poďme na to!' : "Let's do this!")}
-            {sec.phase === 'learning' && (locale === 'sk' ? 'Toto je to najdôležitejšie.' : 'This is the key part.')}
-            {sec.phase === 'facts' && (locale === 'sk' ? 'Vedel/a si toto?' : 'Did you know this?')}
-            {sec.phase === 'real_world' && (locale === 'sk' ? 'Tu sa to používa v praxi.' : 'This is where it gets real.')}
-            {sec.phase === 'takeaways' && (locale === 'sk' ? 'Rýchle zhrnutie!' : 'Quick recap!')}
-          </div>
-        </div>
+        <ByteTip phase={sec.phase} locale={locale} equipment={equipment} sectionIndex={sectionIndex} />
 
         {/* Reel video - shown in intro section */}
         {sec.phase === 'intro' && reelUrl && (
@@ -868,6 +851,62 @@ function isCodeLine(line: string): boolean {
   return false;
 }
 
+/** Byte tip bubble at top of sections */
+function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; locale: string; equipment: any; sectionIndex: number }) {
+  const tipsSk: Record<string, string[]> = {
+    intro: ['Vitaj! Pripravený?', 'Toto bude super.', 'Som rád, že si tu!', 'Pustime sa do toho.'],
+    learning: [
+      'Vedel/a si, že prvý program napísala žena? Ada Lovelace v roku 1843.',
+      'Google spracuje denne viac ako 8.5 miliardy vyhľadávaní.',
+      'Python je pomenovaný po Monty Python, nie po hadovi.',
+      'Priemerný programátor píše 50-100 riadkov kódu denne.',
+      'V jednej appke na telefóne je priemerne 50 000 riadkov kódu.',
+      'Prvý počítačový bug bol skutočný hmyz v počítači v roku 1947.',
+      'Na svete je viac ako 700 programovacích jazykov.',
+      'Instagram mal pri spustení iba 13 zamestnancov.',
+    ],
+    facts: ['Toto je zaujímavé!', 'Málokto toto vie.', 'Prekvapivé, že?'],
+    real_world: ['Toto sa fakt používa.', 'Tu vidíš prečo sa to oplatí.', 'Celkom cool, nie?'],
+    takeaways: ['Rýchle zhrnutie!', 'Toto si zapamätaj.'],
+  };
+  const tipsEn: Record<string, string[]> = {
+    intro: ['Welcome! Ready?', 'This is going to be great.', 'Glad you are here!', 'Let\'s get into it.'],
+    learning: [
+      'Did you know the first program was written by a woman? Ada Lovelace in 1843.',
+      'Google processes over 8.5 billion searches per day.',
+      'Python is named after Monty Python, not the snake.',
+      'The average programmer writes 50-100 lines of code per day.',
+      'A typical phone app has about 50,000 lines of code.',
+      'The first computer bug was an actual insect found in 1947.',
+      'There are over 700 programming languages in the world.',
+      'Instagram had only 13 employees when it launched.',
+    ],
+    facts: ['This is interesting!', 'Not many people know this.', 'Surprising, right?'],
+    real_world: ['This is actually used.', 'Now you see why it matters.', 'Pretty cool, right?'],
+    takeaways: ['Quick recap!', 'Remember this.'],
+  };
+  const tips = locale === 'sk' ? tipsSk : tipsEn;
+  const pool = tips[phase] || tips.learning;
+  const tip = pool[sectionIndex % pool.length];
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+      <motion.div
+        animate={{ y: [0, -4, 0], rotate: [0, 2, -2, 0] }}
+        transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+      >
+        <Byte mood={phase === 'intro' ? 'happy' : phase === 'facts' ? 'celebrating' : 'proud'} size={44} equipment={equipment} />
+      </motion.div>
+      <div style={{
+        background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
+        padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 220,
+      }}>
+        {tip}
+      </div>
+    </div>
+  );
+}
+
 /** Interactive language bubbles - tap to pop and learn */
 function LanguageBubbles({ items, locale }: { items: { name: string; desc: string; color: string }[]; locale: string }) {
   const [popped, setPopped] = useState<Set<number>>(new Set());
@@ -1001,8 +1040,8 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
 
   const isLast = page >= pages.length - 1;
   const byteTips = locale === 'sk'
-    ? ['Vedel/a si to? Skvelé!', 'Toto je základ, zapamätaj si to.', 'Super, ideme ďalej!', 'Výborne, zvládaš to!', 'Cool, že?', 'Toto sa ti bude hodiť!', 'Ešte kúsok!']
-    : ['Did you know? Awesome!', 'This is key, remember it.', 'Great, moving on!', 'You got this!', 'Pretty cool, right?', 'This will come in handy!', 'Almost there!'];
+    ? ['Prvý programátor bol žena - Ada Lovelace.', 'YouTube má viac ako 2 miliardy riadkov kódu.', 'Spotify analyzuje tvoj vkus pomocou AI.', 'Minecraft bol napísaný v Jave za 6 dní.', 'NASA používa Python na riadenie Mars roverov.', 'Git vytvoril Linus Torvalds za 2 týždne.', 'ChatGPT bol trénovaný na miliardách textov.']
+    : ['The first programmer was a woman - Ada Lovelace.', 'YouTube has over 2 billion lines of code.', 'Spotify analyzes your taste using AI.', 'Minecraft was written in Java in 6 days.', 'NASA uses Python to control Mars rovers.', 'Git was created by Linus Torvalds in 2 weeks.', 'ChatGPT was trained on billions of texts.'];
   const byteMoods: Array<'happy' | 'celebrating' | 'proud'> = ['happy', 'celebrating', 'proud'];
 
   return (
@@ -1043,20 +1082,25 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
 
       {/* Byte with speech bubble */}
       <motion.div
+        key={`byte-${page}`}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         style={{ display: 'flex', alignItems: 'flex-end', gap: 10, padding: '12px 0 4px' }}
       >
         <motion.div
-          animate={{ y: [0, -4, 0] }}
+          animate={
+            page % 3 === 0 ? { y: [0, -6, 0] }
+            : page % 3 === 1 ? { rotate: [0, 5, -5, 0] }
+            : { scale: [1, 1.05, 1] }
+          }
           transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
         >
           <Byte mood={byteMoods[page % byteMoods.length]} size={48} equipment={equipment} />
         </motion.div>
         <div style={{
           background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
-          padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 200,
+          padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 220,
         }}>
           {byteTips[page % byteTips.length]}
         </div>
@@ -1069,7 +1113,10 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
           } else {
             setPage(p => p + 1);
           }
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+          document.body.scrollTop = 0;
+          document.documentElement.scrollTop = 0;
+          setTimeout(() => { window.scrollTo(0, 0); document.body.scrollTop = 0; }, 50);
         }}
         style={{
           width: '100%', padding: isLast ? '14px' : '12px', borderRadius: isLast ? 12 : 10,

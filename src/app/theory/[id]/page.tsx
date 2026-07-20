@@ -231,6 +231,7 @@ export default function TheoryLessonPage() {
       loseHeart();
       setTimeout(() => setByteMood('happy'), 1500);
     }
+    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 500);
   };
 
   const handleQuizNext = () => {
@@ -596,10 +597,10 @@ export default function TheoryLessonPage() {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -30 }}
         transition={{ duration: 0.25 }}
-        style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}
       >
         {/* Byte reacts to answers */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, paddingBottom: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 0 }}>
           <motion.div
             animate={
               answerState === 'correct' ? { y: [0, -12, 0], rotate: [0, 10, -10, 0] }
@@ -829,7 +830,7 @@ export default function TheoryLessonPage() {
 
       {/* Lesson title + current section */}
       <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '6px 20px 0' }}>
-        <p style={{ fontSize: 10, color: '#555', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontSize: 9, color: '#555', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {safe(t(lesson, 'title', locale))}
           {sections[sectionIndex] && (
             <span style={{ color: '#444' }}>

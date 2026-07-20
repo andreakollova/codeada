@@ -606,8 +606,13 @@ export default function TheoryLessonPage() {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -30 }}
         transition={{ duration: 0.25 }}
-        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8 }}
       >
+        {/* Byte reacts to answers */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Byte mood={answerState === 'correct' ? 'celebrating' : answerState === 'wrong' ? 'worried' : byteMood} size={48} equipment={equipment} />
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {`${s('questionOf', locale)} ${quizIndex + 1} ${s('of', locale)} ${quiz.length}`}
@@ -702,8 +707,7 @@ export default function TheoryLessonPage() {
                     <div style={{ margin: '8px 0 0' }}>
                       <p style={{ fontSize: 13, color: '#bbb', margin: '0 0 4px', lineHeight: 1.6 }}>
                         <strong style={{ color: '#fff' }}>{safe(correctOpt.text)}</strong>
-                        {' - '}
-                        <span style={{ color: '#888' }}>{explanation}</span>
+                        {explanation && <><br /><span style={{ color: '#888' }}>{explanation}</span></>}
                       </p>
                     </div>
                   );

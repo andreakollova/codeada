@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
-import { Flame, Zap, Settings, Globe, Check } from 'lucide-react';
+import { Flame, Zap, Settings, Flag, Check } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StatusBar() {
@@ -61,7 +61,7 @@ export default function StatusBar() {
                 cursor: 'pointer',
               }}
             >
-              <Globe size={14} color="#6E6E6E" />
+              <Flag size={14} color="#6E6E6E" />
             </div>
             {langOpen && (
               <div style={{

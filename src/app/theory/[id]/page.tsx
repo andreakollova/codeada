@@ -601,7 +601,7 @@ export default function TheoryLessonPage() {
         style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8 }}
       >
         {/* Byte reacts to answers */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 0 }}>
           <motion.div
             animate={
               answerState === 'correct' ? { y: [0, -12, 0], rotate: [0, 10, -10, 0] }
@@ -614,7 +614,7 @@ export default function TheoryLessonPage() {
                 : { duration: 0.5 }
             }
           >
-            <Byte mood={answerState === 'correct' ? 'celebrating' : answerState === 'wrong' ? 'worried' : byteMood} size={48} equipment={equipment} />
+            <Byte mood={answerState === 'correct' ? 'celebrating' : answerState === 'wrong' ? 'worried' : byteMood} size={64} equipment={equipment} />
           </motion.div>
         </div>
 

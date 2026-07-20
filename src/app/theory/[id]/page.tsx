@@ -309,6 +309,8 @@ export default function TheoryLessonPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {formatFacts(String(content))}
           </div>
+        ) : sec.phase === 'learning' ? (
+          <PaginatedContent text={String(content)} locale={locale} equipment={equipment} />
         ) : (
           <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
             {formatContent(String(content), sec.phase)}
@@ -854,6 +856,109 @@ function isCodeLine(line: string): boolean {
   return false;
 }
 
+/** Paginated learning content - splits by # headings */
+function PaginatedContent({ text, locale, equipment }: { text: string; locale: string; equipment: Record<string, string> }) {
+  const [page, setPage] = useState(0);
+
+  // Split content into pages by # headings
+  const sections = text.split(/(?=^# )/m).filter(s => s.trim());
+  // Group small sections together (min ~200 chars per page)
+  const pages: string[] = [];
+  let current = '';
+  for (const sec of sections) {
+    if (current && (current.length + sec.length > 800 || sec.startsWith('# '))) {
+      if (current.length > 100) {
+        pages.push(current.trim());
+        current = sec;
+      } else {
+        current += '\n\n' + sec;
+      }
+    } else {
+      current += (current ? '\n\n' : '') + sec;
+    }
+  }
+  if (current.trim()) pages.push(current.trim());
+
+  // If only 1 page, no pagination needed
+  if (pages.length <= 1) {
+    return (
+      <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
+        {formatContent(text, 'learning')}
+      </div>
+    );
+  }
+
+  const isLast = page >= pages.length - 1;
+  const byteTips = locale === 'sk'
+    ? ['Vedel/a si to? Skvelé! 🚀', 'Toto je základ, zapamätaj si to 💡', 'Super, ideme ďalej! 🏄', 'Výborne, zvládaš to! 💪', 'Cool, že? ⚡', 'Toto sa ti bude hodiť! 🎯', 'Ešte kúsok! 🔥']
+    : ['Did you know? Awesome! 🚀', 'This is key, remember it 💡', 'Great, moving on! 🏄', 'You got this! 💪', 'Pretty cool, right? ⚡', 'This will come in handy! 🎯', 'Almost there! 🔥'];
+  const byteMoods: Array<'happy' | 'celebrating' | 'proud'> = ['happy', 'celebrating', 'proud'];
+
+  return (
+    <div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={page}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}
+          transition={{ duration: 0.2 }}
+          style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}
+        >
+          {formatContent(pages[page], 'learning')}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Page indicator */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 16 }}>
+        {pages.map((_, i) => (
+          <div key={i} style={{
+            width: i === page ? 16 : 6, height: 5, borderRadius: 3,
+            background: i <= page ? '#4ade80' : '#333',
+            transition: 'all 0.3s',
+          }} />
+        ))}
+      </div>
+
+      {/* Byte with speech bubble */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        style={{ display: 'flex', alignItems: 'flex-end', gap: 10, padding: '12px 0 4px' }}
+      >
+        <motion.div
+          animate={{ y: [0, -4, 0] }}
+          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+        >
+          <Byte mood={byteMoods[page % byteMoods.length]} size={48} equipment={equipment} />
+        </motion.div>
+        <div style={{
+          background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
+          padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 200,
+        }}>
+          {byteTips[page % byteTips.length]}
+        </div>
+      </motion.div>
+
+      {!isLast && (
+        <button
+          onClick={() => { setPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          style={{
+            width: '100%', padding: '12px', borderRadius: 10,
+            background: '#1C1C1C', border: '1px solid rgba(255,255,255,0.08)',
+            color: '#ccc', fontWeight: 600, fontSize: 14,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          }}
+        >
+          {locale === 'sk' ? 'Pokračovať' : 'Continue'}
+          <ArrowRight size={14} />
+        </button>
+      )}
+    </div>
+  );
+}
+
 /** Takeaway carousel - auto-swipes every 3s, swipeable */
 function TakeawayCarousel({ items }: { items: string[] }) {
   const [active, setActive] = useState(0);
@@ -980,8 +1085,22 @@ function formatContent(text: string, phase: string = '') {
 
     const lines = trimmed.split('\n');
 
+    // Markdown heading: # Title
+    if (trimmed.startsWith('# ')) {
+      const heading = trimmed.replace(/^#+\s*/, '');
+      result.push(
+        <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
+          <div style={{ width: 24, height: 3, borderRadius: 2, background: '#4ade80', marginBottom: 10, opacity: 0.6 }} />
+          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0 }}>
+            {renderInline(heading, `mh-${keyCounter}`)}
+          </h3>
+        </div>
+      );
+      continue;
+    }
+
     // Heading: single short line, no period, not code, no = sign (code assignment)
-    if (lines.length === 1 && trimmed.length < 60 && !trimmed.endsWith('.') && !trimmed.startsWith('-') && !trimmed.startsWith('#') && !trimmed.includes(' = ') && !trimmed.includes('(') && !isCodeLine(trimmed)) {
+    if (lines.length === 1 && trimmed.length < 60 && !trimmed.endsWith('.') && !trimmed.startsWith('-') && !trimmed.includes(' = ') && !trimmed.includes('(') && !isCodeLine(trimmed)) {
       // Strip trailing colon for cleaner headings
       const heading = trimmed.endsWith(':') ? trimmed.slice(0, -1) : trimmed;
       result.push(

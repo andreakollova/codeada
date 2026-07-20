@@ -857,7 +857,7 @@ function isCodeLine(line: string): boolean {
 }
 
 /** Paginated learning content - splits by # headings */
-function PaginatedContent({ text, locale, equipment }: { text: string; locale: string; equipment: Record<string, string> }) {
+function PaginatedContent({ text, locale, equipment }: { text: string; locale: string; equipment: any }) {
   const [page, setPage] = useState(0);
 
   // Split content into pages by # headings

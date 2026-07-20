@@ -319,9 +319,21 @@ export default function TheoryLessonPage() {
             {formatFacts(String(content))}
           </div>
         ) : (
-          <div style={{ fontSize: 15, color: '#b0b0b0', lineHeight: 1.85 }}>
+          <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
             {formatContent(String(content), sec.phase)}
           </div>
+        )}
+
+        {/* Byte animation between sections */}
+        {(sec.phase === 'intro' || sec.phase === 'real_world') && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}
+          >
+            <Byte mood={sec.phase === 'intro' ? 'happy' : 'thinking'} size={64} equipment={equipment} />
+          </motion.div>
         )}
 
         <motion.button
@@ -949,7 +961,7 @@ function formatContent(text: string, phase: string = '') {
             {bulletLines.map((bl, bi) => (
               <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
                 <span style={{ color: '#4ade80', fontWeight: 700, fontSize: 10, lineHeight: 2.4, flexShrink: 0 }}>●</span>
-                <span style={{ color: '#ccc', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyCounter}-${bi}`)}</span>
+                <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyCounter}-${bi}`)}</span>
               </div>
             ))}
           </div>

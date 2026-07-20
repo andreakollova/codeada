@@ -1373,7 +1373,7 @@ function formatContent(text: string, phase: string = '') {
           <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0, marginBottom: 6 }}>
             {renderInline(heading, `mh-${keyCounter}`)}
           </h3>
-          <div style={{ width: 28, height: 2, borderRadius: 1, background: '#333' }} />
+          <div style={{ width: 32, height: 3, borderRadius: 2, background: '#555' }} />
         </div>
       );
       continue;

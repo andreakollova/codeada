@@ -271,12 +271,14 @@ export default function TheoryLessonPage() {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -30 }}
         transition={{ duration: 0.25 }}
-        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
       >
         {/* Section label */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Icon size={14} color="#555" />
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: '#111', border: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon size={13} color="#4ade80" />
+          </div>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {locale === 'sk' ? sec.labelSk : sec.label}
           </span>
         </div>
@@ -305,10 +307,10 @@ export default function TheoryLessonPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {(content as string[]).map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12 }}>
-                <div style={{ width: 22, height: 22, borderRadius: 7, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                <div style={{ width: 22, height: 22, borderRadius: 7, background: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                   <Check size={12} color="#000" strokeWidth={3} />
                 </div>
-                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{safe(item)}</p>
+                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{renderInline(safe(item), `tk-${i}`)}</p>
               </div>
             ))}
           </div>
@@ -317,8 +319,8 @@ export default function TheoryLessonPage() {
             {formatFacts(String(content))}
           </div>
         ) : (
-          <div style={{ fontSize: 15, color: '#b0b0b0', lineHeight: 1.9 }}>
-            {formatContent(String(content))}
+          <div style={{ fontSize: 15, color: '#b0b0b0', lineHeight: 1.85 }}>
+            {formatContent(String(content), sec.phase)}
           </div>
         )}
 
@@ -326,7 +328,7 @@ export default function TheoryLessonPage() {
           onClick={handleNextSection}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8, border: 'none', cursor: 'pointer' }}
+          style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'linear-gradient(135deg, #4ade80, #22c55e)', color: '#000', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, border: 'none', cursor: 'pointer' }}
         >
           {sectionIndex + 1 < sections.length
             ? s('continueBtn', locale)
@@ -846,7 +848,7 @@ function renderInline(text: string, keyBase: string = 'il'): React.ReactNode {
   });
 }
 
-function formatContent(text: string) {
+function formatContent(text: string, phase: string = '') {
   if (!text) return null;
 
   // First pass: handle markdown ``` code blocks
@@ -861,14 +863,21 @@ function formatContent(text: string) {
       const code = parts[p].trim();
       if (code) {
         result.push(
-          <pre key={`code-${keyCounter++}`} style={{
-            background: '#111', border: '1px solid #1a1a1a', borderRadius: 10,
-            padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
-            overflow: 'auto', marginBottom: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
-            whiteSpace: 'pre-wrap',
-          }}>
-            {code}
-          </pre>
+          <div key={`code-${keyCounter++}`} style={{ marginBottom: 16, borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>
+            <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+            </div>
+            <pre style={{
+              background: '#0a0a0a', margin: 0,
+              padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
+              overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace',
+              whiteSpace: 'pre-wrap',
+            }}>
+              {code}
+            </pre>
+          </div>
         );
       }
       continue;
@@ -895,9 +904,12 @@ function formatContent(text: string) {
       // Strip trailing colon for cleaner headings
       const heading = trimmed.endsWith(':') ? trimmed.slice(0, -1) : trimmed;
       result.push(
-        <h3 key={`h-${keyCounter++}`} style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', marginTop: i > 0 ? 24 : 0, marginBottom: 10 }}>
-          {heading}
-        </h3>
+        <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
+          <div style={{ width: 24, height: 3, borderRadius: 2, background: '#4ade80', marginBottom: 10, opacity: 0.6 }} />
+          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0 }}>
+            {renderInline(heading, `h-${keyCounter}`)}
+          </h3>
+        </div>
       );
       continue;
     }
@@ -906,14 +918,21 @@ function formatContent(text: string) {
     const codeLines = lines.filter(l => isCodeLine(l) || l.trim() === '');
     if (codeLines.length > lines.length * 0.5 && lines.some(l => isCodeLine(l))) {
       result.push(
-        <pre key={`pre-${keyCounter++}`} style={{
-          background: '#111', border: '1px solid #1a1a1a', borderRadius: 10,
-          padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
-          overflow: 'auto', marginBottom: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
-          whiteSpace: 'pre-wrap',
-        }}>
-          {trimmed}
-        </pre>
+        <div key={`pre-${keyCounter++}`} style={{ marginBottom: 16, borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>
+          <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+          </div>
+          <pre style={{
+            background: '#0a0a0a', margin: 0,
+            padding: '14px 16px', fontSize: 13, color: '#ccc', lineHeight: 1.7,
+            overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace',
+            whiteSpace: 'pre-wrap',
+          }}>
+            {trimmed}
+          </pre>
+        </div>
       );
       continue;
     }
@@ -925,11 +944,11 @@ function formatContent(text: string) {
       const intro = nonBulletLines.filter(l => l.trim()).join(' ');
       result.push(
         <div key={`bl-${keyCounter++}`} style={{ marginBottom: 16 }}>
-          {intro && <p style={{ margin: 0, marginBottom: 8 }}>{renderInline(intro, `bli-${keyCounter}`)}</p>}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {intro && <p style={{ margin: 0, marginBottom: 10 }}>{renderInline(intro, `bli-${keyCounter}`)}</p>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: '10px 14px' }}>
             {bulletLines.map((bl, bi) => (
-              <div key={bi} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                <span style={{ color: '#4ade80', fontWeight: 700, fontSize: 14, lineHeight: 1.7, flexShrink: 0 }}>-</span>
+              <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
+                <span style={{ color: '#4ade80', fontWeight: 700, fontSize: 10, lineHeight: 2.4, flexShrink: 0 }}>●</span>
                 <span style={{ color: '#ccc', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyCounter}-${bi}`)}</span>
               </div>
             ))}

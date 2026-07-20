@@ -1316,6 +1316,29 @@ function renderInline(text: string, keyBase: string = 'il'): React.ReactNode {
   });
 }
 
+const BULLET_COLORS = ['#4ade80', '#3b82f6', '#a855f7', '#f97316', '#eab308', '#06b6d4', '#ef4444', '#f472b6'];
+const BULLET_MARKS = ['●', '#', '◆', '●', '#', '◆', '●', '#'];
+const STEP_MARK = '>';
+
+function BulletList({ lines, keyBase }: { lines: string[]; keyBase: number }) {
+  const totalChars = lines.reduce((s, l) => s + l.trim().length, 0);
+  const isSteps = totalChars / lines.length < 35;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: '10px 14px' }}>
+      {lines.map((bl, bi) => {
+        const c = BULLET_COLORS[bi % BULLET_COLORS.length];
+        const m = isSteps ? STEP_MARK : BULLET_MARKS[bi % BULLET_MARKS.length];
+        return (
+          <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
+            <span style={{ color: c, fontWeight: 700, fontSize: isSteps ? 13 : 11, lineHeight: isSteps ? 1.85 : 2.2, flexShrink: 0, textShadow: `0 0 8px ${c}88, 0 0 16px ${c}44` }}>{m}</span>
+            <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyBase}-${bi}`)}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function formatContent(text: string, phase: string = '') {
   if (!text) return null;
 
@@ -1424,22 +1447,7 @@ function formatContent(text: string, phase: string = '') {
       result.push(
         <div key={`bl-${keyCounter++}`} style={{ marginBottom: 16 }}>
           {intro && <p style={{ margin: 0, marginBottom: 10 }}>{renderInline(intro, `bli-${keyCounter}`)}</p>}
-          {(() => {
-            const avgLen = bulletLines.reduce((s, l) => s + l.trim().length, 0) / bulletLines.length;
-            const isSteps = avgLen < 35;
-            const markers = isSteps ? ['>', '>', '>', '>', '>', '>', '>', '>'] : ['●', '#', '◆', '●', '#', '◆', '●', '#'];
-            const colors = ['#4ade80', '#3b82f6', '#a855f7', '#f97316', '#eab308', '#06b6d4', '#ef4444', '#f472b6'];
-            return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: '10px 14px' }}>
-            {bulletLines.map((bl, bi) => (
-              <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
-                <span style={{ color: colors[bi % colors.length], fontWeight: 700, fontSize: isSteps ? 13 : 11, lineHeight: isSteps ? 1.85 : 2.2, flexShrink: 0, textShadow: `0 0 8px ${colors[bi % colors.length]}88, 0 0 16px ${colors[bi % colors.length]}44` }}>{markers[bi % markers.length]}</span>
-                <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyCounter}-${bi}`)}</span>
-              </div>
-            ))}
-          </div>
-            );
-          })()}
+          <BulletList lines={bulletLines} keyBase={keyCounter} />
         </div>
       );
       continue;

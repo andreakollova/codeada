@@ -283,6 +283,21 @@ export default function TheoryLessonPage() {
           </span>
         </div>
 
+        {/* Byte with speech bubble - top of section */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+          <Byte mood={sec.phase === 'intro' ? 'happy' : sec.phase === 'facts' ? 'celebrating' : 'proud'} size={44} equipment={equipment} />
+          <div style={{
+            background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
+            padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 220,
+          }}>
+            {sec.phase === 'intro' && (locale === 'sk' ? 'Poďme na to!' : "Let's do this!")}
+            {sec.phase === 'learning' && (locale === 'sk' ? 'Toto je to najdôležitejšie.' : 'This is the key part.')}
+            {sec.phase === 'facts' && (locale === 'sk' ? 'Vedel/a si toto?' : 'Did you know this?')}
+            {sec.phase === 'real_world' && (locale === 'sk' ? 'Tu sa to používa v praxi.' : 'This is where it gets real.')}
+            {sec.phase === 'takeaways' && (locale === 'sk' ? 'Rýchle zhrnutie!' : 'Quick recap!')}
+          </div>
+        </div>
+
         {/* Reel video - shown in intro section */}
         {sec.phase === 'intro' && reelUrl && (
           <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #1a1a1a', background: '#000' }}>
@@ -317,41 +332,6 @@ export default function TheoryLessonPage() {
           </div>
         )}
 
-        {/* Byte animation between sections */}
-        {sec.phase === 'intro' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: [0, -8, 0] }}
-            transition={{ delay: 0.3, duration: 1.5, y: { repeat: Infinity, duration: 2, ease: 'easeInOut' } }}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, padding: '12px 0' }}
-          >
-            <Byte mood="celebrating" size={64} equipment={equipment} />
-            {/* Surfboard */}
-            <svg width="80" height="20" viewBox="0 0 80 20" style={{ marginTop: -6 }}>
-              <ellipse cx="40" cy="10" rx="38" ry="8" fill="#4ade80" opacity="0.8" />
-              <ellipse cx="40" cy="10" rx="38" ry="8" fill="none" stroke="#22c55e" strokeWidth="1.5" />
-              <line x1="10" y1="10" x2="70" y2="10" stroke="#22c55e" strokeWidth="0.8" opacity="0.5" />
-            </svg>
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              style={{ fontSize: 12, fontWeight: 600, color: '#4ade80', letterSpacing: '0.05em', marginTop: 8 }}
-            >
-              {locale === 'sk' ? 'Poďme do toho!' : "Let's gooo!"}
-            </motion.span>
-          </motion.div>
-        )}
-        {sec.phase === 'real_world' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}
-          >
-            <Byte mood="proud" size={56} equipment={equipment} />
-          </motion.div>
-        )}
 
         {sec.phase !== 'learning' && <motion.button
           onClick={handleNextSection}

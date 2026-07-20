@@ -1433,7 +1433,7 @@ function formatContent(text: string, phase: string = '') {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: '10px 14px' }}>
             {bulletLines.map((bl, bi) => (
               <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
-                <span style={{ color: colors[bi % colors.length], fontWeight: 600, fontSize: isSteps ? 13 : 10, lineHeight: isSteps ? 1.85 : 2.4, flexShrink: 0 }}>{markers[bi % markers.length]}</span>
+                <span style={{ color: colors[bi % colors.length], fontWeight: 700, fontSize: isSteps ? 13 : 11, lineHeight: isSteps ? 1.85 : 2.2, flexShrink: 0, textShadow: `0 0 8px ${colors[bi % colors.length]}88, 0 0 16px ${colors[bi % colors.length]}44` }}>{markers[bi % markers.length]}</span>
                 <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyCounter}-${bi}`)}</span>
               </div>
             ))}

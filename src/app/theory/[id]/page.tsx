@@ -831,6 +831,21 @@ function isCodeLine(line: string): boolean {
   return false;
 }
 
+/** Render inline markdown: **bold** and `code` */
+function renderInline(text: string, keyBase: string = 'il'): React.ReactNode {
+  if (!text.includes('**') && !text.includes('`')) return text;
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={`${keyBase}-${i}`} style={{ color: '#EDEDED', fontWeight: 600 }}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return <code key={`${keyBase}-${i}`} style={{ background: '#1a1a1a', padding: '2px 6px', borderRadius: 4, fontSize: 13, fontFamily: 'JetBrains Mono, monospace', color: '#4ade80' }}>{part.slice(1, -1)}</code>;
+    }
+    return part;
+  });
+}
+
 function formatContent(text: string) {
   if (!text) return null;
 
@@ -910,12 +925,12 @@ function formatContent(text: string) {
       const intro = nonBulletLines.filter(l => l.trim()).join(' ');
       result.push(
         <div key={`bl-${keyCounter++}`} style={{ marginBottom: 16 }}>
-          {intro && <p style={{ margin: 0, marginBottom: 8 }}>{intro}</p>}
+          {intro && <p style={{ margin: 0, marginBottom: 8 }}>{renderInline(intro, `bli-${keyCounter}`)}</p>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {bulletLines.map((bl, bi) => (
               <div key={bi} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                 <span style={{ color: '#4ade80', fontWeight: 700, fontSize: 14, lineHeight: 1.7, flexShrink: 0 }}>-</span>
-                <span style={{ color: '#ccc', lineHeight: 1.7 }}>{bl.trimStart().slice(2)}</span>
+                <span style={{ color: '#ccc', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyCounter}-${bi}`)}</span>
               </div>
             ))}
           </div>
@@ -927,7 +942,7 @@ function formatContent(text: string) {
     // Regular paragraph
     result.push(
       <p key={`p-${keyCounter++}`} style={{ margin: 0, marginBottom: 16 }}>
-        {trimmed}
+        {renderInline(trimmed, `p-${keyCounter}`)}
       </p>
     );
   }
@@ -959,7 +974,7 @@ function formatFacts(text: string) {
         }}>
           {i + 1}
         </div>
-        <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{content}</p>
+        <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{renderInline(content, `fact-${i}`)}</p>
       </div>
     );
   });

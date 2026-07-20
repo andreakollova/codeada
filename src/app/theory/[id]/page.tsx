@@ -902,7 +902,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tip = pool[sectionIndex % pool.length];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '16px 0 8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '20px 0 12px' }}>
       <div style={{
         background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
         padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 260, textAlign: 'center',

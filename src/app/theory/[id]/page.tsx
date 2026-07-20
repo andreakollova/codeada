@@ -903,7 +903,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tip = pool[sectionIndex % pool.length];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '4px 0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '16px 0 8px' }}>
       <div style={{
         background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
         padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 260, textAlign: 'center',
@@ -914,7 +914,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
         animate={{ y: [0, -5, 0], rotate: [0, 2, -2, 0] }}
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
       >
-        <Byte mood={phase === 'intro' ? 'happy' : phase === 'facts' ? 'celebrating' : 'proud'} size={72} equipment={equipment} />
+        <Byte mood={phase === 'intro' ? 'happy' : phase === 'facts' ? 'celebrating' : 'proud'} size={88} equipment={equipment} />
       </motion.div>
     </div>
   );

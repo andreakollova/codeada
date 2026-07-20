@@ -279,15 +279,6 @@ export default function TheoryLessonPage() {
         transition={{ duration: 0.25 }}
         style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
       >
-        {/* Section label */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: '#111', border: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon size={13} color="#4ade80" />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            {locale === 'sk' ? sec.labelSk : sec.label}
-          </span>
-        </div>
 
         {/* Byte with speech bubble - top of section */}
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
@@ -842,12 +833,16 @@ export default function TheoryLessonPage() {
         </div>
       </div>
 
-      {/* Lesson title + Byte */}
-      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '10px 20px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
-        {sectionIndex === 0 && <Byte mood={byteMood} size={48} equipment={equipment} />}
-        <p style={{ fontSize: 11, color: '#777', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+      {/* Lesson title + current section */}
+      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '6px 20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <p style={{ fontSize: 10, color: '#555', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>
           {safe(t(lesson, 'title', locale))}
         </p>
+        {sections[sectionIndex] && (
+          <span style={{ fontSize: 10, color: '#444', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            {locale === 'sk' ? sections[sectionIndex].labelSk : sections[sectionIndex].label}
+          </span>
+        )}
       </div>
 
       {/* Content */}

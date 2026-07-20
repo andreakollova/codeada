@@ -1122,27 +1122,27 @@ function ByteReveal({ items, locale, equipment }: { items: { name: string; desc:
 }
 
 const LANG_BUBBLES_SK = [
-  { name: 'Python', desc: 'Jednoduchý a čitateľný. Používa sa na AI, automatizáciu, webové aplikácie a analýzu dát. Práve tento jazyk sa budeš učiť!', color: '#3b82f6' },
-  { name: 'JavaScript', desc: 'Poháňa takmer každú modernú webovú stránku. Interaktívne weby, aplikácie aj hry v prehliadači.', color: '#eab308' },
-  { name: 'Java', desc: 'Jeden z najrozšírenejších jazykov. Bankové systémy, podnikové aplikácie, Android.', color: '#ef4444' },
-  { name: 'C++', desc: 'Maximálny výkon. Videohry, herné enginy, robotika, operačné systémy.', color: '#8b5cf6' },
-  { name: 'Swift', desc: 'Jazyk od Apple. iPhone, iPad, Apple Watch a Mac aplikácie.', color: '#f97316' },
-  { name: 'Kotlin', desc: 'Preferovaný jazyk Google pre Android aplikácie.', color: '#a855f7' },
-  { name: 'Rust', desc: 'Bezpečnosť pamäte a rýchlosť. Prehliadače, OS, cloudové služby.', color: '#f97316' },
-  { name: 'Go', desc: 'Od Google. Jednoduchosť a škálovateľnosť. Cloudové služby a servery.', color: '#06b6d4' },
-  { name: 'SQL', desc: 'Práca s databázami. Takmer každá aplikácia ukladá dáta do databázy.', color: '#22c55e' },
+  { name: 'Python', desc: 'Python je jednoduchý, prehľadný a patrí medzi najlepšie jazyky pre začiatočníkov. Používa sa na umelú inteligenciu, automatizáciu, webové aplikácie, analýzu dát, robotiku, kybernetickú bezpečnosť, API a strojové učenie. Práve Python sa budeš učiť v tomto kurze. Používajú ho firmy ako Google, Instagram, Spotify a OpenAI.', color: '#3b82f6' },
+  { name: 'JavaScript', desc: 'JavaScript poháňa takmer každú modernú webovú stránku. Používa sa na interaktívne webové stránky, webové aplikácie, backend servery a hry v prehliadači. Ak si niekedy klikol/a na tlačidlo na webovej stránke, veľmi pravdepodobne za tým bol JavaScript. Používajú ho firmy ako Meta, Netflix a Airbnb.', color: '#eab308' },
+  { name: 'Java', desc: 'Java patrí medzi najrozšírenejšie programovacie jazyky na svete. Beží na Java Virtual Machine, čo znamená, že rovnaký kód funguje na akomkoľvek zariadení. Používa sa v bankových systémoch, podnikových aplikáciách, veľkých firemných systémoch a starších Android aplikáciách.', color: '#ef4444' },
+  { name: 'C++', desc: 'C++ je navrhnutý pre maximálny výkon. Používa sa pri tvorbe videohier, herných enginov, robotov a operačných systémov. Poskytuje priamu kontrolu nad pamäťou, čo ho robí rýchlym ale náročnejším na naučenie. Hry ako Fortnite a Unreal Engine sú postavené na C++.', color: '#8b5cf6' },
+  { name: 'Swift', desc: 'Swift je programovací jazyk spoločnosti Apple. Používa sa na vývoj iPhone aplikácií, iPad aplikácií, Apple Watch aplikácií a aplikácií pre macOS. Je moderný, bezpečný a rýchly. Nahradil starší jazyk Objective-C a je navrhnutý tak, aby bol ľahko čitateľný.', color: '#f97316' },
+  { name: 'Kotlin', desc: 'Kotlin je preferovaný jazyk spoločnosti Google pre vývoj Android aplikácií. Je stručnejší a bezpečnejší ako Java, s ktorou je plne kompatibilný. Podporuje funkcionálne aj objektové programovanie. Aplikácie ako Pinterest a Uber používajú Kotlin.', color: '#a855f7' },
+  { name: 'Rust', desc: 'Rust je moderný jazyk zameraný na rýchlosť a bezpečnosť práce s pamäťou. Zabraňuje chybám ako memory leaks už pri kompilácii. Používa sa pri vývoji operačných systémov, prehliadačov, cloudových služieb a bezpečnostného softvéru. Firefox a Dropbox ho aktívne používajú.', color: '#f97316' },
+  { name: 'Go', desc: 'Go je jazyk od Google navrhnutý pre jednoduchosť a škálovateľnosť. Exceluje v budovaní webových serverov, cloudových služieb a nástrojov príkazového riadku. Kompiluje sa do jedného binárneho súboru. Docker a Kubernetes sú napísané v Go.', color: '#06b6d4' },
+  { name: 'SQL', desc: 'SQL nie je klasický programovací jazyk. Slúži na prácu s databázami. Takmer každá aplikácia na svete ukladá svoje údaje práve do databázy. Keď sa prihlásiš na Instagram, tvoje údaje sa načítajú z databázy pomocou SQL. Je to základná zručnosť pre každého vývojára.', color: '#22c55e' },
 ];
 
 const LANG_BUBBLES_EN = [
-  { name: 'Python', desc: 'Simple and readable. Used for AI, automation, web apps and data analysis. This is the language you will learn!', color: '#3b82f6' },
-  { name: 'JavaScript', desc: 'Powers almost every modern website. Interactive websites, apps and browser games.', color: '#eab308' },
-  { name: 'Java', desc: 'One of the most widely used languages. Banking, enterprise software, Android.', color: '#ef4444' },
-  { name: 'C++', desc: 'Maximum performance. Video games, game engines, robotics, operating systems.', color: '#8b5cf6' },
-  { name: 'Swift', desc: 'Apple\'s language. iPhone, iPad, Apple Watch and Mac apps.', color: '#f97316' },
-  { name: 'Kotlin', desc: 'Google\'s preferred language for Android app development.', color: '#a855f7' },
-  { name: 'Rust', desc: 'Memory safety and speed. Browsers, OS, cloud services.', color: '#f97316' },
-  { name: 'Go', desc: 'By Google. Simplicity and scalability. Cloud services and servers.', color: '#06b6d4' },
-  { name: 'SQL', desc: 'Working with databases. Almost every app stores data in a database.', color: '#22c55e' },
+  { name: 'Python', desc: 'Python is simple, readable and one of the best languages for beginners. It is used for artificial intelligence, automation, web applications, data analysis, robotics, cybersecurity, APIs and machine learning. This is the language you will learn in this course. Companies like Google, Instagram, Spotify and OpenAI use it.', color: '#3b82f6' },
+  { name: 'JavaScript', desc: 'JavaScript powers almost every modern website. It is used for interactive websites, web applications, backend servers and browser games. If you have ever clicked a button on a website, JavaScript was very likely involved. Companies like Meta, Netflix and Airbnb use it.', color: '#eab308' },
+  { name: 'Java', desc: 'Java is one of the most widely used programming languages in the world. It runs on the Java Virtual Machine, meaning the same code works on any device. It powers banking systems, enterprise software, large company infrastructure and older Android applications.', color: '#ef4444' },
+  { name: 'C++', desc: 'C++ is designed for maximum performance. It is used for video games, game engines, robotics and operating systems. It provides direct memory control, making it fast but harder to learn. Games like Fortnite and the Unreal Engine are built with C++.', color: '#8b5cf6' },
+  { name: 'Swift', desc: 'Swift is Apple\'s programming language for building iPhone, iPad, Apple Watch and Mac apps. It is modern, safe and fast. It replaced the older Objective-C and is designed to be easy to read. Every app on your iPhone was likely built with Swift.', color: '#f97316' },
+  { name: 'Kotlin', desc: 'Kotlin is Google\'s preferred language for Android app development. It is more concise and safer than Java, while being fully compatible with it. It supports both functional and object-oriented programming. Apps like Pinterest and Uber use Kotlin.', color: '#a855f7' },
+  { name: 'Rust', desc: 'Rust is a modern language focused on memory safety and high performance. It prevents bugs like memory leaks at compile time. It is used for operating systems, browsers, cloud services and security-critical software. Firefox and Dropbox actively use it.', color: '#f97316' },
+  { name: 'Go', desc: 'Go is a language by Google designed for simplicity and scalability. It excels at building web servers, cloud services and command-line tools. It compiles to a single binary file. Docker and Kubernetes are written in Go.', color: '#06b6d4' },
+  { name: 'SQL', desc: 'SQL is not a typical programming language. It is used for working with databases. Almost every application in the world stores its data in a database. When you log into Instagram, your data is loaded from a database using SQL. It is a fundamental skill for every developer.', color: '#22c55e' },
 ];
 
 /** Paginated learning content - splits by # headings */

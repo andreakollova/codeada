@@ -46,15 +46,14 @@ export default function StatusBar() {
               background: '#1C1C1C',
               border: '1px solid rgba(255,255,255,0.08)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: 10, fontWeight: 700, color: '#888',
-              letterSpacing: '0.02em', padding: 0, lineHeight: 1,
+              cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1,
             }}
             title={s('switchLang', locale)}
           >
-            {locale === 'en' ? 'EN' : 'SK'}
+            {locale === 'en' ? '🇬🇧' : '🇸🇰'}
           </button>
 
-          <Link href="/settings">
+          <Link href="/settings" style={{ display: 'flex' }}>
             <div style={{
               width: 32, height: 32, borderRadius: 8,
               background: '#1C1C1C',

@@ -308,20 +308,15 @@ export default function TheoryLessonPage() {
         {Array.isArray(content) ? (
           <TakeawayCarousel items={content as string[]} />
         ) : sec.phase === 'facts' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
-            {/* Sparkle animations */}
-            {[0, 1, 2].map(i => (
-              <motion.div
-                key={i}
-                animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5], y: [0, -20, 0] }}
-                transition={{ repeat: Infinity, duration: 2, delay: i * 0.7 }}
-                style={{ position: 'absolute', top: -8, right: 20 + i * 30, fontSize: 12, color: '#fff', pointerEvents: 'none' }}
-              >
-                ✦
-              </motion.div>
-            ))}
-            {formatFacts(String(content))}
-          </div>
+          <ByteReveal
+            items={String(content).split('\n').filter(l => l.trim()).map((line, i) => ({
+              name: `#${i + 1}`,
+              desc: line.replace(/^(Fun Fact #?\d+|Fact \d+|#\d+)\s*[:—-]\s*/i, ''),
+              color: ['#3b82f6', '#eab308', '#a855f7', '#4ade80', '#f97316', '#06b6d4', '#ef4444', '#f472b6'][i % 8],
+            }))}
+            locale={locale}
+            equipment={equipment}
+          />
         ) : sec.phase === 'learning' ? (
           <PaginatedContent text={String(content)} locale={locale} equipment={equipment} onComplete={handleNextSection} />
         ) : sec.phase === 'real_world' ? (

@@ -168,24 +168,6 @@ export default function SettingsPage() {
                 </button>
               )}
             </div>
-            {/* Language */}
-            <div style={{ borderTop: '1px solid #111' }}>
-              <button
-                onClick={toggle}
-                style={{
-                  width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                }}
-              >
-                <span style={{ fontSize: 14, color: '#ccc', fontWeight: 500 }}>
-                  {locale === 'sk' ? 'Jazyk' : 'Language'}
-                </span>
-                <span style={{ fontSize: 13, color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {locale === 'sk' ? 'Slovenčina' : 'English'}
-                  <ChevronRight size={14} color="#555" />
-                </span>
-              </button>
-            </div>
             {/* Drink preference */}
             <div style={{ borderTop: '1px solid #111' }}>
               <div style={{ padding: '14px 16px' }}>

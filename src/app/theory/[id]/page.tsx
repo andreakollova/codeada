@@ -361,7 +361,7 @@ export default function TheoryLessonPage() {
               setSectionIndex(i => i - 1);
               setPhase(sections[sectionIndex - 1].phase);
             }}
-            style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 4, fontWeight: 500, alignSelf: 'center' }}
+            style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 0, fontWeight: 500, alignSelf: 'center' }}
           >
             {locale === 'sk' ? 'Späť' : 'Back'}
           </button>
@@ -1200,7 +1200,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
       </AnimatePresence>
 
       {/* Page indicator */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 16, marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 16, marginBottom: 20 }}>
         {pages.map((_, i) => (
           <div key={i} style={{
             width: i === page ? 16 : 6, height: 5, borderRadius: 3,

@@ -1427,7 +1427,7 @@ function formatContent(text: string, phase: string = '') {
           {(() => {
             const avgLen = bulletLines.reduce((s, l) => s + l.trim().length, 0) / bulletLines.length;
             const isSteps = avgLen < 35;
-            const markers = isSteps ? ['>', '>', '>', '>', '>', '>', '>', '>'] : ['●', '#', '/', '●', '#', '/', '●', '#'];
+            const markers = isSteps ? ['>', '>', '>', '>', '>', '>', '>', '>'] : ['●', '#', '◆', '●', '#', '◆', '●', '#'];
             const colors = ['#4ade80', '#3b82f6', '#a855f7', '#f97316', '#eab308', '#06b6d4', '#ef4444', '#f472b6'];
             return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: '10px 14px' }}>
@@ -1438,6 +1438,8 @@ function formatContent(text: string, phase: string = '') {
               </div>
             ))}
           </div>
+            );
+          })()}
         </div>
       );
       continue;

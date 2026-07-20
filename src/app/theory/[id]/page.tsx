@@ -355,15 +355,14 @@ export default function TheoryLessonPage() {
               : s('finish', locale)}
           <ArrowRight size={16} />
         </motion.button>}
-        {sectionIndex > 0 && sec.phase !== 'learning' && (
+        {sectionIndex > 0 && (
           <button
             onClick={() => {
-              window.scrollTo(0, 0);
-              document.body.scrollTop = 0;
+              scrollTop();
               setSectionIndex(i => i - 1);
               setPhase(sections[sectionIndex - 1].phase);
             }}
-            style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 10, fontWeight: 500 }}
+            style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 4, fontWeight: 500, alignSelf: 'center' }}
           >
             {locale === 'sk' ? 'Späť' : 'Back'}
           </button>

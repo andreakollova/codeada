@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchLesson, fetchQuizForLesson, DbLesson, DbQuizQuestion } from '@/lib/curriculum-api';
@@ -304,16 +304,7 @@ export default function TheoryLessonPage() {
 
         {/* Content */}
         {Array.isArray(content) ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {(content as string[]).map((item, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12 }}>
-                <div style={{ width: 22, height: 22, borderRadius: 7, background: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                  <Check size={12} color="#000" strokeWidth={3} />
-                </div>
-                <p style={{ fontSize: 14, color: '#ccc', lineHeight: 1.6, margin: 0 }}>{renderInline(safe(item), `tk-${i}`)}</p>
-              </div>
-            ))}
-          </div>
+          <TakeawayCarousel items={content as string[]} />
         ) : sec.phase === 'facts' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {formatFacts(String(content))}
@@ -340,7 +331,7 @@ export default function TheoryLessonPage() {
           onClick={handleNextSection}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'linear-gradient(135deg, #4ade80, #22c55e)', color: '#000', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, border: 'none', cursor: 'pointer' }}
+          style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, border: 'none', cursor: 'pointer' }}
         >
           {sectionIndex + 1 < sections.length
             ? s('continueBtn', locale)
@@ -843,6 +834,66 @@ function isCodeLine(line: string): boolean {
   if (/^\w+\.\w+\(/.test(t)) return true;
   if (/^(print|len|type|str|int|float|list|dict|set|tuple|range|input|open|sorted|map|filter)\s*\(/.test(t)) return true;
   return false;
+}
+
+/** Takeaway carousel - auto-swipes every 3s, swipeable */
+function TakeawayCarousel({ items }: { items: string[] }) {
+  const [active, setActive] = useState(0);
+  const touchStart = useRef(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActive(a => (a + 1) % items.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [items.length]);
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div
+        style={{ overflow: 'hidden', borderRadius: 14, border: '1px solid #1a1a1a', background: '#0a0a0a', minHeight: 100 }}
+        onTouchStart={e => { touchStart.current = e.touches[0].clientX; }}
+        onTouchEnd={e => {
+          const diff = touchStart.current - e.changedTouches[0].clientX;
+          if (Math.abs(diff) > 40) {
+            setActive(a => diff > 0 ? (a + 1) % items.length : (a - 1 + items.length) % items.length);
+          }
+        }}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.25 }}
+            style={{ padding: '20px 20px', display: 'flex', gap: 14, alignItems: 'center', minHeight: 80 }}
+          >
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Check size={14} color="#000" strokeWidth={3} />
+            </div>
+            <p style={{ fontSize: 15, color: '#ddd', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
+              {renderInline(items[active] || '', `tk-${active}`)}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      {/* Dots */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 12 }}>
+        {items.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(i)}
+            style={{
+              width: i === active ? 16 : 6, height: 6, borderRadius: 3, border: 'none', cursor: 'pointer', padding: 0,
+              background: i === active ? '#4ade80' : '#333',
+              transition: 'all 0.3s ease',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /** Render inline markdown: **bold** and `code` */

@@ -51,18 +51,18 @@ export default function StatusBar() {
         {/* Right: Locale dropdown + Settings */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div ref={dropdownRef} style={{ position: 'relative' }}>
-            <button
+            <div
               onClick={() => setLangOpen(o => !o)}
               style={{
                 width: 32, height: 32, borderRadius: 8,
                 background: '#1C1C1C',
                 border: '1px solid rgba(255,255,255,0.08)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', padding: 0,
+                cursor: 'pointer',
               }}
             >
               <Globe size={14} color="#6E6E6E" />
-            </button>
+            </div>
             {langOpen && (
               <div style={{
                 position: 'absolute', top: 38, right: 0, zIndex: 100,

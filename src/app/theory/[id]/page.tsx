@@ -316,14 +316,32 @@ export default function TheoryLessonPage() {
         )}
 
         {/* Byte animation between sections */}
-        {(sec.phase === 'intro' || sec.phase === 'real_world') && (
+        {sec.phase === 'intro' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: [0, -8, 0] }}
+            transition={{ delay: 0.3, duration: 1.5, y: { repeat: Infinity, duration: 2, ease: 'easeInOut' } }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '12px 0' }}
+          >
+            <Byte mood="celebrating" size={64} equipment={equipment} />
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              style={{ fontSize: 12, fontWeight: 600, color: '#4ade80', letterSpacing: '0.05em' }}
+            >
+              {locale === 'sk' ? 'Poďme do toho! 🏄' : "Let's gooo! 🏄"}
+            </motion.span>
+          </motion.div>
+        )}
+        {sec.phase === 'real_world' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
             style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}
           >
-            <Byte mood={sec.phase === 'intro' ? 'happy' : 'proud'} size={64} equipment={equipment} />
+            <Byte mood="proud" size={56} equipment={equipment} />
           </motion.div>
         )}
 

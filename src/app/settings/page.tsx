@@ -167,10 +167,10 @@ export default function SettingsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {([
-                    { id: 'coffee' as const, label: locale === 'sk' ? 'Kava' : 'Coffee' },
-                    { id: 'tea' as const, label: locale === 'sk' ? 'Caj' : 'Tea' },
+                    { id: 'coffee' as const, label: locale === 'sk' ? 'Káva' : 'Coffee' },
+                    { id: 'tea' as const, label: locale === 'sk' ? 'Čaj' : 'Tea' },
                     { id: 'energy' as const, label: 'Energy' },
-                    { id: 'juice' as const, label: locale === 'sk' ? 'Dzus' : 'Juice' },
+                    { id: 'juice' as const, label: locale === 'sk' ? 'Džús' : 'Juice' },
                     { id: 'water' as const, label: locale === 'sk' ? 'Voda' : 'Water' },
                   ]).map(d => (
                     <button

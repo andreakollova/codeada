@@ -872,7 +872,7 @@ function isCodeLine(line: string): boolean {
 /** Byte tip bubble at top of sections */
 function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; locale: string; equipment: any; sectionIndex: number }) {
   const tipsSk: Record<string, string[]> = {
-    intro: ['Vitaj! Pripravený?', 'Toto bude super.', 'Som rád, že si tu!', 'Pustime sa do toho.'],
+    intro: ['Pripravený? Poďme na to!', 'Toto bude super.', 'Dnes sa naučíš niečo nové!', 'Pustime sa do toho.'],
     learning: [
       'Vedel/a si, že prvý program napísala žena? Ada Lovelace v roku 1843.',
       'Google spracuje denne viac ako 8.5 miliardy vyhľadávaní.',
@@ -888,7 +888,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
     takeaways: ['Rýchle zhrnutie!', 'Toto si zapamätaj.'],
   };
   const tipsEn: Record<string, string[]> = {
-    intro: ['Welcome! Ready?', 'This is going to be great.', 'Glad you are here!', 'Let\'s get into it.'],
+    intro: ['Ready? Let\'s go!', 'This is going to be great.', 'You will learn something new today!', 'Let\'s get into it.'],
     learning: [
       'Did you know the first program was written by a woman? Ada Lovelace in 1843.',
       'Google processes over 8.5 billion searches per day.',
@@ -908,19 +908,19 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tip = pool[sectionIndex % pool.length];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-      <motion.div
-        animate={{ y: [0, -4, 0], rotate: [0, 2, -2, 0] }}
-        transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-      >
-        <Byte mood={phase === 'intro' ? 'happy' : phase === 'facts' ? 'celebrating' : 'proud'} size={44} equipment={equipment} />
-      </motion.div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '4px 0' }}>
       <div style={{
-        background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
-        padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 220,
+        background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
+        padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 260, textAlign: 'center',
       }}>
         {tip}
       </div>
+      <motion.div
+        animate={{ y: [0, -5, 0], rotate: [0, 2, -2, 0] }}
+        transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+      >
+        <Byte mood={phase === 'intro' ? 'happy' : phase === 'facts' ? 'celebrating' : 'proud'} size={72} equipment={equipment} />
+      </motion.div>
     </div>
   );
 }
@@ -1215,31 +1215,6 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
         ))}
       </div>
 
-      {/* Byte with speech bubble */}
-      <motion.div
-        key={`byte-${page}`}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        style={{ display: 'flex', alignItems: 'flex-end', gap: 10, padding: '12px 0 4px' }}
-      >
-        <motion.div
-          animate={
-            page % 3 === 0 ? { y: [0, -6, 0] }
-            : page % 3 === 1 ? { rotate: [0, 5, -5, 0] }
-            : { scale: [1, 1.05, 1] }
-          }
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-        >
-          <Byte mood={byteMoods[page % byteMoods.length]} size={48} equipment={equipment} />
-        </motion.div>
-        <div style={{
-          background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px 12px 12px 4px',
-          padding: '8px 12px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 220,
-        }}>
-          {byteTips[page % byteTips.length]}
-        </div>
-      </motion.div>
 
       <button
         onClick={() => {
@@ -1400,10 +1375,10 @@ function formatContent(text: string, phase: string = '') {
       const heading = trimmed.replace(/^#+\s*/, '');
       result.push(
         <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
-          <div style={{ width: 24, height: 3, borderRadius: 2, background: '#4ade80', marginBottom: 10, opacity: 0.6 }} />
-          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0 }}>
+          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0, marginBottom: 6 }}>
             {renderInline(heading, `mh-${keyCounter}`)}
           </h3>
+          <div style={{ width: 28, height: 2, borderRadius: 1, background: '#333' }} />
         </div>
       );
       continue;

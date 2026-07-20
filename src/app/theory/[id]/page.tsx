@@ -830,10 +830,12 @@ export default function TheoryLessonPage() {
         </p>
       </div>
 
-      {/* Byte */}
-      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
-        <Byte mood={byteMood} size={64} equipment={equipment} />
-      </div>
+      {/* Byte - only on first section */}
+      {sectionIndex === 0 && (
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
+          <Byte mood={byteMood} size={64} equipment={equipment} />
+        </div>
+      )}
 
       {/* Content */}
       <div style={{ flex: 1, maxWidth: 520, margin: '0 auto', width: '100%', padding: '0 20px 120px' }}>

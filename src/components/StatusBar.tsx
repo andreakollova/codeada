@@ -19,37 +19,35 @@ export default function StatusBar() {
       WebkitBackdropFilter: 'blur(20px)',
       paddingTop: 'max(env(safe-area-inset-top, 0px), 50px)',
     }}>
-      <div style={{ margin: '0 auto', display: 'flex', alignItems: 'center', gap: 0, padding: '0 12px', height: 48 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 44 }}>
 
-        {/* Streak */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
-          <Flame size={15} color={streak > 0 ? '#EDEDED' : '#3A3A3A'} fill={streak > 0 ? '#EDEDED' : 'none'} />
-          <span style={{ fontWeight: 600, fontSize: 13, color: streak > 0 ? '#EDEDED' : '#3A3A3A' }}>
-            {streak}
-          </span>
+        {/* Left: Streak + XP */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Flame size={14} color={streak > 0 ? '#EDEDED' : '#3A3A3A'} fill={streak > 0 ? '#EDEDED' : 'none'} />
+            <span style={{ fontWeight: 600, fontSize: 13, color: streak > 0 ? '#EDEDED' : '#3A3A3A' }}>
+              {streak}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Zap size={13} color="#EDEDED" fill="#EDEDED" />
+            <span style={{ fontWeight: 600, fontSize: 13, color: '#EDEDED' }}>
+              {xp.toLocaleString()} XP
+            </span>
+          </div>
         </div>
 
-        {/* XP - center */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' }}>
-          <Zap size={14} color="#EDEDED" fill="#EDEDED" />
-          <span style={{ fontWeight: 600, fontSize: 13, color: '#EDEDED' }}>
-            {xp.toLocaleString()} XP
-          </span>
-        </div>
-
-        {/* Locale + settings */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' }}>
-          {/* Language toggle */}
+        {/* Right: Locale + Settings */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button
             onClick={toggle}
             style={{
-              width: 30, height: 30, borderRadius: 8,
+              width: 32, height: 32, borderRadius: 8,
               background: '#1C1C1C',
               border: '1px solid rgba(255,255,255,0.08)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: 10, fontWeight: 600, color: '#999',
-              letterSpacing: '0.02em', padding: 0, boxSizing: 'border-box',
-              lineHeight: 1,
+              cursor: 'pointer', fontSize: 10, fontWeight: 700, color: '#888',
+              letterSpacing: '0.02em', padding: 0, lineHeight: 1,
             }}
             title={s('switchLang', locale)}
           >
@@ -58,13 +56,13 @@ export default function StatusBar() {
 
           <Link href="/settings">
             <div style={{
-              width: 30, height: 30, borderRadius: 8,
+              width: 32, height: 32, borderRadius: 8,
               background: '#1C1C1C',
               border: '1px solid rgba(255,255,255,0.08)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <Settings size={13} color="#6E6E6E" />
+              <Settings size={14} color="#6E6E6E" />
             </div>
           </Link>
         </div>

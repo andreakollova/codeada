@@ -1321,12 +1321,12 @@ let bulletListCounter = 0;
 const MARKER_STYLES = [
   { mark: '>', color: '#4ade80' },
   { mark: '#', color: '#3b82f6' },
-  { mark: '◆', color: '#a855f7' },
-  { mark: '●', color: '#f97316' },
-  { mark: '>', color: '#06b6d4' },
-  { mark: '#', color: '#eab308' },
-  { mark: '◆', color: '#ef4444' },
-  { mark: '●', color: '#f472b6' },
+  { mark: '//', color: '#a855f7' },
+  { mark: '>', color: '#f97316' },
+  { mark: '#', color: '#06b6d4' },
+  { mark: '//', color: '#eab308' },
+  { mark: '>', color: '#ef4444' },
+  { mark: '#', color: '#f472b6' },
 ];
 
 function BulletList({ lines, keyBase }: { lines: string[]; keyBase: number }) {

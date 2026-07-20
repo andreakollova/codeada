@@ -323,16 +323,22 @@ export default function TheoryLessonPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: [0, -8, 0] }}
             transition={{ delay: 0.3, duration: 1.5, y: { repeat: Infinity, duration: 2, ease: 'easeInOut' } }}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '12px 0' }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, padding: '12px 0' }}
           >
             <Byte mood="celebrating" size={64} equipment={equipment} />
+            {/* Surfboard */}
+            <svg width="80" height="20" viewBox="0 0 80 20" style={{ marginTop: -6 }}>
+              <ellipse cx="40" cy="10" rx="38" ry="8" fill="#4ade80" opacity="0.8" />
+              <ellipse cx="40" cy="10" rx="38" ry="8" fill="none" stroke="#22c55e" strokeWidth="1.5" />
+              <line x1="10" y1="10" x2="70" y2="10" stroke="#22c55e" strokeWidth="0.8" opacity="0.5" />
+            </svg>
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              style={{ fontSize: 12, fontWeight: 600, color: '#4ade80', letterSpacing: '0.05em' }}
+              style={{ fontSize: 12, fontWeight: 600, color: '#4ade80', letterSpacing: '0.05em', marginTop: 8 }}
             >
-              {locale === 'sk' ? 'Poďme do toho! 🏄' : "Let's gooo! 🏄"}
+              {locale === 'sk' ? 'Poďme do toho!' : "Let's gooo!"}
             </motion.span>
           </motion.div>
         )}
@@ -813,11 +819,7 @@ export default function TheoryLessonPage() {
           <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#111', overflow: 'hidden' }}>
             <motion.div style={{ height: '100%', background: '#fff', borderRadius: 2 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
           </div>
-          <div style={{ display: 'flex', gap: 3 }}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Heart key={i} size={14} fill={i < hearts ? '#fff' : 'none'} color={i < hearts ? '#fff' : '#2a2a2a'} />
-            ))}
-          </div>
+          <div />
         </div>
       </div>
 
@@ -856,6 +858,109 @@ function isCodeLine(line: string): boolean {
   return false;
 }
 
+/** Interactive language bubbles - tap to pop and learn */
+function LanguageBubbles({ items, locale }: { items: { name: string; desc: string; color: string }[]; locale: string }) {
+  const [popped, setPopped] = useState<Set<number>>(new Set());
+  const [active, setActive] = useState<number | null>(null);
+
+  const pop = (i: number) => {
+    setPopped(p => new Set(p).add(i));
+    setActive(i);
+    setTimeout(() => setActive(null), 3000);
+  };
+
+  return (
+    <div>
+      <p style={{ fontSize: 13, color: '#666', textAlign: 'center', marginBottom: 16 }}>
+        {locale === 'sk' ? '👆 Klikni na bublinu!' : '👆 Tap a bubble!'}
+      </p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', padding: '8px 0' }}>
+        {items.map((lang, i) => (
+          <motion.button
+            key={i}
+            onClick={() => pop(i)}
+            animate={{
+              y: popped.has(i) ? 0 : [0, -6, 0],
+              scale: active === i ? [1, 1.2, 1] : 1,
+            }}
+            transition={{
+              y: { repeat: Infinity, duration: 1.5 + (i % 3) * 0.5, delay: i * 0.2 },
+              scale: { duration: 0.3 },
+            }}
+            style={{
+              padding: '8px 16px', borderRadius: 20,
+              background: popped.has(i) ? lang.color + '22' : lang.color + '33',
+              border: `1.5px solid ${lang.color}`,
+              color: popped.has(i) ? lang.color : '#ccc',
+              fontSize: 13, fontWeight: 700, cursor: 'pointer',
+              opacity: popped.has(i) ? 1 : 0.85,
+              boxShadow: popped.has(i) ? `0 0 12px ${lang.color}44` : 'none',
+            }}
+          >
+            {lang.name} {popped.has(i) ? '✓' : ''}
+          </motion.button>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {active !== null && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              marginTop: 14, padding: '14px 16px', borderRadius: 12,
+              background: items[active].color + '11',
+              border: `1px solid ${items[active].color}33`,
+            }}
+          >
+            <div style={{ fontWeight: 700, fontSize: 15, color: items[active].color, marginBottom: 6 }}>
+              {items[active].name}
+            </div>
+            <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.6, margin: 0 }}>
+              {items[active].desc}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {popped.size === items.length && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{ textAlign: 'center', fontSize: 12, color: '#4ade80', marginTop: 12, fontWeight: 600 }}
+        >
+          {locale === 'sk' ? '🎉 Všetky jazyky preskúmané!' : '🎉 All languages explored!'}
+        </motion.p>
+      )}
+    </div>
+  );
+}
+
+const LANG_BUBBLES_SK = [
+  { name: 'Python', desc: 'Jednoduchý a čitateľný. Používa sa na AI, automatizáciu, webové aplikácie a analýzu dát. Práve tento jazyk sa budeš učiť!', color: '#3b82f6' },
+  { name: 'JavaScript', desc: 'Poháňa takmer každú modernú webovú stránku. Interaktívne weby, aplikácie aj hry v prehliadači.', color: '#eab308' },
+  { name: 'Java', desc: 'Jeden z najrozšírenejších jazykov. Bankové systémy, podnikové aplikácie, Android.', color: '#ef4444' },
+  { name: 'C++', desc: 'Maximálny výkon. Videohry, herné enginy, robotika, operačné systémy.', color: '#8b5cf6' },
+  { name: 'Swift', desc: 'Jazyk od Apple. iPhone, iPad, Apple Watch a Mac aplikácie.', color: '#f97316' },
+  { name: 'Kotlin', desc: 'Preferovaný jazyk Google pre Android aplikácie.', color: '#a855f7' },
+  { name: 'Rust', desc: 'Bezpečnosť pamäte a rýchlosť. Prehliadače, OS, cloudové služby.', color: '#f97316' },
+  { name: 'Go', desc: 'Od Google. Jednoduchosť a škálovateľnosť. Cloudové služby a servery.', color: '#06b6d4' },
+  { name: 'SQL', desc: 'Práca s databázami. Takmer každá aplikácia ukladá dáta do databázy.', color: '#22c55e' },
+];
+
+const LANG_BUBBLES_EN = [
+  { name: 'Python', desc: 'Simple and readable. Used for AI, automation, web apps and data analysis. This is the language you will learn!', color: '#3b82f6' },
+  { name: 'JavaScript', desc: 'Powers almost every modern website. Interactive websites, apps and browser games.', color: '#eab308' },
+  { name: 'Java', desc: 'One of the most widely used languages. Banking, enterprise software, Android.', color: '#ef4444' },
+  { name: 'C++', desc: 'Maximum performance. Video games, game engines, robotics, operating systems.', color: '#8b5cf6' },
+  { name: 'Swift', desc: 'Apple\'s language. iPhone, iPad, Apple Watch and Mac apps.', color: '#f97316' },
+  { name: 'Kotlin', desc: 'Google\'s preferred language for Android app development.', color: '#a855f7' },
+  { name: 'Rust', desc: 'Memory safety and speed. Browsers, OS, cloud services.', color: '#f97316' },
+  { name: 'Go', desc: 'By Google. Simplicity and scalability. Cloud services and servers.', color: '#06b6d4' },
+  { name: 'SQL', desc: 'Working with databases. Almost every app stores data in a database.', color: '#22c55e' },
+];
+
 /** Paginated learning content - splits by # headings */
 function PaginatedContent({ text, locale, equipment }: { text: string; locale: string; equipment: any }) {
   const [page, setPage] = useState(0);
@@ -890,8 +995,8 @@ function PaginatedContent({ text, locale, equipment }: { text: string; locale: s
 
   const isLast = page >= pages.length - 1;
   const byteTips = locale === 'sk'
-    ? ['Vedel/a si to? Skvelé! 🚀', 'Toto je základ, zapamätaj si to 💡', 'Super, ideme ďalej! 🏄', 'Výborne, zvládaš to! 💪', 'Cool, že? ⚡', 'Toto sa ti bude hodiť! 🎯', 'Ešte kúsok! 🔥']
-    : ['Did you know? Awesome! 🚀', 'This is key, remember it 💡', 'Great, moving on! 🏄', 'You got this! 💪', 'Pretty cool, right? ⚡', 'This will come in handy! 🎯', 'Almost there! 🔥'];
+    ? ['Vedel/a si to? Skvelé!', 'Toto je základ, zapamätaj si to.', 'Super, ideme ďalej!', 'Výborne, zvládaš to!', 'Cool, že?', 'Toto sa ti bude hodiť!', 'Ešte kúsok!']
+    : ['Did you know? Awesome!', 'This is key, remember it.', 'Great, moving on!', 'You got this!', 'Pretty cool, right?', 'This will come in handy!', 'Almost there!'];
   const byteMoods: Array<'happy' | 'celebrating' | 'proud'> = ['happy', 'celebrating', 'proud'];
 
   return (
@@ -905,7 +1010,17 @@ function PaginatedContent({ text, locale, equipment }: { text: string; locale: s
           transition={{ duration: 0.2 }}
           style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}
         >
-          {formatContent(pages[page], 'learning')}
+          {/* Detect programming languages page and show interactive bubbles */}
+          {pages[page].includes('**Python**') && pages[page].includes('**Java**') ? (
+            <div>
+              <div style={{ marginBottom: 16 }}>
+                {formatContent(pages[page].split('**Python**')[0], 'learning')}
+              </div>
+              <LanguageBubbles items={locale === 'sk' ? LANG_BUBBLES_SK : LANG_BUBBLES_EN} locale={locale} />
+            </div>
+          ) : (
+            formatContent(pages[page], 'learning')
+          )}
         </motion.div>
       </AnimatePresence>
 

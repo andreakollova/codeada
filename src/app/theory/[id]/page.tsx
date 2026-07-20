@@ -280,8 +280,8 @@ export default function TheoryLessonPage() {
         style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
       >
 
-        {/* Byte with speech bubble - not on facts or real_world */}
-        {sec.phase !== 'facts' && sec.phase !== 'real_world' && (
+        {/* Byte with speech bubble - not on facts, real_world, or learning (learning has its own inside PaginatedContent) */}
+        {sec.phase !== 'facts' && sec.phase !== 'real_world' && sec.phase !== 'learning' && (
           <ByteTip phase={sec.phase} locale={locale} equipment={equipment} sectionIndex={sectionIndex} />
         )}
 
@@ -1176,6 +1176,8 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
 
   return (
     <div>
+      <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={page} />
+
       <AnimatePresence mode="wait">
         <motion.div
           key={page}
@@ -1422,10 +1424,16 @@ function formatContent(text: string, phase: string = '') {
       result.push(
         <div key={`bl-${keyCounter++}`} style={{ marginBottom: 16 }}>
           {intro && <p style={{ margin: 0, marginBottom: 10 }}>{renderInline(intro, `bli-${keyCounter}`)}</p>}
+          {(() => {
+            const avgLen = bulletLines.reduce((s, l) => s + l.trim().length, 0) / bulletLines.length;
+            const isSteps = avgLen < 35;
+            const markers = isSteps ? ['>', '>', '>', '>', '>', '>', '>', '>'] : ['●', '#', '/', '●', '#', '/', '●', '#'];
+            const colors = ['#4ade80', '#3b82f6', '#a855f7', '#f97316', '#eab308', '#06b6d4', '#ef4444', '#f472b6'];
+            return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: '10px 14px' }}>
             {bulletLines.map((bl, bi) => (
               <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
-                <span style={{ color: '#4ade80', fontWeight: 700, fontSize: 10, lineHeight: 2.4, flexShrink: 0 }}>●</span>
+                <span style={{ color: colors[bi % colors.length], fontWeight: 600, fontSize: isSteps ? 13 : 10, lineHeight: isSteps ? 1.85 : 2.4, flexShrink: 0 }}>{markers[bi % markers.length]}</span>
                 <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyCounter}-${bi}`)}</span>
               </div>
             ))}

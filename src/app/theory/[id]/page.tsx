@@ -20,7 +20,6 @@ type Phase = 'loading' | 'coffee' | 'intro' | 'learning' | 'facts' | 'real_world
 const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: string; labelSk: string }[] = [
   { key: 'introduction', phase: 'intro', icon: BookOpen, label: 'Introduction', labelSk: 'Úvod' },
   { key: 'learning_content', phase: 'learning', icon: Lightbulb, label: 'Learning', labelSk: 'Učivo' },
-  { key: 'interesting_facts', phase: 'facts', icon: Sparkles, label: 'Fun Facts', labelSk: 'Zaujímavosti' },
   { key: 'real_world', phase: 'real_world', icon: Globe, label: 'Real World', labelSk: 'Reálny svet' },
   { key: 'key_takeaways', phase: 'takeaways', icon: ListChecks, label: 'Key Takeaways', labelSk: 'Zhrnutie' },
 ];

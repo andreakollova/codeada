@@ -1200,7 +1200,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
       </AnimatePresence>
 
       {/* Page indicator */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 16, marginBottom: 12 }}>
         {pages.map((_, i) => (
           <div key={i} style={{
             width: i === page ? 16 : 6, height: 5, borderRadius: 3,

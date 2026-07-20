@@ -668,7 +668,7 @@ export default function ArenaPage() {
 
       {/* MINIMAP */}
       <div style={{
-        position: 'absolute', top: 60, right: 16,
+        position: 'absolute', top: 16, right: 16,
         width: MINIMAP_SIZE, height: MINIMAP_SIZE,
         background: 'rgba(0,0,0,0.7)', border: '1px solid #1a1a1a',
         borderRadius: 10, overflow: 'hidden',
@@ -692,7 +692,7 @@ export default function ArenaPage() {
       <button
         onClick={() => { window.scrollTo(0, 0); window.history.back(); }}
         style={{
-          position: 'absolute', top: 60, left: 16,
+          position: 'absolute', top: 16, left: 16,
           width: 36, height: 36, borderRadius: 10,
           background: 'rgba(0,0,0,0.7)', border: '1px solid #1a1a1a',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -706,7 +706,7 @@ export default function ArenaPage() {
       <button
         onClick={() => setShowLeaderboard(!showLeaderboard)}
         style={{
-          position: 'absolute', top: 60, left: 60,
+          position: 'absolute', top: 16, left: 60,
           height: 36, borderRadius: 10, padding: '0 12px',
           background: 'rgba(0,0,0,0.7)', border: '1px solid #1a1a1a',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,

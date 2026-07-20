@@ -25,7 +25,7 @@ const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCou
   if (locale === 'sk') {
     if (lessonsCount === 0) return `${timeSk}, ${name}.`;
     if (streak === 0) return `${timeSk}, ${name}.`;
-    if (streak === 1) return `${timeSk}, ${name}. 1-dňový streak.`;
+    if (streak === 1) return `${timeSk}, ${name}.`;
     return `${timeSk}, ${name}. ${streak}-dňový streak.`;
   }
   if (lessonsCount === 0) return `${timeEn}, ${name}.`;

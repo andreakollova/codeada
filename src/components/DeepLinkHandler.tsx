@@ -76,33 +76,40 @@ export default function DeepLinkHandler() {
           void processAuthCallback(launchUrl.url);
         }
 
-        // Request push notification permission
+        // Request push notification permission (skip on emulator/web)
         try {
           const { PushNotifications } = await import('@capacitor/push-notifications');
           const permStatus = await PushNotifications.checkPermissions();
           if (permStatus.receive === 'prompt') {
             const result = await PushNotifications.requestPermissions();
             if (result.receive === 'granted') {
-              await PushNotifications.register();
+              try { await PushNotifications.register(); } catch {}
             }
           } else if (permStatus.receive === 'granted') {
-            await PushNotifications.register();
+            try { await PushNotifications.register(); } catch {}
           }
 
           // Listen for token and save to Supabase
-          await PushNotifications.addListener('registration', async (token) => {
-            console.log('Push token:', token.value);
-            const sb = getSupabase();
-            if (!sb) return;
-            const { data: { user } } = await sb.auth.getUser();
-            if (user) {
-              await sb.from('cb_users').upsert({
-                id: user.id,
-                push_token: token.value,
-                push_platform: 'ios',
-              }, { onConflict: 'id' });
-            }
-          });
+          try {
+            await PushNotifications.addListener('registration', async (token) => {
+              console.log('Push token:', token.value);
+              const sb = getSupabase();
+              if (!sb) return;
+              const { data: { user } } = await sb.auth.getUser();
+              if (user) {
+                const platform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
+                await sb.from('cb_users').upsert({
+                  id: user.id,
+                  push_token: token.value,
+                  push_platform: platform,
+                }, { onConflict: 'id' });
+              }
+            });
+
+            await PushNotifications.addListener('registrationError', (err) => {
+              console.log('Push registration error (normal on emulator):', err);
+            });
+          } catch {}
         } catch (e) {
           console.log('Push notification setup:', e);
         }

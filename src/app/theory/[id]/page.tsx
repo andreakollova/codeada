@@ -292,8 +292,8 @@ export default function TheoryLessonPage() {
           <ByteTip phase={sec.phase} locale={locale} equipment={equipment} sectionIndex={sectionIndex} />
         )}
 
-        {/* Reel video - shown in intro section */}
-        {sec.phase === 'intro' && reelUrl && (
+        {/* Reel video - shown before quiz (last theory section) */}
+        {sectionIndex === sections.length - 1 && reelUrl && (
           <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #1a1a1a', background: '#000' }}>
             <video
               src={reelUrl}

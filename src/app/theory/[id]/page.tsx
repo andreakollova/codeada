@@ -467,7 +467,7 @@ export default function TheoryLessonPage() {
                     background: writeCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
                     border: `1.5px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
                     color: writeCodeState === 'correct' ? '#4ade80' : '#fff',
-                    fontSize: 14, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                    fontSize: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
                     outline: 'none', boxSizing: 'border-box',
                   }}
                 />

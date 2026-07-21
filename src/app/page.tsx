@@ -22,16 +22,8 @@ const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCou
   const timeEn = h < 12 ? 'Good morning' : h < 17 ? 'Hey' : 'Good evening';
   const timeSk = h < 12 ? 'Dobré ránko' : h < 17 ? 'Čauko' : 'Pekný večer';
 
-  if (locale === 'sk') {
-    if (lessonsCount === 0) return `${timeSk}, ${name}.`;
-    if (streak === 0) return `${timeSk}, ${name}.`;
-    if (streak === 1) return `${timeSk}, ${name}.`;
-    return `${timeSk}, ${name}. ${streak}-dňový streak.`;
-  }
-  if (lessonsCount === 0) return `${timeEn}, ${name}.`;
-  if (streak <= 1) return `${timeEn}, ${name}.`;
-  if (streak < 7) return `${timeEn}, ${name}. ${streak}-day streak.`;
-  return `${timeEn}, ${name}. ${streak}-day streak - impressive.`;
+  if (locale === 'sk') return `${timeSk}, ${name}.`;
+  return `${timeEn}, ${name}.`;
 };
 
 const COUNTDOWN_ENABLED = false;
@@ -135,6 +127,14 @@ export default function HomePage() {
                 <h1 style={{ fontWeight: 700, fontSize: 24, color: '#EDEDED', marginBottom: 4, letterSpacing: '-0.03em' }}>
                   {name ? greetings(name, streak, locale, completedLessons.length) : 'Coduy'}
                 </h1>
+                {streak >= 2 && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 8, background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)', marginBottom: 6 }}>
+                    <Flame size={12} color="#f97316" fill="#f97316" style={{ filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.6))' }} />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#f97316' }}>
+                      {streak}{locale === 'sk' ? '-dňový streak' : '-day streak'}
+                    </span>
+                  </div>
+                )}
                 <p style={{ fontSize: 14, color: '#999', lineHeight: 1.5 }}>
                   {completedLessons.length === 0
                     ? s('pickLesson', locale)

@@ -221,10 +221,12 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             const { userId } = useUserStore.getState();
 
             if (isApp) {
-              // Native app - Apple IAP via WKScriptMessageHandler bridge
+              // Native app - Apple IAP or Google Play Billing
               try {
-                const wk = (window as any).webkit?.messageHandlers?.coduyPurchase;
-                if (wk) {
+                const wk = (window as any).webkit?.messageHandlers?.coduyPurchase; // iOS
+                const gp = (window as any).coduyPurchase; // Android
+                const nativeBridge = wk || gp;
+                if (nativeBridge) {
                   const productId = plan === 'yearly' ? 'coduy_pro_yearly' : 'coduy_pro_monthly';
 
                   // Set up callback before posting message
@@ -233,7 +235,11 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                       delete (window as any).__coduyPurchaseCallback;
                       resolve(res);
                     };
-                    wk.postMessage({ action: 'purchase', productId });
+                    if (wk) {
+                      wk.postMessage({ action: 'purchase', productId }); // iOS
+                    } else if (gp) {
+                      gp.purchase(productId); // Android
+                    }
                     // Timeout after 2 minutes
                     setTimeout(() => {
                       if ((window as any).__coduyPurchaseCallback) {

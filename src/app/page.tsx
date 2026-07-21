@@ -128,7 +128,7 @@ export default function HomePage() {
                   {name ? greetings(name, streak, locale, completedLessons.length) : 'Coduy'}
                 </h1>
                 {streak >= 2 && (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 8, background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)', marginBottom: 6 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
                     <Flame size={12} color="#f97316" fill="#f97316" style={{ filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.6))' }} />
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#f97316' }}>
                       {streak}{locale === 'sk' ? '-dňový streak' : '-day streak'}

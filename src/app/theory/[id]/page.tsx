@@ -1185,6 +1185,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
   if (pages.length <= 1) {
     return (
       <div>
+        <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={0} />
         <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
           {formatContent(text, 'learning')}
         </div>

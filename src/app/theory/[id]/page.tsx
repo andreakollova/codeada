@@ -380,7 +380,7 @@ export default function TheoryLessonPage() {
   };
 
   // Normalize whitespace for write_code comparison
-  const normalizeCode = (s: string) => s.replace(/\s+/g, ' ').trim();
+  const normalizeCode = (s: string) => s.replace(/\s+/g, ' ').trim().toLowerCase();
 
   const handleWriteCodeCheck = () => {
     const q = quiz[quizIndex];

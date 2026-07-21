@@ -247,10 +247,10 @@ export default function SettingsPage() {
           <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
             {([
               {
-                q: locale === 'sk' ? 'Ako pridať widget na plochu?' : 'How to add a widget?',
+                q: locale === 'sk' ? 'Ako pridať widget na plochu? (iOS)' : 'How to add a widget? (iOS)',
                 a: locale === 'sk'
-                  ? 'Dlho podrž na ploche telefónu → klikni + v ľavom hornom rohu → vyhľadaj Coduy → vyber widget → hotovo.'
-                  : 'Long press on home screen → tap + in top left → search Coduy → select widget → done.',
+                  ? 'Widget je dostupný na iPhone. Dlho podrž na ploche → klikni + → vyhľadaj Coduy → vyber widget → hotovo.'
+                  : 'Widget is available on iPhone. Long press on home screen → tap + → search Coduy → select widget → done.',
               },
               {
                 q: locale === 'sk' ? 'Ako zrušiť predplatné?' : 'How to cancel subscription?',

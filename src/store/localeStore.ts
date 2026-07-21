@@ -4,16 +4,20 @@ import { persist } from 'zustand/middleware';
 
 type Locale = 'en' | 'sk';
 
-/** Detect locale from domain: .sk = Slovak, everything else = English */
-function detectLocaleFromDomain(): Locale {
+/** Detect locale: .sk domain = Slovak, device language sk = Slovak, otherwise English */
+function detectLocale(): Locale {
   if (typeof window === 'undefined') return 'en';
+  // Domain-based: coduy.sk = SK
   const host = window.location.hostname;
   if (host.endsWith('.sk')) return 'sk';
+  // Device language: Slovak device = SK
+  const lang = navigator.language || (navigator as any).userLanguage || '';
+  if (lang.startsWith('sk')) return 'sk';
   return 'en';
 }
 
 // Detect immediately on load (before any render) so first render is correct
-const domainLocale = detectLocaleFromDomain();
+const domainLocale = detectLocale();
 
 interface LocaleState {
   locale: Locale;
@@ -26,19 +30,19 @@ export const useLocaleStore = create<LocaleState>()(
   persist(
     (set, get) => ({
       locale: domainLocale,
-      setLocale: (locale) => set({ locale }),
-      toggle: () => set({ locale: get().locale === 'en' ? 'sk' : 'en' }),
+      setLocale: (locale) => { set({ locale }); if (typeof window !== 'undefined') localStorage.setItem('coduy-locale-set', '1'); },
+      toggle: () => { const next = get().locale === 'en' ? 'sk' : 'en'; set({ locale: next }); if (typeof window !== 'undefined') localStorage.setItem('coduy-locale-set', '1'); },
       checkDomain: () => {
-        set({ locale: detectLocaleFromDomain() });
+        set({ locale: detectLocale() });
       },
     }),
     {
       name: 'coduy-locale',
       partialize: (s) => ({ locale: s.locale }),
-      // Always override persisted locale with domain-detected one on hydration
+      // On first load, detect locale. After that, respect user's choice from Settings
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.locale = detectLocaleFromDomain();
+        if (state && !localStorage.getItem('coduy-locale-set')) {
+          state.locale = detectLocale();
         }
       },
     }

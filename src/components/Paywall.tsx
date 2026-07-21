@@ -221,35 +221,54 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             const { userId } = useUserStore.getState();
 
             if (isApp) {
-              // Native app - try Apple IAP first, fallback to Stripe browser
+              // Native app - Apple IAP via WKScriptMessageHandler bridge
               try {
-                const cap = (window as any).Capacitor;
-                if (cap?.Plugins?.CoduyStore) {
+                const wk = (window as any).webkit?.messageHandlers?.coduyPurchase;
+                if (wk) {
                   const productId = plan === 'yearly' ? 'coduy_pro_yearly' : 'coduy_pro_monthly';
-                  const result = await cap.Plugins.CoduyStore.purchase({ productId });
+
+                  // Set up callback before posting message
+                  const result = await new Promise<any>((resolve) => {
+                    (window as any).__coduyPurchaseCallback = (res: any) => {
+                      delete (window as any).__coduyPurchaseCallback;
+                      resolve(res);
+                    };
+                    wk.postMessage({ action: 'purchase', productId });
+                    // Timeout after 2 minutes
+                    setTimeout(() => {
+                      if ((window as any).__coduyPurchaseCallback) {
+                        delete (window as any).__coduyPurchaseCallback;
+                        resolve({ success: false, error: 'timeout' });
+                      }
+                    }, 120000);
+                  });
+
                   if (result?.success) {
+                    // Verify with server
                     await fetch('/api/iap/verify', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId, receipt: result.receipt, productId }),
+                      body: JSON.stringify({ userId, transactionId: result.transactionId, productId: result.productId }),
                     });
                     window.location.replace('/');
                     return;
+                  } else if (result?.error !== 'cancelled') {
+                    console.log('Purchase result:', result);
                   }
                 } else {
-                  // Fallback: Stripe in browser overlay
+                  // Fallback: Stripe embedded (same as web)
                   const sb = getSupabase();
                   const session = await sb?.auth.getSession();
                   const email = session?.data?.session?.user?.email;
-                  const res = await fetch('/api/checkout', {
+                  const res = await fetch('/api/create-subscription', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan, userId, email }),
                   });
                   const data = await res.json();
-                  if (data.url) {
-                    const { Browser } = await import('@capacitor/browser');
-                    await Browser.open({ url: data.url, presentationStyle: 'popover' });
+                  if (data.clientSecret) {
+                    setClientSecret(data.clientSecret);
+                    setShowCheckout(true);
                   }
                 }
               } catch (e) {

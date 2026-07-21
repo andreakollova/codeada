@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import WebKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,6 +8,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Register purchase bridge after a short delay to let Capacitor set up the WebView
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            if let vc = self.window?.rootViewController as? CAPBridgeViewController,
+               let webView = vc.webView {
+                PurchaseBridge.register(on: webView)
+                print("[Coduy] PurchaseBridge registered on WebView")
+            }
+        }
         return true
     }
 

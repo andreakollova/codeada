@@ -26,7 +26,7 @@ function CheckoutForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel
     const { error: submitError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/pricing?success=true`,
+        return_url: `${window.location.origin}/?payment=success`,
       },
     });
 

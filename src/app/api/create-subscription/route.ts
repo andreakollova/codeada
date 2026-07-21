@@ -15,11 +15,12 @@ export async function POST(req: NextRequest) {
       customer = await stripe.customers.create({ metadata: { userId } });
     }
 
-    // Create subscription with trial
+    // Create subscription with 7-day trial for trial plan
+    const isTrial = plan === 'trial' || plan === 'yearly';
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: [{ price: priceId }],
-      trial_period_days: plan === 'monthly' ? undefined : undefined,
+      trial_period_days: isTrial ? 7 : undefined,
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent'],

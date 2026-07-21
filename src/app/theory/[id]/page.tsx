@@ -1169,10 +1169,6 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
   }
 
   const isLast = page >= pages.length - 1;
-  const byteTips = locale === 'sk'
-    ? ['Programovanie je ako stavanie z Lega - jeden kúsok po druhom.', 'Chyby v kóde sú normálne. Aj profíci ich robia denne.', 'Najlepší spôsob ako sa naučiť kód je písať kód.', 'Dobrý kód je taký, ktorému rozumieš aj o mesiac.', 'Každý expert bol niekedy úplný začiatočník.', 'Programátori nepiťšu kód spamäti - hľadajú riešenia.', 'Jeden riadok kódu dokáže zmeniť všetko.']
-    : ['Programming is like building with Lego - one piece at a time.', 'Bugs in code are normal. Even pros make them daily.', 'The best way to learn code is to write code.', 'Good code is code you can still understand a month later.', 'Every expert was once a complete beginner.', 'Programmers do not write code from memory - they search for solutions.', 'One line of code can change everything.'];
-  const byteMoods: Array<'happy' | 'celebrating' | 'proud'> = ['happy', 'celebrating', 'proud'];
 
   return (
     <div>

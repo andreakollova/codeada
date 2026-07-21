@@ -118,6 +118,7 @@ export default function CodingPath() {
   });
   const nextLessonRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [unlockModal, setUnlockModal] = useState<{ lessonId: number; title: string; step: 1 | 2 } | null>(null);
 
   useEffect(() => {
     fetchModulesWithLessons().then(mods => {
@@ -407,7 +408,13 @@ export default function CodingPath() {
                     }}
                   >
                     <motion.button
-                      onClick={() => !locked && router.push(`/theory/${item.lesson.id}`)}
+                      onClick={() => {
+                        if (!locked) {
+                          router.push(`/theory/${item.lesson.id}`);
+                        } else {
+                          setUnlockModal({ lessonId: item.lesson.id, title: lessonTitle, step: 1 });
+                        }
+                      }}
                       whileHover={!locked ? { scale: 1.06 } : {}}
                       whileTap={!locked ? { scale: 0.95 } : {}}
                       initial={{ opacity: 0, y: 10 }}
@@ -517,6 +524,79 @@ export default function CodingPath() {
           </motion.button>
         );
       })()}
+
+      {/* Unlock modal */}
+      <AnimatePresence>
+        {unlockModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setUnlockModal(null)}
+            style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{ background: '#111', border: '1px solid #222', borderRadius: 16, padding: 24, maxWidth: 320, width: '100%', textAlign: 'center' }}
+            >
+              {unlockModal.step === 1 ? (
+                <>
+                  <Lock size={28} color="#f97316" style={{ marginBottom: 12 }} />
+                  <h3 style={{ color: '#fff', fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>
+                    {locale === 'sk' ? 'Odomknúť lekciu?' : 'Unlock lesson?'}
+                  </h3>
+                  <p style={{ color: '#888', fontSize: 13, lineHeight: 1.5, margin: '0 0 20px' }}>
+                    {unlockModal.title}
+                  </p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => setUnlockModal(null)}
+                      style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#888', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+                    >
+                      {locale === 'sk' ? 'Zrušiť' : 'Cancel'}
+                    </button>
+                    <button
+                      onClick={() => setUnlockModal({ ...unlockModal, step: 2 })}
+                      style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#EDEDED', border: 'none', color: '#000', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                    >
+                      {locale === 'sk' ? 'Odomknúť' : 'Unlock'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 28, marginBottom: 12 }}>⚠️</div>
+                  <h3 style={{ color: '#fff', fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>
+                    {locale === 'sk' ? 'Si si istý/á?' : 'Are you sure?'}
+                  </h3>
+                  <p style={{ color: '#888', fontSize: 13, lineHeight: 1.5, margin: '0 0 20px' }}>
+                    {locale === 'sk'
+                      ? 'Táto lekcia môže obsahovať pojmy, ktoré si ešte nepreberal/a v predchádzajúcich lekciách.'
+                      : 'This lesson may contain concepts you have not covered in previous lessons.'}
+                  </p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => setUnlockModal(null)}
+                      style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#888', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+                    >
+                      {locale === 'sk' ? 'Späť' : 'Back'}
+                    </button>
+                    <button
+                      onClick={() => { setUnlockModal(null); router.push(`/theory/${unlockModal.lessonId}`); }}
+                      style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#f97316', border: 'none', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                    >
+                      {locale === 'sk' ? 'Pokračovať' : 'Continue'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -946,10 +946,10 @@ function ByteFootball({ items, locale, equipment }: { items: { name: string; des
   const done = revealed >= items.length;
 
   return (
-    <div style={{ position: 'relative', minHeight: 320, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+    <div style={{ position: 'relative', minHeight: 360, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
       {/* Goal */}
-      <div style={{ position: 'relative', width: 160, height: 80, marginBottom: 16 }}>
-        <svg width="160" height="80" viewBox="0 0 160 80">
+      <div style={{ position: 'relative', width: 200, height: 100, marginBottom: 16 }}>
+        <svg width="200" height="100" viewBox="0 0 160 80">
           {/* Goal frame */}
           <rect x="10" y="10" width="140" height="65" rx="4" fill="none" stroke="#333" strokeWidth="2.5" />
           {/* Net lines */}
@@ -982,14 +982,16 @@ function ByteFootball({ items, locale, equipment }: { items: { name: string; des
             : phase === 'ready' ? { repeat: Infinity, duration: 1.5 }
             : { duration: 0.3 }
           }
-          onTouchStart={e => { touchY.current = e.touches[0].clientY; }}
+          onTouchStart={e => { touchY.current = e.touches[0].clientY; e.preventDefault(); }}
+          onTouchMove={e => { e.preventDefault(); }}
           onTouchEnd={e => {
+            e.preventDefault();
             if (touchY.current - e.changedTouches[0].clientY > 30) shoot();
           }}
           onClick={shoot}
-          style={{ cursor: 'pointer', userSelect: 'none' }}
+          style={{ cursor: 'pointer', userSelect: 'none', touchAction: 'none' }}
         >
-          <Byte mood={phase === 'goal' ? 'celebrating' : 'happy'} size={56} equipment={equipment} />
+          <Byte mood={phase === 'goal' ? 'celebrating' : 'happy'} size={72} equipment={equipment} />
         </motion.div>
       )}
 
@@ -1000,7 +1002,7 @@ function ByteFootball({ items, locale, equipment }: { items: { name: string; des
           transition={{ repeat: Infinity, duration: 1.5 }}
           style={{ fontSize: 12, color: '#555', marginTop: 8, fontWeight: 500 }}
         >
-          {locale === 'sk' ? '↑ Flickni Byte do brány!' : '↑ Flick Byte into the goal!'}
+          {locale === 'sk' ? 'Traf do brány a objav nový programovací jazyk!' : 'Score a goal and discover a new programming language!'}
         </motion.p>
       )}
 
@@ -1173,7 +1175,10 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
 
   return (
     <div>
-      <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={page} />
+      {/* Hide ByteTip on football page */}
+      {!(pages[page]?.includes('**Python**') && pages[page]?.includes('**Java**')) && (
+        <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={page} />
+      )}
 
       <AnimatePresence mode="wait">
         <motion.div

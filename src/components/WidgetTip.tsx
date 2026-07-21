@@ -15,6 +15,8 @@ export default function WidgetTip() {
   useEffect(() => {
     // Show only in native app, after login (has name), once, after a delay
     if (typeof window === 'undefined' || !(window as any).Capacitor) return;
+    // Only show on iOS (Android doesn't have Coduy widget yet)
+    if ((window as any).Capacitor?.getPlatform?.() !== 'ios') return;
     if (!name) return;
     const shown = localStorage.getItem('coduy-widget-tip');
     if (shown) return;

@@ -233,7 +233,12 @@ export default function TheoryLessonPage() {
       addWrongQuestion(q.id);
       setTimeout(() => setByteMood('happy'), 1500);
     }
-    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 500);
+    setTimeout(() => {
+      const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      window.scrollTo({ top: h, behavior: 'smooth' });
+      document.body.scrollTop = h;
+      document.documentElement.scrollTop = h;
+    }, 500);
   };
 
   const handleQuizNext = () => {

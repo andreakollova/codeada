@@ -179,7 +179,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           }}>FREE TRIAL</div>
           <div style={{ marginTop: 6 }}>
             <span style={{ fontSize: 14, color: '#555', textDecoration: 'line-through', marginRight: 6 }}>
-              {plan === 'yearly' ? '40.99' : '3.99'} EUR
+              {plan === 'yearly' ? '59.99' : '5.99'} EUR
             </span>
             <span style={{ fontSize: 22, fontWeight: 700, color: accentColor }}>0 EUR</span>
           </div>
@@ -189,8 +189,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
 
           <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>
             {plan === 'yearly'
-              ? (sk ? 'potom 40.99 EUR/rok' : 'then 40.99 EUR/yr')
-              : (sk ? 'potom 3.99 EUR/mes' : 'then 3.99 EUR/mo')}
+              ? (sk ? 'potom 59.99 EUR/rok' : 'then 59.99 EUR/yr')
+              : (sk ? 'potom 5.99 EUR/mes' : 'then 5.99 EUR/mo')}
           </div>
         </button>
 
@@ -202,7 +202,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
           textAlign: 'center',
         }}>
           <div style={{ fontSize: 22, fontWeight: 600, color: plan === 'monthly' ? '#fff' : '#555', marginTop: 14 }}>
-            {plan === 'yearly' ? '40.99' : '3.99'} <span style={{ fontSize: 12, fontWeight: 500, color: '#888' }}>EUR</span>
+            {plan === 'yearly' ? '59.99' : '5.99'} <span style={{ fontSize: 12, fontWeight: 500, color: '#888' }}>EUR</span>
           </div>
           <div style={{ fontSize: 11, color: plan === 'monthly' ? '#fff' : '#888', marginTop: 4 }}>
             {plan === 'yearly' ? (sk ? '/ rok' : '/ year') : (sk ? '/ mesiac' : '/ month')}

@@ -29,7 +29,7 @@ export default function TermsPage() {
           <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>4. Coduy Pro Subscription</h2>
           <p><strong style={{ color: '#fff' }}>Free Tier:</strong> You can access a limited number of lessons for free.</p>
           <p><strong style={{ color: '#fff' }}>Coduy Pro:</strong> A paid subscription that unlocks all lessons, projects, arena battles, and premium features.</p>
-          <p><strong style={{ color: '#fff' }}>Pricing:</strong> Monthly subscription at 3.99 EUR/month or yearly at 40.69 EUR/year. A trial period of 1 EUR for the first billing period is available.</p>
+          <p><strong style={{ color: '#fff' }}>Pricing:</strong> Monthly subscription at 5.99 EUR/month or yearly at 59.99 EUR/year. A trial period of 1 EUR for the first billing period is available.</p>
           <p><strong style={{ color: '#fff' }}>Cancellation:</strong> You can cancel your subscription at any time. Your access continues until the end of the current billing period. No refunds are provided for partial periods.</p>
           <p><strong style={{ color: '#fff' }}>Auto-Renewal:</strong> Subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period.</p>
 

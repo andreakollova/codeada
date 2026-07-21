@@ -244,7 +244,7 @@ export default function WorkshopPage() {
               key={id}
               onClick={() => setActiveTab(id)}
               style={{
-                flex: 1, padding: '8px 4px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+                flex: 1, padding: '8px 4px', borderRadius: 10, fontSize: 10, fontWeight: 700,
                 background: activeTab === id ? '#fff' : 'transparent',
                 color: activeTab === id ? '#000' : '#888',
                 cursor: 'pointer', border: 'none', transition: 'all 0.15s',

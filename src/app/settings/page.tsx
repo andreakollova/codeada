@@ -239,6 +239,45 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {/* FAQ */}
+        <div style={{ marginBottom: 28 }}>
+          <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+            FAQ
+          </h3>
+          <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
+            {([
+              {
+                q: locale === 'sk' ? 'Ako pridať widget na plochu?' : 'How to add a widget?',
+                a: locale === 'sk'
+                  ? 'Dlho podrž na ploche telefónu → klikni + v ľavom hornom rohu → vyhľadaj Coduy → vyber widget → hotovo.'
+                  : 'Long press on home screen → tap + in top left → search Coduy → select widget → done.',
+              },
+              {
+                q: locale === 'sk' ? 'Ako zrušiť predplatné?' : 'How to cancel subscription?',
+                a: locale === 'sk'
+                  ? 'Nastavenia telefónu → tvoje meno → Predplatné → Coduy → Zrušiť. Predplatné zostáva aktívne do konca obdobia.'
+                  : 'Phone Settings → your name → Subscriptions → Coduy → Cancel. Your subscription stays active until the end of the period.',
+              },
+              {
+                q: locale === 'sk' ? 'Funguje to aj offline?' : 'Does it work offline?',
+                a: locale === 'sk'
+                  ? 'Na načítanie lekcií potrebuješ internet. Po načítaní môžeš čítať aj bez pripojenia.'
+                  : 'You need internet to load lessons. Once loaded, you can read without connection.',
+              },
+            ] as { q: string; a: string }[]).map((faq, i) => (
+              <details key={i} style={{ borderBottom: i < 2 ? '1px solid #111' : 'none' }}>
+                <summary style={{ padding: '14px 16px', color: '#ccc', fontSize: 14, fontWeight: 500, cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {faq.q}
+                  <ChevronRight size={14} color="#555" />
+                </summary>
+                <p style={{ padding: '0 16px 14px', color: '#888', fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+
         {/* Legal */}
         <div style={{ marginBottom: 28 }}>
           <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>

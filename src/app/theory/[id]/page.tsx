@@ -856,7 +856,7 @@ export default function TheoryLessonPage() {
       </div>
 
       {/* Ask Coduy AI */}
-      {phase !== 'done' && phase !== 'loading' && phase !== 'coffee' && (
+      {!['done', 'loading', 'coffee', 'quiz'].includes(phase) && (
         <AskByte
           lessonTitle={safe(t(lesson, 'title', locale))}
           lessonContent={lesson.learning_content?.slice(0, 2000) || ''}

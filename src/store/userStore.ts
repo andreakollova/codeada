@@ -18,6 +18,7 @@ interface UserActions {
   addItem: (itemId: string) => void;
   equip: (slot: keyof ByteEquipment, itemId: string | undefined) => void;
   syncToSupabase: () => Promise<void>;
+  loadFromSupabase: () => Promise<void>;
   setUserId: (id: string | null) => void;
   setName: (name: string) => void;
   toggleTopic: (topicId: string) => void;
@@ -157,7 +158,41 @@ export const useUserStore = create<UserState & UserActions>()(
             last_active_date: s.lastActiveDate, byte_mood: s.byteMood,
             byte_battery: s.byteBattery, completed_lessons: s.completedLessons,
             badges: s.badges, weekly_xp: s.weeklyXp, week_start_date: s.weekStartDate,
+            owned_items: s.ownedItems, equipment: s.equipment,
+            selected_topics: s.selectedTopics, coffees: s.coffees, fav_drink: s.favDrink,
           });
+        } catch {}
+      },
+
+      loadFromSupabase: async () => {
+        const s = get();
+        if (!s.userId) return;
+        try {
+          const { data } = await supabase.from('user_state').select('*').eq('user_id', s.userId).single();
+          if (!data) return;
+
+          // Only load from server if server has more progress (more completed lessons)
+          const serverLessons = data.completed_lessons || [];
+          const localLessons = s.completedLessons || [];
+          const serverIsNewer = serverLessons.length > localLessons.length;
+
+          if (serverIsNewer || !s.name) {
+            set({
+              name: data.display_name || s.name,
+              xp: Math.max(data.xp || 0, s.xp),
+              gems: Math.max(data.gems || 0, s.gems),
+              streak: Math.max(data.streak || 0, s.streak),
+              lastActiveDate: data.last_active_date || s.lastActiveDate,
+              completedLessons: serverLessons.length > localLessons.length ? serverLessons : localLessons,
+              badges: [...new Set([...(data.badges || []), ...(s.badges || [])])],
+              weeklyXp: Math.max(data.weekly_xp || 0, s.weeklyXp),
+              ownedItems: [...new Set([...(data.owned_items || []), ...(s.ownedItems || [])])],
+              equipment: data.equipment && Object.keys(data.equipment).length > 0 ? data.equipment : s.equipment,
+              selectedTopics: data.selected_topics?.length > 0 ? data.selected_topics : s.selectedTopics,
+              coffees: Math.max(data.coffees || 0, s.coffees || 0),
+              favDrink: data.fav_drink || s.favDrink,
+            });
+          }
         } catch {}
       },
     }),

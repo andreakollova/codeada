@@ -19,7 +19,7 @@ const LOGIN_SKINS: ByteEquipment[] = [
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const { locale, toggle } = useLocaleStore();
-  const { setUserId, userId } = useUserStore();
+  const { setUserId, userId, loadFromSupabase } = useUserStore();
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
 
@@ -55,6 +55,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         }
         setUserId(newId);
         setAuthed(true);
+        // Load user data from Supabase (sync across devices/domains)
+        setTimeout(() => loadFromSupabase(), 500);
       }
       setChecking(false);
     });

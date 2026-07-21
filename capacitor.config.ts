@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Coduy',
   webDir: 'public',
   server: {
-    url: 'https://www.coduy.sk',
+    url: 'https://www.coduy.com',
     cleartext: false,
     allowNavigation: [
       '*.supabase.co',

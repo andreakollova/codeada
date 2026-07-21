@@ -544,7 +544,9 @@ export default function CodingPath() {
             >
               {unlockModal.step === 1 ? (
                 <>
-                  <Lock size={28} color="#f97316" style={{ marginBottom: 12 }} />
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+                    <Lock size={28} color="#f97316" />
+                  </div>
                   <h3 style={{ color: '#fff', fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>
                     {locale === 'sk' ? 'Odomknúť lekciu?' : 'Unlock lesson?'}
                   </h3>

@@ -76,9 +76,8 @@ export default function DeepLinkHandler() {
           void processAuthCallback(launchUrl.url);
         }
 
-        // Request push notification permission (iOS only - Android needs Firebase setup)
-        const platform = (window as any).Capacitor?.getPlatform?.() || '';
-        if (platform === 'ios') try {
+        // Request push notification permission
+        try {
           const { PushNotifications } = await import('@capacitor/push-notifications');
           const permStatus = await PushNotifications.checkPermissions();
           if (permStatus.receive === 'prompt') {

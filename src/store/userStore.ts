@@ -125,20 +125,30 @@ export const useUserStore = create<UserState & UserActions>()(
         s.ownedItems.includes(itemId) ? {} : { ownedItems: [...s.ownedItems, itemId] }
       ),
 
-      equip: (slot, itemId) => set((s) => ({
-        equipment: { ...s.equipment, [slot]: itemId },
-      })),
+      equip: (slot, itemId) => {
+        set((s) => ({ equipment: { ...s.equipment, [slot]: itemId } }));
+        setTimeout(() => get().syncToSupabase(), 300);
+      },
 
-      setName: (name) => set({ name }),
+      setName: (name) => {
+        set({ name });
+        setTimeout(() => get().syncToSupabase(), 300);
+      },
 
-      toggleTopic: (topicId) => set((s) => ({
-        selectedTopics: s.selectedTopics.includes(topicId)
-          ? s.selectedTopics.filter(id => id !== topicId)
-          : [...s.selectedTopics, topicId],
-      })),
+      toggleTopic: (topicId) => {
+        set((s) => ({
+          selectedTopics: s.selectedTopics.includes(topicId)
+            ? s.selectedTopics.filter(id => id !== topicId)
+            : [...s.selectedTopics, topicId],
+        }));
+        setTimeout(() => get().syncToSupabase(), 300);
+      },
 
       addCoffee: () => set((s) => ({ coffees: (s.coffees || 0) + 1 })),
-      setFavDrink: (drink) => set({ favDrink: drink }),
+      setFavDrink: (drink) => {
+        set({ favDrink: drink });
+        setTimeout(() => get().syncToSupabase(), 300);
+      },
 
       addWrongQuestion: (questionId) => set((s) => ({
         wrongQuestionIds: s.wrongQuestionIds?.includes(questionId) ? s.wrongQuestionIds : [...(s.wrongQuestionIds || []), questionId],

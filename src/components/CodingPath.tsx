@@ -273,6 +273,20 @@ export default function CodingPath() {
                 <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
                   {doneCount} {locale === 'sk' ? (doneCount === 1 ? 'hotová' : doneCount >= 2 && doneCount <= 4 ? 'hotové' : 'hotových') : 'done'}
                 </span>
+                {doneCount > 0 && (
+                  <button
+                    onClick={() => router.push('/practice')}
+                    style={{
+                      background: 'none', border: '1px solid #222', borderRadius: 6,
+                      padding: '3px 8px', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 4,
+                      fontSize: 10, color: '#666', fontWeight: 600,
+                    }}
+                  >
+                    <Repeat size={10} color="#666" />
+                    {locale === 'sk' ? 'Tréning' : 'Training'}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -287,19 +301,6 @@ export default function CodingPath() {
           >
             {locale === 'sk' ? 'Zmeniť cestu' : 'Change path'}
           </button>
-          {wrongQuestionIds.length > 0 && (
-            <button
-              onClick={() => router.push('/practice')}
-              style={{
-                padding: '10px 20px', borderRadius: 10,
-                background: '#1a0a0a', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444',
-                fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              }}
-            >
-              {locale === 'sk' ? `Precvičiť chyby (${wrongQuestionIds.length})` : `Practice mistakes (${wrongQuestionIds.length})`}
-            </button>
-          )}
         </div>
       )}
 

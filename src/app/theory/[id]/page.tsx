@@ -70,10 +70,11 @@ export default function TheoryLessonPage() {
           const maxMcq = Math.min(mcq.length, 6);
           const maxWrite = Math.min(write.length, 2);
           setQuiz([...mcq.slice(0, maxMcq), ...write.slice(0, maxWrite)]);
-          // Show coffee screen only for first lesson of the day
+          // Show coffee screen only for first read of the day (lessons with learning content)
+          const hasReading = l.learning_content && l.learning_content.length > 200;
           const today = new Date().toDateString();
           const lastCoffee = localStorage.getItem('coduy-last-coffee');
-          if (lastCoffee === today) {
+          if (!hasReading || lastCoffee === today) {
             setPhase('intro');
           } else {
             setPhase('coffee');

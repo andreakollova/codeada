@@ -8,6 +8,7 @@ import { useUserStore } from '@/store/userStore';
 import { useLocaleStore, t, tArray } from '@/store/localeStore';
 import { s } from '@/data/strings';
 import Byte from '@/components/Byte';
+import AskByte from '@/components/AskByte';
 import { cosmeticItems } from '@/data/cosmetics';
 import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check, Eye } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -853,6 +854,17 @@ export default function TheoryLessonPage() {
           {phase === 'quiz' ? renderQuiz() : renderTheorySection()}
         </AnimatePresence>
       </div>
+
+      {/* Ask Coduy AI */}
+      {phase !== 'done' && phase !== 'loading' && phase !== 'coffee' && (
+        <AskByte
+          lessonTitle={safe(t(lesson, 'title', locale))}
+          lessonContent={lesson.learning_content?.slice(0, 2000) || ''}
+          locale={locale}
+          equipment={equipment}
+          userId={useUserStore.getState().userId}
+        />
+      )}
     </div>
   );
 }

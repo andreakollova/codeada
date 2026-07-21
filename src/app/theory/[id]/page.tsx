@@ -869,14 +869,14 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tipsSk: Record<string, string[]> = {
     intro: ['Toto ti zmení pohľad na technológie.', 'Za každou appkou je kód.', 'Programovanie je všade okolo nás.', 'Každá veľká vec začala malým krokom.'],
     learning: [
-      'ChatGPT dosiahol 100 miliónov používateľov za 2 mesiace. Žiadna appka v histórii to nedokázala rýchlejšie.',
-      'AI dokáže napísať kód, ale stále potrebuje programátora, ktorý vie čo chce vytvoriť.',
-      'Python je pomenovaný po Monty Python, nie po hadovi.',
-      'Minecraft sa predalo viac ako 300 miliónov kópií.',
-      'V jednej appke na telefóne je priemerne 50 000 riadkov kódu.',
-      'Prvý počítačový bug bol skutočný hmyz v počítači v roku 1947.',
-      'Na svete je viac ako 700 programovacích jazykov.',
-      'Instagram mal pri spustení iba 13 zamestnancov.',
+      'Python je pomenovaný po komediálnej skupine Monty Python.',
+      'Keď napíšeš print("Ahoj"), počítač vykoná desiatky operácií na pozadí.',
+      'Prvý bug v histórii bol skutočný hmyz zaseknutý v počítači.',
+      'Existuje viac ako 700 programovacích jazykov.',
+      'Väčšina programátorov používa denne iba 5-10 príkazov.',
+      'Kód sa píše raz, ale číta sa stokrát.',
+      'Aj ten najzložitejší program je len séria jednoduchých krokov.',
+      'Python zvládne za 1 riadok to, čo Java za 5.',
     ],
     facts: ['Toto je zaujímavé!', 'Málokto toto vie.', 'Prekvapivé, že?'],
     real_world: ['Toto sa fakt používa.', 'Tu vidíš prečo sa to oplatí.', 'Celkom cool, nie?'],
@@ -885,14 +885,14 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   const tipsEn: Record<string, string[]> = {
     intro: ['This will change how you see technology.', 'Behind every app is code.', 'Programming is all around us.', 'Every big thing started with a small step.'],
     learning: [
-      'ChatGPT reached 100 million users in 2 months. No app in history grew faster.',
-      'AI can write code, but it still needs a programmer who knows what to build.',
-      'Python is named after Monty Python, not the snake.',
-      'Minecraft has sold over 300 million copies worldwide.',
-      'A typical phone app has about 50,000 lines of code.',
-      'The first computer bug was an actual insect found in 1947.',
+      'Python is named after the comedy group Monty Python.',
+      'When you write print("Hello"), the computer runs dozens of operations behind the scenes.',
+      'The first bug in history was an actual insect stuck in a computer.',
       'There are over 700 programming languages in the world.',
-      'Instagram had only 13 employees when it launched.',
+      'Most programmers use only 5-10 commands daily.',
+      'Code is written once but read hundreds of times.',
+      'Even the most complex program is just a series of simple steps.',
+      'Python can do in 1 line what Java takes 5 lines to do.',
     ],
     facts: ['This is interesting!', 'Not many people know this.', 'Surprising, right?'],
     real_world: ['This is actually used.', 'Now you see why it matters.', 'Pretty cool, right?'],
@@ -1170,8 +1170,8 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
 
   const isLast = page >= pages.length - 1;
   const byteTips = locale === 'sk'
-    ? ['ChatGPT dosiahol 100 miliónov používateľov za 2 mesiace.', 'AI generuje obrázky, hudbu aj kód.', 'Spotify používa AI na odporúčanie hudby.', 'Tesla autopilot spracuje 2300 snímkov za sekundu.', 'GitHub Copilot napíše až 40% kódu za teba.', 'OpenAI trénuje modely na tisícoch GPU naraz.', 'AI preloží text do 100+ jazykov v reálnom čase.']
-    : ['ChatGPT reached 100 million users in just 2 months.', 'AI generates images, music and code.', 'Spotify uses AI to recommend your music.', 'Tesla autopilot processes 2300 frames per second.', 'GitHub Copilot writes up to 40% of code for you.', 'OpenAI trains models on thousands of GPUs at once.', 'AI translates text into 100+ languages in real time.'];
+    ? ['Programovanie je ako stavanie z Lega - jeden kúsok po druhom.', 'Chyby v kóde sú normálne. Aj profíci ich robia denne.', 'Najlepší spôsob ako sa naučiť kód je písať kód.', 'Dobrý kód je taký, ktorému rozumieš aj o mesiac.', 'Každý expert bol niekedy úplný začiatočník.', 'Programátori nepiťšu kód spamäti - hľadajú riešenia.', 'Jeden riadok kódu dokáže zmeniť všetko.']
+    : ['Programming is like building with Lego - one piece at a time.', 'Bugs in code are normal. Even pros make them daily.', 'The best way to learn code is to write code.', 'Good code is code you can still understand a month later.', 'Every expert was once a complete beginner.', 'Programmers do not write code from memory - they search for solutions.', 'One line of code can change everything.'];
   const byteMoods: Array<'happy' | 'celebrating' | 'proud'> = ['happy', 'celebrating', 'proud'];
 
   return (

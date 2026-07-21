@@ -872,8 +872,10 @@ function isCodeLine(line: string): boolean {
 
 /** Byte tip bubble at top of sections */
 function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; locale: string; equipment: any; sectionIndex: number }) {
+  // Use lesson ID from URL + sectionIndex for stable but varied selection
+  const seed = (typeof window !== 'undefined' ? parseInt(window.location.pathname.split('/').pop() || '0') || 0 : 0) + sectionIndex;
   const tipsSk: Record<string, string[]> = {
-    intro: ['Toto ti zmení pohľad na technológie.', 'Za každou appkou je kód.', 'Programovanie je všade okolo nás.', 'Každá veľká vec začala malým krokom.'],
+    intro: ['Za každou appkou je kód.', 'Programovanie je všade okolo nás.', 'Každá veľká vec začala malým krokom.', 'Toto ťa posunie vpred.', 'Dnes sa naučíš niečo nové.', 'Pripravený na novú lekciu?', 'Poďme na to!', 'Toto bude zaujímavé.', 'Začíname!', 'Nová lekcia, nové vedomosti.'],
     learning: [
       'Python je pomenovaný po komediálnej skupine Monty Python.',
       'Keď napíšeš print("Ahoj"), počítač vykoná desiatky operácií na pozadí.',
@@ -1167,11 +1169,24 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
   }
   if (current.trim()) pages.push(current.trim());
 
-  // If only 1 page, no pagination needed
+  // If only 1 page, no pagination but still show continue
   if (pages.length <= 1) {
     return (
-      <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
-        {formatContent(text, 'learning')}
+      <div>
+        <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
+          {formatContent(text, 'learning')}
+        </div>
+        <button
+          onClick={onComplete}
+          style={{
+            width: '100%', padding: '14px', borderRadius: 12, marginTop: 20,
+            background: '#EDEDED', border: 'none', color: '#0F0F0F',
+            fontWeight: 700, fontSize: 15, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          }}
+        >
+          {locale === 'sk' ? 'Pokračovať' : 'Continue'} <ArrowRight size={16} />
+        </button>
       </div>
     );
   }

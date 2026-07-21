@@ -97,12 +97,11 @@ export default function DeepLinkHandler() {
               if (!sb) return;
               const { data: { user } } = await sb.auth.getUser();
               if (user) {
-                const platform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
-                await sb.from('cb_users').upsert({
-                  id: user.id,
+                // Save token to user_state (where push/send reads from)
+                await sb.from('user_state').upsert({
+                  user_id: user.id,
                   push_token: token.value,
-                  push_platform: platform,
-                }, { onConflict: 'id' });
+                }, { onConflict: 'user_id' });
               }
             });
 

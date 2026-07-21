@@ -75,6 +75,37 @@ export default function DeepLinkHandler() {
         if (launchUrl?.url) {
           void processAuthCallback(launchUrl.url);
         }
+
+        // Request push notification permission
+        try {
+          const { PushNotifications } = await import('@capacitor/push-notifications');
+          const permStatus = await PushNotifications.checkPermissions();
+          if (permStatus.receive === 'prompt') {
+            const result = await PushNotifications.requestPermissions();
+            if (result.receive === 'granted') {
+              await PushNotifications.register();
+            }
+          } else if (permStatus.receive === 'granted') {
+            await PushNotifications.register();
+          }
+
+          // Listen for token and save to Supabase
+          await PushNotifications.addListener('registration', async (token) => {
+            console.log('Push token:', token.value);
+            const sb = getSupabase();
+            if (!sb) return;
+            const { data: { user } } = await sb.auth.getUser();
+            if (user) {
+              await sb.from('cb_users').upsert({
+                id: user.id,
+                push_token: token.value,
+                push_platform: 'ios',
+              }, { onConflict: 'id' });
+            }
+          });
+        } catch (e) {
+          console.log('Push notification setup:', e);
+        }
       } catch (e) {
         console.log('DeepLinkHandler init error:', e);
       }

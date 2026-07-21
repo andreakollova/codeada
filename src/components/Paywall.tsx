@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 const StripeCheckout = dynamic(() => import('./StripeCheckout'), { ssr: false });
 
-const FREE_LESSON_LIMIT = 2;
+const FREE_LESSON_LIMIT = 3;
 
 export function useSubscription() {
   const { userId, completedLessons } = useUserStore();

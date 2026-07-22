@@ -266,41 +266,38 @@ export default function CodingPath() {
               <p style={{ fontSize: 13, color: '#aaa', marginBottom: 8, fontStyle: 'italic' }}>
                 &bdquo;{locale === 'sk' ? activePath.subtitleSk : activePath.subtitleEn}&ldquo;
               </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 11, color: '#555', fontWeight: 600 }}>
-                  {activeModuleNumbers.length} {locale === 'sk' ? 'modulov' : 'modules'} - {allLessons.length} {locale === 'sk' ? 'lekcií' : 'lessons'}
-                </span>
-                <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 600 }}>
-                  {doneCount} {locale === 'sk' ? (doneCount === 1 ? 'hotová' : doneCount >= 2 && doneCount <= 4 ? 'hotové' : 'hotových') : 'done'}
-                </span>
-                {doneCount > 0 && (
-                  <button
-                    onClick={() => router.push('/practice')}
-                    style={{
-                      background: 'none', border: '1px solid #222', borderRadius: 6,
-                      padding: '3px 8px', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', gap: 4,
-                      fontSize: 10, color: '#666', fontWeight: 600,
-                    }}
-                  >
-                    <Repeat size={10} color="#666" />
-                    {locale === 'sk' ? 'Tréning' : 'Training'}
-                  </button>
-                )}
-              </div>
+              <p style={{ fontSize: 11, color: '#555', fontWeight: 600, margin: '0 0 2px' }}>
+                {activeModuleNumbers.length} {locale === 'sk' ? 'modulov' : 'modules'} · {allLessons.length} {locale === 'sk' ? 'lekcií' : 'lessons'} · <span style={{ color: '#4ade80' }}>{doneCount} {locale === 'sk' ? (doneCount === 1 ? 'hotová' : doneCount >= 2 && doneCount <= 4 ? 'hotové' : 'hotových') : 'done'}</span>
+              </p>
             </div>
           </div>
-          <button
-            onClick={() => { setSelectedPath(null); localStorage.removeItem('coduy-path'); }}
-            style={{
-              marginTop: 14, width: '100%', padding: '10px', borderRadius: 10,
-              background: '#161616', border: '1px solid #222', color: '#888',
-              fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            }}
-          >
-            {locale === 'sk' ? 'Zmeniť cestu' : 'Change path'}
-          </button>
+          <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+            <button
+              onClick={() => { setSelectedPath(null); localStorage.removeItem('coduy-path'); }}
+              style={{
+                flex: 1, padding: '10px', borderRadius: 10,
+                background: '#161616', border: '1px solid #222', color: '#888',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
+              {locale === 'sk' ? 'Zmeniť cestu' : 'Change path'}
+            </button>
+            {doneCount > 0 && (
+              <button
+                onClick={() => router.push('/practice')}
+                style={{
+                  padding: '10px 16px', borderRadius: 10,
+                  background: '#161616', border: '1px solid #222', color: '#888',
+                  fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}
+              >
+                <Repeat size={12} color="#888" />
+                {locale === 'sk' ? 'Tréning' : 'Training'}
+              </button>
+            )}
+          </div>
         </div>
       )}
 

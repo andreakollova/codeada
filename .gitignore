@@ -48,3 +48,5 @@ supabase-arena-schema.sql
 __pycache__/
 AuthKey_*.p8
 ios/App/.next/
+android/.idea/
+coduy-release.jks

@@ -88,20 +88,20 @@ export default function ScreenshotsPage() {
             {/* Top: Logo + Byte + Text */}
             <div style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
-              padding: '32px 24px 12px', gap: 8, flexShrink: 0,
+              padding: '36px 24px 16px', gap: 10, flexShrink: 0,
             }}>
               {/* Logo */}
-              <img src="/logocoduy.png" alt="Coduy" style={{ height: 16, marginBottom: 0 }} />
+              <img src="/logocoduy.png" alt="Coduy" style={{ height: 20, marginBottom: 2 }} />
 
               {/* Byte with glow */}
               <div style={{ position: 'relative' }}>
                 <div style={{
-                  position: 'absolute', inset: -18,
+                  position: 'absolute', inset: -24,
                   background: `radial-gradient(circle, ${s.accent}30 0%, ${s.accent}10 50%, transparent 70%)`,
                   borderRadius: '50%',
-                  filter: 'blur(12px)',
+                  filter: 'blur(14px)',
                 }} />
-                <img src={s.byte} alt="Byte" style={{ width: 56, height: 56, objectFit: 'contain', position: 'relative', zIndex: 1 }} />
+                <img src={s.byte} alt="Byte" style={{ width: 80, height: 80, objectFit: 'contain', position: 'relative', zIndex: 1 }} />
               </div>
 
               {/* Badge */}
@@ -109,7 +109,7 @@ export default function ScreenshotsPage() {
                 background: 'rgba(255,255,255,0.06)',
                 border: `1px solid ${s.accent}33`,
                 color: s.accent,
-                fontSize: 8, fontWeight: 700, padding: '3px 12px',
+                fontSize: 9, fontWeight: 700, padding: '4px 14px',
                 borderRadius: 14, letterSpacing: '0.08em', textTransform: 'uppercase',
               }}>
                 {s.badge}
@@ -117,9 +117,9 @@ export default function ScreenshotsPage() {
 
               {/* Title */}
               <h1 style={{
-                fontSize: 21, fontWeight: 800, color: '#fff',
-                textAlign: 'center', lineHeight: 1.15,
-                letterSpacing: '-0.02em', margin: 0,
+                fontSize: 28, fontWeight: 800, color: '#fff',
+                textAlign: 'center', lineHeight: 1.12,
+                letterSpacing: '-0.03em', margin: 0,
                 whiteSpace: 'pre-line',
               }}>
                 {s.title}
@@ -127,24 +127,24 @@ export default function ScreenshotsPage() {
 
               {/* Subtitle */}
               <p style={{
-                fontSize: 9, color: 'rgba(255,255,255,0.4)',
-                textAlign: 'center', lineHeight: 1.45,
-                maxWidth: 210, margin: 0,
+                fontSize: 11, color: 'rgba(255,255,255,0.45)',
+                textAlign: 'center', lineHeight: 1.5,
+                maxWidth: 260, margin: 0,
               }}>
                 {s.subtitle}
               </p>
             </div>
 
-            {/* Screenshot - full image, rounded, floating with shadow */}
+            {/* Screenshot - smaller, pushed up, rounded, floating */}
             <div style={{
-              flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center',
-              padding: '4px 20px 24px', width: '100%',
+              flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start',
+              padding: '0 28px 32px', width: '100%',
             }}>
               <div style={{
                 width: '100%',
                 height: '100%',
                 position: 'relative',
-                borderRadius: 20,
+                borderRadius: 28,
                 overflow: 'hidden',
                 border: '1.5px solid rgba(255,255,255,0.08)',
                 boxShadow: `0 12px 40px rgba(0,0,0,0.6), 0 4px 20px ${s.accent}12, inset 0 0.5px 0 rgba(255,255,255,0.1)`,

@@ -52,7 +52,7 @@ const screens = [
   {
     badge: 'Workshop',
     title: 'Earn Rewards\nas You Learn',
-    subtitle: 'Unlock hats, glasses, auras and more for your Byte.',
+    subtitle: 'Unlock hats, glasses, auras and more.',
     accent: '#f59e0b',
     byte: '/byte-master.png',
     screenshot: '/ss-locker.png',

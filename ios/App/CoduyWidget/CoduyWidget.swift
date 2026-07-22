@@ -18,8 +18,10 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GlossaryTimelineEntry>) -> ()) {
-        let isPro = true
-        let urlStr = isPro ? "https://www.coduy.sk/api/widget?pro=true" : "https://www.coduy.sk/api/widget"
+        // Always fetch free term (monthly). Pro users get daily via ?pro=true
+        let shared0 = UserDefaults(suiteName: "group.sk.coduy.app")
+        let isPro = shared0?.bool(forKey: "coduy-pro") ?? false
+        let urlStr = isPro ? "https://www.coduy.com/api/widget?pro=true" : "https://www.coduy.com/api/widget"
         guard let url = URL(string: urlStr) else {
             let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code", isPro: true)
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600))))
@@ -36,10 +38,11 @@ struct Provider: TimelineProvider {
                 let detail = lang == "sk" ? glossary.sk : glossary.en
                 entry = GlossaryTimelineEntry(date: Date(), term: glossary.term, definition: glossary.full, detail: detail, isPro: true)
             } else {
+                // Fallback when API fails — show a default term
                 let shared2 = UserDefaults(suiteName: "group.sk.coduy.app")
                 let lang = shared2?.string(forKey: "coduy-locale") ?? Locale.current.language.languageCode?.identifier ?? "en"
-                let msg = lang == "sk" ? "0 EUR - 7 dní zadarmo. Získaj Pro pre denné slovíčka." : "0 EUR - 7 days free. Get Pro for daily terms."
-                entry = GlossaryTimelineEntry(date: Date(), term: "Coduy Pro", definition: lang == "sk" ? "Získaj widget" : "Get widget", detail: msg, isPro: false)
+                let detail = lang == "sk" ? "Postupné inštrukcie na vyriešenie problému." : "Step-by-step instructions to solve a problem."
+                entry = GlossaryTimelineEntry(date: Date(), term: "Algorithm", definition: "", detail: detail, isPro: false)
             }
 
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(6 * 3600))))

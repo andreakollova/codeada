@@ -138,13 +138,13 @@ export default function ScreenshotsPage() {
             {/* Screenshot - smaller, pushed up, rounded, floating */}
             <div style={{
               flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start',
-              padding: '0 44px 40px', width: '100%',
+              padding: '0 56px 48px', width: '100%',
             }}>
               <div style={{
                 width: '100%',
                 height: '100%',
                 position: 'relative',
-                borderRadius: 28,
+                borderRadius: 36,
                 overflow: 'hidden',
                 border: '1.5px solid rgba(255,255,255,0.08)',
                 boxShadow: `0 12px 40px rgba(0,0,0,0.6), 0 4px 20px ${s.accent}12, inset 0 0.5px 0 rgba(255,255,255,0.1)`,

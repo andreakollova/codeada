@@ -88,7 +88,7 @@ export default function ScreenshotsPage() {
             {/* Top: Logo + Byte + Text */}
             <div style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
-              padding: '36px 24px 16px', gap: 10, flexShrink: 0,
+              padding: '52px 24px 16px', gap: 10, flexShrink: 0,
             }}>
               {/* Logo */}
               <img src="/logocoduy.png" alt="Coduy" style={{ height: 20, marginBottom: 2 }} />
@@ -138,7 +138,7 @@ export default function ScreenshotsPage() {
             {/* Screenshot - smaller, pushed up, rounded, floating */}
             <div style={{
               flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start',
-              padding: '0 56px 48px', width: '100%',
+              padding: '0 66px 52px', width: '100%',
             }}>
               <div style={{
                 width: '100%',

@@ -138,7 +138,7 @@ export default function ScreenshotsPage() {
             {/* Screenshot - smaller, pushed up, rounded, floating */}
             <div style={{
               flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start',
-              padding: '0 28px 32px', width: '100%',
+              padding: '0 44px 40px', width: '100%',
             }}>
               <div style={{
                 width: '100%',

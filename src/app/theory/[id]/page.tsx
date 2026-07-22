@@ -47,11 +47,20 @@ export default function TheoryLessonPage() {
   const [writeCodeValue, setWriteCodeValue] = useState('');
   const [writeCodeState, setWriteCodeState] = useState<'editing' | 'correct' | 'wrong'>('editing');
   const [showWriteCodeAnswer, setShowWriteCodeAnswer] = useState(false);
+  const [fillCodeValues, setFillCodeValues] = useState<string[]>([]);
+  const [fillCodeState, setFillCodeState] = useState<'editing' | 'correct' | 'wrong'>('editing');
+  const feedbackRef = useRef<HTMLDivElement>(null);
 
   // Initialize write_code editor with starter code when question changes
   useEffect(() => {
     if (quiz.length > 0 && quiz[quizIndex]?.question_type === 'write_code') {
       setWriteCodeValue(quiz[quizIndex].code_snippet || '');
+    }
+    if (quiz.length > 0 && quiz[quizIndex]?.question_type === 'fill_code') {
+      const snippet = quiz[quizIndex].code_snippet || '';
+      const blanks = snippet.split('___').length - 1;
+      setFillCodeValues(new Array(Math.max(blanks, 1)).fill(''));
+      setFillCodeState('editing');
     }
   }, [quizIndex, quiz]);
 
@@ -66,11 +75,14 @@ export default function TheoryLessonPage() {
           setLesson(l);
           // Shuffle quiz, put write_code at end, limit to ~8 questions
           const allQ = q || [];
-          const mcq = allQ.filter(x => x.question_type !== 'write_code').sort(() => Math.random() - 0.5);
+          // Split: theoretical (mcq/true_false) first, then fill_code, then write_code
+          const theory = allQ.filter(x => x.question_type === 'multiple_choice' || x.question_type === 'true_false').sort(() => Math.random() - 0.5);
+          const fill = allQ.filter(x => x.question_type === 'fill_code').sort(() => Math.random() - 0.5);
           const write = allQ.filter(x => x.question_type === 'write_code').sort(() => Math.random() - 0.5);
-          const maxMcq = Math.min(mcq.length, 6);
+          const maxTheory = Math.min(theory.length, 4);
+          const maxFill = Math.min(fill.length, 2);
           const maxWrite = Math.min(write.length, 2);
-          setQuiz([...mcq.slice(0, maxMcq), ...write.slice(0, maxWrite)]);
+          setQuiz([...theory.slice(0, maxTheory), ...fill.slice(0, maxFill), ...write.slice(0, maxWrite)]);
           // Show coffee screen only for first read of the day (lessons with learning content)
           const hasReading = l.learning_content && l.learning_content.length > 1000;
           const today = new Date().toDateString();
@@ -193,8 +205,9 @@ export default function TheoryLessonPage() {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
-    // Fallback for Capacitor WebView
+    // Fallback for Capacitor WebView - multiple attempts for animation transitions
     setTimeout(() => { window.scrollTo(0, 0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }, 50);
+    setTimeout(() => { window.scrollTo(0, 0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }, 150);
   };
 
   const handleNextSection = () => {
@@ -235,11 +248,8 @@ export default function TheoryLessonPage() {
       setTimeout(() => setByteMood('happy'), 1500);
     }
     setTimeout(() => {
-      const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-      window.scrollTo({ top: h, behavior: 'smooth' });
-      document.body.scrollTop = h;
-      document.documentElement.scrollTop = h;
-    }, 500);
+      feedbackRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 350);
   };
 
   const handleQuizNext = () => {
@@ -248,6 +258,8 @@ export default function TheoryLessonPage() {
     setWriteCodeValue('');
     setWriteCodeState('editing');
     setShowWriteCodeAnswer(false);
+    setFillCodeValues([]);
+    setFillCodeState('editing');
     if (quizIndex + 1 < quiz.length) {
       setQuizIndex(i => i + 1);
     } else {
@@ -573,6 +585,208 @@ export default function TheoryLessonPage() {
     );
   };
 
+  // Render fill_code with inline inputs in code
+  const renderFillCode = () => {
+    const q = quiz[quizIndex];
+    if (!q) return null;
+    const snippet = q.code_snippet || '';
+    const correctAnswers = q.correct_answer.split('|||').map(a => a.trim());
+    const parts = snippet.split('___');
+
+    const handleFillCheck = () => {
+      const allCorrect = correctAnswers.every((ans, i) => {
+        const val = (fillCodeValues[i] || '').trim().toLowerCase();
+        return val === ans.trim().toLowerCase();
+      });
+      if (allCorrect) {
+        setFillCodeState('correct');
+        setAnswerState('correct');
+        setScore(s => s + 1);
+        setByteMood('celebrating');
+        setTimeout(() => setByteMood('happy'), 1500);
+      } else {
+        setFillCodeState('wrong');
+        setByteMood('worried');
+        setTimeout(() => setByteMood('happy'), 1500);
+        loseHeart();
+        addWrongQuestion(q.id);
+      }
+    };
+
+    const handleFillShowAnswer = () => {
+      setFillCodeValues(correctAnswers);
+      setFillCodeState('correct');
+      setAnswerState('correct');
+    };
+
+    const handleFillTryAgain = () => {
+      setFillCodeValues(new Array(correctAnswers.length).fill(''));
+      setFillCodeState('editing');
+    };
+
+    return (
+      <motion.div
+        key={`quiz-${quizIndex}`}
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -30 }}
+        transition={{ duration: 0.25 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}
+      >
+        {/* Byte */}
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12 }}>
+          <motion.div
+            animate={
+              fillCodeState === 'correct' ? { y: [0, -12, 0], rotate: [0, 10, -10, 0] }
+              : fillCodeState === 'wrong' ? { x: [-4, 4, -4, 4, 0] }
+              : { y: [0, -5, 0], rotate: [0, 3, -3, 0] }
+            }
+            transition={fillCodeState === 'editing' ? { repeat: Infinity, duration: 3, ease: 'easeInOut' } : { duration: 0.5 }}
+          >
+            <Byte mood={fillCodeState === 'correct' ? 'celebrating' : fillCodeState === 'wrong' ? 'worried' : byteMood} size={64} equipment={equipment} />
+          </motion.div>
+        </div>
+
+        <span style={{ fontSize: 11, fontWeight: 700, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          {`${s('questionOf', locale)} ${quizIndex + 1} ${s('of', locale)} ${quiz.length}`}
+        </span>
+
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#EDEDED', lineHeight: 1.4 }}>
+          {safe(t(q, 'question_text', locale))}
+        </h2>
+
+        {/* Code with inline inputs */}
+        <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>
+          <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+          </div>
+          <pre style={{
+            background: '#0a0a0a', margin: 0,
+            padding: '14px 16px', fontSize: 14, color: '#ccc', lineHeight: 2.2,
+            overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace',
+            whiteSpace: 'pre-wrap',
+          }}>
+            {parts.map((part, i) => (
+              <span key={i}>
+                {part}
+                {i < parts.length - 1 && (
+                  <input
+                    type="text"
+                    value={fillCodeValues[i] || ''}
+                    onChange={e => {
+                      const v = [...fillCodeValues];
+                      v[i] = e.target.value;
+                      setFillCodeValues(v);
+                    }}
+                    disabled={fillCodeState !== 'editing'}
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    style={{
+                      background: fillCodeState === 'correct' ? 'rgba(74,222,128,0.15)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.15)' : '#161616',
+                      border: `1.5px solid ${fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff6060' : 'rgba(255,255,255,0.15)'}`,
+                      borderRadius: 6,
+                      color: fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff8080' : '#fff',
+                      fontFamily: 'inherit', fontSize: 'inherit',
+                      padding: '2px 8px',
+                      width: `${Math.max((correctAnswers[i]?.length || 4) + 2, 4)}ch`,
+                      outline: 'none',
+                      verticalAlign: 'baseline',
+                    }}
+                    onFocus={e => { if (fillCodeState === 'editing') e.target.style.borderColor = '#4ade80'; }}
+                    onBlur={e => { if (fillCodeState === 'editing') e.target.style.borderColor = 'rgba(255,255,255,0.15)'; }}
+                  />
+                )}
+              </span>
+            ))}
+          </pre>
+        </div>
+
+        {/* Action buttons */}
+        {fillCodeState === 'editing' && (
+          <motion.button
+            onClick={handleFillCheck}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+          >
+            {locale === 'sk' ? 'Skontrolovať' : 'Check'}
+            <Check size={16} />
+          </motion.button>
+        )}
+
+        {fillCodeState === 'wrong' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{
+              padding: '12px 16px', borderRadius: 12,
+              background: 'rgba(255,80,80,0.05)',
+              border: '1px solid rgba(255,80,80,0.15)',
+            }}>
+              <p style={{ fontWeight: 700, fontSize: 13, color: '#ff8080', margin: 0 }}>
+                {locale === 'sk' ? 'Nie celkom správne' : 'Not quite right'}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <motion.button
+                onClick={handleFillTryAgain}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ flex: 1, padding: '14px', borderRadius: 12, background: '#161616', color: '#EDEDED', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+              >
+                {locale === 'sk' ? 'Skúsiť znova' : 'Try again'}
+              </motion.button>
+              <motion.button
+                onClick={handleFillShowAnswer}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ flex: 1, padding: '14px', borderRadius: 12, background: '#161616', color: '#888', fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+              >
+                <Eye size={14} />
+                {locale === 'sk' ? 'Ukázať odpoveď' : 'Show answer'}
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+
+        {fillCodeState === 'correct' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{
+              padding: '12px 16px', borderRadius: 12,
+              background: 'rgba(74,222,128,0.06)',
+              border: '1px solid rgba(74,222,128,0.25)',
+            }}>
+              <p style={{ fontWeight: 700, fontSize: 13, color: '#4ade80', margin: 0 }}>
+                {s('correct', locale)}
+              </p>
+              {(() => {
+                const dbExpl = locale === 'sk' ? (q as any).explanation_sk : (q as any).explanation;
+                const explanation = dbExpl || (locale === 'sk'
+                  ? `Správna odpoveď: ${correctAnswers.join(', ')}`
+                  : `Correct answer: ${correctAnswers.join(', ')}`);
+                return (
+                  <p style={{ fontSize: 13, color: '#888', margin: '6px 0 0', lineHeight: 1.6 }}>
+                    {explanation}
+                  </p>
+                );
+              })()}
+            </div>
+            <motion.button
+              onClick={handleQuizNext}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+            >
+              {quizIndex + 1 < quiz.length ? s('nextQuestion', locale) : s('finish', locale)}
+              <ArrowRight size={16} />
+            </motion.button>
+          </motion.div>
+        )}
+      </motion.div>
+    );
+  };
+
   // Render quiz question
   const renderQuiz = () => {
     const q = quiz[quizIndex];
@@ -580,6 +794,8 @@ export default function TheoryLessonPage() {
 
     // Delegate write_code questions to dedicated renderer
     if (q.question_type === 'write_code') return renderWriteCode();
+    // Delegate fill_code to inline input renderer
+    if (q.question_type === 'fill_code') return renderFillCode();
 
     // Build options list
     let options: { label: string; text: string }[];
@@ -683,7 +899,7 @@ export default function TheoryLessonPage() {
         {/* Continue after answer */}
         <AnimatePresence>
           {answerState !== 'idle' && (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div ref={feedbackRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
               <div style={{
                 padding: '12px 16px', borderRadius: 12, marginBottom: 8,
                 background: answerState === 'correct' ? 'rgba(74,222,128,0.06)' : 'rgba(255,80,80,0.05)',
@@ -712,6 +928,11 @@ export default function TheoryLessonPage() {
                       explanation = locale === 'sk'
                         ? `Správny kód je: ${filled}`
                         : `The correct code is: ${filled}`;
+                    } else {
+                      // Fallback for multiple_choice without explanation
+                      explanation = locale === 'sk'
+                        ? `Správna odpoveď je ${correctOpt.text}.`
+                        : `The correct answer is ${correctOpt.text}.`;
                     }
                   }
 
@@ -1429,6 +1650,10 @@ function formatContent(text: string, phase: string = '') {
     if (/^TEXT:?$/i.test(trimmed)) continue;
 
     const lines = trimmed.split('\n');
+
+    // Skip "Review" / "Opakovanie" headings from GPT content
+    if (/^#*\s*(Review|Opakovanie|Zhrnutie)\s*$/i.test(trimmed)) continue;
+    if (/^(Review|Opakovanie)$/i.test(trimmed)) continue;
 
     // Markdown heading: # Title
     if (trimmed.startsWith('# ')) {

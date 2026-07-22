@@ -113,10 +113,11 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         }
       }
     } else {
-      // On web: normal redirect
+      // On web: redirect to current domain
+      const origin = window.location.origin;
       await sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: 'https://www.coduy.sk/auth/callback' },
+        options: { redirectTo: `${origin}/auth/callback` },
       });
     }
   };

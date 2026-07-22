@@ -39,16 +39,30 @@ export default function PrivacyPage() {
           <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>4. Data Storage and Security</h2>
           <p>Your data is stored securely using Supabase (hosted on AWS in the EU region). We implement industry-standard security measures including encryption in transit (TLS) and at rest. Access to user data is restricted to authorized personnel only.</p>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>5. Data Sharing</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>5. Platforms and In-App Purchases</h2>
+          <p>Coduy is available on the web (coduy.com, coduy.sk), Apple App Store (iOS) and Google Play Store (Android). When you subscribe to Coduy Pro:</p>
+          <ul style={{ paddingLeft: 20, marginTop: 8 }}>
+            <li><strong style={{ color: '#fff' }}>On iOS:</strong> Payments are processed through Apple In-App Purchases. Apple manages billing and subscriptions according to their terms.</li>
+            <li><strong style={{ color: '#fff' }}>On Android:</strong> Payments are processed through Google Play Billing. Google manages billing and subscriptions according to their terms.</li>
+            <li><strong style={{ color: '#fff' }}>On Web:</strong> Payments are processed through Stripe. We do not store credit card details.</li>
+          </ul>
+          <p>You can manage or cancel subscriptions through your device settings (Apple: Settings → Apple ID → Subscriptions, Android: Play Store → Subscriptions) or through your Stripe account for web purchases.</p>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>6. Push Notifications</h2>
+          <p>With your permission, we send push notifications including daily glossary terms and learning reminders. You can disable notifications at any time in your device settings or in the Coduy app settings.</p>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>7. Data Sharing</h2>
           <p>We do not sell your personal information. We share data only with:</p>
           <ul style={{ paddingLeft: 20, marginTop: 8 }}>
             <li><strong style={{ color: '#fff' }}>Supabase</strong> - database and authentication provider</li>
-            <li><strong style={{ color: '#fff' }}>Stripe</strong> - payment processing</li>
+            <li><strong style={{ color: '#fff' }}>Stripe</strong> - payment processing (web)</li>
+            <li><strong style={{ color: '#fff' }}>Apple</strong> - in-app purchases and App Store distribution (iOS)</li>
+            <li><strong style={{ color: '#fff' }}>Google</strong> - in-app purchases, Play Store distribution, authentication, Firebase Cloud Messaging</li>
             <li><strong style={{ color: '#fff' }}>Vercel</strong> - website hosting</li>
-            <li><strong style={{ color: '#fff' }}>Google</strong> - authentication (when you choose Google Sign-In)</li>
+            <li><strong style={{ color: '#fff' }}>OpenAI</strong> - AI-powered features (Ask Coduy)</li>
           </ul>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>6. Your Rights</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>8. Your Rights</h2>
           <p>You have the right to:</p>
           <ul style={{ paddingLeft: 20, marginTop: 8 }}>
             <li>Access your personal data</li>
@@ -59,16 +73,16 @@ export default function PrivacyPage() {
           </ul>
           <p>To exercise these rights, contact us at support@coduy.sk.</p>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>7. Children's Privacy</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>9. Children's Privacy</h2>
           <p>Coduy is designed for users of all ages who want to learn programming. We do not knowingly collect personal information from children under 13 without parental consent. If you believe a child under 13 has provided us with personal information, please contact us.</p>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>8. Cookies and Tracking</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>10. Cookies and Tracking</h2>
           <p>We use essential cookies for authentication and session management. We use Vercel Analytics for anonymous usage statistics. We do not use third-party advertising trackers.</p>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>9. Changes to This Policy</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>11. Changes to This Policy</h2>
           <p>We may update this Privacy Policy from time to time. We will notify you of significant changes through the app or by email.</p>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>10. Contact Us</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginTop: 32, marginBottom: 12 }}>12. Contact Us</h2>
           <p>If you have questions about this Privacy Policy, contact us at:</p>
           <p>Email: support@coduy.sk</p>
           <p>Website: coduy.sk</p>

@@ -17,11 +17,16 @@ const LOGIN_SKINS: ByteEquipment[] = [
   { hat: 'hat-golden-crown', glasses: 'glasses-golden', accessory: 'acc-wings-gold', aura: 'aura-golden' },
 ];
 
+const PUBLIC_PATHS = ['/screenshots', '/privacy', '/terms'];
+
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const { locale, toggle } = useLocaleStore();
   const { setUserId, userId, loadFromSupabase } = useUserStore();
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
+
+  // Public pages skip auth
+  const isPublic = typeof window !== 'undefined' && PUBLIC_PATHS.some(p => window.location.pathname.startsWith(p));
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,49 +45,52 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (isPublic) { setAuthed(true); setChecking(false); return; }
+
     const sb = getSupabase();
     if (!sb) { setAuthed(true); setChecking(false); return; }
 
+    const handleUser = (user: any, event?: string) => {
+      const newId = user.id;
+      if (userId && userId !== newId) {
+        localStorage.removeItem('coduy-user');
+        localStorage.removeItem('coduy-path');
+        window.location.reload();
+        return;
+      }
+      setUserId(newId);
+      setAuthed(true);
+      // Notify Slack on new sign-up
+      if (event === 'SIGNED_IN') {
+        const notified = localStorage.getItem('coduy-slack-notified');
+        if (!notified) {
+          localStorage.setItem('coduy-slack-notified', 'true');
+          fetch('/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event: 'new_user', email: user.email }),
+          }).catch(() => {});
+        }
+      }
+    };
+
     sb.auth.getSession().then(({ data }) => {
       if (data.session?.user) {
-        const newId = data.session.user.id;
-        if (userId && userId !== newId) {
-          // Different user - reset store
-          localStorage.removeItem('coduy-user');
-          localStorage.removeItem('coduy-path');
-          window.location.reload();
-          return;
-        }
-        setUserId(newId);
-        setAuthed(true);
-        // Load user data from Supabase (sync across devices/domains)
+        handleUser(data.session.user);
         setTimeout(() => loadFromSupabase(), 500);
       }
       setChecking(false);
     });
 
     const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setAuthed(false);
+        return;
+      }
       if (session?.user) {
-        const newId = session.user.id;
-        if (userId && userId !== newId) {
-          localStorage.removeItem('coduy-user');
-          localStorage.removeItem('coduy-path');
-          window.location.reload();
-          return;
-        }
-        setUserId(newId);
-        setAuthed(true);
-        // Notify Slack on new sign-up
-        if (event === 'SIGNED_IN') {
-          const notified = localStorage.getItem('coduy-slack-notified');
-          if (!notified) {
-            localStorage.setItem('coduy-slack-notified', 'true');
-            fetch('/api/notify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ event: 'new_user', email: session.user.email }),
-            }).catch(() => {});
-          }
+        handleUser(session.user, event);
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setTimeout(() => loadFromSupabase(), 500);
         }
       }
     });

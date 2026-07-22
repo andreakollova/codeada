@@ -10,7 +10,13 @@ export function getSupabase(): SupabaseClient | null {
 
   if (!url || !key) return null;
 
-  _client = createClient(url, key);
+  _client = createClient(url, key, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      storageKey: 'coduy-sb-auth',
+    },
+  });
   // Expose for Capacitor deep link handler
   if (typeof window !== 'undefined') (window as any).__supabase = _client;
   return _client;

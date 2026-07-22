@@ -52,7 +52,7 @@ const screens = [
   {
     badge: 'Workshop',
     title: 'Earn Rewards\nas You Learn',
-    subtitle: 'Unlock hats, glasses, auras and more.',
+    subtitle: 'Unlock hats, glasses, auras\nand more.',
     accent: '#f59e0b',
     byte: '/byte-master.png',
     screenshot: '/ss-locker.png',
@@ -60,7 +60,7 @@ const screens = [
   {
     badge: 'Progress',
     title: 'Track Your\nJourney',
-    subtitle: 'XP, streaks, and path progress all in one place.',
+    subtitle: 'XP, streaks, and path progress\nall in one place.',
     accent: '#4ade80',
     byte: '/byte-builder.png',
     screenshot: '/ss-builder.png',
@@ -129,7 +129,7 @@ export default function ScreenshotsPage() {
               <p style={{
                 fontSize: 11, color: 'rgba(255,255,255,0.45)',
                 textAlign: 'center', lineHeight: 1.5,
-                maxWidth: 260, margin: 0,
+                maxWidth: 260, margin: 0, whiteSpace: 'pre-line',
               }}>
                 {s.subtitle}
               </p>

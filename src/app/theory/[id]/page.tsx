@@ -99,16 +99,16 @@ export default function TheoryLessonPage() {
         console.error('Failed to load lesson:', err);
       });
 
-    // Fetch latest reel video for this lesson
-    fetch('https://zjyolgkakxuaegpvhimy.supabase.co/storage/v1/object/public/ig-media/tracking/reels.json')
-      .then(r => r.json())
-      .then((reels: any[]) => {
-        const match = reels
-          .filter((r: any) => r.lessonId === numId && r.lang === locale && r.videoUrl)
-          .sort((a: any, b: any) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-        if (match.length > 0) setReelUrl(match[0].videoUrl);
-      })
-      .catch(() => {});
+    // Reels temporarily disabled
+    // fetch('https://zjyolgkakxuaegpvhimy.supabase.co/storage/v1/object/public/ig-media/tracking/reels.json')
+    //   .then(r => r.json())
+    //   .then((reels: any[]) => {
+    //     const match = reels
+    //       .filter((r: any) => r.lessonId === numId && r.lang === locale && r.videoUrl)
+    //       .sort((a: any, b: any) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    //     if (match.length > 0) setReelUrl(match[0].videoUrl);
+    //   })
+    //   .catch(() => {});
   }, [id, locale]);
 
   // Paywall: after 5 free lessons, show upgrade prompt

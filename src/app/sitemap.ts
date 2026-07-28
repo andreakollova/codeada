@@ -9,7 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/glossary`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
     { url: `${base}/topics`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.7 },
     { url: `${base}/workshop`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.7 },
-    { url: `${base}/reels`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.6 },
   ];
 
   // Generate theory lesson URLs (1-296)

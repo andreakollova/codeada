@@ -6,10 +6,20 @@ import { BookOpen, FolderCode, BookMarked, Wrench, Swords } from 'lucide-react';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
 
+// Mobile order: Projekt, Slovník, Kurz, Aréna, Šatník
 const tabDefs = [
   { href: '/topics',   labelKey: 'projects' as const, Icon: FolderCode },
   { href: '/glossary', labelKey: 'glossary' as const,  Icon: BookMarked },
   { href: '/',          labelKey: 'courses' as const,  Icon: BookOpen },
+  { href: '/arena',    labelKey: 'arena' as const,     Icon: Swords },
+  { href: '/workshop', labelKey: 'workshop' as const,  Icon: Wrench },
+];
+
+// Desktop order: Kurz first
+const desktopTabDefs = [
+  { href: '/',          labelKey: 'courses' as const,  Icon: BookOpen },
+  { href: '/topics',   labelKey: 'projects' as const, Icon: FolderCode },
+  { href: '/glossary', labelKey: 'glossary' as const,  Icon: BookMarked },
   { href: '/arena',    labelKey: 'arena' as const,     Icon: Swords },
   { href: '/workshop', labelKey: 'workshop' as const,  Icon: Wrench },
 ];
@@ -26,7 +36,7 @@ export default function BottomNav() {
           <img src="/logocoduy.png" alt="Coduy" style={{ height: 24, opacity: 0.9 }} />
         </Link>
         <div className="desktop-nav-links">
-          {tabDefs.map(({ href, labelKey, Icon }) => {
+          {desktopTabDefs.map(({ href, labelKey, Icon }) => {
             const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
             return (
               <Link key={href} href={href} onClick={() => window.scrollTo(0, 0)} className={`desktop-nav-item ${active ? 'active' : ''}`}>

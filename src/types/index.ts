@@ -106,3 +106,79 @@ export interface ProjectTopic {
   icon: string;
   lessons: Lesson[];
 }
+
+// === Interactive Projects ===
+
+export type ProjectDifficulty = 'beginner' | 'intermediate' | 'advanced';
+
+export type ProjectStepType = 'theory' | 'quiz' | 'fill' | 'write';
+
+export interface ProjectHint {
+  text: string;
+  code?: string;
+}
+
+export interface ProjectTest {
+  description: string;
+  code: string;
+  expected: string;
+}
+
+export interface ProjectErrorMessage {
+  pattern: string; // regex or keyword to match against student code/output
+  message: string;
+  suggestion?: string;
+}
+
+export interface ProjectQuizOption {
+  text: string;
+  correct: boolean;
+}
+
+export interface ProjectStep {
+  id: string;
+  type: ProjectStepType;
+  title: string;
+  // Theory
+  theoryContent?: string; // markdown
+  // Quiz
+  quizQuestion?: string;
+  quizOptions?: ProjectQuizOption[];
+  quizExplanation?: string;
+  // Fill code
+  fillCode?: string; // code with ___ blanks
+  fillBlanks?: { id: string; answer: string; alternatives?: string[] }[];
+  // Write code
+  prompt?: string;
+  starterCode?: string;
+  solution?: string;
+  tests?: ProjectTest[];
+  hints?: ProjectHint[];
+  errorMessages?: ProjectErrorMessage[];
+  // Preview state after completing this step
+  previewState?: string; // key that tells preview which parts to unlock
+  // XP
+  xp: number;
+}
+
+export interface ProjectSection {
+  id: string;
+  title: string;
+  steps: ProjectStep[];
+}
+
+export interface InteractiveProject {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string; // markdown — what you'll build
+  difficulty: ProjectDifficulty;
+  estimatedMinutes: number;
+  skills: string[]; // what you'll learn
+  icon: string;
+  color: string; // theme color
+  totalSteps: number;
+  sections: ProjectSection[];
+  finalCode: string; // complete solution
+  downloadUrl?: string; // ZIP on Supabase Storage
+}

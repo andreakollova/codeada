@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { projectTopics } from '@/data/myprojects-topics';
+import { projects as interactiveProjects } from '@/data/projects';
 import StatusBar from '@/components/StatusBar';
 import { useRouter } from 'next/navigation';
-import { Check, ChevronRight, ArrowLeft, BookOpen, Code, PenTool, Lightbulb, X, Zap } from 'lucide-react';
+import { Check, ChevronRight, ArrowLeft, BookOpen, Code, PenTool, Lightbulb, X, Zap, Trophy } from 'lucide-react';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
-import type { Exercise } from '@/types';
+import type { Exercise, InteractiveProject } from '@/types';
 
 const iconMap: Record<string, string> = {
   smartphone: '📱', database: '🗄', shield: '🔐', 'credit-card': '💳',
@@ -468,6 +469,78 @@ export default function TopicsPage() {
             {s('myProjectsDesc', locale)}
           </p>
         </motion.div>
+
+        {/* ═══ INTERACTIVE PROJECTS ═══ */}
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <Zap size={16} color="#22c55e" />
+            <h2 style={{ fontWeight: 700, fontSize: 16, color: '#fff', margin: 0 }}>
+              {locale === 'sk' ? 'Interaktívne projekty' : 'Interactive Projects'}
+            </h2>
+          </div>
+          <p style={{ fontSize: 13, color: '#666', marginBottom: 16, lineHeight: 1.5 }}>
+            {locale === 'sk' ? 'Postav reálne aplikácie krok za krokom. Píšeš Python, vidíš výsledok naživo.' : 'Build real apps step by step. Write Python, see results live.'}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {interactiveProjects.map((proj, i) => {
+              const totalSteps = proj.sections.reduce((s, sec) => s + sec.steps.length, 0);
+              const completedSteps = proj.sections.reduce((s, sec) =>
+                s + sec.steps.filter(step => completedLessons.includes(`project-${proj.id}-${step.id}`)).length, 0);
+              const progress = totalSteps > 0 ? completedSteps / totalSteps : 0;
+              const isComplete = completedSteps === totalSteps && totalSteps > 0;
+
+              return (
+                <motion.button
+                  key={proj.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06 }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => router.push(`/project/${proj.id}`)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 16,
+                    padding: '16px 18px', borderRadius: 14, textAlign: 'left',
+                    cursor: 'pointer', border: 'none',
+                    background: '#0a0a0a',
+                    outline: `1.5px solid ${isComplete ? '#22c55e30' : '#1a1a1a'}`,
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: `${proj.color}15`, fontSize: 22, flexShrink: 0,
+                  }}>
+                    {proj.icon}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: '#eee', marginBottom: 2 }}>
+                      {proj.title}
+                      {isComplete && <Trophy size={14} color="#f59e0b" style={{ marginLeft: 6, verticalAlign: -2 }} />}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>{proj.subtitle}</div>
+                    {/* Progress bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ flex: 1, height: 4, background: '#1a1a1a', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ width: `${progress * 100}%`, height: '100%', background: '#22c55e', borderRadius: 2, transition: 'width 0.3s' }} />
+                      </div>
+                      <span style={{ fontSize: 11, color: '#555', flexShrink: 0 }}>{completedSteps}/{totalSteps}</span>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} color="#333" />
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ═══ TOPIC EXERCISES (old system) ═══ */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <Code size={16} color="#888" />
+          <h2 style={{ fontWeight: 700, fontSize: 16, color: '#aaa', margin: 0 }}>
+            {locale === 'sk' ? 'Cvičenia' : 'Exercises'}
+          </h2>
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
           {projectTopics.map((topic, i) => {

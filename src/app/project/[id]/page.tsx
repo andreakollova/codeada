@@ -208,11 +208,11 @@ function FillCodeView({ step, onComplete, locale }: { step: ProjectStep; onCompl
     setRes(ok ? 'ok' : 'bad');
   };
 
-  // Auto-generate hints from blanks if none provided
-  const effectiveHints = hints.length > 0 ? hints : blanks.map((b, i) => ({
-    text: locale === 'sk' ? `Odpoveď ${i + 1}: pozri sa na kontext okolo prázdneho miesta.` : `Answer ${i + 1}: look at the context around the blank.`,
-    code: b.answer,
-  }));
+  // Auto-generate progressive hints from blanks if none provided
+  const effectiveHints = hints.length > 0 ? hints : blanks.flatMap((b, i) => [
+    { text: locale === 'sk' ? 'Pozri sa na kód okolo prázdneho miesta. Čo tam logicky patrí?' : 'Look at the code around the blank. What logically belongs there?' },
+    { text: locale === 'sk' ? `Odpoveď má ${b.answer.length} ${b.answer.length === 1 ? 'znak' : b.answer.length < 5 ? 'znaky' : 'znakov'} a začína na "${b.answer[0]}".` : `The answer has ${b.answer.length} characters and starts with "${b.answer[0]}".` },
+  ]);
 
   const lines = (step.fillCode || '').split('\n');
   let bi = 0;
@@ -262,7 +262,7 @@ function FillCodeView({ step, onComplete, locale }: { step: ProjectStep; onCompl
             <div key={i} style={{ padding: '12px 16px', background: '#1a1a1a', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', fontSize: 14, color: '#bbb' }}>
               <span style={{ color: '#f59e0b', fontWeight: 600, marginRight: 8 }}>{locale === 'sk' ? 'Nápoveda' : 'Hint'} {i + 1}:</span>
               {h.text}
-              {h.code && <pre style={{ marginTop: 8, padding: '8px 12px', background: '#111', borderRadius: 6, color: '#22c55e', fontSize: 13 }}>{h.code}</pre>}
+              {(h as any).code && <pre style={{ marginTop: 8, padding: '8px 12px', background: '#111', borderRadius: 6, color: '#22c55e', fontSize: 13 }}>{(h as any).code}</pre>}
             </div>
           ))}
           {hintIdx >= effectiveHints.length - 1 && !showSolution && (
@@ -416,7 +416,7 @@ function WriteCodeView({ step, onComplete, locale, onVariables }: {
             <div key={i} style={{ padding: '12px 16px', background: '#1a1a1a', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', fontSize: 14, color: '#bbb' }}>
               <span style={{ color: '#f59e0b', fontWeight: 600, marginRight: 8 }}>{locale === 'sk' ? 'Nápoveda' : 'Hint'} {i + 1}:</span>
               {h.text}
-              {h.code && <pre style={{ marginTop: 8, padding: '8px 12px', background: '#111', borderRadius: 6, color: '#22c55e', fontSize: 13 }}>{h.code}</pre>}
+              {(h as any).code && <pre style={{ marginTop: 8, padding: '8px 12px', background: '#111', borderRadius: 6, color: '#22c55e', fontSize: 13 }}>{(h as any).code}</pre>}
             </div>
           ))}
           {hintIdx >= hints.length - 1 && !showSolution && step.solution && (

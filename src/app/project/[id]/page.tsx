@@ -431,7 +431,7 @@ function ProgressSidebar({ project, completedSteps, currentGlobalIdx, onSelectSt
 export default function ProjectPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { completeLesson, completedLessons, addXp } = useUserStore();
+  const { completeLesson, completedLessons } = useUserStore();
   const { locale } = useLocaleStore();
 
   const project = getProject(id as string);
@@ -465,7 +465,7 @@ export default function ProjectPage() {
   const handleStepComplete = () => {
     if (!currentStep) return;
     const key = compKey(project.id, currentStep.id);
-    if (!completedLessons.includes(key)) { completeLesson(key); if (currentStep.xp > 0) addXp(currentStep.xp); }
+    if (!completedLessons.includes(key)) { completeLesson(key, currentStep.xp || 0); }
     if (currentGlobalIdx < totalSteps - 1) setCurrentGlobalIdx(currentGlobalIdx + 1);
   };
 

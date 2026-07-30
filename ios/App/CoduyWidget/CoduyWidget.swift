@@ -149,7 +149,7 @@ struct CoduyWidgetEntryView: View {
                     Image(["ByteBuilder", "ByteAi", "ByteMechanic", "ByteMaster"][Calendar.current.component(.day, from: Date()) % 4])
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: family == .systemSmall ? 28 : 34, height: family == .systemSmall ? 28 : 34)
+                        .frame(width: family == .systemSmall ? 38 : 44, height: family == .systemSmall ? 38 : 44)
                 }
 
                 Spacer()
@@ -170,9 +170,9 @@ struct CoduyWidgetEntryView: View {
 
                 // Description
                 Text(entry.detail)
-                    .font(.system(size: family == .systemSmall ? 10 : 12))
+                    .font(.system(size: family == .systemSmall ? 11 : 13))
                     .foregroundColor(.white.opacity(0.7))
-                    .lineLimit(family == .systemSmall ? 2 : 3)
+                    .lineLimit(family == .systemSmall ? 3 : 4)
 
                 // Footer
                 Text(isSk ? "Slovo dňa" : "Word of the Day")

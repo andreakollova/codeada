@@ -433,12 +433,13 @@ Python sa najskôr pokúsi vykonať kód v časti \`try\`. Ak nastane chyba, vyk
           solution: 'first_number = 12\nsecond_number = 8\noperation = "+"\n\nresult = first_number + second_number',
           tests: [
             { description: 'Premenná result existuje', code: '"result" in globals()', expected: 'True' },
-            { description: 'Výsledok má správnu hodnotu', code: 'result == 20', expected: 'True' },
             { description: 'Výsledok je číselný údaj', code: 'isinstance(result, (int, float))', expected: 'True' },
+            { description: 'Výsledok má správnu hodnotu', code: 'result == 20', expected: 'True' },
+            { description: 'Kód používa premenné (nie pevný výsledok)', code: '"first_number" in __source__ and "second_number" in __source__ and "result = 20" not in __source__ and "result=20" not in __source__', expected: 'True' },
           ],
           hints: [
             { text: 'Na sčítanie dvoch hodnôt používame operátor +' },
-            { text: 'Výsledok má vzniknúť sčítaním premenných first_number a second_number.' },
+            { text: 'Výsledok má vzniknúť sčítaním premenných first_number a second_number — nie napísaním čísla 20.' },
             { text: 'Výraz bude mať tvar:', code: 'prva_premenna + druha_premenna' },
             { text: 'Doplň:', code: 'first_number + second_number' },
           ],

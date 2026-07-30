@@ -115,8 +115,8 @@ export function usePyodide(): PyodideHook {
     const pyodide = await loadPyodide();
 
     try {
-      // Run student code + test in same scope using exec
-      const combined = studentCode + '\n\n__test_result__ = bool(' + testCode + ')';
+      // Run student code + test in same scope, inject __source__ for code analysis
+      const combined = `__source__ = ${JSON.stringify(studentCode)}\n` + studentCode + '\n\n__test_result__ = bool(' + testCode + ')';
       pyodide.runPython(`
 _scope = {}
 exec(${JSON.stringify(combined)}, _scope)

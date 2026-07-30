@@ -10,11 +10,12 @@ struct GlossaryEntry: Codable {
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> GlossaryTimelineEntry {
-        GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.", isPro: true)
+        GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.", isPro: true, streak: 3)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (GlossaryTimelineEntry) -> ()) {
-        completion(GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.", isPro: true))
+        let streak = UserDefaults(suiteName: "group.sk.coduy.app")?.integer(forKey: "coduy-streak") ?? 0
+        completion(GlossaryTimelineEntry(date: Date(), term: "API", definition: "Application Programming Interface", detail: "A set of rules that lets apps talk to each other.", isPro: true, streak: streak))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GlossaryTimelineEntry>) -> ()) {
@@ -31,18 +32,17 @@ struct Provider: TimelineProvider {
         URLSession.shared.dataTask(with: url) { data, _, _ in
             var entry: GlossaryTimelineEntry
 
+            let shared = UserDefaults(suiteName: "group.sk.coduy.app")
+            let streak = shared?.integer(forKey: "coduy-streak") ?? 0
+
             if let data = data, let glossary = try? JSONDecoder().decode(GlossaryEntry.self, from: data) {
-                // Read language from shared App Group (set by main app), fallback to device locale
-                let shared = UserDefaults(suiteName: "group.sk.coduy.app")
                 let lang = shared?.string(forKey: "coduy-locale") ?? Locale.current.language.languageCode?.identifier ?? "en"
                 let detail = lang == "sk" ? glossary.sk : glossary.en
-                entry = GlossaryTimelineEntry(date: Date(), term: glossary.term, definition: glossary.full, detail: detail, isPro: true)
+                entry = GlossaryTimelineEntry(date: Date(), term: glossary.term, definition: glossary.full, detail: detail, isPro: true, streak: streak)
             } else {
-                // Fallback when API fails — show a default term
-                let shared2 = UserDefaults(suiteName: "group.sk.coduy.app")
-                let lang = shared2?.string(forKey: "coduy-locale") ?? Locale.current.language.languageCode?.identifier ?? "en"
+                let lang = shared?.string(forKey: "coduy-locale") ?? Locale.current.language.languageCode?.identifier ?? "en"
                 let detail = lang == "sk" ? "Postupné inštrukcie na vyriešenie problému." : "Step-by-step instructions to solve a problem."
-                entry = GlossaryTimelineEntry(date: Date(), term: "Algorithm", definition: "", detail: detail, isPro: false)
+                entry = GlossaryTimelineEntry(date: Date(), term: "Algorithm", definition: "", detail: detail, isPro: false, streak: streak)
             }
 
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(6 * 3600))))
@@ -56,6 +56,7 @@ struct GlossaryTimelineEntry: TimelineEntry {
     let definition: String
     let detail: String
     let isPro: Bool
+    let streak: Int
 }
 
 struct ByteView: View {
@@ -132,9 +133,15 @@ struct CoduyWidgetEntryView: View {
         Locale.current.language.languageCode?.identifier == "sk"
     }
 
+    var streakColor: Color {
+        if entry.streak >= 7 { return Color(red: 1.0, green: 0.4, blue: 0.1) } // hot orange
+        if entry.streak >= 3 { return Color(red: 1.0, green: 0.6, blue: 0.2) } // warm amber
+        return Color(red: 0.29, green: 0.87, blue: 0.5) // green
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 6) {
-                // Header - logo + byte
+                // Header - logo + streak + byte
                 HStack(alignment: .center) {
                     Image("CoduyLogo")
                         .resizable()
@@ -144,6 +151,21 @@ struct CoduyWidgetEntryView: View {
                         .frame(height: 14)
 
                     Spacer()
+
+                    // Streak badge
+                    if entry.streak > 0 {
+                        HStack(spacing: 3) {
+                            Text("🔥")
+                                .font(.system(size: family == .systemSmall ? 12 : 14))
+                            Text("\(entry.streak)")
+                                .font(.system(size: family == .systemSmall ? 12 : 14, weight: .bold, design: .rounded))
+                                .foregroundColor(streakColor)
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(streakColor.opacity(0.15))
+                        .cornerRadius(8)
+                    }
 
                     // Rotate Byte variants daily
                     Image(["ByteBuilder", "ByteAi", "ByteMechanic", "ByteMaster"][Calendar.current.component(.day, from: Date()) % 4])
@@ -175,11 +197,22 @@ struct CoduyWidgetEntryView: View {
                     .lineLimit(family == .systemSmall ? 3 : 4)
 
                 // Footer
-                Text(isSk ? "Slovo dňa" : "Word of the Day")
-                    .font(.system(size: 8, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.25))
-                    .textCase(.uppercase)
-                    .tracking(1)
+                HStack {
+                    Text(isSk ? "Slovo dňa" : "Word of the Day")
+                        .font(.system(size: 8, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.25))
+                        .textCase(.uppercase)
+                        .tracking(1)
+
+                    if entry.streak > 0 {
+                        Spacer()
+                        Text(isSk ? "\(entry.streak) dní streak" : "\(entry.streak) day streak")
+                            .font(.system(size: 8, weight: .semibold))
+                            .foregroundColor(streakColor.opacity(0.6))
+                            .textCase(.uppercase)
+                            .tracking(0.5)
+                    }
+                }
             }
             .padding(family == .systemSmall ? 14 : 16)
     }

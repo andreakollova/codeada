@@ -80,6 +80,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const [promoError, setPromoError] = useState('');
   const [clientSecret, setClientSecret] = useState('');
   const [showCheckout, setShowCheckout] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const sk = locale === 'sk';
 
   const accentGradient = 'linear-gradient(135deg, #4ade80, #22c55e)';
@@ -92,12 +94,17 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
       exit={{ opacity: 0 }}
       style={{
         position: 'fixed', inset: 0, zIndex: 300,
-        background: '#000',
-        display: 'flex', flexDirection: 'column',
+        background: 'rgba(0,0,0,0.85)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: 'center',
         overflow: 'auto',
+        backdropFilter: 'blur(12px)',
       }}
     >
+    <div className="paywall-card" style={{
+      width: '100%', maxWidth: 440, background: '#0a0a0a', borderRadius: 0,
+      overflow: 'auto', maxHeight: '100vh', position: 'relative',
+    }}>
       {/* X close */}
       <button
         onClick={onClose || (() => router.back())}
@@ -217,6 +224,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
       <div style={{ padding: '0 24px 10px' }}>
         <motion.button
           onClick={async () => {
+            if (loading) return;
+            setLoading(true); setError('');
             const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
             const { userId } = useUserStore.getState();
 
@@ -286,6 +295,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                 const sb = getSupabase();
                 const session = await sb?.auth.getSession();
                 const email = session?.data?.session?.user?.email;
+                if (!userId) { setError(sk ? 'Najprv sa prihlás.' : 'Please log in first.'); setLoading(false); return; }
                 const res = await fetch('/api/create-subscription', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -296,9 +306,14 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                   setClientSecret(data.clientSecret);
                   setShowCheckout(true);
                 } else if (data.error) {
-                  console.log('Subscription error:', data.error);
+                  setError(data.error);
+                } else {
+                  setError(sk ? 'Niečo sa pokazilo. Skús to znova.' : 'Something went wrong. Try again.');
                 }
-              } catch {}
+              } catch (e: any) {
+                setError(e?.message || (sk ? 'Chyba pripojenia.' : 'Connection error.'));
+              }
+              setLoading(false);
             }
           }}
           whileTap={{ scale: 0.98 }}
@@ -309,11 +324,12 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
-          <Sparkles size={16} />
-          {plan === 'trial' || plan === 'yearly'
+          {loading ? <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', width: 16, height: 16, border: '2px solid transparent', borderTopColor: '#000', borderRadius: '50%' }} /> : <Sparkles size={16} />}
+          {loading ? (sk ? 'Spracovávam...' : 'Processing...') : plan === 'trial' || plan === 'yearly'
             ? (sk ? 'Začať free trial' : 'Start free trial')
             : (sk ? 'Získať Pro' : 'Get Pro')}
         </motion.button>
+        {error && <p style={{ fontSize: 12, color: '#ff8080', textAlign: 'center', marginTop: 8 }}>{error}</p>}
         <p style={{ fontSize: 12, color: '#888', textAlign: 'center', marginTop: 8, fontWeight: 500 }}>
           {sk ? 'Zrušíš kedykoľvek. Bez záväzkov.' : 'Cancel anytime. No strings attached.'}
         </p>
@@ -380,6 +396,18 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
         )}
 
       </div>
+      </div>
+
+      <style>{`
+        @media (min-width: 640px) {
+          .paywall-card {
+            border-radius: 24px !important;
+            max-height: 90vh !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5) !important;
+          }
+        }
+      `}</style>
     </motion.div>
   );
 }

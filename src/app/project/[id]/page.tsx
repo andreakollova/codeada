@@ -70,7 +70,8 @@ function downloadCode(filename: string, code: string) {
 function TheoryView({ step, onComplete, locale }: { step: ProjectStep; onComplete: () => void; locale: string }) {
   const rendered = useMemo(() => {
     if (!step.theoryContent) return '';
-    let md = step.theoryContent;
+    // Remove first heading if it matches the step title (avoid duplicate)
+    let md = step.theoryContent.replace(/^# .+\n+/, '');
 
     // Tables — parse before other replacements
     md = md.replace(/((?:\|.+\|\n)+)/g, (tableBlock) => {
@@ -610,7 +611,7 @@ export default function ProjectPage() {
         .project-preview { display: none; }
         .mobile-only-btn { display: block; }
         @media (min-width: 900px) {
-          .project-page-root { margin-left: 200px; }
+          .project-page-root { padding-left: 200px; }
           .project-sidebar { display: block !important; }
           .mobile-only-btn { display: none !important; }
         }

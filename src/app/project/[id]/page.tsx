@@ -517,7 +517,7 @@ export default function ProjectPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0F0F0F' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: '#0F0F0F', position: 'fixed', inset: 0 }}>
       <StatusBar />
 
       {/* Header */}

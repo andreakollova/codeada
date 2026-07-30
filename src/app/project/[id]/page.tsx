@@ -427,7 +427,7 @@ function ProgressSidebar({ project, completedSteps, currentGlobalIdx, onSelectSt
   const allSteps = getAllSteps(project);
   let gi = 0;
   return (
-    <div style={{ width: 220, minHeight: '100%', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '20px 0', overflowY: 'auto', flexShrink: 0 }}>
+    <div style={{ width: 220, height: '100%', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '20px 0', overflowY: 'auto', flexShrink: 0 }}>
       {project.sections.map((sec, si) => {
         const start = gi;
         const items = sec.steps.map((_, sti) => ({ gIdx: gi++, step: sec.steps[sti] }));
@@ -545,7 +545,7 @@ export default function ProjectPage() {
       </div>
 
       {/* Body */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
         {/* Sidebar */}
         <div className="project-sidebar" style={{ display: sidebarOpen ? 'block' : undefined }}>
           <ProgressSidebar project={project} completedSteps={completedSteps} currentGlobalIdx={currentGlobalIdx}

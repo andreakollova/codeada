@@ -194,8 +194,11 @@ function QuizView({ step, onComplete, locale }: { step: ProjectStep; onComplete:
 // ═══════════════════════════════════════════════════
 function FillCodeView({ step, onComplete, locale }: { step: ProjectStep; onComplete: () => void; locale: string }) {
   const blanks = step.fillBlanks || [];
+  const hints = step.hints || [];
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [res, setRes] = useState<'ok' | 'bad' | null>(null);
+  const [hintIdx, setHintIdx] = useState(-1);
+  const [showSolution, setShowSolution] = useState(false);
 
   const handleCheck = () => {
     const ok = blanks.every(b => {
@@ -204,6 +207,12 @@ function FillCodeView({ step, onComplete, locale }: { step: ProjectStep; onCompl
     });
     setRes(ok ? 'ok' : 'bad');
   };
+
+  // Auto-generate hints from blanks if none provided
+  const effectiveHints = hints.length > 0 ? hints : blanks.map((b, i) => ({
+    text: locale === 'sk' ? `Odpoveď ${i + 1}: pozri sa na kontext okolo prázdneho miesta.` : `Answer ${i + 1}: look at the context around the blank.`,
+    code: b.answer,
+  }));
 
   const lines = (step.fillCode || '').split('\n');
   let bi = 0;
@@ -220,17 +229,56 @@ function FillCodeView({ step, onComplete, locale }: { step: ProjectStep; onCompl
             <div key={li} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
               <span style={{ color: '#a0a0a0' }}>{parts[0]}</span>
               <input value={answers[b?.id || ''] || ''} onChange={e => setAnswers(p => ({ ...p, [b?.id || '']: e.target.value }))}
-                placeholder="..." disabled={res === 'ok'} style={{
-                  background: res === 'ok' ? '#22c55e20' : '#0a0a0a', border: '1px solid',
-                  borderColor: res === 'ok' ? '#22c55e' : res === 'bad' ? '#ef4444' : 'rgba(255,255,255,0.15)',
-                  borderRadius: 6, padding: '4px 10px', color: '#fff', fontFamily: 'inherit', fontSize: 14, minWidth: 80, maxWidth: 200, outline: 'none',
+                placeholder="..." disabled={res === 'ok'} autoFocus={bi === 1} style={{
+                  background: res === 'ok' ? '#22c55e20' : '#0a0a0a', border: '2px solid',
+                  borderColor: res === 'ok' ? '#22c55e' : res === 'bad' ? '#ef4444' : '#22c55e60',
+                  borderRadius: 6, padding: '4px 12px', color: '#fff', fontFamily: 'inherit', fontSize: 14, minWidth: 100, maxWidth: 240, outline: 'none',
                 }} />
               <span style={{ color: '#a0a0a0' }}>{parts[1]}</span>
             </div>
           );
         })}
       </div>
-      {!res && <button onClick={handleCheck} style={{ padding: '14px 32px', background: '#22c55e', color: '#000', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', alignSelf: 'flex-start' }}>{locale === 'sk' ? 'Skontrolovať' : 'Check'}</button>}
+
+      {/* Buttons */}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {!res && <button onClick={handleCheck} style={{ padding: '14px 32px', background: '#22c55e', color: '#000', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>{locale === 'sk' ? 'Skontrolovať' : 'Check'}</button>}
+        {effectiveHints.length > 0 && !res && (
+          <button onClick={() => setHintIdx(p => Math.min(p + 1, effectiveHints.length - 1))} style={{
+            padding: '14px 24px', background: 'transparent', color: '#a0a0a0',
+            border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 14, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <Lightbulb size={16} />
+            {locale === 'sk' ? 'Nápoveda' : 'Hint'} {hintIdx >= 0 ? `(${hintIdx + 1}/${effectiveHints.length})` : ''}
+          </button>
+        )}
+      </div>
+
+      {/* Hints */}
+      {hintIdx >= 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {effectiveHints.slice(0, hintIdx + 1).map((h, i) => (
+            <div key={i} style={{ padding: '12px 16px', background: '#1a1a1a', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', fontSize: 14, color: '#bbb' }}>
+              <span style={{ color: '#f59e0b', fontWeight: 600, marginRight: 8 }}>{locale === 'sk' ? 'Nápoveda' : 'Hint'} {i + 1}:</span>
+              {h.text}
+              {h.code && <pre style={{ marginTop: 8, padding: '8px 12px', background: '#111', borderRadius: 6, color: '#22c55e', fontSize: 13 }}>{h.code}</pre>}
+            </div>
+          ))}
+          {hintIdx >= effectiveHints.length - 1 && !showSolution && (
+            <button onClick={() => setShowSolution(true)} style={{
+              padding: '10px 20px', background: 'transparent', color: '#666', border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: 8, fontSize: 13, cursor: 'pointer', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 6,
+            }}><Eye size={14} /> {locale === 'sk' ? 'Zobraziť odpoveď' : 'Show answer'}</button>
+          )}
+          {showSolution && (
+            <div style={{ padding: 16, background: '#111', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+              <pre style={{ color: '#22c55e', fontSize: 13, whiteSpace: 'pre-wrap' }}>{blanks.map(b => b.answer).join(', ')}</pre>
+            </div>
+          )}
+        </div>
+      )}
+
       {res === 'ok' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ padding: 16, background: '#22c55e15', borderRadius: 12, border: '1px solid #22c55e40', display: 'flex', alignItems: 'center', gap: 12 }}>
           <Check size={20} color="#22c55e" />
@@ -256,7 +304,9 @@ function WriteCodeView({ step, onComplete, locale, onVariables }: {
   step: ProjectStep; onComplete: () => void; locale: string;
   onVariables: (v: Record<string, any>) => void;
 }) {
-  const [code, setCode] = useState(step.starterCode || '');
+  // Clean starter code — replace ___ placeholders with comment
+  const cleanStarter = (s: string) => s.replace(/__{3,}/g, '# tvoj kód tu');
+  const [code, setCode] = useState(cleanStarter(step.starterCode || ''));
   const [hintIdx, setHintIdx] = useState(-1);
   const [showSolution, setShowSolution] = useState(false);
   const [testResults, setTestResults] = useState<{ desc: string; passed: boolean }[] | null>(null);
@@ -297,7 +347,7 @@ function WriteCodeView({ step, onComplete, locale, onVariables }: {
 
   // Reset when step changes
   useEffect(() => {
-    setCode(step.starterCode || '');
+    setCode(cleanStarter(step.starterCode || ''));
     setHintIdx(-1); setShowSolution(false); setTestResults(null); setAllPassed(false); setError(null);
   }, [step.id]);
 
@@ -420,9 +470,9 @@ function WriteCodeView({ step, onComplete, locale, onVariables }: {
 // ═══════════════════════════════════════════════════
 // SIDEBAR
 // ═══════════════════════════════════════════════════
-function ProgressSidebar({ project, completedSteps, currentGlobalIdx, onSelectStep }: {
+function ProgressSidebar({ project, completedSteps, currentGlobalIdx, onSelectStep, onUnlockStep, locale }: {
   project: InteractiveProject; completedSteps: Set<string>; currentGlobalIdx: number;
-  onSelectStep: (gi: number) => void;
+  onSelectStep: (gi: number) => void; onUnlockStep: (gi: number) => void; locale: string;
 }) {
   const allSteps = getAllSteps(project);
   let gi = 0;
@@ -437,16 +487,16 @@ function ProgressSidebar({ project, completedSteps, currentGlobalIdx, onSelectSt
             {items.map(({ gIdx, step }) => {
               const done = completedSteps.has(step.id);
               const active = gIdx === currentGlobalIdx;
-              const locked = gIdx > 0 && !completedSteps.has(allSteps[gIdx - 1]?.step.id) && !active;
+              const locked = gIdx > 0 && !completedSteps.has(allSteps[gIdx - 1]?.step.id) && !active && !done;
               return (
-                <button key={step.id} onClick={() => !locked && onSelectStep(gIdx)} disabled={locked} style={{
+                <button key={step.id} onClick={() => locked ? onUnlockStep(gIdx) : onSelectStep(gIdx)} style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px',
-                  border: 'none', cursor: locked ? 'default' : 'pointer',
+                  border: 'none', cursor: 'pointer',
                   background: active ? 'rgba(255,255,255,0.05)' : 'transparent',
                   borderLeft: active ? '3px solid #22c55e' : '3px solid transparent',
-                  color: locked ? '#333' : done ? '#22c55e' : active ? '#fff' : '#888', fontSize: 13, textAlign: 'left',
+                  color: locked ? '#444' : done ? '#22c55e' : active ? '#fff' : '#888', fontSize: 13, textAlign: 'left',
                 }}>
-                  {done ? <CheckCircle2 size={16} color="#22c55e" /> : locked ? <Lock size={14} /> : <StepIcon type={step.type} size={14} />}
+                  {done ? <CheckCircle2 size={16} color="#22c55e" /> : locked ? <Lock size={14} color="#444" /> : <StepIcon type={step.type} size={14} />}
                   <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{step.title}</span>
                 </button>
               );
@@ -478,29 +528,29 @@ export default function ProjectPage() {
   const project = getProject(id as string);
   const allSteps = project ? getAllSteps(project) : [];
 
+  // Track completedLessons length to detect rehydration
+  const completedCount2 = completedLessons.length;
+
   const completedSteps = useMemo(() => {
     const set = new Set<string>();
     if (!project) return set;
     allSteps.forEach(({ step }) => { if (completedLessons.includes(compKey(project.id, step.id))) set.add(step.id); });
     return set;
-  }, [project, completedLessons]);
+  }, [project, completedCount2]);
 
-  const firstIncomplete = allSteps.findIndex(({ step }) => !completedSteps.has(step.id));
-  const [currentGlobalIdx, setCurrentGlobalIdx] = useState(Math.max(0, firstIncomplete));
-
-  // Restore position after rehydration
-  useEffect(() => {
-    const fi = allSteps.findIndex(({ step }) => !completedSteps.has(step.id));
-    if (fi > 0) setCurrentGlobalIdx(fi);
-  }, [completedSteps.size]);
+  const [currentGlobalIdx, setCurrentGlobalIdx] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [previewVars, setPreviewVars] = useState<Record<string, any>>({});
-  const contentDivRef = { current: null as HTMLDivElement | null };
-
-  // Scroll to top when step changes
-  useEffect(() => {
-    if (contentDivRef.current) contentDivRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+  const [unlockConfirm, setUnlockConfirm] = useState<number | null>(null);
+  const contentRef = useCallback((node: HTMLDivElement | null) => {
+    if (node) node.scrollTo({ top: 0 });
   }, [currentGlobalIdx]);
+
+  // Restore position after rehydration — jump to first incomplete step
+  useEffect(() => {
+    const fi = allSteps.findIndex(({ step }) => !completedSteps.has(step.id));
+    setCurrentGlobalIdx(fi >= 0 ? fi : allSteps.length - 1);
+  }, [completedSteps.size]);
 
   if (!project) return (
     <div style={{ padding: 40, textAlign: 'center' }}>
@@ -555,11 +605,13 @@ export default function ProjectPage() {
         {/* Sidebar */}
         <div className="project-sidebar" style={{ display: sidebarOpen ? 'block' : undefined }}>
           <ProgressSidebar project={project} completedSteps={completedSteps} currentGlobalIdx={currentGlobalIdx}
-            onSelectStep={(gi) => { setCurrentGlobalIdx(gi); setSidebarOpen(false); }} />
+            onSelectStep={(gi) => { setCurrentGlobalIdx(gi); setSidebarOpen(false); }}
+            onUnlockStep={(gi) => setUnlockConfirm(gi)}
+            locale={locale} />
         </div>
 
         {/* Main content */}
-        <div ref={(el) => { contentDivRef.current = el; }} style={{ flex: 1, overflow: 'auto', padding: '24px 20px 120px', minWidth: 0 }}>
+        <div ref={contentRef} style={{ flex: 1, overflow: 'auto', padding: '24px 20px 120px', minWidth: 0 }}>
           <div style={{ maxWidth: 720 }}>
             {currentStep && !isComplete && (
               <AnimatePresence mode="wait">
@@ -620,6 +672,42 @@ export default function ProjectPage() {
         </div>
       </div>
 
+      {/* Unlock confirmation dialog */}
+      {unlockConfirm !== null && (
+        <div className="unlock-overlay" onClick={() => setUnlockConfirm(null)}>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#1a1a1a', borderRadius: 16, padding: 24, maxWidth: 340, width: '90%', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
+              {locale === 'sk' ? 'Odomknúť krok?' : 'Unlock step?'}
+            </h3>
+            <p style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.5 }}>
+              {locale === 'sk' ? 'Preskočíš predchádzajúce kroky. Najviac sa naučíš keď ich prejdeš postupne.' : 'You will skip previous steps. You learn the most by going through them in order.'}
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setUnlockConfirm(null)} style={{
+                flex: 1, padding: '12px', borderRadius: 10, background: '#222', color: '#aaa',
+                border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13,
+              }}>{locale === 'sk' ? 'Zostať tu' : 'Stay here'}</button>
+              <button onClick={() => {
+                // Mark all previous steps as completed
+                if (project) {
+                  for (let i = 0; i < unlockConfirm; i++) {
+                    const key = compKey(project.id, allSteps[i].step.id);
+                    if (!completedLessons.includes(key)) completeLesson(key, 0);
+                  }
+                }
+                setCurrentGlobalIdx(unlockConfirm);
+                setUnlockConfirm(null);
+              }} style={{
+                flex: 1, padding: '12px', borderRadius: 10, background: '#22c55e', color: '#000',
+                border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: 13,
+              }}>{locale === 'sk' ? 'Odomknúť' : 'Unlock'}</button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       <style>{`
         .project-sidebar { display: none; }
         .project-preview { display: none; }
@@ -632,6 +720,7 @@ export default function ProjectPage() {
           .project-preview { display: block !important; }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .unlock-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 400; display: flex; align-items: center; justify-content: center; }
         .spin { animation: spin 1s linear infinite; }
         .theory-content p { margin: 0 0 8px; }
         .theory-content h1 { font-size: 22px; font-weight: 700; color: #fff; margin: 20px 0 8px; }

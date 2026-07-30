@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       customerId: customer.id,
     });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error('Stripe subscription error:', err);
+    return NextResponse.json({ error: err.message || 'Stripe error' }, { status: 500 });
   }
 }

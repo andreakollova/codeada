@@ -508,7 +508,7 @@ export default function ProjectPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0F0F0F' }}>
+    <div className="project-page-root" style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0F0F0F' }}>
       <StatusBar />
 
       {/* Header */}
@@ -606,6 +606,9 @@ export default function ProjectPage() {
       </div>
 
       <style>{`
+        @media (min-width: 900px) {
+          .project-page-root { margin-left: 200px; }
+        }
         .project-sidebar { display: none; }
         .project-preview { display: none; }
         .mobile-only-btn { display: block; }

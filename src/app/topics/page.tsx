@@ -7,7 +7,7 @@ import { projectTopics } from '@/data/myprojects-topics';
 import { projects as interactiveProjects } from '@/data/projects/index';
 import StatusBar from '@/components/StatusBar';
 import { useRouter } from 'next/navigation';
-import { Check, ChevronRight, ArrowLeft, BookOpen, Code, PenTool, Lightbulb, X, Zap, Trophy } from 'lucide-react';
+import { Check, ChevronRight, ArrowLeft, BookOpen, Code, PenTool, Lightbulb, X, Zap, Trophy, Calculator, KeyRound, ListTodo } from 'lucide-react';
 import { useLocaleStore } from '@/store/localeStore';
 import { s } from '@/data/strings';
 import type { Exercise, InteractiveProject } from '@/types';
@@ -509,9 +509,11 @@ export default function TopicsPage() {
                 >
                   <div style={{
                     width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `${proj.color}15`, fontSize: 22, flexShrink: 0,
+                    background: `${proj.color}15`, flexShrink: 0,
                   }}>
-                    {proj.icon}
+                    {proj.id === 'calculator' && <Calculator size={22} color={proj.color} />}
+                    {proj.id === 'password-generator' && <KeyRound size={22} color={proj.color} />}
+                    {proj.id === 'todo-list' && <ListTodo size={22} color={proj.color} />}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: '#eee', marginBottom: 2 }}>
@@ -534,15 +536,7 @@ export default function TopicsPage() {
           </div>
         </div>
 
-        {/* ═══ TOPIC EXERCISES (old system) ═══ */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <Code size={16} color="#888" />
-          <h2 style={{ fontWeight: 700, fontSize: 16, color: '#aaa', margin: 0 }}>
-            {locale === 'sk' ? 'Cvičenia' : 'Exercises'}
-          </h2>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, display: 'none' }}>
           {projectTopics.map((topic, i) => {
             const done = topic.lessons.flatMap(l => l.exercises).filter(e =>
               completedLessons.includes(topic.id + '-' + e.id)

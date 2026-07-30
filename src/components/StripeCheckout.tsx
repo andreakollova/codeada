@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
-function CheckoutForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) {
+function CheckoutForm({ onSuccess, onCancel, isSetup }: { onSuccess: () => void; onCancel: () => void; isSetup?: boolean }) {
   const stripe = useStripe();
   const elements = useElements();
   const { locale } = useLocaleStore();
@@ -23,7 +23,9 @@ function CheckoutForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel
     setLoading(true);
     setError('');
 
-    const { error: submitError } = await stripe.confirmPayment({
+    // Use confirmSetup for trial (SetupIntent) or confirmPayment for immediate charge
+    const confirmFn = isSetup ? stripe.confirmSetup : stripe.confirmPayment;
+    const { error: submitError } = await confirmFn({
       elements,
       confirmParams: {
         return_url: `${window.location.origin}/?payment=success`,
@@ -79,10 +81,12 @@ export default function StripeCheckout({
   clientSecret,
   onSuccess,
   onCancel,
+  isSetup,
 }: {
   clientSecret: string;
   onSuccess: () => void;
   onCancel: () => void;
+  isSetup?: boolean;
 }) {
   if (!clientSecret) return null;
 
@@ -104,7 +108,7 @@ export default function StripeCheckout({
         },
       }}
     >
-      <CheckoutForm onSuccess={onSuccess} onCancel={onCancel} />
+      <CheckoutForm onSuccess={onSuccess} onCancel={onCancel} isSetup={isSetup} />
     </Elements>
   );
 }

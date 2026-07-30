@@ -80,6 +80,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
   const [promoError, setPromoError] = useState('');
   const [clientSecret, setClientSecret] = useState('');
   const [showCheckout, setShowCheckout] = useState(false);
+  const [isSetupIntent, setIsSetupIntent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const sk = locale === 'sk';
@@ -304,6 +305,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                 const data = await res.json();
                 if (data.clientSecret) {
                   setClientSecret(data.clientSecret);
+                  setIsSetupIntent(data.type === 'setup');
                   setShowCheckout(true);
                 } else if (data.error) {
                   setError(data.error);
@@ -342,6 +344,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
             clientSecret={clientSecret}
             onSuccess={() => window.location.replace('/')}
             onCancel={() => { setShowCheckout(false); setClientSecret(''); }}
+            isSetup={isSetupIntent}
           />
         </div>
       )}

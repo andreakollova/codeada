@@ -487,6 +487,12 @@ export default function ProjectPage() {
 
   const firstIncomplete = allSteps.findIndex(({ step }) => !completedSteps.has(step.id));
   const [currentGlobalIdx, setCurrentGlobalIdx] = useState(Math.max(0, firstIncomplete));
+
+  // Restore position after rehydration
+  useEffect(() => {
+    const fi = allSteps.findIndex(({ step }) => !completedSteps.has(step.id));
+    if (fi > 0) setCurrentGlobalIdx(fi);
+  }, [completedSteps.size]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [previewVars, setPreviewVars] = useState<Record<string, any>>({});
   const contentDivRef = { current: null as HTMLDivElement | null };

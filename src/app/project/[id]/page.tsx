@@ -426,7 +426,7 @@ function ProgressSidebar({ project, completedSteps, currentGlobalIdx, onSelectSt
   const allSteps = getAllSteps(project);
   let gi = 0;
   return (
-    <div style={{ width: 260, minHeight: '100%', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '20px 0', overflowY: 'auto', flexShrink: 0 }}>
+    <div style={{ width: 220, minHeight: '100%', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '20px 0', overflowY: 'auto', flexShrink: 0 }}>
       {project.sections.map((sec, si) => {
         const start = gi;
         const items = sec.steps.map((_, sti) => ({ gIdx: gi++, step: sec.steps[sti] }));
@@ -544,7 +544,7 @@ export default function ProjectPage() {
         </div>
 
         {/* Main content */}
-        <div ref={(el) => { contentDivRef.current = el; }} style={{ flex: 1, overflow: 'auto', padding: '32px 40px 120px', minWidth: 0 }}>
+        <div ref={(el) => { contentDivRef.current = el; }} style={{ flex: 1, overflow: 'auto', padding: '24px 20px 120px', minWidth: 0 }}>
           <div style={{ maxWidth: 720 }}>
             {currentStep && !isComplete && (
               <AnimatePresence mode="wait">
@@ -606,17 +606,15 @@ export default function ProjectPage() {
       </div>
 
       <style>{`
-        @media (min-width: 900px) {
-          .project-page-root { margin-left: 200px; }
-        }
         .project-sidebar { display: none; }
         .project-preview { display: none; }
         .mobile-only-btn { display: block; }
-        @media (min-width: 768px) {
+        @media (min-width: 900px) {
+          .project-page-root { margin-left: 200px; }
           .project-sidebar { display: block !important; }
           .mobile-only-btn { display: none !important; }
         }
-        @media (min-width: 1100px) {
+        @media (min-width: 1200px) {
           .project-preview { display: block !important; }
         }
         @keyframes spin { to { transform: rotate(360deg); } }

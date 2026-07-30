@@ -467,6 +467,14 @@ export default function ProjectPage() {
   const { completeLesson, completedLessons } = useUserStore();
   const { locale } = useLocaleStore();
 
+  // Hide main nav on project page — project has its own sidebar
+  useEffect(() => {
+    document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => (el as HTMLElement).style.display = 'none');
+    return () => {
+      document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => (el as HTMLElement).style.display = '');
+    };
+  }, []);
+
   const project = getProject(id as string);
   const allSteps = project ? getAllSteps(project) : [];
 
@@ -509,7 +517,7 @@ export default function ProjectPage() {
   };
 
   return (
-    <div className="project-page-root" style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0F0F0F' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0F0F0F' }}>
       <StatusBar />
 
       {/* Header */}
@@ -611,7 +619,6 @@ export default function ProjectPage() {
         .project-preview { display: none; }
         .mobile-only-btn { display: block; }
         @media (min-width: 900px) {
-          .project-page-root { padding-left: 200px; }
           .project-sidebar { display: block !important; }
           .mobile-only-btn { display: none !important; }
         }

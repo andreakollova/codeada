@@ -25,6 +25,39 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ========== Theme variables ========== */
+:root {
+  --bg: #0F0F0F;
+  --bg-card: #0a0a0a;
+  --bg-surface: #111;
+  --bg-raised: #1a1a1a;
+  --bg-input: #0a0a0a;
+  --text: #EDEDED;
+  --text-secondary: #aaa;
+  --text-hint: #888;
+  --text-dim: #555;
+  --border: #1a1a1a;
+  --border-light: rgba(255,255,255,0.08);
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.08);
+}
+
+[data-theme="light"] {
+  --bg: #F5F5F7;
+  --bg-card: #FFFFFF;
+  --bg-surface: #F0F0F2;
+  --bg-raised: #E8E8EC;
+  --bg-input: #FFFFFF;
+  --text: #1A1A1A;
+  --text-secondary: #555;
+  --text-hint: #888;
+  --text-dim: #bbb;
+  --border: #E0E0E0;
+  --border-light: rgba(0,0,0,0.08);
+  --green: #16a34a;
+  --green-bg: rgba(22,163,74,0.08);
+}
+
 html {
   overflow: hidden;
   width: 100vw;
@@ -32,8 +65,8 @@ html {
 }
 
 body {
-  background-color: #0F0F0F;
-  color: #EDEDED;
+  background-color: var(--bg);
+  color: var(--text);
   font-family: -apple-system, 'SF Pro Text', 'SF Pro', system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.6;
@@ -340,3 +373,16 @@ a { color: inherit; text-decoration: none; }
   }
   h1 { font-size: 18px !important; }
 }
+
+/* ========== Light Mode Overrides ========== */
+[data-theme="light"] body { background-color: var(--bg); color: var(--text); }
+[data-theme="light"] .page-shell { background: var(--bg) !important; }
+[data-theme="light"] .desktop-nav { background: var(--bg-card) !important; border-color: var(--border) !important; }
+[data-theme="light"] .desktop-nav-logo { border-color: var(--border) !important; }
+[data-theme="light"] .desktop-nav-item { color: var(--text-hint) !important; }
+[data-theme="light"] .desktop-nav-item:hover { color: var(--text) !important; background: var(--bg-surface) !important; }
+[data-theme="light"] .desktop-nav-item.active { color: var(--text) !important; background: var(--bg-raised) !important; }
+[data-theme="light"] .mobile-nav { background: rgba(255,255,255,0.85) !important; border-color: var(--border) !important; }
+[data-theme="light"] .code-block { background: #1e1e2e !important; }
+[data-theme="light"] .panel-shadow { box-shadow: 0 8px 40px rgba(0,0,0,0.1), 0 1px 0 rgba(0,0,0,0.04) inset; }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }

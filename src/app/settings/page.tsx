@@ -7,7 +7,7 @@ import { useLocaleStore } from '@/store/localeStore';
 import { getSupabase } from '@/lib/supabase';
 import StatusBar from '@/components/StatusBar';
 import AuthModal from '@/components/AuthModal';
-import { LogIn, LogOut, Globe, User, Trash2, ChevronRight } from 'lucide-react';
+import { LogIn, LogOut, Globe, User, Trash2, ChevronRight, Sun, Moon } from 'lucide-react';
 
 export default function SettingsPage() {
   const { locale, toggle } = useLocaleStore();
@@ -18,11 +18,14 @@ export default function SettingsPage() {
   const [nameVal, setNameVal] = useState(name || '');
   const [notifOn, setNotifOn] = useState(true);
   const [isApp, setIsApp] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
     setNotifOn(localStorage.getItem('coduy-notifications') !== 'off');
-    // Detect Capacitor app
     setIsApp(!!(window as any).Capacitor?.isNativePlatform?.());
+    // Load saved theme
+    const saved = localStorage.getItem('coduy-theme') as 'dark' | 'light' | null;
+    if (saved) { setTheme(saved); document.documentElement.setAttribute('data-theme', saved); }
   }, []);
 
   useEffect(() => {
@@ -131,8 +134,34 @@ export default function SettingsPage() {
               </span>
             </button>
 
+            {/* Theme */}
+            <div style={{ borderTop: '1px solid var(--border-light, #111)', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {theme === 'dark' ? <Moon size={16} color="var(--text-hint, #888)" /> : <Sun size={16} color="var(--text-hint, #888)" />}
+                <span style={{ fontSize: 14, color: 'var(--text, #ccc)', fontWeight: 500 }}>
+                  {locale === 'sk' ? 'Režim' : 'Theme'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', background: 'var(--bg-surface, #111)', borderRadius: 8, padding: 2 }}>
+                {(['dark', 'light'] as const).map(t => (
+                  <button key={t} onClick={() => {
+                    setTheme(t);
+                    localStorage.setItem('coduy-theme', t);
+                    document.documentElement.setAttribute('data-theme', t);
+                  }} style={{
+                    padding: '6px 14px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                    background: theme === t ? 'var(--bg-raised, #1a1a1a)' : 'transparent',
+                    color: theme === t ? 'var(--text, #fff)' : 'var(--text-dim, #555)',
+                    fontSize: 12, fontWeight: 600,
+                  }}>
+                    {t === 'dark' ? (locale === 'sk' ? 'Tmavý' : 'Dark') : (locale === 'sk' ? 'Svetlý' : 'Light')}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Name */}
-            <div style={{ borderTop: '1px solid #111' }}>
+            <div style={{ borderTop: '1px solid var(--border-light, #111)' }}>
               {editName ? (
                 <div style={{ padding: '10px 16px', display: 'flex', gap: 8 }}>
                   <input

@@ -121,8 +121,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const lang = isSk ? 'sk' : 'en';
 
   return (
-    <html lang={lang}>
+    <html lang={lang} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('coduy-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}` }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="alternate" hrefLang="en" href="https://coduy.com" />

@@ -70,16 +70,48 @@ function downloadCode(filename: string, code: string) {
 function TheoryView({ step, onComplete, locale }: { step: ProjectStep; onComplete: () => void; locale: string }) {
   const rendered = useMemo(() => {
     if (!step.theoryContent) return '';
-    return step.theoryContent
-      .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="code-block"><code>$2</code></pre>')
-      .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-      .replace(/\n\n/g, '<br/><br/>');
+    let md = step.theoryContent;
+
+    // Tables — parse before other replacements
+    md = md.replace(/((?:\|.+\|\n)+)/g, (tableBlock) => {
+      const rows = tableBlock.trim().split('\n').filter(r => r.includes('|'));
+      const parsed = rows.map(r => r.split('|').filter(Boolean).map(c => c.trim()));
+      // Skip separator row (|---|---|)
+      const dataRows = parsed.filter(r => !r.every(c => /^[-:]+$/.test(c)));
+      if (dataRows.length === 0) return '';
+      const header = dataRows[0];
+      const body = dataRows.slice(1);
+      return '<table class="md-table"><thead><tr>' + header.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>' + body.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+    });
+
+    // Code blocks
+    md = md.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="code-block"><code>$2</code></pre>');
+    // Inline code
+    md = md.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+    // Headings
+    md = md.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    md = md.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    md = md.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+    // Bold
+    md = md.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    // Lists
+    md = md.replace(/^- (.+)$/gm, '<li>$1</li>');
+    md = md.replace(/((?:<li>.*<\/li>\s*)+)/g, '<ul>$1</ul>');
+    // Paragraphs — single newlines between non-block elements
+    md = md.replace(/\n\n/g, '</p><p>');
+    md = '<p>' + md + '</p>';
+    // Clean up empty paragraphs
+    md = md.replace(/<p>\s*<\/p>/g, '');
+    md = md.replace(/<p>\s*(<h[123]>)/g, '$1');
+    md = md.replace(/(<\/h[123]>)\s*<\/p>/g, '$1');
+    md = md.replace(/<p>\s*(<pre)/g, '$1');
+    md = md.replace(/(<\/pre>)\s*<\/p>/g, '$1');
+    md = md.replace(/<p>\s*(<table)/g, '$1');
+    md = md.replace(/(<\/table>)\s*<\/p>/g, '$1');
+    md = md.replace(/<p>\s*(<ul>)/g, '$1');
+    md = md.replace(/(<\/ul>)\s*<\/p>/g, '$1');
+
+    return md;
   }, [step.theoryContent]);
 
   return (
@@ -448,6 +480,12 @@ export default function ProjectPage() {
   const [currentGlobalIdx, setCurrentGlobalIdx] = useState(Math.max(0, firstIncomplete));
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [previewVars, setPreviewVars] = useState<Record<string, any>>({});
+  const contentDivRef = { current: null as HTMLDivElement | null };
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    if (contentDivRef.current) contentDivRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentGlobalIdx]);
 
   if (!project) return (
     <div style={{ padding: 40, textAlign: 'center' }}>
@@ -478,8 +516,8 @@ export default function ProjectPage() {
         <button onClick={() => router.push('/topics')} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: 4 }}>
           <ArrowLeft size={20} />
         </button>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{project.icon} {project.title}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{project.title}</div>
           <div style={{ fontSize: 12, color: '#555' }}>{completedCount}/{totalSteps} {locale === 'sk' ? 'krokov' : 'steps'}</div>
         </div>
         <div style={{ width: 120, height: 6, background: '#1a1a1a', borderRadius: 3, overflow: 'hidden' }}>
@@ -506,7 +544,7 @@ export default function ProjectPage() {
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '32px 40px 120px' }}>
+        <div ref={(el) => { contentDivRef.current = el; }} style={{ flex: 1, overflow: 'auto', padding: '32px 40px 120px', minWidth: 0 }}>
           <div style={{ maxWidth: 720 }}>
             {currentStep && !isComplete && (
               <AnimatePresence mode="wait">
@@ -580,15 +618,21 @@ export default function ProjectPage() {
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         .spin { animation: spin 1s linear infinite; }
-        .theory-content h1 { font-size: 22px; font-weight: 700; color: #fff; margin: 24px 0 12px; }
-        .theory-content h2 { font-size: 18px; font-weight: 600; color: #eee; margin: 20px 0 10px; }
-        .theory-content h3 { font-size: 16px; font-weight: 600; color: #ddd; margin: 16px 0 8px; }
-        .theory-content ul { padding-left: 20px; margin: 8px 0; }
-        .theory-content li { margin: 4px 0; color: #bbb; }
+        .theory-content p { margin: 0 0 8px; }
+        .theory-content h1 { font-size: 22px; font-weight: 700; color: #fff; margin: 20px 0 8px; }
+        .theory-content h1:first-child { margin-top: 0; }
+        .theory-content h2 { font-size: 18px; font-weight: 600; color: #eee; margin: 16px 0 6px; }
+        .theory-content h3 { font-size: 16px; font-weight: 600; color: #ddd; margin: 14px 0 4px; }
+        .theory-content ul { padding-left: 20px; margin: 4px 0 8px; }
+        .theory-content li { margin: 2px 0; color: #bbb; }
         .theory-content strong { color: #fff; }
-        .theory-content .code-block { background: #1a1a1a; border-radius: 10px; padding: 16px 20px; margin: 12px 0; overflow-x: auto; border: 1px solid rgba(255,255,255,0.06); }
+        .theory-content .code-block { background: #1a1a1a; border-radius: 10px; padding: 16px 20px; margin: 8px 0; overflow-x: auto; border: 1px solid rgba(255,255,255,0.06); }
         .theory-content .code-block code { color: #22c55e; font-family: var(--font-mono); font-size: 13px; white-space: pre; }
         .theory-content .inline-code { background: #1a1a1a; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; color: #22c55e; }
+        .theory-content .md-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+        .theory-content .md-table th { padding: 8px 12px; text-align: left; font-weight: 600; color: #fff; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); font-size: 13px; }
+        .theory-content .md-table td { padding: 8px 12px; color: #bbb; border: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
+        .theory-content .md-table .inline-code { font-size: 12px; }
       `}</style>
     </div>
   );

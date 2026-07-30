@@ -536,7 +536,7 @@ export default function TopicsPage() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, display: 'none' }}>
+        <div style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, display: 'none' }}>
           {projectTopics.map((topic, i) => {
             const done = topic.lessons.flatMap(l => l.exercises).filter(e =>
               completedLessons.includes(topic.id + '-' + e.id)

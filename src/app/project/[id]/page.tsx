@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
-import { getProject } from '@/data/projects';
+import { getProject } from '@/data/projects/index';
 import { usePyodide } from '@/hooks/usePyodide';
 import StatusBar from '@/components/StatusBar';
 import Link from 'next/link';

@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { projectTopics } from '@/data/myprojects-topics';
-import { projects as interactiveProjects } from '@/data/projects';
+import { projects as interactiveProjects } from '@/data/projects/index';
 import StatusBar from '@/components/StatusBar';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, ArrowLeft, BookOpen, Code, PenTool, Lightbulb, X, Zap, Trophy } from 'lucide-react';

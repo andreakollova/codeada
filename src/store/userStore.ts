@@ -161,6 +161,7 @@ export const useUserStore = create<UserState & UserActions>()(
         const s = get();
         if (!s.userId) return;
         try {
+          const pushToken = typeof window !== 'undefined' ? localStorage.getItem('coduy-push-token') : null;
           await supabase.from('user_state').upsert({
             user_id: s.userId,
             display_name: s.name || 'User',
@@ -170,6 +171,7 @@ export const useUserStore = create<UserState & UserActions>()(
             badges: s.badges, weekly_xp: s.weeklyXp, week_start_date: s.weekStartDate,
             owned_items: s.ownedItems, equipment: s.equipment,
             selected_topics: s.selectedTopics, coffees: s.coffees, fav_drink: s.favDrink,
+            ...(pushToken ? { push_token: pushToken } : {}),
           });
         } catch {}
       },

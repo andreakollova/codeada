@@ -103,20 +103,21 @@ export default function DeepLinkHandler() {
             try { await PushNotifications.register(); } catch {}
           }
 
-          // Listen for token and save to Supabase
+          // Listen for token and save to localStorage + Supabase
           try {
             await PushNotifications.addListener('registration', async (token) => {
               console.log('Push token:', token.value);
+              // Always save to localStorage so syncToSupabase can include it
+              localStorage.setItem('coduy-push-token', token.value);
+              // Try to save to Supabase directly too
               const sb = getSupabase();
               if (!sb) return;
-              const { data: { user } } = await sb.auth.getUser();
-              if (user) {
-                // Save token to user_state (where push/send reads from)
-                await sb.from('user_state').upsert({
-                  user_id: user.id,
-                  push_token: token.value,
-                }, { onConflict: 'user_id' });
-              }
+              try {
+                const { data: { user } } = await sb.auth.getUser();
+                if (user) {
+                  await sb.from('user_state').update({ push_token: token.value }).eq('user_id', user.id);
+                }
+              } catch {}
             });
 
             await PushNotifications.addListener('registrationError', (err) => {

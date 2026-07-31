@@ -36,10 +36,10 @@ export default function StatusBar() {
           </div>
         </div>
 
-        {/* Center: Logo (mobile only) */}
-        <div className="mobile-logo-center" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+        {/* Center: Logo (mobile only) — tap to go home */}
+        <Link href="/" className="mobile-logo-center" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <img src="/logocoduy.png" alt="Coduy" style={{ height: 18, objectFit: 'contain' }} />
-        </div>
+        </Link>
 
         {/* Right: Settings */}
         <Link href="/settings" style={{ display: 'flex' }}>

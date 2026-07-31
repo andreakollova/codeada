@@ -281,18 +281,29 @@ export default function WidgetTip() {
             ))}
           </div>
 
-          {/* Phone mockup */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              initial={{ x: 60, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -60, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            >
-              <PhoneMockup step={step} />
-            </motion.div>
-          </AnimatePresence>
+          {/* Phone mockup — swipeable */}
+          <motion.div
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.3}
+            onDragEnd={(_, info) => {
+              if (info.offset.x < -50 && step < 3) setStep(step + 1);
+              if (info.offset.x > 50 && step > 0) setStep(step - 1);
+            }}
+            style={{ width: '100%', display: 'flex', justifyContent: 'center', touchAction: 'pan-y' }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ x: 60, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -60, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              >
+                <PhoneMockup step={step} />
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
 
           {/* Title + description */}
           <AnimatePresence mode="wait">

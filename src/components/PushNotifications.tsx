@@ -22,10 +22,7 @@ export default function PushNotificationHandler() {
           return;
         }
 
-        // Register for push
-        await PushNotifications.register();
-
-        // Get token and save to DB
+        // Listen for token BEFORE registering (avoids race condition)
         PushNotifications.addListener('registration', async (token) => {
           console.log('Push token:', token.value);
           // Save token to server
@@ -43,6 +40,9 @@ export default function PushNotificationHandler() {
         PushNotifications.addListener('registrationError', (error) => {
           console.log('Push registration error:', error);
         });
+
+        // Register AFTER listeners are set up
+        await PushNotifications.register();
 
         // Handle received notification while app is open
         PushNotifications.addListener('pushNotificationReceived', (notification) => {

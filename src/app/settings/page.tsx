@@ -247,8 +247,22 @@ export default function SettingsPage() {
                   {locale === 'sk' ? 'Push notifikácie' : 'Push notifications'}
                 </span>
                 <div
-                  onClick={() => {
+                  onClick={async () => {
                     const next = !notifOn;
+                    if (next && (window as any).Capacitor) {
+                      try {
+                        const { PushNotifications } = await import('@capacitor/push-notifications');
+                        const perm = await PushNotifications.checkPermissions();
+                        if (perm.receive === 'prompt') {
+                          const r = await PushNotifications.requestPermissions();
+                          if (r.receive !== 'granted') return;
+                        } else if (perm.receive === 'denied') {
+                          window.open('app-settings:', '_system');
+                          return;
+                        }
+                        await PushNotifications.register();
+                      } catch {}
+                    }
                     setNotifOn(next);
                     localStorage.setItem('coduy-notifications', next ? 'on' : 'off');
                   }}

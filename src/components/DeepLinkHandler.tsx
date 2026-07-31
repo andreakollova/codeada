@@ -119,10 +119,17 @@ export default function DeepLinkHandler() {
           const hasSession = sb3 ? (await sb3.auth.getSession()).data.session : null;
 
           if (hasSession) {
-            // Already logged in — register immediately if permitted
+            // Already logged in — ask permission if needed, then register
             const perm = await PushNotifications.checkPermissions();
             if (perm.receive === 'granted') {
               await PushNotifications.register();
+            } else if (perm.receive === 'prompt') {
+              setTimeout(async () => {
+                try {
+                  const r = await PushNotifications.requestPermissions();
+                  if (r.receive === 'granted') await PushNotifications.register();
+                } catch {}
+              }, 3000);
             }
           } else if (sb3) {
             // Wait for login, then ask permission

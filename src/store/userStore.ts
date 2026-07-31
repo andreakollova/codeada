@@ -176,9 +176,11 @@ export const useUserStore = create<UserState & UserActions>()(
 
       loadFromSupabase: async () => {
         const s = get();
-        if (!s.userId) return;
+        console.log('[loadFromSupabase] userId:', s.userId, 'name:', s.name);
+        if (!s.userId) { console.log('[loadFromSupabase] NO userId, skipping'); return; }
         try {
-          const { data } = await supabase.from('user_state').select('*').eq('user_id', s.userId).single();
+          const { data, error } = await supabase.from('user_state').select('*').eq('user_id', s.userId).single();
+          console.log('[loadFromSupabase] data:', data?.display_name, 'error:', error?.message);
           if (!data) return;
 
           // Only load from server if server has more progress (more completed lessons)

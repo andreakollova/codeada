@@ -74,11 +74,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     };
 
     sb.auth.getSession().then(({ data }) => {
+      console.log('[AuthGate] getSession:', data.session?.user?.email);
       if (data.session?.user) {
         handleUser(data.session.user);
-        // Delay to let Zustand persist rehydrate from localStorage first
-        // Otherwise loadFromSupabase data gets overwritten by empty rehydration
-        setTimeout(() => loadFromSupabase(), 800);
+        setTimeout(() => {
+          console.log('[AuthGate] calling loadFromSupabase');
+          loadFromSupabase();
+        }, 800);
       }
       setChecking(false);
     });

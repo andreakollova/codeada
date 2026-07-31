@@ -355,7 +355,7 @@ export default function SettingsPage() {
           onClick={handleDeleteData}
           style={{
             padding: '10px 14px', borderRadius: 10,
-            background: 'none', border: '1px solid #1a1a1a',
+            background: 'none', border: 'none',
             display: 'flex', alignItems: 'center', gap: 8,
             cursor: 'pointer', color: '#555', fontSize: 11, fontWeight: 500,
             opacity: 0.6,

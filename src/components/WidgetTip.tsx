@@ -12,6 +12,12 @@ export function triggerWidgetWizard() { openWidgetWizard?.(); }
 
 const STEPS = [
   {
+    titleSk: 'Slovo dňa na tvojej ploche',
+    titleEn: 'Word of the Day on your Home Screen',
+    descSk: 'Každý deň nový programátorský pojem priamo na ploche tvojho iPhonu. Učenie bez otvárania apky.',
+    descEn: 'A new programming term every day right on your iPhone Home Screen. Learn without opening the app.',
+  },
+  {
     titleSk: 'Dlho drž na ploche',
     titleEn: 'Long press on Home Screen',
     descSk: 'Drž prst na prázdnom mieste na ploche tvojho iPhonu, kým sa ikonky nezačnú triasť.',
@@ -24,10 +30,10 @@ const STEPS = [
     descEn: 'Tap "Edit" in the top left corner, then tap "Add Widget".',
   },
   {
-    titleSk: 'Hľadaj Coduy',
-    titleEn: 'Search for Coduy',
-    descSk: 'Do vyhľadávania napíš "Coduy", vyber veľkosť widgetu a pridaj ho na plochu.',
-    descEn: 'Type "Coduy" in the search bar, pick a widget size, and add it to your Home Screen.',
+    titleSk: 'Hľadaj Coduy a vyber veľkosť',
+    titleEn: 'Search Coduy and pick a size',
+    descSk: 'Do vyhľadávania napíš "Coduy", vyber malý alebo stredný widget a pridaj ho na plochu.',
+    descEn: 'Type "Coduy" in the search bar, choose small or medium widget, and add it to your Home Screen.',
   },
 ];
 
@@ -44,13 +50,44 @@ function PhoneMockup({ step }: { step: number }) {
 
       {/* Screen content */}
       <div style={{ padding: '36px 14px 14px', height: '100%', boxSizing: 'border-box' }}>
+        {/* Step 0: Intro — widget preview */}
         {step === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 16, paddingBottom: 40 }}
+          >
+            {/* Large widget preview */}
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                width: 180, background: '#111', borderRadius: 20, padding: 14,
+                border: '1px solid #222', boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <img src="/logocoduy.png" alt="" style={{ height: 12, opacity: 0.5 }} />
+                <div style={{ width: 24, height: 24, borderRadius: 12, border: '1.5px solid rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 4, height: 4, borderRadius: 2, background: '#fff', margin: '0 1px' }} />
+                  <div style={{ width: 4, height: 4, borderRadius: 2, background: '#fff', margin: '0 1px' }} />
+                </div>
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 4 }}>API</div>
+              <div style={{ fontSize: 10, color: '#4ade80', marginBottom: 6 }}>Application Programming Interface</div>
+              <div style={{ fontSize: 9, color: '#999', lineHeight: 1.4 }}>A set of rules that lets apps talk to each other.</div>
+              <div style={{ fontSize: 7, color: '#555', marginTop: 8, textTransform: 'uppercase', letterSpacing: 1 }}>Word of the Day</div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Step 1: Long press */}
+        {step === 1 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 8 }}
           >
-            {/* Fake app icons jiggling */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
               {Array.from({ length: 12 }, (_, i) => (
                 <motion.div
@@ -69,24 +106,23 @@ function PhoneMockup({ step }: { step: number }) {
                 </motion.div>
               ))}
             </div>
-            {/* Pulsing finger */}
             <motion.div
               animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              style={{ position: 'absolute', bottom: 100, left: '50%', transform: 'translateX(-50)', fontSize: 40 }}
+              style={{ position: 'absolute', bottom: 100, left: '50%', transform: 'translateX(-50%)', fontSize: 40 }}
             >
               👆
             </motion.div>
           </motion.div>
         )}
 
-        {step === 1 && (
+        {/* Step 2: Edit → Add Widget */}
+        {step === 2 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 20 }}
           >
-            {/* Edit button */}
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 1.2, repeat: Infinity }}
@@ -97,7 +133,6 @@ function PhoneMockup({ step }: { step: number }) {
             >
               Upraviť
             </motion.div>
-            {/* Add widget button */}
             <motion.div
               animate={{ scale: [1, 1.08, 1], boxShadow: ['0 0 0 rgba(74,222,128,0)', '0 0 20px rgba(74,222,128,0.3)', '0 0 0 rgba(74,222,128,0)'] }}
               transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
@@ -113,52 +148,53 @@ function PhoneMockup({ step }: { step: number }) {
           </motion.div>
         )}
 
-        {step === 2 && (
+        {/* Step 3: Search + pick size */}
+        {step === 3 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 8 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 8 }}
           >
-            {/* Search bar */}
             <div style={{
               background: '#2a2a2a', borderRadius: 10, padding: '8px 12px',
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <Search size={14} color="#888" />
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                style={{ color: '#fff', fontSize: 13, fontWeight: 500 }}
-              >
-                Coduy
-              </motion.span>
+              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+                style={{ color: '#fff', fontSize: 13, fontWeight: 500 }}>Coduy</motion.span>
             </div>
-            {/* Widget preview */}
+            {/* Size options */}
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 8 }}>
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                style={{
+                  width: 70, height: 70, borderRadius: 16, background: '#111',
+                  border: '2px solid #22c55e', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center', gap: 2,
+                }}
+              >
+                <div style={{ fontSize: 8, fontWeight: 800, color: '#fff' }}>API</div>
+                <div style={{ fontSize: 5, color: '#4ade80' }}>Small</div>
+              </motion.div>
+              <motion.div
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                style={{
+                  width: 110, height: 70, borderRadius: 16, background: '#111',
+                  border: '1px solid #333', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center', gap: 2,
+                }}
+              >
+                <div style={{ fontSize: 8, fontWeight: 800, color: '#fff' }}>API</div>
+                <div style={{ fontSize: 5, color: '#888' }}>Medium</div>
+              </motion.div>
+            </div>
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
-              style={{
-                background: '#111', borderRadius: 16, padding: 12,
-                border: '1px solid #222',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <img src="/logocoduy.png" alt="" style={{ height: 10, opacity: 0.5 }} />
-                <div style={{ width: 20, height: 20, borderRadius: 10, border: '1.5px solid rgba(255,255,255,0.5)' }} />
-              </div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>API</div>
-              <div style={{ fontSize: 9, color: '#4ade80', marginTop: 2 }}>Application Programming Interface</div>
-              <div style={{ fontSize: 7, color: '#666', marginTop: 4 }}>WORD OF THE DAY</div>
-            </motion.div>
-            {/* Add button */}
-            <motion.div
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 1.2, repeat: Infinity, delay: 1.5 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
               style={{
                 background: '#22c55e', borderRadius: 12, padding: '10px',
-                color: '#000', fontSize: 12, fontWeight: 700, textAlign: 'center',
+                color: '#000', fontSize: 12, fontWeight: 700, textAlign: 'center', marginTop: 8,
               }}
             >
               Pridať widget
@@ -200,7 +236,7 @@ export default function WidgetTip() {
   };
 
   const next = () => {
-    if (step < 2) {
+    if (step < 3) {
       setStep(step + 1);
     } else {
       dismiss();
@@ -235,7 +271,7 @@ export default function WidgetTip() {
 
           {/* Step indicator */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 32 }}>
-            {[0, 1, 2].map(i => (
+            {[0, 1, 2, 3].map(i => (
               <div key={i} style={{
                 width: i === step ? 24 : 8, height: 8, borderRadius: 4,
                 background: i === step ? '#22c55e' : '#333',
@@ -286,16 +322,16 @@ export default function WidgetTip() {
               display: 'flex', alignItems: 'center', gap: 8,
             }}
           >
-            {step < 2
+            {step < 3
               ? (sk ? 'Ďalej' : 'Next')
               : (sk ? 'Hotovo' : 'Done')
             }
-            {step < 2 && <ChevronRight size={16} strokeWidth={3} />}
+            {step < 3 && <ChevronRight size={16} strokeWidth={3} />}
           </motion.button>
 
           {/* Step number */}
           <p style={{ fontSize: 12, color: '#555', marginTop: 16 }}>
-            {step + 1} / 3
+            {step + 1} / 4
           </p>
         </motion.div>
       )}

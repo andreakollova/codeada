@@ -111,11 +111,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     if (isApp) {
       // Google blocks OAuth in WKWebView — must use SFSafariViewController
+      // Flow: SFSafariVC → Google → Supabase → coduy.com/auth/callback?from=app
+      //   → middleware redirects to coduy://auth/callback?code=xxx
+      //   → iOS catches deep link, opens app, DeepLinkHandler exchanges code
       const origin = window.location.origin;
       const { data } = await sb.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${origin}/auth/callback`,
+          redirectTo: `${origin}/auth/callback?from=app`,
           skipBrowserRedirect: true,
           queryParams: { prompt: 'select_account' },
         },

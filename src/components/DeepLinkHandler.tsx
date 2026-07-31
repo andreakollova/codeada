@@ -13,27 +13,37 @@ async function processAuthCallback(url: string) {
   isProcessingAuthCallback = true;
 
   try {
-    const hash = url.split('#')[1] ?? '';
-    const params = new URLSearchParams(hash);
-
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
-
-    if (!accessToken || !refreshToken) {
-      throw new Error('OAuth callback missing tokens');
-    }
-
     const sb = getSupabase();
     if (!sb) throw new Error('Supabase not initialized');
 
-    const { error } = await sb.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
+    // Try PKCE flow first (code in query params)
+    const queryStr = url.split('?')[1]?.split('#')[0] ?? '';
+    const queryParams = new URLSearchParams(queryStr);
+    const code = queryParams.get('code');
 
-    if (error) throw error;
+    if (code) {
+      // PKCE: exchange code for session
+      const { error } = await sb.auth.exchangeCodeForSession(code);
+      if (error) throw error;
+      console.log('exchangeCodeForSession: OK');
+    } else {
+      // Implicit flow fallback: tokens in hash fragment
+      const hash = url.split('#')[1] ?? '';
+      const hashParams = new URLSearchParams(hash);
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
 
-    console.log('setSession: OK');
+      if (!accessToken || !refreshToken) {
+        throw new Error('OAuth callback missing code and tokens');
+      }
+
+      const { error } = await sb.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      if (error) throw error;
+      console.log('setSession: OK');
+    }
 
     // Close the Safari/SFSafariViewController browser window
     try {

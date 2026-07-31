@@ -74,15 +74,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       }
     };
 
-    sb.auth.getSession().then(({ data }) => {
+    sb.auth.getSession().then(async ({ data }) => {
       if (data.session?.user) {
         handleUser(data.session.user);
-        setTimeout(() => loadFromSupabase(), 500);
+        await loadFromSupabase();
       }
       setChecking(false);
     });
 
-    const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         setAuthed(false);
         return;
@@ -90,7 +90,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         handleUser(session.user, event);
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          setTimeout(() => loadFromSupabase(), 500);
+          await loadFromSupabase();
         }
       }
     });

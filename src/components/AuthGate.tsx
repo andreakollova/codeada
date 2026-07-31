@@ -256,13 +256,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           </div>
           <p style={{ fontSize: 15, color: '#fff', fontWeight: 700, marginBottom: 4, marginTop: 12 }}>
             {locale === 'sk'
-              ? 'Registruj sa teraz zadarmo.'
-              : 'Register now for free.'}
+              ? 'Prihlás sa alebo sa zaregistruj zadarmo.'
+              : 'Sign in or register for free.'}
           </p>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 28, lineHeight: 1.6 }}>
             {locale === 'sk'
-              ? 'Prihlásenie je potrebné na ukladanie tvojho progressu.'
-              : 'Sign in to save your progress across all devices.'}
+              ? 'Tvoj progres sa uloží naprieč všetkými zariadeniami.'
+              : 'Your progress is saved across all devices.'}
           </p>
         </motion.div>
 

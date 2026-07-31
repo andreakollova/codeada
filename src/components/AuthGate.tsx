@@ -285,6 +285,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 <Mail size={16} />
                 {locale === 'sk' ? 'Pokračovať s emailom' : 'Continue with email'}
               </button>
+
+              <p style={{ textAlign: 'center', fontSize: 12, color: '#555', marginTop: 16 }}>
+                {locale === 'sk' ? 'Máš už účet? ' : 'Already have an account? '}
+                <button
+                  onClick={() => setStep('email')}
+                  style={{ background: 'none', border: 'none', color: '#22c55e', fontSize: 12, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  {locale === 'sk' ? 'Prihlásiť sa' : 'Sign in'}
+                </button>
+              </p>
             </motion.div>
           )}
 

@@ -42,6 +42,8 @@ export default function SettingsPage() {
     localStorage.removeItem('coduy-user');
     localStorage.removeItem('coduy-path');
     localStorage.removeItem('coduy-locale');
+    localStorage.removeItem('coduy-last-auth-code');
+    localStorage.removeItem('coduy-sb-auth');
     window.location.href = '/';
   };
 

@@ -83,7 +83,16 @@ export default function DeepLinkHandler() {
 
         const launchUrl = await App.getLaunchUrl();
         if (launchUrl?.url) {
-          void processAuthCallback(launchUrl.url);
+          // Only process if we haven't already processed this code
+          const processedKey = 'coduy-last-auth-code';
+          const codeMatch = launchUrl.url.match(/[?&]code=([^&#]+)/);
+          const code = codeMatch?.[1];
+          if (code && localStorage.getItem(processedKey) === code) {
+            // Already processed this code, skip
+          } else {
+            if (code) localStorage.setItem(processedKey, code);
+            void processAuthCallback(launchUrl.url);
+          }
         }
 
         // Request push notification permission

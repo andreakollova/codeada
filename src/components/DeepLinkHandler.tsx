@@ -106,7 +106,7 @@ export default function DeepLinkHandler() {
                 await fetch('/api/push/register', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ userId: user.id, token: token.value, locale: localStorage.getItem('coduy-locale') || 'en' }),
+                  body: JSON.stringify({ userId: user.id, token: token.value, locale: (() => { try { return JSON.parse(localStorage.getItem('coduy-locale') || '{}').state?.locale || 'en'; } catch { return 'en'; } })() }),
                 });
                 console.log('Push token saved via API');
               }

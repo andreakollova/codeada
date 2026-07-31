@@ -79,7 +79,6 @@ import BottomNav from '@/components/BottomNav';
 import LocaleInit from '@/components/LocaleInit';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
 import LightModeOverride from '@/components/LightModeOverride';
-import PushNotificationHandler from '@/components/PushNotifications';
 import ProRewardModal from '@/components/ProRewardModal';
 import WidgetTip from '@/components/WidgetTip';
 import AuthGate from '@/components/AuthGate';
@@ -142,7 +141,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Analytics />
         <DeepLinkHandler />
         <LightModeOverride />
-        <PushNotificationHandler />
         <ProRewardModal />
         <WidgetTip />
         <script dangerouslySetInnerHTML={{ __html: `

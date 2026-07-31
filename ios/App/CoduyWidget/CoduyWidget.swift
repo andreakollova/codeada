@@ -24,7 +24,7 @@ struct Provider: TimelineProvider {
         let isPro = shared0?.bool(forKey: "coduy-pro") ?? false
         let urlStr = isPro ? "https://www.coduy.com/api/widget?pro=true" : "https://www.coduy.com/api/widget"
         guard let url = URL(string: urlStr) else {
-            let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code", isPro: true)
+            let entry = GlossaryTimelineEntry(date: Date(), term: "Coduy", definition: "", detail: "Learn to code", isPro: true, streak: 0)
             completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600))))
             return
         }

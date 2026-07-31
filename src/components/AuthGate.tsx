@@ -110,6 +110,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         options: {
           redirectTo: 'coduy://auth/callback',
           skipBrowserRedirect: true,
+          queryParams: { prompt: 'select_account' },
         },
       });
       if (data?.url) {

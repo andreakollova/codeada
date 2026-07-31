@@ -219,6 +219,7 @@ export const useUserStore = create<UserState & UserActions>()(
         }
       },
       partialize: (s) => ({
+        userId: s.userId,
         xp: s.xp, gems: s.gems, hearts: s.hearts, streak: s.streak,
         lastActiveDate: s.lastActiveDate, byteMood: s.byteMood,
         byteBattery: s.byteBattery, completedLessons: s.completedLessons,

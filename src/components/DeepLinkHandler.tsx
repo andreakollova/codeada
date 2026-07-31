@@ -90,18 +90,45 @@ export default function DeepLinkHandler() {
           void processAuthCallback(launchUrl.url);
         }
 
-        // Request push notification permission
+        // Request push notification permission — only after user is logged in
+        const sb = getSupabase();
+        const waitForAuth = async () => {
+          if (!sb) return;
+          const { data } = await sb.auth.getSession();
+          if (!data.session) {
+            // Not logged in yet — wait for auth state change
+            sb.auth.onAuthStateChange(async (event) => {
+              if (event === 'SIGNED_IN') {
+                // Delay 3s after login so user sees the app first
+                setTimeout(async () => {
+                  try {
+                    const { PushNotifications } = await import('@capacitor/push-notifications');
+                    const perm = await PushNotifications.checkPermissions();
+                    if (perm.receive === 'prompt') {
+                      const result = await PushNotifications.requestPermissions();
+                      if (result.receive === 'granted') await PushNotifications.register();
+                    } else if (perm.receive === 'granted') {
+                      await PushNotifications.register();
+                    }
+                  } catch {}
+                }, 3000);
+              }
+            });
+            return;
+          }
+          // Already logged in — just register if already permitted
+          try {
+            const { PushNotifications } = await import('@capacitor/push-notifications');
+            const permStatus = await PushNotifications.checkPermissions();
+            if (permStatus.receive === 'granted') {
+              await PushNotifications.register();
+            }
+          } catch {}
+        };
+        await waitForAuth();
+
         try {
           const { PushNotifications } = await import('@capacitor/push-notifications');
-          const permStatus = await PushNotifications.checkPermissions();
-          if (permStatus.receive === 'prompt') {
-            const result = await PushNotifications.requestPermissions();
-            if (result.receive === 'granted') {
-              try { await PushNotifications.register(); } catch {}
-            }
-          } else if (permStatus.receive === 'granted') {
-            try { await PushNotifications.register(); } catch {}
-          }
 
           // Listen for token and save to localStorage + Supabase
           try {

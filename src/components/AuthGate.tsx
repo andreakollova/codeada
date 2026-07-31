@@ -107,16 +107,36 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const sb = getSupabase();
     if (!sb) return;
 
-    // Standard web redirect for both app and web — no SFSafariViewController
-    // With all Google domains in allowNavigation, OAuth stays in the webview
-    const origin = window.location.origin;
-    await sb.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-        queryParams: { prompt: 'select_account' },
-      },
-    });
+    const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
+
+    if (isApp) {
+      // Capacitor: use SFSafariViewController (supports biometric/passkey auth)
+      // Redirect goes to coduy:// deep link → DeepLinkHandler exchanges PKCE code
+      const { data } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: 'coduy://auth/callback',
+          skipBrowserRedirect: true,
+        },
+      });
+      if (data?.url) {
+        try {
+          const { Browser } = await import('@capacitor/browser');
+          await Browser.open({ url: data.url });
+        } catch {
+          window.open(data.url, '_blank');
+        }
+      }
+    } else {
+      // Web: standard redirect
+      const origin = window.location.origin;
+      await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${origin}/auth/callback`,
+        },
+      });
+    }
   };
 
   const handleSendOtp = async () => {

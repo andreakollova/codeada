@@ -35,11 +35,12 @@ export default function NameModal() {
   // Wait for Supabase data to load before showing onboarding
   // This prevents the flash of onboarding for existing users
   useEffect(() => {
-    const timer = setTimeout(() => setReady(true), 1200);
+    const timer = setTimeout(() => setReady(true), 2000);
     return () => clearTimeout(timer);
   }, []);
 
-  if (name || !ready) return null;
+  // Don't show onboarding if: user already has name, still loading, or no userId yet
+  if (name || !ready || !userId) return null;
 
   const handleNameSubmit = () => {
     if (!value.trim()) return;

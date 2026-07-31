@@ -21,7 +21,7 @@ export default function StatusBar() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 44 }}>
 
         {/* Left: Streak + XP */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <Flame size={14} color={streak > 0 ? '#EDEDED' : '#3A3A3A'} fill={streak > 0 ? '#EDEDED' : 'none'} />
             <span style={{ fontWeight: 600, fontSize: 13, color: streak > 0 ? '#EDEDED' : '#3A3A3A' }}>
@@ -34,6 +34,11 @@ export default function StatusBar() {
               {xp.toLocaleString()} XP
             </span>
           </div>
+        </div>
+
+        {/* Center: Logo (mobile only) */}
+        <div className="mobile-logo-center" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+          <img src="/logocoduy.png" alt="Coduy" style={{ height: 14, objectFit: 'contain' }} />
         </div>
 
         {/* Right: Settings */}

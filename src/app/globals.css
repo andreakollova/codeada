@@ -214,6 +214,7 @@ a { color: inherit; text-decoration: none; }
 
 @media (min-width: 900px) {
   .mobile-nav { display: none !important; }
+  .mobile-logo-center { display: none !important; }
 }
 
 /* ========== Dashboard grid ========== */

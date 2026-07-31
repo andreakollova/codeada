@@ -322,6 +322,20 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: '10px 14px', borderRadius: 10,
+            background: 'none', border: '1px solid #1a1a1a',
+            display: 'flex', alignItems: 'center', gap: 8,
+            cursor: 'pointer', color: '#888', fontSize: 11, fontWeight: 500,
+          }}
+        >
+          <LogOut size={12} />
+          {locale === 'sk' ? 'Odhlásiť sa' : 'Log out'}
+        </button>
+
         {/* Delete data */}
         <button
           onClick={handleDeleteData}

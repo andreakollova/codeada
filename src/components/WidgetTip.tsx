@@ -12,10 +12,10 @@ export function triggerWidgetWizard() { openWidgetWizard?.(); }
 
 const STEPS = [
   {
-    titleSk: 'Slovo dňa na tvojej ploche',
-    titleEn: 'Word of the Day on your Home Screen',
-    descSk: 'Každý deň nový programátorský pojem priamo na ploche tvojho iPhonu. Učenie bez otvárania apky.',
-    descEn: 'A new programming term every day right on your iPhone Home Screen. Learn without opening the app.',
+    titleSk: 'Pridaj si Coduy widget',
+    titleEn: 'Add the Coduy widget',
+    descSk: 'Nový programátorský pojem každý deň priamo na tvojej ploche. Stačia 3 jednoduché kroky.',
+    descEn: 'A new programming term every day right on your Home Screen. Just 3 simple steps.',
   },
   {
     titleSk: 'Dlho drž na ploche',
@@ -255,8 +255,9 @@ export default function WidgetTip() {
             background: 'rgba(0,0,0,0.92)',
             backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
             display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
+            alignItems: 'center',
             padding: '40px 24px',
+            overflowY: 'auto', justifyContent: 'safe center',
           }}
         >
           {/* Close */}
@@ -311,28 +312,46 @@ export default function WidgetTip() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Next / Done button */}
-          <motion.button
-            onClick={next}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              marginTop: 32, padding: '14px 40px', borderRadius: 14,
-              background: '#22c55e', color: '#000', fontWeight: 700, fontSize: 15,
-              border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}
-          >
-            {step < 3
-              ? (sk ? 'Ďalej' : 'Next')
-              : (sk ? 'Hotovo' : 'Done')
-            }
-            {step < 3 && <ChevronRight size={16} strokeWidth={3} />}
-          </motion.button>
+          {/* Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 32 }}>
+            <motion.button
+              onClick={next}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                padding: '14px 40px', borderRadius: 14,
+                background: '#22c55e', color: '#000', fontWeight: 700, fontSize: 15,
+                border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}
+            >
+              {step === 0
+                ? (sk ? 'Ako na to?' : 'Show me how')
+                : step < 3
+                  ? (sk ? 'Ďalej' : 'Next')
+                  : (sk ? 'Hotovo' : 'Done')
+              }
+              {step > 0 && step < 3 && <ChevronRight size={16} strokeWidth={3} />}
+            </motion.button>
+
+            {step === 0 && (
+              <button
+                onClick={dismiss}
+                style={{
+                  background: 'none', border: 'none', color: '#555', fontSize: 13,
+                  cursor: 'pointer', fontWeight: 500, padding: '8px 16px',
+                }}
+              >
+                {sk ? 'Teraz nie' : 'Not now'}
+              </button>
+            )}
+          </div>
 
           {/* Step number */}
-          <p style={{ fontSize: 12, color: '#555', marginTop: 16 }}>
-            {step + 1} / 4
-          </p>
+          {step > 0 && (
+            <p style={{ fontSize: 12, color: '#555', marginTop: 16 }}>
+              {step} / 3
+            </p>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

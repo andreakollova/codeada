@@ -155,6 +155,32 @@ export default function DeepLinkHandler() {
         } catch (e) {
           console.log('Push notification setup:', e);
         }
+
+        // Fallback: AppDelegate injects token into localStorage as 'coduy-push-token'
+        // Poll for it in case Capacitor JS listener didn't fire
+        const pollToken = setInterval(async () => {
+          const nativeToken = localStorage.getItem('coduy-push-token');
+          if (!nativeToken) return;
+          clearInterval(pollToken);
+          console.log('Push token from native fallback:', nativeToken);
+          try {
+            const sbFallback = getSupabase();
+            const user = sbFallback ? (await sbFallback.auth.getUser()).data.user : null;
+            if (user) {
+              const res = await fetch('/api/push/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, token: nativeToken, locale: (() => { try { return JSON.parse(localStorage.getItem('coduy-locale') || '{}').state?.locale || 'en'; } catch { return 'en'; } })() }),
+              });
+              console.log('Push token fallback save:', res.ok ? 'OK' : res.status);
+            }
+          } catch (e) {
+            console.log('Push token fallback error:', e);
+          }
+        }, 3000);
+        // Stop polling after 30s
+        setTimeout(() => clearInterval(pollToken), 30000);
+
       } catch (e) {
         console.log('DeepLinkHandler init error:', e);
       }

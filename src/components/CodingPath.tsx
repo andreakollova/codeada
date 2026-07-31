@@ -117,6 +117,7 @@ export default function CodingPath() {
     return null;
   });
   const nextLessonRef = useRef<HTMLDivElement>(null);
+  const pathHeaderRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [unlockModal, setUnlockModal] = useState<{ lessonId: number; title: string; step: 1 | 2 } | null>(null);
 
@@ -141,6 +142,10 @@ export default function CodingPath() {
     const open: Record<number, boolean> = {};
     dbModules.forEach(m => { open[m.id] = true; });
     setOpenModules(open);
+    // Scroll to path header after render
+    setTimeout(() => {
+      pathHeaderRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const toggleModule = (id: number) =>
@@ -256,7 +261,7 @@ export default function CodingPath() {
     <div>
       {/* Path hero */}
       {activePath && (
-        <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+        <div ref={pathHeaderRef} style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 16, padding: 24, marginBottom: 20, scrollMarginTop: 80 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <Byte mood="happy" size={72} equipment={activePath.equipment} />
             <div style={{ flex: 1 }}>

@@ -107,34 +107,17 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const sb = getSupabase();
     if (!sb) return;
 
-    const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
-
-    if (isApp) {
-      const { data } = await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: 'coduy://auth/callback',
-          skipBrowserRedirect: true,
-          queryParams: { prompt: 'select_account' },
-        },
-      });
-      if (data?.url) {
-        // Use window.open to trigger SFSafariViewController via Capacitor
-        // Adding a small delay fixes blank page rendering issue
-        setTimeout(() => {
-          window.open(data.url, '_blank');
-        }, 100);
-      }
-    } else {
-      const origin = window.location.origin;
-      await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${origin}/auth/callback`,
-          queryParams: { prompt: 'select_account' },
-        },
-      });
-    }
+    // Same web redirect flow for both app and web
+    // Capacitor webview loads coduy.com so standard redirect works
+    // Google OAuth opens in the webview, callback returns to /auth/callback page
+    const origin = window.location.origin;
+    await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+        queryParams: { prompt: 'select_account' },
+      },
+    });
   };
 
   const handleSendOtp = async () => {

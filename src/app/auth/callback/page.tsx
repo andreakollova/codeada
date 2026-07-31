@@ -1,41 +1,40 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase';
 
 export default function AuthCallback() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   useEffect(() => {
-    const sb = getSupabase();
-    if (!sb) { router.push('/'); return; }
+    const handleCallback = async () => {
+      const sb = getSupabase();
+      if (!sb) { window.location.replace('/'); return; }
 
-    const fromApp = searchParams.get('from') === 'app';
+      // PKCE flow: exchange code for session
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
 
-    // Get the session from URL hash (Supabase puts tokens in hash fragment)
-    sb.auth.getSession().then(({ data }) => {
-      if (fromApp && data.session) {
-        // Redirect immediately to app via custom URL scheme
-        // This will open the app and Safari browser will dismiss
-        window.location.replace(
-          `coduy://auth?access_token=${data.session.access_token}&refresh_token=${data.session.refresh_token}`
-        );
-        return;
+      if (code) {
+        try {
+          await sb.auth.exchangeCodeForSession(code);
+        } catch (e) {
+          console.log('Code exchange error:', e);
+        }
       }
-      router.push('/');
-    });
+
+      // Redirect to home
+      window.location.replace('/');
+    };
+
+    handleCallback();
   }, []);
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#000',
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center', gap: 12,
+      minHeight: '100vh', background: '#0F0F0F',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: '#666', fontSize: 14,
     }}>
-      <p style={{ color: '#888', fontSize: 14 }}>Signing you in...</p>
-      <p style={{ color: '#555', fontSize: 11 }}>Returning to Coduy app...</p>
+      Signing in...
     </div>
   );
 }

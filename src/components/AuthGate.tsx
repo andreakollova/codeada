@@ -116,7 +116,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       if (data?.url) {
         try {
           const { Browser } = await import('@capacitor/browser');
-          await Browser.open({ url: data.url, presentationStyle: 'popover' });
+          await Browser.open({ url: data.url, presentationStyle: 'fullscreen' });
         } catch (e) {
           console.log('Browser.open error:', e);
         }

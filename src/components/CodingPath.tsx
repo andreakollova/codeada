@@ -57,7 +57,7 @@ const PATHS: CharacterPath[] = [
     id: 'ai-pilot',
     titleEn: 'The AI Pilot',
     titleSk: 'AI Pilot',
-    subtitleEn: 'I want to understand AI and vibe coding.',
+    subtitleEn: 'I want to understand AI and vibecoding.',
     subtitleSk: 'Chcem rozumieť AI a vibecodingu.',
     descEn: 'Learn enough Python to work with AI tools effectively.',
     descSk: 'Nauč sa dosť Pythonu na efektívnu prácu s AI nástrojmi.',

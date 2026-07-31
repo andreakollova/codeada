@@ -260,6 +260,23 @@ export default function SettingsPage() {
                           window.open('app-settings:', '_system');
                           return;
                         }
+                        // Add listener before register to catch token
+                        await PushNotifications.addListener('registration', async (token) => {
+                          console.log('Push token from settings:', token.value);
+                          localStorage.setItem('coduy-push-token', token.value);
+                          try {
+                            const sb = getSupabase();
+                            const user = sb ? (await sb.auth.getUser()).data.user : null;
+                            if (user) {
+                              await fetch('/api/push/register', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ userId: user.id, token: token.value, locale }),
+                              });
+                              console.log('Push token saved via settings toggle');
+                            }
+                          } catch {}
+                        });
                         await PushNotifications.register();
                       } catch {}
                     }

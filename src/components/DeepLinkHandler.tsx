@@ -98,14 +98,17 @@ export default function DeepLinkHandler() {
           await PushNotifications.addListener('registration', async (token) => {
             console.log('Push token:', token.value);
             localStorage.setItem('coduy-push-token', token.value);
-            // Save directly to Supabase
-            const sb2 = getSupabase();
-            if (!sb2) return;
+            // Save via API route (uses service role, bypasses RLS)
             try {
-              const { data: { user } } = await sb2.auth.getUser();
+              const sb2 = getSupabase();
+              const user = sb2 ? (await sb2.auth.getUser()).data.user : null;
               if (user) {
-                await sb2.from('user_state').update({ push_token: token.value }).eq('user_id', user.id);
-                console.log('Push token saved to Supabase');
+                await fetch('/api/push/register', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ userId: user.id, token: token.value, locale: localStorage.getItem('coduy-locale') || 'en' }),
+                });
+                console.log('Push token saved via API');
               }
             } catch {}
           });

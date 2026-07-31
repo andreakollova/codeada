@@ -107,17 +107,37 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const sb = getSupabase();
     if (!sb) return;
 
-    // Same web redirect flow for both app and web
-    // Capacitor webview loads coduy.com so standard redirect works
-    // Google OAuth opens in the webview, callback returns to /auth/callback page
-    const origin = window.location.origin;
-    await sb.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-        queryParams: { prompt: 'select_account' },
-      },
-    });
+    const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
+
+    if (isApp) {
+      // Google blocks OAuth in WKWebView — must use SFSafariViewController
+      const origin = window.location.origin;
+      const { data } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${origin}/auth/callback`,
+          skipBrowserRedirect: true,
+          queryParams: { prompt: 'select_account' },
+        },
+      });
+      if (data?.url) {
+        try {
+          const { Browser } = await import('@capacitor/browser');
+          await Browser.open({ url: data.url });
+        } catch {
+          window.open(data.url, '_blank');
+        }
+      }
+    } else {
+      const origin = window.location.origin;
+      await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${origin}/auth/callback`,
+          queryParams: { prompt: 'select_account' },
+        },
+      });
+    }
   };
 
   const handleSendOtp = async () => {

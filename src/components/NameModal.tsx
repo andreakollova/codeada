@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { useLocaleStore } from '@/store/localeStore';
@@ -25,13 +25,21 @@ const PATHS = [
 ];
 
 export default function NameModal() {
-  const { name, setName, setFavDrink } = useUserStore();
+  const { name, setName, setFavDrink, userId } = useUserStore();
   const { locale } = useLocaleStore();
   const [value, setValue] = useState('');
   const [step, setStep] = useState<'name' | 'path' | 'drink' | 'done'>('name');
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
-  if (name) return null;
+  // Wait for Supabase data to load before showing onboarding
+  // This prevents the flash of onboarding for existing users
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (name || !ready) return null;
 
   const handleNameSubmit = () => {
     if (!value.trim()) return;

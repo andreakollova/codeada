@@ -90,67 +90,58 @@ export default function DeepLinkHandler() {
           void processAuthCallback(launchUrl.url);
         }
 
-        // Request push notification permission — only after user is logged in
-        const sb = getSupabase();
-        const waitForAuth = async () => {
-          if (!sb) return;
-          const { data } = await sb.auth.getSession();
-          if (!data.session) {
-            // Not logged in yet — wait for auth state change
-            sb.auth.onAuthStateChange(async (event) => {
+        // Push notifications setup
+        try {
+          const { PushNotifications } = await import('@capacitor/push-notifications');
+
+          // Register token listener FIRST (before register() fires)
+          await PushNotifications.addListener('registration', async (token) => {
+            console.log('Push token:', token.value);
+            localStorage.setItem('coduy-push-token', token.value);
+            // Save directly to Supabase
+            const sb2 = getSupabase();
+            if (!sb2) return;
+            try {
+              const { data: { user } } = await sb2.auth.getUser();
+              if (user) {
+                await sb2.from('user_state').update({ push_token: token.value }).eq('user_id', user.id);
+                console.log('Push token saved to Supabase');
+              }
+            } catch {}
+          });
+
+          await PushNotifications.addListener('registrationError', (err) => {
+            console.log('Push registration error (normal on emulator):', err);
+          });
+
+          // Now register — permission check + register
+          const sb3 = getSupabase();
+          const hasSession = sb3 ? (await sb3.auth.getSession()).data.session : null;
+
+          if (hasSession) {
+            // Already logged in — register immediately if permitted
+            const perm = await PushNotifications.checkPermissions();
+            if (perm.receive === 'granted') {
+              await PushNotifications.register();
+            }
+          } else if (sb3) {
+            // Wait for login, then ask permission
+            sb3.auth.onAuthStateChange(async (event) => {
               if (event === 'SIGNED_IN') {
-                // Delay 3s after login so user sees the app first
                 setTimeout(async () => {
                   try {
-                    const { PushNotifications } = await import('@capacitor/push-notifications');
-                    const perm = await PushNotifications.checkPermissions();
-                    if (perm.receive === 'prompt') {
-                      const result = await PushNotifications.requestPermissions();
-                      if (result.receive === 'granted') await PushNotifications.register();
-                    } else if (perm.receive === 'granted') {
+                    const p = await PushNotifications.checkPermissions();
+                    if (p.receive === 'prompt') {
+                      const r = await PushNotifications.requestPermissions();
+                      if (r.receive === 'granted') await PushNotifications.register();
+                    } else if (p.receive === 'granted') {
                       await PushNotifications.register();
                     }
                   } catch {}
                 }, 3000);
               }
             });
-            return;
           }
-          // Already logged in — just register if already permitted
-          try {
-            const { PushNotifications } = await import('@capacitor/push-notifications');
-            const permStatus = await PushNotifications.checkPermissions();
-            if (permStatus.receive === 'granted') {
-              await PushNotifications.register();
-            }
-          } catch {}
-        };
-        await waitForAuth();
-
-        try {
-          const { PushNotifications } = await import('@capacitor/push-notifications');
-
-          // Listen for token and save to localStorage + Supabase
-          try {
-            await PushNotifications.addListener('registration', async (token) => {
-              console.log('Push token:', token.value);
-              // Always save to localStorage so syncToSupabase can include it
-              localStorage.setItem('coduy-push-token', token.value);
-              // Try to save to Supabase directly too
-              const sb = getSupabase();
-              if (!sb) return;
-              try {
-                const { data: { user } } = await sb.auth.getUser();
-                if (user) {
-                  await sb.from('user_state').update({ push_token: token.value }).eq('user_id', user.id);
-                }
-              } catch {}
-            });
-
-            await PushNotifications.addListener('registrationError', (err) => {
-              console.log('Push registration error (normal on emulator):', err);
-            });
-          } catch {}
         } catch (e) {
           console.log('Push notification setup:', e);
         }

@@ -82,7 +82,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     sb.auth.getSession().then(async ({ data }) => {
       if (data.session?.user) {
         handleUser(data.session.user);
-        await loadFromSupabase();
+        // Load user data but don't block forever
+        try { await Promise.race([loadFromSupabase(), new Promise(r => setTimeout(r, 3000))]); } catch {}
       }
       setChecking(false);
     });

@@ -7,7 +7,7 @@ import { useLocaleStore } from '@/store/localeStore';
 import { getSupabase } from '@/lib/supabase';
 import StatusBar from '@/components/StatusBar';
 import AuthModal from '@/components/AuthModal';
-import { LogIn, LogOut, Globe, User, Trash2, ChevronRight, Sun, Moon } from 'lucide-react';
+import { LogIn, LogOut, Globe, User, Trash2, ChevronRight, Sun, Moon, Smartphone } from 'lucide-react';
 
 export default function SettingsPage() {
   const { locale, toggle } = useLocaleStore();
@@ -280,8 +280,8 @@ export default function SettingsPage() {
               {
                 q: locale === 'sk' ? 'Ako pridať widget na plochu? (iOS)' : 'How to add a widget? (iOS)',
                 a: locale === 'sk'
-                  ? 'Widget je dostupný na iPhone. Dlho podrž na ploche → klikni + → vyhľadaj Coduy → vyber widget → hotovo.'
-                  : 'Widget is available on iPhone. Long press on home screen → tap + → search Coduy → select widget → done.',
+                  ? 'WIDGET_WIZARD'
+                  : 'WIDGET_WIZARD',
               },
               {
                 q: locale === 'sk' ? 'Ako zrušiť predplatné?' : 'How to cancel subscription?',
@@ -301,9 +301,21 @@ export default function SettingsPage() {
                   {faq.q}
                   <ChevronRight size={14} color="#555" />
                 </summary>
-                <p style={{ padding: '0 16px 14px', color: '#888', fontSize: 13, lineHeight: 1.5, margin: 0 }}>
-                  {faq.a}
-                </p>
+                <div style={{ padding: '0 16px 14px', color: '#888', fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+                  {faq.a === 'WIDGET_WIZARD' ? (
+                    <button
+                      onClick={() => { import('@/components/WidgetTip').then(m => m.triggerWidgetWizard()); }}
+                      style={{
+                        background: '#22c55e', color: '#000', fontWeight: 700, fontSize: 13,
+                        border: 'none', borderRadius: 10, padding: '10px 18px', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 6,
+                      }}
+                    >
+                      <Smartphone size={14} />
+                      {locale === 'sk' ? 'Ukázať návod' : 'Show tutorial'}
+                    </button>
+                  ) : faq.a}
+                </div>
               </details>
             ))}
           </div>

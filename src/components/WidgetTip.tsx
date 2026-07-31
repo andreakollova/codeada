@@ -4,24 +4,193 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocaleStore } from '@/store/localeStore';
 import { useUserStore } from '@/store/userStore';
-import { X } from 'lucide-react';
+import { X, ChevronRight, Smartphone, Search, Plus } from 'lucide-react';
+
+// Exportable trigger — other components can open the wizard
+let openWidgetWizard: (() => void) | null = null;
+export function triggerWidgetWizard() { openWidgetWizard?.(); }
+
+const STEPS = [
+  {
+    titleSk: 'Dlho drž na ploche',
+    titleEn: 'Long press on Home Screen',
+    descSk: 'Drž prst na prázdnom mieste na ploche tvojho iPhonu, kým sa ikonky nezačnú triasť.',
+    descEn: 'Hold your finger on an empty area of your iPhone Home Screen until the icons start to jiggle.',
+  },
+  {
+    titleSk: 'Klikni Upraviť → Pridať widget',
+    titleEn: 'Tap Edit → Add Widget',
+    descSk: 'V ľavom hornom rohu klikni "Upraviť" a potom "Pridať widget".',
+    descEn: 'Tap "Edit" in the top left corner, then tap "Add Widget".',
+  },
+  {
+    titleSk: 'Hľadaj Coduy',
+    titleEn: 'Search for Coduy',
+    descSk: 'Do vyhľadávania napíš "Coduy", vyber veľkosť widgetu a pridaj ho na plochu.',
+    descEn: 'Type "Coduy" in the search bar, pick a widget size, and add it to your Home Screen.',
+  },
+];
+
+function PhoneMockup({ step }: { step: number }) {
+  return (
+    <div style={{
+      width: 220, height: 380, borderRadius: 32, position: 'relative',
+      background: '#1a1a1a', border: '3px solid #333',
+      overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+      margin: '0 auto',
+    }}>
+      {/* Notch */}
+      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 80, height: 22, background: '#000', borderRadius: '0 0 16px 16px', zIndex: 10 }} />
+
+      {/* Screen content */}
+      <div style={{ padding: '36px 14px 14px', height: '100%', boxSizing: 'border-box' }}>
+        {step === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 8 }}
+          >
+            {/* Fake app icons jiggling */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+              {Array.from({ length: 12 }, (_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{ rotate: [0, -2, 2, -2, 0] }}
+                  transition={{ duration: 0.3, repeat: Infinity, delay: i * 0.05 }}
+                  style={{
+                    width: 38, height: 38, borderRadius: 10,
+                    background: ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#14b8a6', '#6366f1', '#000', '#84cc16'][i],
+                    opacity: i === 10 ? 1 : 0.7,
+                  }}
+                >
+                  {i === 10 && (
+                    <img src="/logocoduy.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6 }} />
+                  )}
+                </motion.div>
+              ))}
+            </div>
+            {/* Pulsing finger */}
+            <motion.div
+              animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              style={{ position: 'absolute', bottom: 100, left: '50%', transform: 'translateX(-50)', fontSize: 40 }}
+            >
+              👆
+            </motion.div>
+          </motion.div>
+        )}
+
+        {step === 1 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 20 }}
+          >
+            {/* Edit button */}
+            <motion.div
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity }}
+              style={{
+                background: '#333', borderRadius: 14, padding: '10px 20px',
+                color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 24,
+              }}
+            >
+              Upraviť
+            </motion.div>
+            {/* Add widget button */}
+            <motion.div
+              animate={{ scale: [1, 1.08, 1], boxShadow: ['0 0 0 rgba(74,222,128,0)', '0 0 20px rgba(74,222,128,0.3)', '0 0 0 rgba(74,222,128,0)'] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+              style={{
+                background: '#22c55e', borderRadius: 14, padding: '12px 24px',
+                color: '#000', fontSize: 13, fontWeight: 700,
+                display: 'flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              <Plus size={14} strokeWidth={3} />
+              Pridať widget
+            </motion.div>
+          </motion.div>
+        )}
+
+        {step === 2 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 8 }}
+          >
+            {/* Search bar */}
+            <div style={{
+              background: '#2a2a2a', borderRadius: 10, padding: '8px 12px',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <Search size={14} color="#888" />
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                style={{ color: '#fff', fontSize: 13, fontWeight: 500 }}
+              >
+                Coduy
+              </motion.span>
+            </div>
+            {/* Widget preview */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1 }}
+              style={{
+                background: '#111', borderRadius: 16, padding: 12,
+                border: '1px solid #222',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <img src="/logocoduy.png" alt="" style={{ height: 10, opacity: 0.5 }} />
+                <div style={{ width: 20, height: 20, borderRadius: 10, border: '1.5px solid rgba(255,255,255,0.5)' }} />
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>API</div>
+              <div style={{ fontSize: 9, color: '#4ade80', marginTop: 2 }}>Application Programming Interface</div>
+              <div style={{ fontSize: 7, color: '#666', marginTop: 4 }}>WORD OF THE DAY</div>
+            </motion.div>
+            {/* Add button */}
+            <motion.div
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 1.5 }}
+              style={{
+                background: '#22c55e', borderRadius: 12, padding: '10px',
+                color: '#000', fontSize: 12, fontWeight: 700, textAlign: 'center',
+              }}
+            >
+              Pridať widget
+            </motion.div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function WidgetTip() {
   const { locale } = useLocaleStore();
   const { name } = useUserStore();
   const [show, setShow] = useState(false);
+  const [step, setStep] = useState(0);
   const sk = locale === 'sk';
 
+  // Register global trigger
   useEffect(() => {
-    // Show only in native app, after login (has name), once, after a delay
+    openWidgetWizard = () => { setStep(0); setShow(true); };
+    return () => { openWidgetWizard = null; };
+  }, []);
+
+  // Auto-show once for new users in native app
+  useEffect(() => {
     if (typeof window === 'undefined' || !(window as any).Capacitor) return;
-    // Only show on iOS (Android doesn't have Coduy widget yet)
-    if ((window as any).Capacitor?.getPlatform?.() !== 'ios') return;
     if (!name) return;
     const shown = localStorage.getItem('coduy-widget-tip');
     if (shown) return;
 
-    const timer = setTimeout(() => setShow(true), 3000);
+    const timer = setTimeout(() => { setStep(0); setShow(true); }, 5000);
     return () => clearTimeout(timer);
   }, [name]);
 
@@ -30,73 +199,104 @@ export default function WidgetTip() {
     localStorage.setItem('coduy-widget-tip', 'true');
   };
 
+  const next = () => {
+    if (step < 2) {
+      setStep(step + 1);
+    } else {
+      dismiss();
+    }
+  };
+
   return (
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           style={{
-            position: 'fixed', bottom: 90, left: 16, right: 16, zIndex: 200,
-            background: 'rgba(20,20,20,0.95)',
+            position: 'fixed', inset: 0, zIndex: 300,
+            background: 'rgba(0,0,0,0.92)',
             backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(74,222,128,0.2)',
-            borderRadius: 18, padding: '16px 18px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            padding: '40px 24px',
           }}
         >
+          {/* Close */}
           <button onClick={dismiss} style={{
-            position: 'absolute', top: 10, right: 10,
-            background: 'none', border: 'none', color: '#555', cursor: 'pointer',
+            position: 'absolute', top: 'calc(env(safe-area-inset-top, 16px) + 16px)', right: 16,
+            background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 20,
+            width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#888',
           }}>
-            <X size={14} />
+            <X size={16} />
           </button>
 
-          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            {/* Mini widget preview - matches real widget design */}
-            <div style={{
-              width: 64, height: 64, borderRadius: 16, flexShrink: 0,
-              background: 'linear-gradient(135deg, #0a0a0a, #111)',
-              border: '1px solid #222',
-              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-              padding: '7px 8px',
-              overflow: 'hidden',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <img src="/logocoduy.png" alt="" style={{ height: 8, opacity: 0.4 }} />
-                <div style={{ width: 12, height: 12, borderRadius: 6, border: '1px solid rgba(255,255,255,0.6)', position: 'relative' }}>
-                  <div style={{ width: 2, height: 2, borderRadius: 1, background: '#fff', position: 'absolute', left: 3, top: 4 }} />
-                  <div style={{ width: 2, height: 2, borderRadius: 1, background: '#fff', position: 'absolute', right: 3, top: 4 }} />
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', lineHeight: 1 }}>API</div>
-                <div style={{ fontSize: 5, color: '#4ade80', marginTop: 1 }}>Application Programming...</div>
-              </div>
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>
-                {sk ? 'Pridaj si widget' : 'Add widget to Home Screen'}
-              </p>
-              <div style={{ fontSize: 11, color: '#888', lineHeight: 1.6, margin: 0 }}>
-                {sk ? (
-                  <>
-                    <span style={{ color: '#ccc' }}>1.</span> Dlho drž na ploche iPhonu<br/>
-                    <span style={{ color: '#ccc' }}>2.</span> Klikni <span style={{ color: '#fff', fontWeight: 600 }}>Upraviť</span> → <span style={{ color: '#fff', fontWeight: 600 }}>Pridať widget</span><br/>
-                    <span style={{ color: '#ccc' }}>3.</span> Hľadaj <span style={{ color: '#4ade80', fontWeight: 600 }}>Coduy</span> → vyber veľkosť → pridaj
-                  </>
-                ) : (
-                  <>
-                    <span style={{ color: '#ccc' }}>1.</span> Long press on iPhone Home Screen<br/>
-                    <span style={{ color: '#ccc' }}>2.</span> Tap <span style={{ color: '#fff', fontWeight: 600 }}>Edit</span> → <span style={{ color: '#fff', fontWeight: 600 }}>Add Widget</span><br/>
-                    <span style={{ color: '#ccc' }}>3.</span> Search <span style={{ color: '#4ade80', fontWeight: 600 }}>Coduy</span> → pick size → add
-                  </>
-                )}
-              </div>
-            </div>
+          {/* Step indicator */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 32 }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                width: i === step ? 24 : 8, height: 8, borderRadius: 4,
+                background: i === step ? '#22c55e' : '#333',
+                transition: 'all 0.3s',
+              }} />
+            ))}
           </div>
+
+          {/* Phone mockup */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ x: 60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -60, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            >
+              <PhoneMockup step={step} />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Title + description */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              style={{ textAlign: 'center', marginTop: 28, maxWidth: 300 }}
+            >
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
+                {sk ? STEPS[step].titleSk : STEPS[step].titleEn}
+              </h3>
+              <p style={{ fontSize: 14, color: '#888', lineHeight: 1.6 }}>
+                {sk ? STEPS[step].descSk : STEPS[step].descEn}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Next / Done button */}
+          <motion.button
+            onClick={next}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              marginTop: 32, padding: '14px 40px', borderRadius: 14,
+              background: '#22c55e', color: '#000', fontWeight: 700, fontSize: 15,
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}
+          >
+            {step < 2
+              ? (sk ? 'Ďalej' : 'Next')
+              : (sk ? 'Hotovo' : 'Done')
+            }
+            {step < 2 && <ChevronRight size={16} strokeWidth={3} />}
+          </motion.button>
+
+          {/* Step number */}
+          <p style={{ fontSize: 12, color: '#555', marginTop: 16 }}>
+            {step + 1} / 3
+          </p>
         </motion.div>
       )}
     </AnimatePresence>

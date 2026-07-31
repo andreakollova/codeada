@@ -176,25 +176,25 @@ struct CoduyWidgetEntryView: View {
 
                 Spacer()
 
-                // Term
+                // Term — smaller to leave room for description
                 Text(entry.term)
-                    .font(.system(size: family == .systemSmall ? 24 : 30, weight: .heavy, design: .rounded))
+                    .font(.system(size: family == .systemSmall ? 18 : 24, weight: .heavy, design: .rounded))
                     .foregroundColor(.white)
                     .lineLimit(1)
 
                 // Full name
                 if !entry.definition.isEmpty {
                     Text(entry.definition)
-                        .font(.system(size: family == .systemSmall ? 10 : 12, weight: .semibold))
+                        .font(.system(size: family == .systemSmall ? 9 : 11, weight: .semibold))
                         .foregroundColor(Color(red: 0.29, green: 0.87, blue: 0.5))
                         .lineLimit(1)
                 }
 
-                // Description
+                // Description — more lines, slightly smaller
                 Text(entry.detail)
-                    .font(.system(size: family == .systemSmall ? 11 : 13))
+                    .font(.system(size: family == .systemSmall ? 10 : 12))
                     .foregroundColor(.white.opacity(0.7))
-                    .lineLimit(family == .systemSmall ? 3 : 4)
+                    .lineLimit(family == .systemSmall ? 4 : 5)
 
                 // Footer
                 HStack {

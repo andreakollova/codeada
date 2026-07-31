@@ -10,22 +10,24 @@ async function processAuthCallback(url: string) {
   if (!url.startsWith('coduy://auth/callback')) return;
   if (isProcessingAuthCallback) return;
 
+  // Check if we already processed this code
+  const codeMatch = url.match(/[?&]code=([^&#]+)/);
+  const code = codeMatch?.[1];
+  const processedKey = 'coduy-last-auth-code';
+  if (code && localStorage.getItem(processedKey) === code) return;
+
   isProcessingAuthCallback = true;
+  if (code) localStorage.setItem(processedKey, code);
 
   try {
     const sb = getSupabase();
     if (!sb) throw new Error('Supabase not initialized');
 
-    // Try PKCE flow first (code in query params)
-    const queryStr = url.split('?')[1]?.split('#')[0] ?? '';
-    const queryParams = new URLSearchParams(queryStr);
-    const code = queryParams.get('code');
-
     if (code) {
       // PKCE: exchange code for session
       const { error } = await sb.auth.exchangeCodeForSession(code);
       if (error) throw error;
-      console.log('exchangeCodeForSession: OK');
+      console.log('[DeepLink] exchangeCodeForSession: OK');
     } else {
       // Implicit flow fallback: tokens in hash fragment
       const hash = url.split('#')[1] ?? '';
@@ -42,19 +44,21 @@ async function processAuthCallback(url: string) {
         refresh_token: refreshToken,
       });
       if (error) throw error;
-      console.log('setSession: OK');
+      console.log('[DeepLink] setSession: OK');
     }
 
-    // Close the Safari/SFSafariViewController browser window
+    // Close SFSafariViewController — onAuthStateChange in AuthGate
+    // will automatically detect the new session, no page reload needed
     try {
       const { Browser } = await import('@capacitor/browser');
       await Browser.close();
     } catch {}
 
-    // Navigate in the main WebView - NOT location.reload()
-    window.location.replace('/');
+    // NO window.location.replace('/') — this was causing infinite reload loop!
+    // AuthGate's onAuthStateChange will pick up the session and render the app
+
   } catch (error) {
-    console.log('OAuth callback error:', error);
+    console.log('[DeepLink] OAuth callback error:', error);
     try {
       const { Browser } = await import('@capacitor/browser');
       await Browser.close();
@@ -83,16 +87,7 @@ export default function DeepLinkHandler() {
 
         const launchUrl = await App.getLaunchUrl();
         if (launchUrl?.url) {
-          // Only process if we haven't already processed this code
-          const processedKey = 'coduy-last-auth-code';
-          const codeMatch = launchUrl.url.match(/[?&]code=([^&#]+)/);
-          const code = codeMatch?.[1];
-          if (code && localStorage.getItem(processedKey) === code) {
-            // Already processed this code, skip
-          } else {
-            if (code) localStorage.setItem(processedKey, code);
-            void processAuthCallback(launchUrl.url);
-          }
+          void processAuthCallback(launchUrl.url);
         }
 
         // Request push notification permission

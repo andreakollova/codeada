@@ -10,7 +10,11 @@ const config: CapacitorConfig = {
     allowNavigation: [
       '*.supabase.co',
       '*.google.com',
+      '*.googleapis.com',
+      '*.gstatic.com',
+      '*.googleusercontent.com',
       'accounts.google.com',
+      'oauth2.googleapis.com',
       'coduy.sk',
       '*.coduy.sk',
       'coduy.com',

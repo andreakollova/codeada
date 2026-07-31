@@ -107,40 +107,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const sb = getSupabase();
     if (!sb) return;
 
-    const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
-
-    if (isApp) {
-      // Google blocks OAuth in WKWebView — must use SFSafariViewController
-      // Flow: SFSafariVC → Google → Supabase → coduy.com/auth/callback?from=app
-      //   → middleware redirects to coduy://auth/callback?code=xxx
-      //   → iOS catches deep link, opens app, DeepLinkHandler exchanges code
-      const origin = window.location.origin;
-      const { data } = await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${origin}/auth/callback?from=app`,
-          skipBrowserRedirect: true,
-          queryParams: { prompt: 'select_account' },
-        },
-      });
-      if (data?.url) {
-        try {
-          const { Browser } = await import('@capacitor/browser');
-          await Browser.open({ url: data.url });
-        } catch {
-          window.open(data.url, '_blank');
-        }
-      }
-    } else {
-      const origin = window.location.origin;
-      await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${origin}/auth/callback`,
-          queryParams: { prompt: 'select_account' },
-        },
-      });
-    }
+    // Standard web redirect for both app and web — no SFSafariViewController
+    // With all Google domains in allowNavigation, OAuth stays in the webview
+    const origin = window.location.origin;
+    await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+        queryParams: { prompt: 'select_account' },
+      },
+    });
   };
 
   const handleSendOtp = async () => {

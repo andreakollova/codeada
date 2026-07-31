@@ -52,12 +52,6 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     const handleUser = (user: any, event?: string) => {
       const newId = user.id;
-      if (userId && userId !== newId) {
-        localStorage.removeItem('coduy-user');
-        localStorage.removeItem('coduy-path');
-        window.location.reload();
-        return;
-      }
       setUserId(newId);
       setAuthed(true);
       // Notify Slack on new sign-up — check Supabase if user_state exists (not localStorage which resets)

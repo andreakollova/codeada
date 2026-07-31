@@ -66,7 +66,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         if (!localStorage.getItem(notifiedKey)) {
           localStorage.setItem(notifiedKey, 'true');
           // Only notify if user has no data in Supabase (truly new user)
-          supabase.from('user_state').select('user_id').eq('user_id', newId).maybeSingle().then(({ data: existing }) => {
+          sb.from('user_state').select('user_id').eq('user_id', newId).maybeSingle().then(({ data: existing }: any) => {
             if (!existing) {
               fetch('/api/notify', {
                 method: 'POST',

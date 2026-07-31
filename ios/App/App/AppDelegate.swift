@@ -41,6 +41,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    // Push notification token received
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        print("[Coduy] APNs token: \(token)")
+        // Save to UserDefaults for widget/extension access
+        UserDefaults(suiteName: "group.sk.coduy.app")?.set(token, forKey: "coduy-push-token")
+        // Inject into WebView localStorage so syncToSupabase picks it up
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            if let vc = self.window?.rootViewController as? CAPBridgeViewController,
+               let webView = vc.webView {
+                webView.evaluateJavaScript("localStorage.setItem('coduy-push-token', '\(token)');console.log('[Native] push token injected');", completionHandler: nil)
+            }
+        }
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("[Coduy] Push registration failed: \(error.localizedDescription)")
+    }
+
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         // Called when the app was launched with a url. Feel free to add additional processing here,
         // but if you want the App API to support tracking app url opens, make sure to keep this call

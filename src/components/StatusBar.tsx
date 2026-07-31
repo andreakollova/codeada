@@ -38,7 +38,7 @@ export default function StatusBar() {
 
         {/* Center: Logo (mobile only) */}
         <div className="mobile-logo-center" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-          <img src="/logocoduy.png" alt="Coduy" style={{ height: 14, objectFit: 'contain' }} />
+          <img src="/logocoduy.png" alt="Coduy" style={{ height: 18, objectFit: 'contain' }} />
         </div>
 
         {/* Right: Settings */}

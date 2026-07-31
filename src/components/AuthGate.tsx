@@ -60,16 +60,21 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       }
       setUserId(newId);
       setAuthed(true);
-      // Notify Slack on new sign-up
+      // Notify Slack on new sign-up — check Supabase if user_state exists (not localStorage which resets)
       if (event === 'SIGNED_IN') {
-        const notified = localStorage.getItem('coduy-slack-notified');
-        if (!notified) {
-          localStorage.setItem('coduy-slack-notified', 'true');
-          fetch('/api/notify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ event: 'new_user', email: user.email }),
-          }).catch(() => {});
+        const notifiedKey = `coduy-slack-notified-${newId}`;
+        if (!localStorage.getItem(notifiedKey)) {
+          localStorage.setItem(notifiedKey, 'true');
+          // Only notify if user has no data in Supabase (truly new user)
+          supabase.from('user_state').select('user_id').eq('user_id', newId).maybeSingle().then(({ data: existing }) => {
+            if (!existing) {
+              fetch('/api/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ event: 'new_user', email: user.email }),
+              }).catch(() => {});
+            }
+          });
         }
       }
     };
@@ -102,33 +107,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const sb = getSupabase();
     if (!sb) return;
 
-    const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
-
-    if (isApp) {
-      const { data, error } = await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: 'coduy://auth/callback',
-          skipBrowserRedirect: true,
-          queryParams: { prompt: 'select_account' },
-        },
-      });
-      if (data?.url) {
-        try {
-          const { Browser } = await import('@capacitor/browser');
-          await Browser.open({ url: data.url, presentationStyle: 'fullscreen' });
-        } catch (e) {
-          console.log('Browser.open error:', e);
-        }
-      }
-    } else {
-      // On web: redirect to current domain
-      const origin = window.location.origin;
-      await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: `${origin}/auth/callback` },
-      });
-    }
+    // Use web OAuth flow for both web and Capacitor app
+    // The app loads coduy.com in a webview, so standard redirect works
+    const origin = window.location.origin;
+    await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+        queryParams: { prompt: 'select_account' },
+      },
+    });
   };
 
   const handleSendOtp = async () => {

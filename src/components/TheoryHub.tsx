@@ -85,8 +85,8 @@ export default function TheoryHub() {
 
   useEffect(() => {
     fetchModulesWithLessons().then(mods => {
-      // Theory Hub shows only theory modules (1-18), not Python coding modules
-      setDbModules(mods.filter(m => m.module_number <= 18));
+      // Theory Hub shows only theory modules (2-18), skip Úvod (1) — it's in the path
+      setDbModules(mods.filter(m => m.module_number >= 2 && m.module_number <= 18));
     });
   }, []);
 

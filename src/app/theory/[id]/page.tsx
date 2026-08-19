@@ -1075,7 +1075,7 @@ export default function TheoryLessonPage() {
       </div>
 
       {/* Lesson title + current section */}
-      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '6px 20px 0' }}>
+      <div style={{ maxWidth: 520, margin: '0 auto', width: '100%', padding: '20px 20px 0' }}>
         <p style={{ fontSize: 9, color: '#555', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {safe(t(lesson, 'title', locale))}
           {sections[sectionIndex] && (

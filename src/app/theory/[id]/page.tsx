@@ -10,7 +10,7 @@ import { s } from '@/data/strings';
 import Byte from '@/components/Byte';
 import AskByte from '@/components/AskByte';
 import { cosmeticItems } from '@/data/cosmetics';
-import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check, Eye } from 'lucide-react';
+import { X, Heart, ArrowRight, BookOpen, Lightbulb, Globe, ListChecks, Sparkles, Check, Eye, ChevronRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
@@ -1696,6 +1696,49 @@ function BulletList({ lines, keyBase }: { lines: string[]; keyBase: number }) {
   );
 }
 
+function FactCard({ title, detail }: { title: string; detail: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{
+      background: 'var(--bg-surface, #111)',
+      border: '1px solid var(--border, #1a1a1a)',
+      borderRadius: 12,
+      overflow: 'hidden',
+      marginBottom: 4,
+    }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: '100%', padding: '12px 16px',
+          display: 'flex', alignItems: 'center', gap: 10,
+          background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        <Lightbulb size={16} color="#4ade80" style={{ flexShrink: 0 }} />
+        <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: 'var(--text, #eee)', lineHeight: 1.4 }}>{title}</span>
+        <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.15 }}>
+          <ChevronRight size={16} color="var(--text-hint, #555)" />
+        </motion.div>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ padding: '0 16px 14px', fontSize: 13, color: 'var(--text-secondary, #aaa)', lineHeight: 1.7 }}>
+              {detail}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function formatContent(text: string, phase: string = '') {
   if (!text) return null;
 
@@ -1750,6 +1793,17 @@ function formatContent(text: string, phase: string = '') {
     // Skip "Review" / "Opakovanie" headings from GPT content
     if (/^#*\s*(Review|Opakovanie|Zhrnutie)\s*$/i.test(trimmed)) continue;
     if (/^(Review|Opakovanie)$/i.test(trimmed)) continue;
+
+    // Fun fact card: 💡 Title\nExplanation
+    if (trimmed.startsWith('\u{1F4A1}')) {
+      const factLines = trimmed.split('\n');
+      const title = factLines[0].replace(/^\u{1F4A1}\s*/, '');
+      const detail = factLines.slice(1).join('\n').trim();
+      result.push(
+        <FactCard key={`fact-${keyCounter++}`} title={title} detail={detail} />
+      );
+      continue;
+    }
 
     // Markdown headings: # Title, ## Title, ### Title
     if (/^#{1,3}\s+/.test(trimmed)) {

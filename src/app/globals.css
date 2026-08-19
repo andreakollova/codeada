@@ -519,8 +519,34 @@ a { color: inherit; text-decoration: none; }
 [data-theme="light"] [style*="fill: #1a1a1a"],
 [data-theme="light"] [style*="fill:#1a1a1a"] { fill: #E8E8EC !important; }
 
-/* Arena — keep dark (game environment) */
-[data-theme="light"] [style*="background: #030303"][style*="position: fixed"] { background: #030303 !important; }
+/* Arena — keep dark game canvas but lighten UI elements */
+[data-theme="light"] [style*="background: #030303"][style*="position: fixed"] { background: #E8E8EC !important; }
+
+/* Arena battle modal */
+[data-theme="light"] [style*="background: #111"][style*="border-radius: 20"] {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+/* Arena quiz option buttons */
+[data-theme="light"] button[style*="border: 1.5px solid #222"],
+[data-theme="light"] button[style*="border: 1.5px solid #333"],
+[data-theme="light"] button[style*="border:1.5px solid #222"],
+[data-theme="light"] button[style*="border: 1.5px solid rgb(34,"],
+[data-theme="light"] button[style*="border: 1.5px solid rgb(51,"] {
+  border-color: var(--border) !important;
+}
+
+/* Arena intro overlay */
+[data-theme="light"] [style*="background: rgba(0,0,0,0.95)"][style*="position: fixed"],
+[data-theme="light"] [style*="background: rgba(0, 0, 0, 0.95)"][style*="position: fixed"] {
+  background: rgba(245,245,247,0.98) !important;
+}
+
+/* Arena bot labels */
+[data-theme="light"] [style*="background: rgba(0,0,0,0.6)"][style*="position: fixed"] {
+  background: rgba(0,0,0,0.2) !important;
+}
 
 /* Code blocks stay dark */
 [data-theme="light"] .code-block,

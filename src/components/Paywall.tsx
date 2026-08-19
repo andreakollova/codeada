@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 const StripeCheckout = dynamic(() => import('./StripeCheckout'), { ssr: false });
 
-const FREE_LESSON_LIMIT = 3;
+const FREE_LESSON_LIMIT = 5;
 
 export function useSubscription() {
   const { userId, completedLessons } = useUserStore();
@@ -51,7 +51,7 @@ export function useSubscription() {
   }, [userId]);
 
   const isPro = status === 'active' || status === 'admin';
-  const needsUpgrade = !isPro && status !== 'loading' && completedLessons.length >= FREE_LESSON_LIMIT;
+  const needsUpgrade = !isPro && status !== 'loading' && completedLessons.length > FREE_LESSON_LIMIT;
 
   const [showProReward, setShowProReward] = useState(false);
 

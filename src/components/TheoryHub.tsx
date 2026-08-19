@@ -142,7 +142,16 @@ export default function TheoryHub() {
             // Same status: by module_number
             return a.module_number - b.module_number;
           });
-          return sorted.slice(0, 4).map(mod => (
+          // Show first 4 not-completed + all completed
+          const notDone = sorted.filter(m => {
+            const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+            return done < m.lessons.length;
+          });
+          const allDone = sorted.filter(m => {
+            const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+            return done === m.lessons.length;
+          });
+          return [...notDone.slice(0, 4), ...allDone].map(mod => (
             <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
           ));
         })()}

@@ -60,9 +60,14 @@ export async function POST(req: NextRequest) {
       const invoice = subscription.latest_invoice as any;
       const paymentIntent = invoice?.payment_intent as any;
 
+      if (!paymentIntent?.client_secret) {
+        console.error('No client_secret. Subscription:', subscription.id, 'Invoice status:', invoice?.status, 'PI status:', paymentIntent?.status);
+        return NextResponse.json({ error: 'Payment could not be initiated. Please try again.' }, { status: 500 });
+      }
+
       return NextResponse.json({
         subscriptionId: subscription.id,
-        clientSecret: paymentIntent?.client_secret || null,
+        clientSecret: paymentIntent.client_secret,
         customerId: customer.id,
         type: 'payment',
       });

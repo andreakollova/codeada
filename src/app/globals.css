@@ -245,7 +245,7 @@ a { color: inherit; text-decoration: none; }
     overflow-y: auto;
   }
   .dashboard-sidebar {
-    padding: 40px 28px;
+    padding: 40px 48px 40px 28px;
     position: sticky;
     top: 72px;
     height: calc(100vh - 72px);
@@ -532,9 +532,16 @@ a { color: inherit; text-decoration: none; }
 /* Dashboard */
 [data-theme="light"] .dashboard-main { background: var(--bg) !important; }
 
-/* SVG strokes */
+/* SVG strokes — path connectors */
 [data-theme="light"] [style*="stroke: #333"],
 [data-theme="light"] [style*="stroke:#333"] { stroke: #ccc !important; }
+[data-theme="light"] path[stroke="#333"] { stroke: #ccc !important; }
+[data-theme="light"] path[stroke="#1a1a1a"] { stroke: #ddd !important; }
+
+/* CodingPath section divider line */
+[data-theme="light"] [style*="border-color: #333"] { border-color: #ddd !important; }
+[data-theme="light"] [style*="border-top: 1px solid #333"],
+[data-theme="light"] [style*="border-bottom: 1px solid #333"] { border-color: #ddd !important; }
 
 /* ===== AGGRESSIVE LIGHT MODE — catch everything ===== */
 

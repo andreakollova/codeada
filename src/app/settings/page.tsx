@@ -7,7 +7,7 @@ import { useLocaleStore } from '@/store/localeStore';
 import { getSupabase } from '@/lib/supabase';
 import StatusBar from '@/components/StatusBar';
 import AuthModal from '@/components/AuthModal';
-import { LogIn, LogOut, Globe, User, Trash2, ChevronRight, Sun, Moon, Smartphone } from 'lucide-react';
+import { LogIn, LogOut, Globe, User, Trash2, ChevronRight, Sun, Moon, Smartphone, CreditCard } from 'lucide-react';
 
 export default function SettingsPage() {
   const { locale, toggle } = useLocaleStore();
@@ -19,6 +19,7 @@ export default function SettingsPage() {
   const [notifOn, setNotifOn] = useState(true);
   const [isApp, setIsApp] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [billingLoading, setBillingLoading] = useState(false);
 
   useEffect(() => {
     setNotifOn(localStorage.getItem('coduy-notifications') !== 'off');
@@ -110,6 +111,61 @@ export default function SettingsPage() {
             </button>
           )}
         </div>
+
+        {/* Subscription - web only */}
+        {authUser && !isApp && (
+          <div style={{ marginBottom: 28 }}>
+            <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+              {locale === 'sk' ? 'Predplatne' : 'Subscription'}
+            </h3>
+            <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
+              <button
+                onClick={async () => {
+                  setBillingLoading(true);
+                  try {
+                    const sb = getSupabase();
+                    const user = sb ? (await sb.auth.getUser()).data.user : null;
+                    if (!user) return;
+                    const res = await fetch('/api/billing-portal', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId: user.id }),
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                      window.location.href = data.url;
+                    } else {
+                      alert(locale === 'sk' ? 'Ziadne aktivne predplatne.' : 'No active subscription found.');
+                    }
+                  } catch {
+                    alert(locale === 'sk' ? 'Nastala chyba.' : 'Something went wrong.');
+                  } finally {
+                    setBillingLoading(false);
+                  }
+                }}
+                disabled={billingLoading}
+                style={{
+                  width: '100%', padding: '14px 16px',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+                }}
+              >
+                <CreditCard size={16} color="#888" />
+                <span style={{ flex: 1, fontSize: 14, color: '#ccc', fontWeight: 500 }}>
+                  {billingLoading
+                    ? (locale === 'sk' ? 'Nacitavam...' : 'Loading...')
+                    : (locale === 'sk' ? 'Spravovat predplatne' : 'Manage subscription')}
+                </span>
+                <ChevronRight size={14} color="#555" />
+              </button>
+            </div>
+            <p style={{ fontSize: 11, color: '#555', marginTop: 6, paddingLeft: 4 }}>
+              {locale === 'sk'
+                ? 'Zobraz faktury, zmen kartu alebo zrus predplatne.'
+                : 'View invoices, update card or cancel subscription.'}
+            </p>
+          </div>
+        )}
 
         {/* Preferences */}
         <div style={{ marginBottom: 28 }}>
@@ -317,8 +373,12 @@ export default function SettingsPage() {
               {
                 q: locale === 'sk' ? 'Ako zrušiť predplatné?' : 'How to cancel subscription?',
                 a: locale === 'sk'
-                  ? 'Nastavenia telefónu → tvoje meno → Predplatné → Coduy → Zrušiť. Predplatné zostáva aktívne do konca obdobia.'
-                  : 'Phone Settings → your name → Subscriptions → Coduy → Cancel. Your subscription stays active until the end of the period.',
+                  ? isApp
+                    ? 'Nastavenia telefónu → tvoje meno → Predplatné → Coduy → Zrušiť. Predplatné zostáva aktívne do konca obdobia.'
+                    : 'Klikni na "Spravovať predplatné" vyššie. Tam môžeš zrušiť predplatné, zmeniť kartu alebo si pozrieť faktúry.'
+                  : isApp
+                    ? 'Phone Settings → your name → Subscriptions → Coduy → Cancel. Your subscription stays active until the end of the period.'
+                    : 'Click "Manage subscription" above. There you can cancel, update your card or view invoices.',
               },
               {
                 q: locale === 'sk' ? 'Funguje to aj offline?' : 'Does it work offline?',

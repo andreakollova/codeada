@@ -73,8 +73,8 @@ export default function TheoryLessonPage() {
       .then(([l, q]) => {
         if (l) {
           setLesson(l);
-          // Shuffle quiz — only mcq and true_false for now (fill_code/write_code temporarily disabled)
-          const allQ = (q || []).filter(x => x.question_type === 'multiple_choice' || x.question_type === 'true_false');
+          // Shuffle quiz — only mcq for now (other types temporarily disabled)
+          const allQ = (q || []).filter(x => x.question_type === 'multiple_choice');
           const shuffled = allQ.sort(() => Math.random() - 0.5);
           setQuiz(shuffled.slice(0, Math.min(shuffled.length, 6)));
           setPhase('intro');

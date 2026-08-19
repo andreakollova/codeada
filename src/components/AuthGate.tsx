@@ -108,10 +108,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const isApp = typeof window !== 'undefined' && !!(window as any).Capacitor;
 
     if (isApp) {
+      // Route through web callback which then redirects to deep link
+      // This fixes Apple OAuth first-time consent (uses POST, not GET)
       const { data } = await sb.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: 'coduy://auth/callback',
+          redirectTo: 'https://coduy.com/auth/callback?from=app',
           skipBrowserRedirect: true,
         },
       });

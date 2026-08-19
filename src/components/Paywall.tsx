@@ -291,7 +291,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                 console.log('Purchase error:', e);
               }
             } else {
-              // Web - Stripe
+              // Web - Stripe Checkout redirect
               try {
                 const sb = getSupabase();
                 const session = await sb?.auth.getSession();
@@ -304,13 +304,8 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                 });
                 const data = await res.json();
                 if (data.checkoutUrl) {
-                  // Redirect to Stripe Checkout
                   window.location.href = data.checkoutUrl;
                   return;
-                } else if (data.clientSecret) {
-                  setClientSecret(data.clientSecret);
-                  setIsSetupIntent(data.type === 'setup');
-                  setShowCheckout(true);
                 } else if (data.error) {
                   setError(data.error);
                 } else {

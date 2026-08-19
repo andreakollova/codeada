@@ -251,7 +251,7 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
           fontSize: allDone ? 18 : 14,
         }}>
           {allDone
-            ? <span>{drinkReward.icon}</span>
+            ? <Check size={14} color="#4ade80" strokeWidth={3} />
             : (() => { const Icon = MODULE_ICONS[mod.module_number] || BookOpen; return <Icon size={14} color="#777" />; })()
           }
         </div>
@@ -259,7 +259,7 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
           <div style={{ fontWeight: 600, fontSize: 14, color: allDone ? '#4ade80' : '#ddd' }}>{t(mod, 'title', locale)}</div>
           <div style={{ fontSize: 11, color: allDone ? '#16a34a' : '#777', marginTop: 2 }}>
             {allDone
-              ? `${locale === 'sk' ? drinkReward.nameSk : drinkReward.name} ${drinkReward.icon}`
+              ? (locale === 'sk' ? 'Dokončené' : 'Completed')
               : `${doneCount}/${mod.lessons.length} ${s('lessons', locale)}`
             }
           </div>

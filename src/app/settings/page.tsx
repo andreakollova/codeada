@@ -319,9 +319,9 @@ export default function SettingsPage() {
                       onClick={() => setFavDrink(d.id)}
                       style={{
                         padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600,
-                        background: favDrink === d.id ? 'rgba(74,222,128,0.1)' : '#111',
-                        border: `1px solid ${favDrink === d.id ? 'rgba(74,222,128,0.4)' : '#1a1a1a'}`,
-                        color: favDrink === d.id ? '#4ade80' : '#888',
+                        background: favDrink === d.id ? 'rgba(74,222,128,0.1)' : 'var(--bg-raised, #111)',
+                        border: `1px solid ${favDrink === d.id ? 'rgba(74,222,128,0.4)' : 'var(--border, #1a1a1a)'}`,
+                        color: favDrink === d.id ? '#4ade80' : 'var(--text-hint, #888)',
                         cursor: 'pointer',
                       }}
                     >

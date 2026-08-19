@@ -73,11 +73,11 @@ function generateBots(): LeaderboardEntry[] {
   const bots: LeaderboardEntry[] = [];
   for (let i = 0; i < totalBots; i++) {
     const name = shuffled[i % shuffled.length];
-    // XP: top bots have more, exponential decay with daily variation
+    // XP: steep decay so many users have low XP (realistic distribution)
     const rank = i + 1;
-    const baseXp = Math.round(5000 * Math.pow(0.993, rank));
-    const dailyVariation = Math.round(seed(i * 1000 + daysSinceStart) * 30 - 10);
-    const xp = Math.max(5, baseXp + dailyVariation);
+    const baseXp = Math.round(6000 * Math.pow(0.985, rank));
+    const dailyVariation = Math.round(seed(i * 1000 + daysSinceStart) * 40 - 15);
+    const xp = Math.max(0, baseXp + dailyVariation);
     bots.push({ display_name: name, xp });
   }
   return bots;

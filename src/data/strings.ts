@@ -83,7 +83,7 @@ const strings = {
   noResults: { en: 'No results for', sk: 'Žiadne výsledky pre' },
 
   // Workshop
-  locker: { en: 'Locker', sk: 'Skrinka' },
+  locker: { en: 'Locker', sk: 'Šatník' },
   itemsUnlocked: { en: 'items unlocked', sk: 'predmetov odomknutých' },
   random: { en: 'Random', sk: 'Náhodne' },
   noEquipment: { en: 'No equipment - pick something below', sk: 'Žiadne vybavenie - vyber si niečo' },

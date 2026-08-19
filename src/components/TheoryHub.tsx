@@ -170,14 +170,30 @@ export default function TheoryHub() {
         <div style={{ flex: 1, height: 1, background: '#222' }} />
       </div>
 
-      {/* Remaining modules */}
-      {showAll && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {dbModules.slice(4).map((mod) => (
-            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
-          ))}
-        </div>
-      )}
+      {/* Remaining modules — sorted same way, excluding already shown */}
+      {showAll && (() => {
+        const shownIds = new Set(
+          [...dbModules].filter(m => {
+            const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+            return done < m.lessons.length;
+          }).slice(0, 4).map(m => m.id)
+        );
+        // Add completed module IDs to shown set
+        dbModules.forEach(m => {
+          const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+          if (done === m.lessons.length) shownIds.add(m.id);
+        });
+        const remaining = dbModules
+          .filter(m => !shownIds.has(m.id))
+          .sort((a, b) => a.module_number - b.module_number);
+        return remaining.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {remaining.map((mod) => (
+              <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
+            ))}
+          </div>
+        ) : null;
+      })()}
     </div>
   );
 }

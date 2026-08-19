@@ -144,9 +144,10 @@ function AuraEffect({ auraId, colors, size }: { auraId: string; colors: { c1: st
   const isMythic = auraId.includes('void') || auraId.includes('cosmic');
   const isLegendary = auraId.includes('golden') || auraId.includes('galaxy');
   const isEpic = !isMythic && !isLegendary && (auraId.includes('fire') || auraId.includes('water') || auraId.includes('earth') || auraId.includes('air'));
+  const isPro = auraId === 'aura-pro';
 
   return (
-    <div style={{ position: 'absolute', inset: -size * 0.15, zIndex: 1, pointerEvents: 'none' }}>
+    <div style={{ position: 'absolute', inset: -size * (isPro ? 0.1 : 0.15), zIndex: 1, pointerEvents: 'none' }}>
       {/* Outer ring */}
       <motion.div
         animate={{ rotate: 360 }}
@@ -154,7 +155,7 @@ function AuraEffect({ auraId, colors, size }: { auraId: string; colors: { c1: st
         style={{
           position: 'absolute', inset: 0, borderRadius: '50%',
           background: `conic-gradient(from 0deg, ${colors.c1}, ${colors.c2}, ${colors.c3 || colors.c1}, ${colors.c2}, ${colors.c1})`,
-          filter: `blur(${isMythic ? 16 : isLegendary ? 12 : 8}px)`,
+          filter: `blur(${isMythic ? 16 : isLegendary ? 12 : isPro ? 6 : 8}px)`,
         }}
       />
 

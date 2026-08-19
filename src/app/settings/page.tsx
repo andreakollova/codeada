@@ -66,9 +66,18 @@ export default function SettingsPage() {
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '24px 20px' }}>
-        <h1 style={{ fontWeight: 800, fontSize: 22, color: '#fff', marginBottom: 24 }}>
-          {locale === 'sk' ? 'Nastavenia' : 'Settings'}
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+          <h1 style={{ fontWeight: 800, fontSize: 22, color: '#fff' }}>
+            {locale === 'sk' ? 'Nastavenia' : 'Settings'}
+          </h1>
+          {isPro && (
+            <span style={{
+              fontSize: 10, fontWeight: 800, color: '#000',
+              background: 'linear-gradient(135deg, #4ade80, #22c55e)',
+              padding: '3px 10px', borderRadius: 7, letterSpacing: '0.06em',
+            }}>PRO</span>
+          )}
+        </div>
 
         {/* Account */}
         <div style={{ marginBottom: 28 }}>

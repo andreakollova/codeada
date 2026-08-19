@@ -118,8 +118,8 @@ export default function TheoryHub() {
       </div>
 
       {/* Progress bar */}
-      <div style={{ height: 3, borderRadius: 2, background: '#1a1a1a', marginBottom: 20, overflow: 'hidden' }}>
-        <div style={{ height: '100%', background: '#fff', borderRadius: 2, width: `${(readCount / allTheoryLessons.length) * 100}%`, transition: 'width 0.4s' }} />
+      <div style={{ height: 3, borderRadius: 2, background: 'var(--bg-raised, #1a1a1a)', marginBottom: 20, overflow: 'hidden' }}>
+        <div style={{ height: '100%', background: 'var(--text, #fff)', borderRadius: 2, width: `${(readCount / allTheoryLessons.length) * 100}%`, transition: 'width 0.4s' }} />
       </div>
 
       {/* Modules: in-progress first, then shuffled others */}

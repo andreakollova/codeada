@@ -468,29 +468,6 @@ export default function TheoryLessonPage() {
                   {beforeLines.join('\n')}
                 </pre>
               )}
-              {/* Editable input for the missing line */}
-              <div style={{ background: '#111', padding: '4px 16px' }}>
-                <textarea
-                  value={writeCodeValue}
-                  onChange={e => { if (writeCodeState === 'editing') setWriteCodeValue(e.target.value); }}
-                  placeholder={locale === 'sk' ? 'Napíš chýbajúci kód...' : 'Type the missing code...'}
-                  disabled={writeCodeState === 'correct'}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  rows={Math.max(2, (writeCodeValue || '').split('\n').length)}
-                  style={{
-                    width: '100%', padding: '10px 12px', borderRadius: 8,
-                    background: writeCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
-                    border: `1.5px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
-                    color: writeCodeState === 'correct' ? '#4ade80' : '#fff',
-                    fontSize: 14, fontFamily: 'JetBrains Mono, Fira Code, monospace',
-                    outline: 'none', boxSizing: 'border-box',
-                    resize: 'none', lineHeight: 1.7,
-                  }}
-                />
-              </div>
               {/* Readonly code after TODO */}
               {afterLines.length > 0 && (
                 <pre style={{ background: '#111', padding: '4px 16px 12px', margin: 0, fontSize: 13, color: '#888', fontFamily: 'JetBrains Mono, Fira Code, monospace', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
@@ -498,6 +475,29 @@ export default function TheoryLessonPage() {
                 </pre>
               )}
             </div>
+
+            {/* Editable input BELOW code block */}
+            <textarea
+              value={writeCodeValue}
+              onChange={e => { if (writeCodeState === 'editing') setWriteCodeValue(e.target.value); }}
+              placeholder={locale === 'sk' ? 'Napíš odpoveď...' : 'Type your answer...'}
+              disabled={writeCodeState === 'correct'}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              autoFocus
+              rows={Math.max(2, (writeCodeValue || '').split('\n').length)}
+              style={{
+                width: '100%', padding: '14px 16px', borderRadius: 12,
+                background: writeCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
+                border: `1.5px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
+                color: writeCodeState === 'correct' ? '#4ade80' : '#fff',
+                fontSize: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                outline: 'none', boxSizing: 'border-box',
+                resize: 'none', lineHeight: 1.7,
+              }}
+            />
           );
         })()}
 

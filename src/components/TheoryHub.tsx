@@ -254,7 +254,7 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
   const drinkReward = getModuleDrink(mod.module_number, favDrink);
 
   return (
-    <div style={{ background: '#0a0a0a', border: `1px solid ${allDone ? 'rgba(74,222,128,0.25)' : '#1a1a1a'}`, borderRadius: 12, overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg-card, #0a0a0a)', border: `1px solid ${allDone ? 'rgba(74,222,128,0.25)' : 'var(--border, #1a1a1a)'}`, borderRadius: 12, overflow: 'hidden' }}>
       <button
         onClick={() => setOpen(!open)}
         style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left' }}
@@ -262,8 +262,8 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
         <div style={{
           width: 32, height: 32, borderRadius: 8, flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: allDone ? 'rgba(74,222,128,0.1)' : '#111',
-          border: allDone ? '1px solid rgba(74,222,128,0.3)' : '1px solid #222',
+          background: allDone ? 'rgba(74,222,128,0.1)' : 'var(--bg-surface, #111)',
+          border: allDone ? '1px solid rgba(74,222,128,0.3)' : '1px solid var(--border, #222)',
           fontSize: allDone ? 18 : 14,
         }}>
           {allDone
@@ -286,7 +286,7 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
       </button>
 
       {open && (
-        <div style={{ borderTop: '1px solid #111' }}>
+        <div style={{ borderTop: '1px solid var(--border-light, #111)' }}>
           {mod.lessons.map((lesson) => {
             const done = completedLessons.includes(`theory-${lesson.id}`);
             return (
@@ -296,18 +296,18 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                   padding: '10px 16px 10px 28px', cursor: 'pointer', textAlign: 'left',
-                  borderTop: '1px solid #0f0f0f',
+                  borderTop: '1px solid var(--border-light, #0f0f0f)',
                 }}
               >
                 <div style={{
                   width: 24, height: 24, borderRadius: 7, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: done ? '#4ade80' : 'transparent',
-                  border: done ? 'none' : '1px solid #2a2a2a',
+                  border: done ? 'none' : '1px solid var(--border, #2a2a2a)',
                 }}>
                   {done && <Check size={12} color="#000" strokeWidth={3} />}
                 </div>
-                <span style={{ fontSize: 13, color: done ? '#aaa' : '#ccc', fontWeight: 500 }}>
+                <span style={{ fontSize: 13, color: done ? 'var(--text-dim, #aaa)' : 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
                   {t(lesson, 'title', locale)}
                 </span>
               </button>

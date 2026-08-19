@@ -94,7 +94,7 @@ export default function WorkshopPage() {
   const isPreviewMode = previewEquipment !== null;
 
   return (
-    <div className="page-shell" style={{ minHeight: '100vh', background: '#000', color: '#fff' }}>
+    <div className="page-shell" style={{ minHeight: '100vh', background: 'var(--bg, #000)', color: 'var(--text, #fff)' }}>
       {/* Header */}
       <div style={{ borderBottom: '1px solid #111', padding: '14px 16px', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 14px)', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', zIndex: 50 }}>
         <Link href="/" onClick={() => window.scrollTo(0, 0)}>
@@ -284,8 +284,8 @@ export default function WorkshopPage() {
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                     padding: '14px 6px 12px', borderRadius: 16, textAlign: 'center',
                     cursor: 'pointer',
-                    background: equipped ? '#1a1a1a' : previewing ? '#0f0f0f' : '#070707',
-                    border: `1.5px solid ${equipped ? '#4ade80' : previewing ? rc.border + '66' : owned ? rc.border + '44' : '#181818'}`,
+                    background: equipped ? 'var(--bg-raised, #1a1a1a)' : previewing ? 'var(--bg-surface, #0f0f0f)' : 'var(--bg-card, #070707)',
+                    border: `1.5px solid ${equipped ? '#4ade80' : previewing ? rc.border + '66' : owned ? rc.border + '44' : 'var(--border, #181818)'}`,
                     boxShadow: equipped ? '0 0 24px rgba(74,222,128,0.15)'
                       : previewing ? rc.glow.replace(/0\.\d/g, '0.2')
                       : owned && (item.rarity === 'mythic' || item.rarity === 'legendary' || item.rarity === 'epic') ? rc.glow : 'none',

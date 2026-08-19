@@ -1751,15 +1751,17 @@ function formatContent(text: string, phase: string = '') {
     if (/^#*\s*(Review|Opakovanie|Zhrnutie)\s*$/i.test(trimmed)) continue;
     if (/^(Review|Opakovanie)$/i.test(trimmed)) continue;
 
-    // Markdown heading: # Title
-    if (trimmed.startsWith('# ')) {
+    // Markdown headings: # Title, ## Title, ### Title
+    if (/^#{1,3}\s+/.test(trimmed)) {
+      const level = trimmed.match(/^(#+)/)?.[1].length || 1;
       const heading = trimmed.replace(/^#+\s*/, '');
+      const fontSize = level === 1 ? 20 : level === 2 ? 17 : 15;
       result.push(
         <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
-          <h3 style={{ fontWeight: 700, fontSize: 17, color: '#EDEDED', margin: 0, marginBottom: 10 }}>
+          <h3 style={{ fontWeight: 700, fontSize, color: '#EDEDED', margin: 0, marginBottom: level <= 2 ? 10 : 6 }}>
             {renderInline(heading, `mh-${keyCounter}`)}
           </h3>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: '#444' }} />
+          {level <= 2 && <div style={{ width: 36, height: 4, borderRadius: 2, background: '#444' }} />}
         </div>
       );
       continue;

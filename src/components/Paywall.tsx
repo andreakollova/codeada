@@ -291,7 +291,7 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                 console.log('Purchase error:', e);
               }
             } else {
-              // Web - Stripe Embedded Elements
+              // Web - Stripe
               try {
                 const sb = getSupabase();
                 const session = await sb?.auth.getSession();
@@ -303,7 +303,11 @@ export default function Paywall({ onClose }: { onClose?: () => void }) {
                   body: JSON.stringify({ plan, userId, email }),
                 });
                 const data = await res.json();
-                if (data.clientSecret) {
+                if (data.checkoutUrl) {
+                  // Redirect to Stripe Checkout
+                  window.location.href = data.checkoutUrl;
+                  return;
+                } else if (data.clientSecret) {
                   setClientSecret(data.clientSecret);
                   setIsSetupIntent(data.type === 'setup');
                   setShowCheckout(true);

@@ -45,31 +45,20 @@ export async function POST(req: NextRequest) {
         type: 'setup',
       });
     } else {
-      // No trial: immediate payment
-      const subscription = await stripe.subscriptions.create({
+      // No trial: use Checkout Session for reliable payment flow
+      const session = await stripe.checkout.sessions.create({
         customer: customer.id,
-        items: [{ price: priceId }],
-        payment_behavior: 'default_incomplete',
-        payment_settings: {
-          save_default_payment_method: 'on_subscription',
-        },
-        expand: ['latest_invoice.payment_intent'],
+        mode: 'subscription',
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: `${req.headers.get('origin') || 'https://coduy.sk'}/?payment=success`,
+        cancel_url: `${req.headers.get('origin') || 'https://coduy.sk'}/pricing?canceled=true`,
         metadata: { userId },
+        allow_promotion_codes: true,
       });
 
-      const invoice = subscription.latest_invoice as any;
-      const paymentIntent = invoice?.payment_intent as any;
-
-      if (!paymentIntent?.client_secret) {
-        console.error('No client_secret. Subscription:', subscription.id, 'Invoice status:', invoice?.status, 'PI status:', paymentIntent?.status);
-        return NextResponse.json({ error: 'Payment could not be initiated. Please try again.' }, { status: 500 });
-      }
-
       return NextResponse.json({
-        subscriptionId: subscription.id,
-        clientSecret: paymentIntent.client_secret,
-        customerId: customer.id,
-        type: 'payment',
+        checkoutUrl: session.url,
+        type: 'redirect',
       });
     }
   } catch (err: any) {

@@ -530,7 +530,7 @@ export default function ArenaPage() {
           >
             {/* Back button */}
             <button
-              onClick={() => router.push('/')}
+              onClick={() => window.location.href = '/'}
               style={{
                 position: 'absolute', top: 16, left: 16,
                 padding: '8px 14px', borderRadius: 10,

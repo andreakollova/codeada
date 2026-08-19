@@ -83,15 +83,7 @@ export default function TheoryLessonPage() {
           const maxFill = Math.min(fill.length, 2);
           const maxWrite = Math.min(write.length, 2);
           setQuiz([...theory.slice(0, maxTheory), ...fill.slice(0, maxFill), ...write.slice(0, maxWrite)]);
-          // Show coffee screen only for first read of the day (lessons with learning content)
-          const hasReading = l.learning_content && l.learning_content.length > 1000;
-          const today = new Date().toDateString();
-          const lastCoffee = localStorage.getItem('coduy-last-coffee');
-          if (!hasReading || lastCoffee === today) {
-            setPhase('intro');
-          } else {
-            setPhase('coffee');
-          }
+          setPhase('intro');
           setByteMood('happy');
         }
       })
@@ -205,9 +197,22 @@ export default function TheoryLessonPage() {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
+    // Also scroll any scrollable parent containers
+    const main = document.querySelector('main');
+    if (main) main.scrollTop = 0;
     // Fallback for Capacitor WebView - multiple attempts for animation transitions
-    setTimeout(() => { window.scrollTo(0, 0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }, 50);
-    setTimeout(() => { window.scrollTo(0, 0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }, 150);
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      if (main) main.scrollTop = 0;
+    }, 50);
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      if (main) main.scrollTop = 0;
+    }, 150);
   };
 
   const handleNextSection = () => {

@@ -470,7 +470,7 @@ export default function TheoryLessonPage() {
               )}
               {/* Editable input for the missing line */}
               <div style={{ background: '#111', padding: '4px 16px' }}>
-                <input
+                <textarea
                   value={writeCodeValue}
                   onChange={e => { if (writeCodeState === 'editing') setWriteCodeValue(e.target.value); }}
                   placeholder={locale === 'sk' ? 'Napíš chýbajúci kód...' : 'Type the missing code...'}
@@ -479,13 +479,15 @@ export default function TheoryLessonPage() {
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
+                  rows={Math.max(2, (writeCodeValue || '').split('\n').length)}
                   style={{
                     width: '100%', padding: '10px 12px', borderRadius: 8,
                     background: writeCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
                     border: `1.5px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
                     color: writeCodeState === 'correct' ? '#4ade80' : '#fff',
-                    fontSize: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                    fontSize: 14, fontFamily: 'JetBrains Mono, Fira Code, monospace',
                     outline: 'none', boxSizing: 'border-box',
+                    resize: 'none', lineHeight: 1.7,
                   }}
                 />
               </div>
@@ -689,14 +691,16 @@ export default function TheoryLessonPage() {
                     autoCapitalize="off"
                     autoCorrect="off"
                     spellCheck={false}
+                    placeholder={fillCodeState === 'editing' ? '...' : ''}
                     style={{
                       background: fillCodeState === 'correct' ? 'rgba(74,222,128,0.15)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.15)' : '#161616',
                       border: `1.5px solid ${fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff6060' : 'rgba(255,255,255,0.15)'}`,
                       borderRadius: 6,
                       color: fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff8080' : '#fff',
                       fontFamily: 'inherit', fontSize: 'inherit',
-                      padding: '2px 8px',
-                      width: `${Math.max((correctAnswers[i]?.length || 4) + 2, 4)}ch`,
+                      padding: '4px 10px',
+                      minWidth: '80px',
+                      width: `${Math.max((correctAnswers[i]?.length || 6) + 4, 8)}ch`,
                       outline: 'none',
                       verticalAlign: 'baseline',
                     }}

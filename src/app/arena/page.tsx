@@ -802,20 +802,20 @@ export default function ArenaPage() {
               style={{
                 maxWidth: 420, width: '100%',
                 background: '#111', border: '1px solid #222',
-                borderRadius: 20, padding: '24px 20px',
+                borderRadius: 20, padding: '48px 20px 24px',
                 position: 'relative', maxHeight: '90vh', overflowY: 'auto',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
               }}
             >
               {/* X close button */}
               <button onClick={closeBattle} style={{
-                position: 'absolute', top: -44, right: 0,
+                position: 'absolute', top: 12, right: 12,
                 width: 32, height: 32, borderRadius: 8,
-                background: '#1a1a1a', border: '1px solid #2a2a2a',
+                background: 'rgba(255,255,255,0.08)', border: 'none',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', color: '#888', zIndex: 10,
               }}>
-                <X size={14} />
+                <X size={16} />
               </button>
 
               {battleResult ? (

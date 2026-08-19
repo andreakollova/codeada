@@ -161,7 +161,7 @@ export default function HomePage() {
               {[
                 { icon: Flame, value: skStreak(streak, locale), label: s('dayStreakLabel', locale), tooltip: s('streakTooltip', locale), iconColor: streak > 0 ? '#fff' : '#555' },
                 { icon: Zap, value: xp.toLocaleString(), label: s('totalXp', locale), tooltip: s('xpTooltip', locale), iconColor: '#fff' },
-                { icon: BookOpen, value: completedLessons.length, label: s('lessonsDone', locale), tooltip: s('lessonsTooltip', locale), iconColor: '#fff' },
+                { icon: BookOpen, value: completedLessons.filter(l => l.startsWith('theory-')).length, label: s('lessonsDone', locale), tooltip: s('lessonsTooltip', locale), iconColor: '#fff' },
               ].map(({ icon: Icon, value, label, tooltip, iconColor }) => (
                 <div className="stat-card" key={label} style={{ position: 'relative' }}>
                   <div className="stat-card-icon">

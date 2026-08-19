@@ -27,13 +27,30 @@ export default function AuthCallback() {
 
     // Web flow: exchange code and redirect home
     const handleWeb = async () => {
+      const sb = getSupabase();
+      if (!sb) { window.location.replace('/'); return; }
+
       if (code) {
-        const sb = getSupabase();
-        if (sb) {
-          try { await sb.auth.exchangeCodeForSession(code); } catch {}
+        try {
+          await sb.auth.exchangeCodeForSession(code);
+        } catch (e) {
+          console.error('[AuthCallback] code exchange failed:', e);
         }
       }
-      window.location.replace('/');
+
+      // Also check hash fragment (some providers return tokens there)
+      const hash = window.location.hash;
+      if (hash && hash.includes('access_token')) {
+        // Supabase client auto-detects hash tokens via getSession
+        try {
+          await sb.auth.getSession();
+        } catch (e) {
+          console.error('[AuthCallback] hash session failed:', e);
+        }
+      }
+
+      // Wait a moment for session to settle before redirecting
+      setTimeout(() => window.location.replace('/'), 500);
     };
     handleWeb();
   }, []);

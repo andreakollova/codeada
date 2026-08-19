@@ -15,7 +15,11 @@ import { supabase } from '@/lib/supabase';
 
 interface LeaderboardEntry { display_name: string; xp: number; }
 
-const BOT_NAMES = ['Byte', 'Pixel', 'Nova', 'Echo', 'Spark', 'Luna', 'Atlas', 'Kai', 'Milo', 'Zara'];
+const BOT_NAMES = [
+  'Byte', 'Pixel', 'Nova', 'Echo', 'Spark', 'Luna', 'Atlas', 'Kai', 'Milo', 'Zara',
+  'Max', 'Leo', 'Aria', 'Finn', 'Ruby', 'Owen', 'Ivy', 'Axel', 'Nora', 'Hugo',
+  'Mia', 'Rex', 'Ella', 'Theo', 'Lila', 'Sam', 'Jade', 'Nico', 'Vera', 'Teo',
+];
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCount: number) => {
   const h = new Date().getHours();
@@ -91,8 +95,12 @@ export default function HomePage() {
         const { data } = await supabase.from('user_state').select('display_name, xp').order('xp', { ascending: false }).limit(50);
         const realUsers: LeaderboardEntry[] = (data || []).filter((u: any) => u.display_name && u.xp > 0);
         // Fill with bots if less than 15 users
-        const botXps = [2800, 2100, 1500, 980, 750, 520, 340, 210, 130, 60];
-        const bots: LeaderboardEntry[] = BOT_NAMES.map((n, i) => ({ display_name: n, xp: botXps[i] || 50 }));
+        const botXps = [
+          4200, 3800, 3100, 2800, 2100, 1500, 980, 750, 520, 340,
+          210, 180, 150, 130, 110, 95, 85, 75, 60, 50,
+          45, 40, 35, 30, 25, 20, 15, 12, 10, 5,
+        ];
+        const bots: LeaderboardEntry[] = BOT_NAMES.map((n, i) => ({ display_name: n, xp: botXps[i] || 5 }));
         const combined = [...realUsers, ...bots].sort((a, b) => b.xp - a.xp);
         // Deduplicate by name
         const seen = new Set<string>();

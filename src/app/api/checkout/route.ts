@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
       customer_email: email || undefined,
       metadata: { userId: userId || '' },
       success_url: `${origin}/pricing?success=true`,
-      cancel_url: `${origin}/pricing?canceled=true`,
+      cancel_url: `${origin}/`,
       allow_promotion_codes: true,
     };
 

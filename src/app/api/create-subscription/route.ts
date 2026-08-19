@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/?payment=success`,
-      cancel_url: `${origin}/pricing?canceled=true`,
+      cancel_url: `${origin}/`,
       metadata: { userId },
       allow_promotion_codes: true,
     };

@@ -55,7 +55,7 @@ export default function Byte({ mood, size = 120, className = '', animate = true,
   const aura = equipment.aura ? auraColors[equipment.aura] : null;
 
   return (
-    <motion.div className={`inline-flex items-center justify-center ${className}`} style={{ width: size, height: size, position: 'relative' }} {...mainAnim}>
+    <motion.div className={`byte-character inline-flex items-center justify-center ${className}`} style={{ width: size, height: size, position: 'relative' }} {...mainAnim}>
 
       {/* === AURA EFFECT === */}
       {aura && animate && <AuraEffect auraId={equipment.aura!} colors={aura} size={size} />}

@@ -528,6 +528,20 @@ export default function ArenaPage() {
               padding: 24,
             }}
           >
+            {/* Back button */}
+            <button
+              onClick={() => router.push('/')}
+              style={{
+                position: 'absolute', top: 16, left: 16,
+                padding: '8px 14px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.08)', border: 'none',
+                color: '#888', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              ← {locale === 'sk' ? 'Späť' : 'Back'}
+            </button>
+
             <motion.div
               key={introStep}
               initial={{ opacity: 0, y: 12 }}

@@ -284,9 +284,9 @@ export default function WorkshopPage() {
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                     padding: '14px 6px 12px', borderRadius: 16, textAlign: 'center',
                     cursor: 'pointer',
-                    background: equipped ? '#fff' : previewing ? '#0f0f0f' : '#070707',
-                    border: `1.5px solid ${equipped ? '#fff' : previewing ? rc.border + '66' : owned ? rc.border + '44' : '#181818'}`,
-                    boxShadow: equipped ? '0 0 24px rgba(255,255,255,0.15)'
+                    background: equipped ? '#1a1a1a' : previewing ? '#0f0f0f' : '#070707',
+                    border: `1.5px solid ${equipped ? '#4ade80' : previewing ? rc.border + '66' : owned ? rc.border + '44' : '#181818'}`,
+                    boxShadow: equipped ? '0 0 24px rgba(74,222,128,0.15)'
                       : previewing ? rc.glow.replace(/0\.\d/g, '0.2')
                       : owned && (item.rarity === 'mythic' || item.rarity === 'legendary' || item.rarity === 'epic') ? rc.glow : 'none',
                     transition: 'border-color 0.15s',
@@ -316,7 +316,7 @@ export default function WorkshopPage() {
                   <div>
                     <div style={{
                       fontWeight: 600, fontSize: 11,
-                      color: equipped ? '#000' : owned ? '#fff' : '#666',
+                      color: equipped ? '#fff' : owned ? '#fff' : '#666',
                       lineHeight: 1.2,
                     }}>
                       {item.name}
@@ -324,7 +324,7 @@ export default function WorkshopPage() {
                     <div style={{
                       fontSize: 10, marginTop: 2,
                       fontWeight: item.rarity === 'mythic' || item.rarity === 'legendary' ? 700 : 500,
-                      color: equipped ? '#555' : rc.color + (owned ? '' : '88'),
+                      color: equipped ? '#4ade80' : rc.color + (owned ? '' : '88'),
                     }}>
                       {rc.label}
                     </div>
@@ -332,7 +332,7 @@ export default function WorkshopPage() {
 
                   {/* Status badge */}
                   {equipped ? (
-                    <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(0,0,0,0.5)', background: '#ddd', padding: '2px 8px', borderRadius: 20 }}>
+                    <div style={{ fontSize: 9, fontWeight: 800, color: '#000', background: '#4ade80', padding: '2px 8px', borderRadius: 20 }}>
                       {s('equippedBadge', locale)}
                     </div>
                   ) : !owned ? (

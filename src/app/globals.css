@@ -382,8 +382,12 @@ a { color: inherit; text-decoration: none; }
 [data-theme="light"] body { background-color: var(--bg) !important; color: var(--text) !important; }
 [data-theme="light"] .page-shell { background: var(--bg) !important; }
 
-/* Logo — invert to black */
-[data-theme="light"] .desktop-nav-logo img { filter: invert(1) !important; }
+/* Logo — invert to black with slight outline */
+[data-theme="light"] .desktop-nav-logo img { filter: invert(1) !important; -webkit-filter: invert(1) !important; }
+[data-theme="light"] .mobile-logo-center img,
+[data-theme="light"] .desktop-nav-logo img {
+  filter: invert(1) drop-shadow(0 0 0.5px rgba(0,0,0,0.4)) drop-shadow(0 0 0.5px rgba(0,0,0,0.4)) !important;
+}
 
 /* Desktop nav */
 [data-theme="light"] .desktop-nav { background: var(--bg-card) !important; border-color: var(--border) !important; }

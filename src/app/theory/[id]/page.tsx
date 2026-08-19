@@ -662,7 +662,7 @@ export default function TheoryLessonPage() {
           {safe(t(q, 'question_text', locale))}
         </h2>
 
-        {/* Code with inline inputs */}
+        {/* Code preview with highlighted blanks */}
         <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>
           <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
@@ -671,7 +671,7 @@ export default function TheoryLessonPage() {
           </div>
           <pre style={{
             background: '#0a0a0a', margin: 0,
-            padding: '14px 16px', fontSize: 14, color: '#ccc', lineHeight: 2.2,
+            padding: '14px 16px', fontSize: 14, color: '#ccc', lineHeight: 1.8,
             overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace',
             whiteSpace: 'pre-wrap',
           }}>
@@ -679,38 +679,52 @@ export default function TheoryLessonPage() {
               <span key={i}>
                 {part}
                 {i < parts.length - 1 && (
-                  <input
-                    type="text"
-                    value={fillCodeValues[i] || ''}
-                    onChange={e => {
-                      const v = [...fillCodeValues];
-                      v[i] = e.target.value;
-                      setFillCodeValues(v);
-                    }}
-                    disabled={fillCodeState !== 'editing'}
-                    autoCapitalize="off"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    placeholder={fillCodeState === 'editing' ? '...' : ''}
-                    style={{
-                      background: fillCodeState === 'correct' ? 'rgba(74,222,128,0.15)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.15)' : '#161616',
-                      border: `1.5px solid ${fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff6060' : 'rgba(255,255,255,0.15)'}`,
-                      borderRadius: 6,
-                      color: fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff8080' : '#fff',
-                      fontFamily: 'inherit', fontSize: 'inherit',
-                      padding: '4px 10px',
-                      minWidth: '80px',
-                      width: `${Math.max((correctAnswers[i]?.length || 6) + 4, 8)}ch`,
-                      outline: 'none',
-                      verticalAlign: 'baseline',
-                    }}
-                    onFocus={e => { if (fillCodeState === 'editing') e.target.style.borderColor = '#4ade80'; }}
-                    onBlur={e => { if (fillCodeState === 'editing') e.target.style.borderColor = 'rgba(255,255,255,0.15)'; }}
-                  />
+                  <span style={{
+                    background: fillCodeState === 'correct' ? 'rgba(74,222,128,0.2)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.2)' : 'rgba(74,222,128,0.1)',
+                    color: fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff8080' : '#4ade80',
+                    padding: '2px 6px', borderRadius: 4,
+                    borderBottom: '2px solid',
+                    borderColor: fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff6060' : '#4ade80',
+                  }}>
+                    {fillCodeValues[i] || (correctAnswers.length > 1 ? `#${i + 1}` : '?')}
+                  </span>
                 )}
               </span>
             ))}
           </pre>
+        </div>
+
+        {/* Separate input fields below code */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {correctAnswers.map((_, i) => (
+            <input
+              key={i}
+              type="text"
+              value={fillCodeValues[i] || ''}
+              onChange={e => {
+                const v = [...fillCodeValues];
+                v[i] = e.target.value;
+                setFillCodeValues(v);
+              }}
+              disabled={fillCodeState !== 'editing'}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              autoFocus={i === 0}
+              placeholder={correctAnswers.length > 1
+                ? (locale === 'sk' ? `Odpoveď #${i + 1}...` : `Answer #${i + 1}...`)
+                : (locale === 'sk' ? 'Napíš odpoveď...' : 'Type your answer...')}
+              onKeyDown={e => { if (e.key === 'Enter' && fillCodeState === 'editing') handleFillCheck(); }}
+              style={{
+                width: '100%', padding: '14px 16px', borderRadius: 12,
+                background: fillCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
+                border: `1.5px solid ${fillCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
+                color: fillCodeState === 'correct' ? '#4ade80' : '#fff',
+                fontSize: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                outline: 'none', boxSizing: 'border-box',
+              }}
+            />
+          ))}
         </div>
 
         {/* Action buttons */}

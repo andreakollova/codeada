@@ -407,12 +407,12 @@ export default function SettingsPage() {
           </h3>
           <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
             {([
-              {
+              ...(isApp ? [{
                 q: locale === 'sk' ? 'Ako pridať widget na plochu? (iOS)' : 'How to add a widget? (iOS)',
                 a: locale === 'sk'
                   ? 'WIDGET_WIZARD'
                   : 'WIDGET_WIZARD',
-              },
+              }] : []),
               {
                 q: locale === 'sk' ? 'Ako zrušiť predplatné?' : 'How to cancel subscription?',
                 a: locale === 'sk'

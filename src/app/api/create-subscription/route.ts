@@ -20,6 +20,13 @@ export async function POST(req: NextRequest) {
       customer = await stripe.customers.create({ metadata: { userId } });
     }
 
+    // Cancel any existing active/trialing subscriptions to prevent duplicates
+    const existingSubs = await stripe.subscriptions.list({ customer: customer.id, status: 'trialing', limit: 10 });
+    const existingActive = await stripe.subscriptions.list({ customer: customer.id, status: 'active', limit: 10 });
+    for (const sub of [...existingSubs.data, ...existingActive.data]) {
+      await stripe.subscriptions.cancel(sub.id);
+    }
+
     const isTrial = plan === 'trial';
     const origin = req.headers.get('origin') || 'https://coduy.sk';
 

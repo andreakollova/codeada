@@ -1114,7 +1114,8 @@ function isCodeLine(line: string): boolean {
   if (/^(import |from |def |class |if |elif |else:|for |while |return |print\(|try:|except|finally:|raise |with |async |await |const |let |var |function |export |del |assert |yield |lambda )/.test(t)) return true;
   if (/^[a-zA-Z_]\w*\s*[=(]/.test(t) && (t.includes('(') || t.includes('=')) && !t.endsWith('.') && t.length < 120) return true;
   if (/^[a-zA-Z_]\w*(\s*,\s*[a-zA-Z_]\w*)+\s*=/.test(t)) return true; // a, b = 5, 10
-  if (/^(#|\/\/)/.test(t)) return true;
+  if (/^\/\//.test(t)) return true;
+  if (/^#[^#]/.test(t) && !/^#{1,3}\s+[A-ZÁÉÍÓÚÝŽŠČŤĎĽŇŔ]/.test(t)) return true; // # comment but not ## Heading
   if (/^\w+\.\w+\(/.test(t)) return true;
   if (/^(print|len|type|str|int|float|list|dict|set|tuple|range|input|open|sorted|map|filter)\s*\(/.test(t)) return true;
   return false;

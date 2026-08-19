@@ -113,7 +113,7 @@ export const useUserStore = create<UserState & UserActions>()(
           const daysMissed = Math.floor((Date.now() - lastDate.getTime()) / 86400000) - 1;
           const heartsLost = Math.min(daysMissed, s.hearts);
           const hearts = Math.max(0, s.hearts - heartsLost);
-          return { streak: 0, hearts, byteBattery: 20, byteMood: hearts === 0 ? 'low_battery' : hearts <= 2 ? 'worried' : 'happy', lastActiveDate: todayStr };
+          return { streak: 1, hearts, byteBattery: 20, byteMood: hearts === 0 ? 'low_battery' : hearts <= 2 ? 'worried' : 'happy', lastActiveDate: todayStr };
         });
       },
 

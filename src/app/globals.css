@@ -657,6 +657,69 @@ a { color: inherit; text-decoration: none; }
 [data-theme="light"] [style*="color: #22c55e"],
 [data-theme="light"] [style*="color:#22c55e"] { color: #16a34a !important; }
 
-/* Lucide icons in dark containers */
+/* Lucide icons — white → dark in light mode */
+[data-theme="light"] svg[color="#fff"],
+[data-theme="light"] svg[color="white"],
+[data-theme="light"] svg[color="#EDEDED"] { color: #333 !important; }
 [data-theme="light"] svg[color="#6E6E6E"] { color: #999 !important; }
 [data-theme="light"] svg[color="#888"] { color: #777 !important; }
+[data-theme="light"] svg[color="#555"] { color: #999 !important; }
+[data-theme="light"] svg[color="#333"] { color: #bbb !important; }
+[data-theme="light"] svg[color="#4ade80"] { color: #16a34a !important; }
+
+/* Stat cards */
+[data-theme="light"] .stat-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+[data-theme="light"] .stat-card-icon {
+  background: var(--bg-raised) !important;
+}
+[data-theme="light"] .stat-card-icon svg { color: #333 !important; }
+[data-theme="light"] .stat-card-value { color: var(--text) !important; }
+[data-theme="light"] .stat-card-label { color: #666 !important; }
+[data-theme="light"] .stat-info-trigger svg { color: #bbb !important; }
+
+/* CodingPath — lesson node circles */
+[data-theme="light"] [style*="background: #161616"][style*="border-radius"] {
+  background: var(--bg-raised) !important;
+}
+[data-theme="light"] [style*="background: #161616"][style*="border-radius"] svg { color: #333 !important; }
+
+/* Theory page — content text readability */
+[data-theme="light"] [style*="color: #c0c0c0"],
+[data-theme="light"] [style*="color:#c0c0c0"],
+[data-theme="light"] [style*="color: #b0b0b0"],
+[data-theme="light"] [style*="color:#b0b0b0"] { color: #444 !important; }
+
+/* Theory — Pokračovať button and similar action buttons */
+[data-theme="light"] button[style*="background: #EDEDED"],
+[data-theme="light"] button[style*="background:#EDEDED"] {
+  background: #1A1A1A !important;
+  color: #fff !important;
+}
+
+/* Dashed path lines */
+[data-theme="light"] [style*="border-color: #333"],
+[data-theme="light"] [style*="border-color:#333"] { border-color: #ccc !important; }
+
+/* Dashboard greeting subtitle */
+[data-theme="light"] [style*="color: #6B7280"],
+[data-theme="light"] [style*="color:#6B7280"] { color: #666 !important; }
+
+/* Outline selected items (plan cards etc) */
+[data-theme="light"] [style*="outline: 1px solid #1a1a1a"],
+[data-theme="light"] [style*="outline:1px solid #1a1a1a"] { outline-color: var(--border) !important; }
+[data-theme="light"] [style*="outline: 2px solid #4ade80"] { outline-color: #16a34a !important; }
+
+/* Chat bubble */
+[data-theme="light"] [style*="background: #0F0F0F"][style*="position: fixed"] {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Dropdown/modal overlays */
+[data-theme="light"] [style*="background: rgba(0,0,0,0.5)"],
+[data-theme="light"] [style*="background: rgba(0, 0, 0, 0.5)"] {
+  background: rgba(0,0,0,0.3) !important;
+}

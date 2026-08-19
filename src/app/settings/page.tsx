@@ -150,7 +150,7 @@ export default function SettingsPage() {
         {authUser && !isApp && (
           <div style={{ marginBottom: 28 }}>
             <h3 style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
-              {locale === 'sk' ? 'Predplatne' : 'Subscription'}
+              {locale === 'sk' ? 'Predplatné' : 'Subscription'}
             </h3>
             <div style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 14, overflow: 'hidden' }}>
               <button
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                     if (data.url) {
                       window.location.href = data.url;
                     } else {
-                      alert(locale === 'sk' ? 'Ziadne aktivne predplatne.' : 'No active subscription found.');
+                      alert(locale === 'sk' ? 'Žiadne aktívne predplatné.' : 'No active subscription found.');
                     }
                   } catch {
                     alert(locale === 'sk' ? 'Nastala chyba.' : 'Something went wrong.');
@@ -188,14 +188,14 @@ export default function SettingsPage() {
                 <span style={{ flex: 1, fontSize: 14, color: '#ccc', fontWeight: 500 }}>
                   {billingLoading
                     ? (locale === 'sk' ? 'Nacitavam...' : 'Loading...')
-                    : (locale === 'sk' ? 'Spravovat predplatne' : 'Manage subscription')}
+                    : (locale === 'sk' ? 'Spravovať predplatné' : 'Manage subscription')}
                 </span>
                 <ChevronRight size={14} color="#555" />
               </button>
             </div>
             <p style={{ fontSize: 11, color: '#555', marginTop: 6, paddingLeft: 4 }}>
               {locale === 'sk'
-                ? 'Zobraz faktury, zmen kartu alebo zrus predplatne.'
+                ? 'Zobraz faktúry, zmeň kartu alebo zruš predplatné.'
                 : 'View invoices, update card or cancel subscription.'}
             </p>
           </div>

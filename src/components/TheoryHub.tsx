@@ -104,8 +104,8 @@ export default function TheoryHub() {
     <div style={{ marginBottom: 40 }}>
       {/* Section header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: '#161616', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <BookOpen size={16} color="#fff" />
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-raised, #161616)', border: '1px solid var(--border, #222)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <BookOpen size={16} color="var(--text, #fff)" />
         </div>
         <div>
           <h2 style={{ fontWeight: 700, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>

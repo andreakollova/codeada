@@ -35,7 +35,7 @@ function generateBots(): LeaderboardEntry[] {
   const startDate = new Date('2026-07-01');
   const today = new Date();
   const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / 86400000);
-  const totalBots = Math.min(500, 120 + daysSinceStart * 3);
+  const totalBots = 120 + daysSinceStart * 3;
 
   // Seeded random for consistency within same day
   const seed = (n: number) => {

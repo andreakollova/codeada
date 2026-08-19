@@ -73,16 +73,10 @@ export default function TheoryLessonPage() {
       .then(([l, q]) => {
         if (l) {
           setLesson(l);
-          // Shuffle quiz, put write_code at end, limit to ~8 questions
-          const allQ = q || [];
-          // Split: theoretical (mcq/true_false) first, then fill_code, then write_code
-          const theory = allQ.filter(x => x.question_type === 'multiple_choice' || x.question_type === 'true_false').sort(() => Math.random() - 0.5);
-          const fill = allQ.filter(x => x.question_type === 'fill_code').sort(() => Math.random() - 0.5);
-          const write = allQ.filter(x => x.question_type === 'write_code').sort(() => Math.random() - 0.5);
-          const maxTheory = Math.min(theory.length, 4);
-          const maxFill = Math.min(fill.length, 2);
-          const maxWrite = Math.min(write.length, 2);
-          setQuiz([...theory.slice(0, maxTheory), ...fill.slice(0, maxFill), ...write.slice(0, maxWrite)]);
+          // Shuffle quiz — only mcq and true_false for now (fill_code/write_code temporarily disabled)
+          const allQ = (q || []).filter(x => x.question_type === 'multiple_choice' || x.question_type === 'true_false');
+          const shuffled = allQ.sort(() => Math.random() - 0.5);
+          setQuiz(shuffled.slice(0, Math.min(shuffled.length, 6)));
           setPhase('intro');
           setByteMood('happy');
         }

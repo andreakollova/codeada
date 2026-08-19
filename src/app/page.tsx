@@ -245,12 +245,13 @@ export default function HomePage() {
                 // Find current user's rank
                 const myIdx = leaderboard.findIndex(u => u.display_name === name);
                 const myRank = myIdx >= 0 ? myIdx + 1 : leaderboard.length + 1;
-                // Show 2 above + user + 2 below
-                const startIdx = Math.max(0, (myIdx >= 0 ? myIdx : leaderboard.length) - 2);
-                const slice = leaderboard.slice(startIdx, startIdx + 5);
-                // If user not in leaderboard, insert them
+                // Show 3 above + user + 3 below
+                const startIdx = Math.max(0, (myIdx >= 0 ? myIdx : leaderboard.length) - 3);
+                const slice = leaderboard.slice(startIdx, startIdx + 7);
+                // If user not in leaderboard, insert them above others with same XP
                 if (myIdx < 0 && name) {
-                  slice.splice(2, 0, { display_name: name, xp });
+                  const insertIdx = slice.findIndex(u => u.xp <= xp);
+                  slice.splice(insertIdx >= 0 ? insertIdx : slice.length, 0, { display_name: name, xp });
                 }
                 return (
                   <div style={{ textAlign: 'left' }}>

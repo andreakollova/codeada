@@ -37,6 +37,9 @@ export default function TheoryLessonPage() {
   const [phase, setPhase] = useState<Phase>('loading');
   const [sectionIndex, setSectionIndex] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
+  // Subsection-based learning: split learning_content by # headers
+  const [subsections, setSubsections] = useState<string[]>([]);
+  const [subsectionIndex, setSubsectionIndex] = useState(0);
   const [score, setScore] = useState(0);
   // Safe string helper - ensures no objects reach React render
   const safe = (v: unknown): string => (v == null ? '' : typeof v === 'string' ? v : String(v));
@@ -73,10 +76,18 @@ export default function TheoryLessonPage() {
       .then(([l, q]) => {
         if (l) {
           setLesson(l);
-          // Shuffle quiz — only mcq for now (other types temporarily disabled)
+          // Quiz — keep in order (question_number) for subsection distribution
           const allQ = (q || []).filter(x => x.question_type === 'multiple_choice');
-          const shuffled = allQ.sort(() => Math.random() - 0.5);
-          setQuiz(shuffled.slice(0, Math.min(shuffled.length, 6)));
+          allQ.sort((a, b) => (a.question_number || 0) - (b.question_number || 0));
+          setQuiz(allQ);
+
+          // Split learning_content into subsections by # headers
+          const content = locale === 'sk' ? (l.learning_content_sk || l.learning_content || '') : (l.learning_content || '');
+          const subs = content.split(/(?=^## )/m).filter(s => s.trim());
+          if (subs.length > 1) {
+            setSubsections(subs);
+          }
+
           setPhase('intro');
           setByteMood('happy');
         }
@@ -181,11 +192,13 @@ export default function TheoryLessonPage() {
     } catch { return false; }
   });
 
-  const totalSteps = sections.length + quiz.length;
-  const currentStep = phase === 'quiz' || phase === 'done'
-    ? sections.length + quizIndex
-    : sectionIndex;
-  const progress = totalSteps > 0 ? (currentStep / totalSteps) * 100 : 0;
+  const totalSteps = subsections.length > 1
+    ? 1 + subsections.length * 2 // intro + (content + quiz) per subsection
+    : sections.length + quiz.length;
+  const currentStep = subsections.length > 1
+    ? 1 + subsectionIndex * 2 + (phase === 'quiz' ? 1 : 0)
+    : phase === 'quiz' || phase === 'done' ? sections.length + quizIndex : sectionIndex;
+  const progress = totalSteps > 0 ? Math.min((currentStep / totalSteps) * 100, 100) : 0;
 
   const scrollTop = () => {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
@@ -211,16 +224,44 @@ export default function TheoryLessonPage() {
 
   const handleNextSection = () => {
     scrollTop();
+
+    // Subsection mode: learning → quiz → next subsection → quiz → ... → done
+    if (subsections.length > 1 && phase === 'learning') {
+      const qPerSub = Math.max(1, Math.floor(quiz.length / subsections.length));
+      const startQ = subsectionIndex * qPerSub;
+      const endQ = subsectionIndex === subsections.length - 1 ? quiz.length : startQ + qPerSub;
+      if (startQ < quiz.length && startQ < endQ) {
+        // Show quiz for this subsection
+        setQuizIndex(startQ);
+        setPhase('quiz');
+        setSelectedAnswer(null);
+        setAnswerState('idle');
+        return;
+      }
+      // No quiz questions for this sub → go to next subsection
+      if (subsectionIndex + 1 < subsections.length) {
+        setSubsectionIndex(i => i + 1);
+        setPhase('learning');
+        return;
+      }
+      finishLesson();
+      return;
+    }
+
+    // Normal section flow
     if (sectionIndex + 1 < sections.length) {
       setSectionIndex(i => i + 1);
       setPhase(sections[sectionIndex + 1].phase);
     } else {
-      // Move to quiz
-      if (quiz.length > 0) {
+      if (subsections.length <= 1 && quiz.length > 0) {
         setQuizIndex(0);
         setPhase('quiz');
-      } else {
+      } else if (subsections.length <= 1) {
         finishLesson();
+      } else {
+        // Start subsection mode
+        setSubsectionIndex(0);
+        setPhase('learning');
       }
     }
   };
@@ -259,6 +300,28 @@ export default function TheoryLessonPage() {
     setShowWriteCodeAnswer(false);
     setFillCodeValues([]);
     setFillCodeState('editing');
+
+    // Subsection mode: check if we've finished this subsection's quiz questions
+    if (subsections.length > 1) {
+      const qPerSub = Math.max(1, Math.floor(quiz.length / subsections.length));
+      const endQ = subsectionIndex === subsections.length - 1 ? quiz.length : (subsectionIndex + 1) * qPerSub;
+
+      if (quizIndex + 1 < endQ) {
+        // More questions for this subsection
+        setQuizIndex(i => i + 1);
+      } else if (subsectionIndex + 1 < subsections.length) {
+        // Move to next subsection
+        scrollTop();
+        setSubsectionIndex(i => i + 1);
+        setPhase('learning');
+      } else {
+        // All subsections done
+        finishLesson();
+      }
+      return;
+    }
+
+    // Normal mode
     if (quizIndex + 1 < quiz.length) {
       setQuizIndex(i => i + 1);
     } else {
@@ -336,6 +399,21 @@ export default function TheoryLessonPage() {
             locale={locale}
             equipment={equipment}
           />
+        ) : sec.phase === 'learning' && subsections.length > 1 ? (
+          /* Subsection mode: show one subsection at a time */
+          <div>
+            <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={subsectionIndex} />
+            <div style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}>
+              {formatContent(subsections[subsectionIndex] || '', 'learning')}
+            </div>
+            <motion.button
+              onClick={handleNextSection}
+              whileTap={{ scale: 0.98 }}
+              style={{ width: '100%', padding: '16px', borderRadius: 14, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer', marginTop: 24 }}
+            >
+              {locale === 'sk' ? 'Pokračovať' : 'Continue'} <ArrowRight size={16} />
+            </motion.button>
+          </div>
         ) : sec.phase === 'learning' ? (
           <PaginatedContent text={String(content)} locale={locale} equipment={equipment} onComplete={handleNextSection} />
         ) : sec.phase === 'real_world' ? (

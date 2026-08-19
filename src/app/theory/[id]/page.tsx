@@ -350,12 +350,12 @@ export default function TheoryLessonPage() {
                 {locale === 'sk' ? '# Použitie v praxi' : '# Real-world use'}
               </pre>
             </div>
-            <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
+            <div style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}>
               {formatContent(String(content), sec.phase)}
             </div>
           </div>
         ) : (
-          <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
+          <div style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}>
             {formatContent(String(content), sec.phase)}
           </div>
         )}
@@ -1425,7 +1425,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
     return (
       <div>
         <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={0} />
-        <div style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}>
+        <div style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}>
           {formatContent(text, 'learning')}
         </div>
         <button
@@ -1459,7 +1459,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -30 }}
           transition={{ duration: 0.2 }}
-          style={{ fontSize: 15, color: '#c8c8c8', lineHeight: 1.85 }}
+          style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}
         >
           {/* Detect programming languages page and show interactive bubbles */}
           {pages[page].includes('**Python**') && pages[page].includes('**Java**') ? (
@@ -1611,7 +1611,7 @@ function BulletList({ lines, keyBase }: { lines: string[]; keyBase: number }) {
       {lines.map((bl, bi) => (
         <div key={bi} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '4px 0' }}>
           <span style={{ color, fontWeight: 700, fontSize: 12, lineHeight: 2, flexShrink: 0, textShadow: `0 0 8px ${color}88, 0 0 16px ${color}44` }}>{mark}</span>
-          <span style={{ color: '#c8c8c8', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyBase}-${bi}`)}</span>
+          <span style={{ color: '#ddd', lineHeight: 1.7 }}>{renderInline(bl.trimStart().slice(2), `blt-${keyBase}-${bi}`)}</span>
         </div>
       ))}
     </div>

@@ -125,19 +125,24 @@ export default function TheoryHub() {
       {/* Modules: in-progress first, then shuffled others */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {(() => {
-          // Find in-progress module (has some but not all lessons done)
-          const inProgress = dbModules.filter(m => {
-            const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
-            return done > 0 && done < m.lessons.length;
+          // Sort: in-progress first, then not-started (by module_number), completed at bottom
+          const sorted = [...dbModules].sort((a, b) => {
+            const aDone = a.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+            const bDone = b.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
+            const aAll = aDone === a.lessons.length;
+            const bAll = bDone === b.lessons.length;
+            const aStarted = aDone > 0 && !aAll;
+            const bStarted = bDone > 0 && !bAll;
+            // In-progress first
+            if (aStarted && !bStarted) return -1;
+            if (!aStarted && bStarted) return 1;
+            // Completed last
+            if (aAll && !bAll) return 1;
+            if (!aAll && bAll) return -1;
+            // Same status: by module_number
+            return a.module_number - b.module_number;
           });
-          const notStarted = dbModules.filter(m => {
-            const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
-            return done === 0;
-          });
-          // Shuffle not-started
-          const shuffled = [...notStarted].sort(() => Math.random() - 0.5);
-          const ordered = [...inProgress, ...shuffled];
-          return ordered.slice(0, 4).map(mod => (
+          return sorted.slice(0, 4).map(mod => (
             <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
           ));
         })()}
@@ -224,7 +229,7 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
   const drinkReward = getModuleDrink(mod.module_number, favDrink);
 
   return (
-    <div style={{ background: '#0a0a0a', border: `1px solid ${allDone ? 'rgba(245,158,11,0.2)' : '#1a1a1a'}`, borderRadius: 12, overflow: 'hidden' }}>
+    <div style={{ background: '#0a0a0a', border: `1px solid ${allDone ? 'rgba(74,222,128,0.25)' : '#1a1a1a'}`, borderRadius: 12, overflow: 'hidden' }}>
       <button
         onClick={() => setOpen(!open)}
         style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left' }}
@@ -232,8 +237,8 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
         <div style={{
           width: 32, height: 32, borderRadius: 8, flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: allDone ? 'rgba(245,158,11,0.1)' : '#111',
-          border: allDone ? '1px solid rgba(245,158,11,0.3)' : '1px solid #222',
+          background: allDone ? 'rgba(74,222,128,0.1)' : '#111',
+          border: allDone ? '1px solid rgba(74,222,128,0.3)' : '1px solid #222',
           fontSize: allDone ? 18 : 14,
         }}>
           {allDone
@@ -242,8 +247,8 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600, fontSize: 14, color: allDone ? '#f59e0b' : '#ddd' }}>{t(mod, 'title', locale)}</div>
-          <div style={{ fontSize: 11, color: allDone ? '#b45309' : '#777', marginTop: 2 }}>
+          <div style={{ fontWeight: 600, fontSize: 14, color: allDone ? '#4ade80' : '#ddd' }}>{t(mod, 'title', locale)}</div>
+          <div style={{ fontSize: 11, color: allDone ? '#16a34a' : '#777', marginTop: 2 }}>
             {allDone
               ? `${locale === 'sk' ? drinkReward.nameSk : drinkReward.name} ${drinkReward.icon}`
               : `${doneCount}/${mod.lessons.length} ${s('lessons', locale)}`

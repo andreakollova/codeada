@@ -469,31 +469,31 @@ export default function TheoryLessonPage() {
                 </pre>
               )}
             </div>
-
-            {/* Editable input BELOW code block */}
-            <textarea
-              value={writeCodeValue}
-              onChange={e => { if (writeCodeState === 'editing') setWriteCodeValue(e.target.value); }}
-              placeholder={locale === 'sk' ? 'Napíš odpoveď...' : 'Type your answer...'}
-              disabled={writeCodeState === 'correct'}
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck={false}
-              autoFocus
-              rows={Math.max(2, (writeCodeValue || '').split('\n').length)}
-              style={{
-                width: '100%', padding: '14px 16px', borderRadius: 12,
-                background: writeCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
-                border: `1.5px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
-                color: writeCodeState === 'correct' ? '#4ade80' : '#fff',
-                fontSize: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
-                outline: 'none', boxSizing: 'border-box',
-                resize: 'none', lineHeight: 1.7,
-              }}
-            />
           );
         })()}
+
+        {/* Editable input BELOW code block */}
+        <textarea
+          value={writeCodeValue}
+          onChange={e => { if (writeCodeState === 'editing') setWriteCodeValue(e.target.value); }}
+          placeholder={locale === 'sk' ? 'Napíš odpoveď...' : 'Type your answer...'}
+          disabled={writeCodeState === 'correct'}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          autoFocus
+          rows={Math.max(2, (writeCodeValue || '').split('\n').length)}
+          style={{
+            width: '100%', padding: '14px 16px', borderRadius: 12,
+            background: writeCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
+            border: `1.5px solid ${writeCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : writeCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
+            color: writeCodeState === 'correct' ? '#4ade80' : '#fff',
+            fontSize: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
+            outline: 'none', boxSizing: 'border-box',
+            resize: 'none', lineHeight: 1.7,
+          }}
+        />
 
         {/* Action buttons based on state */}
         {writeCodeState === 'editing' && (

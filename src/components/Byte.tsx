@@ -81,6 +81,8 @@ export default function Byte({ mood, size = 120, className = '', animate = true,
             fill="white" opacity={eye.opacity}
             style={{ filter: eye.opacity > 0.5 ? 'drop-shadow(0 0 8px rgba(255,255,255,0.6))' : 'none' }}
             {...blinkAnim} />
+          {/* Cute highlight dot */}
+          <circle className="byte-eye-highlight" cx="46" cy={70 + eye.dy} r={eye.rx * 0.3} fill="white" opacity={0} />
         </motion.g>
 
         {/* RIGHT EYE */}
@@ -89,6 +91,8 @@ export default function Byte({ mood, size = 120, className = '', animate = true,
             fill="white" opacity={eye.opacity}
             style={{ filter: eye.opacity > 0.5 ? 'drop-shadow(0 0 8px rgba(255,255,255,0.6))' : 'none' }}
             {...(blinkAnim.animate ? { ...blinkAnim, transition: { ...blinkAnim.transition, delay: 0.05 } } : {})} />
+          {/* Cute highlight dot */}
+          <circle className="byte-eye-highlight" cx="80" cy={70 + eye.dy} r={eye.rx * 0.3} fill="white" opacity={0} />
         </motion.g>
 
         {/* SMILE */}

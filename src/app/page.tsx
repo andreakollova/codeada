@@ -53,6 +53,9 @@ function generateBots(): LeaderboardEntry[] {
     'Eugen','Felicia','Goran','Hedviga','Ivor','Joana','Konrad','Livia','Milan','Nadia2',
     'Orest','Paloma','Rasto','Sonja2','Tibor2','Uma','Vilma','Werner','Xeno','Yveta',
   ];
+  // Remove any names with numbers
+  const cleanNames = names.filter(n => !/\d/.test(n));
+
   const startDate = new Date('2026-07-01');
   const today = new Date();
   const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / 86400000);
@@ -64,11 +67,12 @@ function generateBots(): LeaderboardEntry[] {
     return x - Math.floor(x);
   };
 
+  // Shuffle names deterministically
+  const shuffled = [...cleanNames].sort((a, b) => seed(a.charCodeAt(0) * 100 + b.charCodeAt(0)) - 0.5);
+
   const bots: LeaderboardEntry[] = [];
   for (let i = 0; i < totalBots; i++) {
-    const nameIdx = i % names.length;
-    const suffix = i >= names.length ? `${Math.floor(i / names.length) + 1}` : '';
-    const name = names[nameIdx] + suffix;
+    const name = shuffled[i % shuffled.length];
     // XP: top bots have more, exponential decay with daily variation
     const rank = i + 1;
     const baseXp = Math.round(5000 * Math.pow(0.993, rank));

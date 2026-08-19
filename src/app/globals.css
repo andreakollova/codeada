@@ -231,7 +231,7 @@ a { color: inherit; text-decoration: none; }
   }
   .dashboard-content {
     display: grid;
-    grid-template-columns: 1fr 280px;
+    grid-template-columns: 1fr 320px;
     gap: 0;
     width: 100%;
     min-height: calc(100vh - 72px);
@@ -241,6 +241,8 @@ a { color: inherit; text-decoration: none; }
     border-right: 1px solid #1a1a1a;
     min-height: 0;
     overflow-y: auto;
+    max-width: 900px;
+    margin: 0 auto;
   }
   .dashboard-sidebar {
     padding: 40px 28px;

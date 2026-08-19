@@ -47,6 +47,21 @@ export async function POST(req: NextRequest) {
     await notifySlack(`New subscription! ${email || userId} - ${session.amount_total ? (session.amount_total / 100).toFixed(2) + ' EUR' : ''}`);
   }
 
+  // Handle subscription becoming active after trial or renewal
+  if (event.type === 'customer.subscription.updated') {
+    const sub = event.data.object;
+    const userId = sub.metadata?.userId;
+    if (userId && (sub.status === 'active' || sub.status === 'trialing')) {
+      const plan = sub.items?.data?.[0]?.price?.recurring?.interval === 'year' ? 'yearly' : 'monthly';
+      const expiresAt = new Date((sub.current_period_end || Date.now() / 1000 + 30 * 86400) * 1000).toISOString();
+      await sb.from('user_state').update({
+        subscription_status: 'active',
+        subscription_plan: plan,
+        subscription_expires_at: expiresAt,
+      }).eq('user_id', userId);
+    }
+  }
+
   if (event.type === 'customer.subscription.deleted') {
     const sub = event.data.object;
     const customerId = sub.customer;

@@ -61,7 +61,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="page-shell" style={{ minHeight: '100vh', background: '#0F0F0F', paddingBottom: 80 }}>
+    <div className="page-shell" style={{ minHeight: '100vh', background: 'var(--bg, #0F0F0F)', paddingBottom: 80 }}>
       <StatusBar />
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 

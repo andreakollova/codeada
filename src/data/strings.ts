@@ -12,7 +12,7 @@ const strings = {
 
   // Stats sidebar
   yourStats: { en: 'Your Stats', sk: 'Tvoje štatistiky' },
-  dayStreakLabel: { en: 'Day Streak', sk: 'Streak' },
+  dayStreakLabel: { en: 'Day Streak', sk: 'Počet dní učenia za sebou' },
   totalXp: { en: 'Total XP', sk: 'Celkové XP' },
   lessonsDone: { en: 'Lessons Done', sk: 'Hotové lekcie' },
   hearts: { en: 'Hearts', sk: 'Životy' },

@@ -15,11 +15,48 @@ import { supabase } from '@/lib/supabase';
 
 interface LeaderboardEntry { display_name: string; xp: number; }
 
-const BOT_NAMES = [
-  'Byte', 'Pixel', 'Nova', 'Echo', 'Spark', 'Luna', 'Atlas', 'Kai', 'Milo', 'Zara',
-  'Max', 'Leo', 'Aria', 'Finn', 'Ruby', 'Owen', 'Ivy', 'Axel', 'Nora', 'Hugo',
-  'Mia', 'Rex', 'Ella', 'Theo', 'Lila', 'Sam', 'Jade', 'Nico', 'Vera', 'Teo',
-];
+// Generate deterministic bot leaderboard — grows by ~3 users/day
+function generateBots(): LeaderboardEntry[] {
+  const names = [
+    'Byte','Pixel','Nova','Echo','Spark','Luna','Atlas','Kai','Milo','Zara',
+    'Max','Leo','Aria','Finn','Ruby','Owen','Ivy','Axel','Nora','Hugo',
+    'Mia','Rex','Ella','Theo','Lila','Sam','Jade','Nico','Vera','Teo',
+    'Adam','Ben','Cleo','Dan','Eva','Fox','Gigi','Hana','Igor','Jana',
+    'Kira','Luca','Maya','Niko','Olga','Petr','Quinn','Rosa','Sara','Tom',
+    'Uma','Vlad','Wren','Xena','Yuri','Zoe','Alex','Bea','Cole','Dara',
+    'Eli','Fay','Gus','Hope','Iris','Jake','Koda','Lena','Matt','Nina',
+    'Otto','Pia','Remy','Sky','Tara','Uri','Val','Wes','Xia','Yara',
+    'Zack','Alba','Bo','Cruz','Dio','Emi','Flo','Gil','Ida','Jax',
+    'Kit','Liv','Moe','Ned','Ola','Pat','Rio','Sue','Ty','Ula',
+    'Vic','Win','Yuki','Zen','Alma','Bram','Cara','Dex','Elan','Fern',
+    'Gio','Haze','Isla','Juno','Knox','Lyra','Mars','Nyx','Onyx','Pax',
+    'Rain','Sol','Trix','Vega','Wolf','Xeno','Yale','Zara2','Aero','Blaze',
+  ];
+  const startDate = new Date('2026-07-01');
+  const today = new Date();
+  const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / 86400000);
+  const totalBots = Math.min(500, 120 + daysSinceStart * 3);
+
+  // Seeded random for consistency within same day
+  const seed = (n: number) => {
+    let x = Math.sin(n * 9301 + 49297) * 49297;
+    return x - Math.floor(x);
+  };
+
+  const bots: LeaderboardEntry[] = [];
+  for (let i = 0; i < totalBots; i++) {
+    const nameIdx = i % names.length;
+    const suffix = i >= names.length ? `${Math.floor(i / names.length) + 1}` : '';
+    const name = names[nameIdx] + suffix;
+    // XP: top bots have more, exponential decay with daily variation
+    const rank = i + 1;
+    const baseXp = Math.round(5000 * Math.pow(0.993, rank));
+    const dailyVariation = Math.round(seed(i * 1000 + daysSinceStart) * 30 - 10);
+    const xp = Math.max(5, baseXp + dailyVariation);
+    bots.push({ display_name: name, xp });
+  }
+  return bots;
+}
 
 const greetings = (name: string, streak: number, locale: 'en' | 'sk', lessonsCount: number) => {
   const h = new Date().getHours();
@@ -94,13 +131,7 @@ export default function HomePage() {
       try {
         const { data } = await supabase.from('user_state').select('display_name, xp').order('xp', { ascending: false }).limit(50);
         const realUsers: LeaderboardEntry[] = (data || []).filter((u: any) => u.display_name && u.xp > 0);
-        // Fill with bots if less than 15 users
-        const botXps = [
-          4200, 3800, 3100, 2800, 2100, 1500, 980, 750, 520, 340,
-          210, 180, 150, 130, 110, 95, 85, 75, 60, 50,
-          45, 40, 35, 30, 25, 20, 15, 12, 10, 5,
-        ];
-        const bots: LeaderboardEntry[] = BOT_NAMES.map((n, i) => ({ display_name: n, xp: botXps[i] || 5 }));
+        const bots = generateBots();
         const combined = [...realUsers, ...bots].sort((a, b) => b.xp - a.xp);
         // Deduplicate by name
         const seen = new Set<string>();

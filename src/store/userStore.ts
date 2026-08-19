@@ -160,6 +160,8 @@ export const useUserStore = create<UserState & UserActions>()(
       syncToSupabase: async () => {
         const s = get();
         if (!s.userId) return;
+        // Don't sync empty state — prevents wiping server data on fresh login
+        if (s.xp === 0 && s.completedLessons.length === 0 && (!s.name || s.name === 'User')) return;
         try {
           const pushToken = typeof window !== 'undefined' ? localStorage.getItem('coduy-push-token') : null;
           await supabase.from('user_state').upsert({

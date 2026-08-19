@@ -7,7 +7,10 @@ import { useLocaleStore } from '@/store/localeStore';
 import { getSupabase } from '@/lib/supabase';
 import StatusBar from '@/components/StatusBar';
 import AuthModal from '@/components/AuthModal';
-import { LogIn, LogOut, Globe, User, Trash2, ChevronRight, Sun, Moon, Smartphone, CreditCard } from 'lucide-react';
+import { LogIn, LogOut, Globe, User, Trash2, ChevronRight, Sun, Moon, Smartphone, CreditCard, Crown } from 'lucide-react';
+import { useSubscription } from '@/components/Paywall';
+import dynamic from 'next/dynamic';
+const Paywall = dynamic(() => import('@/components/Paywall'), { ssr: false });
 
 export default function SettingsPage() {
   const { locale, toggle } = useLocaleStore();
@@ -20,6 +23,8 @@ export default function SettingsPage() {
   const [isApp, setIsApp] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [billingLoading, setBillingLoading] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { isPro } = useSubscription();
 
   useEffect(() => {
     setNotifOn(localStorage.getItem('coduy-notifications') !== 'off');
@@ -111,6 +116,35 @@ export default function SettingsPage() {
             </button>
           )}
         </div>
+
+        {/* Get Pro */}
+        {authUser && !isPro && (
+          <div style={{ marginBottom: 28 }}>
+            <button
+              onClick={() => setShowPaywall(true)}
+              style={{
+                width: '100%', padding: '16px 16px', borderRadius: 14,
+                background: 'linear-gradient(135deg, rgba(74,222,128,0.1), rgba(34,197,94,0.05))',
+                border: '1px solid rgba(74,222,128,0.3)',
+                display: 'flex', alignItems: 'center', gap: 12,
+                cursor: 'pointer', textAlign: 'left',
+              }}
+            >
+              <Crown size={18} color="#4ade80" />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>
+                  {locale === 'sk' ? 'Získať Coduy Pro' : 'Get Coduy Pro'}
+                </div>
+                <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
+                  {locale === 'sk' ? 'Odomkni všetky lekcie a funkcie' : 'Unlock all lessons and features'}
+                </div>
+              </div>
+              <ChevronRight size={16} color="#4ade80" />
+            </button>
+          </div>
+        )}
+
+        {showPaywall && <Paywall onClose={() => setShowPaywall(false)} />}
 
         {/* Subscription - web only */}
         {authUser && !isApp && (

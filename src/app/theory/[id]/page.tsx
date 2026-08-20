@@ -1185,19 +1185,48 @@ export default function TheoryLessonPage() {
       {/* Onboarding wizard */}
       <AnimatePresence>
         {showOnboarding && (() => {
-          const steps = locale === 'sk' ? [
-            { icon: BookOpen, title: 'Prečítaj si teóriu', desc: 'Každá lekcia začína krátkym úvodom a potom sa rozdelí na tématické sekcie.' },
-            { icon: Lightbulb, title: 'Zaujímavosť od Byte-a', desc: 'Pri každej sekcii ti Byte prezradí zaujímavý fakt. Klikni na "viac" pre detail.' },
-            { icon: Check, title: 'Odpovedaj na otázky', desc: 'Po každej sekcii prídu kvízové otázky — vyber správnu odpoveď alebo doplň kód.' },
-            { icon: ArrowRight, title: 'Pokračuj ďalej', desc: 'Po poslednej sekcii dokončíš lekciu a získaš XP a odmenu.' },
-          ] : [
-            { icon: BookOpen, title: 'Read the theory', desc: 'Each lesson starts with a short intro and then splits into thematic sections.' },
-            { icon: Lightbulb, title: 'Fun fact from Byte', desc: 'With each section, Byte shares an interesting fact. Click "more" for details.' },
-            { icon: Check, title: 'Answer questions', desc: 'After each section, quiz questions come — pick the right answer or fill in code.' },
-            { icon: ArrowRight, title: 'Continue forward', desc: 'After the last section, you complete the lesson and earn XP and a reward.' },
+          const sk = locale === 'sk';
+          const steps = [
+            { title: sk ? 'Prečítaj si teóriu' : 'Read the theory',
+              desc: sk ? 'Každá lekcia sa skladá z tématických sekcií. Prečítaš text a pokračuješ ďalej.' : 'Each lesson has thematic sections. Read the text and continue.',
+              visual: (
+                <div style={{ background: '#111', borderRadius: 10, padding: '12px 16px', textAlign: 'left', width: '100%', maxWidth: 260 }}>
+                  <div style={{ height: 6, background: '#333', borderRadius: 3, width: '70%', marginBottom: 8 }} />
+                  <div style={{ height: 5, background: '#222', borderRadius: 3, width: '100%', marginBottom: 5 }} />
+                  <div style={{ height: 5, background: '#222', borderRadius: 3, width: '90%', marginBottom: 5 }} />
+                  <div style={{ height: 5, background: '#222', borderRadius: 3, width: '60%' }} />
+                </div>
+              ) },
+            { title: sk ? 'Zaujímavosť' : 'Fun fact',
+              desc: sk ? 'Pri každej sekcii nájdeš zaujímavý fakt. Klikni na "viac" pre detail.' : 'Each section has an interesting fact. Click "more" for details.',
+              visual: (
+                <div style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 10, padding: '10px 14px', width: '100%', maxWidth: 260, textAlign: 'center' }}>
+                  <span style={{ fontSize: 12, color: '#aaa' }}>{sk ? 'Prvý program vznikol v roku 1843.' : 'The first program was written in 1843.'}</span>
+                  <span style={{ marginLeft: 6, color: '#4ade80', fontSize: 11, fontWeight: 600 }}>{sk ? 'viac' : 'more'} {'>'}</span>
+                </div>
+              ) },
+            { title: sk ? 'Odpovedaj na otázky' : 'Answer questions',
+              desc: sk ? 'Po každej sekcii vyber správnu odpoveď z možností.' : 'After each section, pick the correct answer.',
+              visual: (
+                <div style={{ width: '100%', maxWidth: 260, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {['A', 'B', 'C'].map((l, i) => (
+                    <div key={l} style={{ background: i === 1 ? 'rgba(74,222,128,0.1)' : '#111', border: `1px solid ${i === 1 ? '#4ade80' : '#222'}`, borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: i === 1 ? '#4ade80' : '#555', background: i === 1 ? 'rgba(74,222,128,0.15)' : '#1a1a1a', borderRadius: 5, padding: '2px 6px' }}>{l}</span>
+                      <div style={{ height: 5, background: i === 1 ? '#4ade80' : '#333', borderRadius: 3, width: ['60%', '80%', '50%'][i] }} />
+                    </div>
+                  ))}
+                </div>
+              ) },
+            { title: sk ? 'Doplň kód' : 'Fill in the code',
+              desc: sk ? 'Niekedy doplníš chýbajúcu časť kódu priamo v termináli.' : 'Sometimes you fill in the missing code directly in the terminal.',
+              visual: (
+                <div style={{ background: '#0a0a0a', borderRadius: 10, padding: '12px 16px', textAlign: 'left', width: '100%', maxWidth: 260, fontFamily: 'monospace', fontSize: 12 }}>
+                  <div><span style={{ color: '#ff7b72' }}>if</span><span style={{ color: '#e6edf3' }}> age </span><span style={{ display: 'inline-block', width: 32, height: 16, background: 'rgba(43,202,101,0.12)', border: '1.5px dashed #2bca65', borderRadius: 4, verticalAlign: 'middle' }} /><span style={{ color: '#e6edf3' }}> 18:</span></div>
+                  <div style={{ paddingLeft: 16 }}><span style={{ color: '#d2a8ff' }}>allow_access</span><span style={{ color: '#8b949e' }}>()</span></div>
+                </div>
+              ) },
           ];
           const step = steps[onboardingStep];
-          const StepIcon = step.icon;
           return (
             <motion.div
               key="onboarding"
@@ -1210,10 +1239,10 @@ export default function TheoryLessonPage() {
                 key={onboardingStep}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                style={{ maxWidth: 340, textAlign: 'center' }}
+                style={{ maxWidth: 340, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
               >
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                  <StepIcon size={24} color="#4ade80" />
+                <div style={{ marginBottom: 24 }}>
+                  {step.visual}
                 </div>
                 <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 8 }}>{step.title}</h2>
                 <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.6, marginBottom: 28 }}>{step.desc}</p>

@@ -402,7 +402,12 @@ export default function TheoryLessonPage() {
         ) : sec.phase === 'learning' && subsections.length > 1 ? (
           /* Subsection mode: show one subsection at a time */
           <div>
-            <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={subsectionIndex} />
+            <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={subsectionIndex}
+              customTip={(() => {
+                const sub = subsections[subsectionIndex] || '';
+                const factMatch = sub.match(/\u{1F4A1}\s*(.+)/u);
+                return factMatch ? factMatch[1].split('\n')[0] : undefined;
+              })()} />
             <div style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}>
               {formatContent(subsections[subsectionIndex] || '', 'learning')}
             </div>
@@ -1200,7 +1205,7 @@ function isCodeLine(line: string): boolean {
 }
 
 /** Byte tip bubble at top of sections */
-function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; locale: string; equipment: any; sectionIndex: number }) {
+function ByteTip({ phase, locale, equipment, sectionIndex, customTip }: { phase: string; locale: string; equipment: any; sectionIndex: number; customTip?: string }) {
   // Use lesson ID from URL + sectionIndex for stable but varied selection
   const seed = (typeof window !== 'undefined' ? parseInt(window.location.pathname.split('/').pop() || '0') || 0 : 0) + sectionIndex;
   const tipsSk: Record<string, string[]> = {
@@ -1237,7 +1242,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex }: { phase: string; lo
   };
   const tips = locale === 'sk' ? tipsSk : tipsEn;
   const pool = tips[phase] || tips.learning;
-  const tip = pool[sectionIndex % pool.length];
+  const tip = customTip || pool[sectionIndex % pool.length];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: `${phase === 'intro' ? 40 : 12}px 0 0` }}>

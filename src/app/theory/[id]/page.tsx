@@ -977,15 +977,17 @@ export default function TheoryLessonPage() {
             <pre style={{ margin: 0, padding: '14px 16px', fontSize: 14, lineHeight: 1.8, overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace', whiteSpace: 'pre-wrap' }}>
               {safe(q.code_snippet).split('\n').map((line, li) => (
                 <div key={li}>
-                  {line.split(/(___|\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|True|False|None)\b|"[^"]*"|'[^']*'|\b\d+\b|#.*$)/gm).map((part, pi) => {
-                    if (part === '___') return <span key={pi} style={{ display: 'inline-block', minWidth: 48, height: 22, background: 'rgba(74,222,128,0.15)', border: '1.5px dashed #4ade80', borderRadius: 6, verticalAlign: 'middle', margin: '0 2px' }} />;
-                    if (/^(if|else|elif|for|while|def|return|import|from|class|in|not|and|or)$/.test(part)) return <span key={pi} style={{ color: '#c084fc' }}>{part}</span>;
-                    if (/^(print|len|type|int|float|str|input)$/.test(part)) return <span key={pi} style={{ color: '#60a5fa' }}>{part}</span>;
-                    if (/^(True|False|None)$/.test(part)) return <span key={pi} style={{ color: '#f97316' }}>{part}</span>;
-                    if (/^["']/.test(part)) return <span key={pi} style={{ color: '#4ade80' }}>{part}</span>;
-                    if (/^\d+$/.test(part)) return <span key={pi} style={{ color: '#f59e0b' }}>{part}</span>;
-                    if (/^#/.test(part)) return <span key={pi} style={{ color: '#555' }}>{part}</span>;
-                    return <span key={pi} style={{ color: '#ddd' }}>{part}</span>;
+                  {line.split(/(___|\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|True|False|None|self)\b|"[^"]*"|'[^']*'|\[|\]|\(|\)|\b\d+\b|#.*$)/gm).map((part, pi) => {
+                    if (!part) return null;
+                    if (part === '___') return <span key={pi} style={{ display: 'inline-block', minWidth: 48, height: 24, background: 'rgba(43,202,101,0.12)', border: '1.5px dashed #2bca65', borderRadius: 6, verticalAlign: 'middle', margin: '0 3px' }} />;
+                    if (/^(if|else|elif|for|while|def|return|import|from|class|in|not|and|or|self)$/.test(part)) return <span key={pi} style={{ color: '#ff7b72' }}>{part}</span>;
+                    if (/^(print|len|type|int|float|str|input|range|list|dict|set|tuple|sorted|map|filter|open)$/.test(part)) return <span key={pi} style={{ color: '#d2a8ff' }}>{part}</span>;
+                    if (/^(True|False|None)$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
+                    if (/^["']/.test(part)) return <span key={pi} style={{ color: '#a5d6ff' }}>{part}</span>;
+                    if (/^\d+$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
+                    if (/^[[\]()]$/.test(part)) return <span key={pi} style={{ color: '#8b949e' }}>{part}</span>;
+                    if (/^#/.test(part)) return <span key={pi} style={{ color: '#8b949e', fontStyle: 'italic' }}>{part}</span>;
+                    return <span key={pi} style={{ color: '#e6edf3' }}>{part}</span>;
                   })}
                 </div>
               ))}

@@ -83,7 +83,7 @@ export default function TheoryLessonPage() {
 
           // Split learning_content into subsections by # headers
           const content = locale === 'sk' ? ((l as any).learning_content_sk || l.learning_content || '') : (l.learning_content || '');
-          const subs = content.split(/(?=^## )/m).filter(s => s.trim());
+          const subs = content.split(/(?=^## )/m).filter((s: string) => s.trim());
           if (subs.length > 1) {
             setSubsections(subs);
           }

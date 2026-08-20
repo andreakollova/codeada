@@ -1802,7 +1802,7 @@ function formatContent(text: string, phase: string = '') {
     // Fun fact card: 💡 Title\nExplanation
     if (trimmed.startsWith('\u{1F4A1}')) {
       const factLines = trimmed.split('\n');
-      const title = factLines[0].replace(/^\u{1F4A1}\s*/, '');
+      const title = factLines[0].replace(/^\u{1F4A1}\s*/u, '');
       const detail = factLines.slice(1).join('\n').trim();
       result.push(
         <FactCard key={`fact-${keyCounter++}`} title={title} detail={detail} />

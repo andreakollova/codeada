@@ -82,8 +82,8 @@ export default function Byte({ mood, size = 120, className = '', animate = true,
             fill="white" opacity={eye.opacity}
             style={{ filter: eye.opacity > 0.5 ? 'drop-shadow(0 0 8px rgba(255,255,255,0.6))' : 'none' }}
             {...blinkAnim} />
-          {/* Cute highlight dot — visible only in light mode via CSS */}
-          <motion.circle className="byte-eye-highlight" cx="46" cy={70 + eye.dy} r={eye.rx * 0.3} fill="white"
+          {/* Pupil dot — dark mode: black pupil, light mode: white highlight (via CSS) */}
+          <motion.circle className="byte-eye-dot" cx="45" cy={72 + eye.dy} r={eye.rx * 0.35} fill="#111"
             {...blinkAnim} />
         </motion.g>
 
@@ -93,8 +93,8 @@ export default function Byte({ mood, size = 120, className = '', animate = true,
             fill="white" opacity={eye.opacity}
             style={{ filter: eye.opacity > 0.5 ? 'drop-shadow(0 0 8px rgba(255,255,255,0.6))' : 'none' }}
             {...(blinkAnim.animate ? { ...blinkAnim, transition: { ...blinkAnim.transition, delay: 0.05 } } : {})} />
-          {/* Cute highlight dot — visible only in light mode via CSS */}
-          <motion.circle className="byte-eye-highlight" cx="80" cy={70 + eye.dy} r={eye.rx * 0.3} fill="white"
+          {/* Pupil dot — dark mode: black pupil, light mode: white highlight (via CSS) */}
+          <motion.circle className="byte-eye-dot" cx="79" cy={72 + eye.dy} r={eye.rx * 0.35} fill="#111"
             {...(blinkAnim.animate ? { ...blinkAnim, transition: { ...blinkAnim.transition, delay: 0.05 } } : {})} />
         </motion.g>
 

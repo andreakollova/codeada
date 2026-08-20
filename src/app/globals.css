@@ -599,9 +599,9 @@ a { color: inherit; text-decoration: none; }
 /* White body with dark outline */
 [data-theme="light"] .byte-character ellipse[cx="60"] { fill: #FFFFFF !important; stroke: #333 !important; }
 /* Dark eyes */
-[data-theme="light"] .byte-character ellipse[fill="white"]:not(.byte-eye-highlight) { fill: #333 !important; filter: none !important; }
+[data-theme="light"] .byte-character ellipse[fill="white"]:not(.byte-eye-dot) { fill: #333 !important; filter: none !important; }
 /* White highlight dots in eyes */
-[data-theme="light"] .byte-eye-highlight { opacity: 0.9 !important; fill: white !important; }
+[data-theme="light"] .byte-eye-dot { opacity: 0.9 !important; fill: white !important; }
 /* Dark smile */
 [data-theme="light"] .byte-character path[fill="none"][stroke] { stroke: rgba(0,0,0,0.35) !important; }
 /* Dark antenna */
@@ -612,7 +612,7 @@ a { color: inherit; text-decoration: none; }
 [data-theme="light"] .byte-character polygon,
 [data-theme="light"] .byte-character path[fill="white"],
 [data-theme="light"] .byte-character path[fill="#fff"],
-[data-theme="light"] .byte-character circle[fill="white"]:not(.byte-eye-highlight) { fill: #333 !important; }
+[data-theme="light"] .byte-character circle[fill="white"]:not(.byte-eye-dot) { fill: #333 !important; }
 /* Hat outlines dark */
 [data-theme="light"] .byte-character rect[stroke="white"],
 [data-theme="light"] .byte-character path[stroke="white"],

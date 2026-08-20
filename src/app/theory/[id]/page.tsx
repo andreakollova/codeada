@@ -82,7 +82,7 @@ export default function TheoryLessonPage() {
           setQuiz(allQ);
 
           // Split learning_content into subsections by # headers
-          const content = locale === 'sk' ? (l.learning_content_sk || l.learning_content || '') : (l.learning_content || '');
+          const content = locale === 'sk' ? ((l as any).learning_content_sk || l.learning_content || '') : (l.learning_content || '');
           const subs = content.split(/(?=^## )/m).filter(s => s.trim());
           if (subs.length > 1) {
             setSubsections(subs);

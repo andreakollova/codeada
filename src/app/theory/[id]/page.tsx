@@ -40,6 +40,9 @@ export default function TheoryLessonPage() {
   // Subsection-based learning: split learning_content by # headers
   const [subsections, setSubsections] = useState<string[]>([]);
   const [subsectionIndex, setSubsectionIndex] = useState(0);
+  // Onboarding wizard — shown once before first lesson
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [score, setScore] = useState(0);
   // Safe string helper - ensures no objects reach React render
   const safe = (v: unknown): string => (v == null ? '' : typeof v === 'string' ? v : String(v));
@@ -90,6 +93,10 @@ export default function TheoryLessonPage() {
 
           setPhase('intro');
           setByteMood('happy');
+          // Show onboarding wizard on first lesson ever
+          if (!localStorage.getItem('coduy-lesson-onboarding')) {
+            setShowOnboarding(true);
+          }
         }
       })
       .catch(err => {
@@ -1173,6 +1180,75 @@ export default function TheoryLessonPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
+      {/* Onboarding wizard */}
+      <AnimatePresence>
+        {showOnboarding && (() => {
+          const steps = locale === 'sk' ? [
+            { icon: BookOpen, title: 'Prečítaj si teóriu', desc: 'Každá lekcia začína krátkym úvodom a potom sa rozdelí na tématické sekcie.' },
+            { icon: Lightbulb, title: 'Zaujímavosť od Byte-a', desc: 'Pri každej sekcii ti Byte prezradí zaujímavý fakt. Klikni na "viac" pre detail.' },
+            { icon: Check, title: 'Odpovedaj na otázky', desc: 'Po každej sekcii prídu kvízové otázky — vyber správnu odpoveď alebo doplň kód.' },
+            { icon: ArrowRight, title: 'Pokračuj ďalej', desc: 'Po poslednej sekcii dokončíš lekciu a získaš XP a odmenu.' },
+          ] : [
+            { icon: BookOpen, title: 'Read the theory', desc: 'Each lesson starts with a short intro and then splits into thematic sections.' },
+            { icon: Lightbulb, title: 'Fun fact from Byte', desc: 'With each section, Byte shares an interesting fact. Click "more" for details.' },
+            { icon: Check, title: 'Answer questions', desc: 'After each section, quiz questions come — pick the right answer or fill in code.' },
+            { icon: ArrowRight, title: 'Continue forward', desc: 'After the last section, you complete the lesson and earn XP and a reward.' },
+          ];
+          const step = steps[onboardingStep];
+          const StepIcon = step.icon;
+          return (
+            <motion.div
+              key="onboarding"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+            >
+              <motion.div
+                key={onboardingStep}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ maxWidth: 340, textAlign: 'center' }}
+              >
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                  <StepIcon size={24} color="#4ade80" />
+                </div>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 8 }}>{step.title}</h2>
+                <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.6, marginBottom: 28 }}>{step.desc}</p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 20 }}>
+                  {steps.map((_, i) => (
+                    <div key={i} style={{ width: 8, height: 8, borderRadius: 4, background: i === onboardingStep ? '#4ade80' : '#333' }} />
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    if (onboardingStep < steps.length - 1) {
+                      setOnboardingStep(s => s + 1);
+                    } else {
+                      localStorage.setItem('coduy-lesson-onboarding', 'done');
+                      setShowOnboarding(false);
+                    }
+                  }}
+                  style={{ padding: '14px 40px', borderRadius: 12, background: '#EDEDED', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
+                >
+                  {onboardingStep < steps.length - 1
+                    ? (locale === 'sk' ? 'Ďalej' : 'Next')
+                    : (locale === 'sk' ? 'Začať lekciu' : 'Start lesson')}
+                </button>
+                <div>
+                  <button
+                    onClick={() => { localStorage.setItem('coduy-lesson-onboarding', 'done'); setShowOnboarding(false); }}
+                    style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 12 }}
+                  >
+                    {locale === 'sk' ? 'Preskočiť' : 'Skip'}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
+
       {/* Header */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '12px 20px', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)', background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid #0f0f0f' }}>
         <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>

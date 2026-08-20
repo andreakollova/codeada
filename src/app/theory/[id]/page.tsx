@@ -961,9 +961,29 @@ export default function TheoryLessonPage() {
         </h2>
 
         {q.code_snippet && (
-          <pre style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '14px 16px', fontSize: 13, color: '#EDEDED', overflow: 'auto', lineHeight: 1.7 }}>
-            {safe(q.code_snippet)}
-          </pre>
+          <div style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, overflow: 'hidden' }}>
+            <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
+            </div>
+            <pre style={{ margin: 0, padding: '14px 16px', fontSize: 14, lineHeight: 1.8, overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace', whiteSpace: 'pre-wrap' }}>
+              {safe(q.code_snippet).split('\n').map((line, li) => (
+                <div key={li}>
+                  {line.split(/(___|\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|True|False|None)\b|"[^"]*"|'[^']*'|\b\d+\b|#.*$)/gm).map((part, pi) => {
+                    if (part === '___') return <span key={pi} style={{ display: 'inline-block', minWidth: 48, height: 22, background: 'rgba(74,222,128,0.15)', border: '1.5px dashed #4ade80', borderRadius: 6, verticalAlign: 'middle', margin: '0 2px' }} />;
+                    if (/^(if|else|elif|for|while|def|return|import|from|class|in|not|and|or)$/.test(part)) return <span key={pi} style={{ color: '#c084fc' }}>{part}</span>;
+                    if (/^(print|len|type|int|float|str|input)$/.test(part)) return <span key={pi} style={{ color: '#60a5fa' }}>{part}</span>;
+                    if (/^(True|False|None)$/.test(part)) return <span key={pi} style={{ color: '#f97316' }}>{part}</span>;
+                    if (/^["']/.test(part)) return <span key={pi} style={{ color: '#4ade80' }}>{part}</span>;
+                    if (/^\d+$/.test(part)) return <span key={pi} style={{ color: '#f59e0b' }}>{part}</span>;
+                    if (/^#/.test(part)) return <span key={pi} style={{ color: '#555' }}>{part}</span>;
+                    return <span key={pi} style={{ color: '#ddd' }}>{part}</span>;
+                  })}
+                </div>
+              ))}
+            </pre>
+          </div>
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

@@ -403,10 +403,11 @@ export default function TheoryLessonPage() {
           /* Subsection mode: show one subsection at a time */
           <div>
             <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={subsectionIndex}
-              customTip={(() => {
+              {...(() => {
                 const sub = subsections[subsectionIndex] || '';
-                const factMatch = sub.match(/\u{1F4A1}\s*(.+)/u);
-                return factMatch ? factMatch[1].split('\n')[0] : undefined;
+                const factMatch = sub.match(/\u{1F4A1}\s*(.+)\n([\s\S]*?)(?=\n\n|\u{1F4A1}|$)/u);
+                if (factMatch) return { customTip: factMatch[1].trim(), customDetail: factMatch[2].trim() };
+                return {};
               })()} />
             <div style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}>
               {formatContent(subsections[subsectionIndex] || '', 'learning')}
@@ -1205,40 +1206,18 @@ function isCodeLine(line: string): boolean {
 }
 
 /** Byte tip bubble at top of sections */
-function ByteTip({ phase, locale, equipment, sectionIndex, customTip }: { phase: string; locale: string; equipment: any; sectionIndex: number; customTip?: string }) {
-  // Use lesson ID from URL + sectionIndex for stable but varied selection
+function ByteTip({ phase, locale, equipment, sectionIndex, customTip, customDetail }: { phase: string; locale: string; equipment: any; sectionIndex: number; customTip?: string; customDetail?: string }) {
+  const [expanded, setExpanded] = useState(false);
   const seed = (typeof window !== 'undefined' ? parseInt(window.location.pathname.split('/').pop() || '0') || 0 : 0) + sectionIndex;
   const tipsSk: Record<string, string[]> = {
     intro: ['Za každou appkou je kód.', 'Programovanie je všade okolo nás.', 'Každá veľká vec začala malým krokom.', 'Toto ťa posunie vpred.', 'Dnes sa naučíš niečo nové.', 'Pripravený na novú lekciu?', 'Poďme na to!', 'Toto bude zaujímavé.', 'Začíname!', 'Nová lekcia, nové vedomosti.'],
-    learning: [
-      'Aj ten najzložitejší program je len séria jednoduchých krokov.',
-      'Kód sa píše raz, ale číta sa stokrát.',
-      'Programovanie je riešenie problémov, nie písanie kódu.',
-      'Dobrý programátor trávi viac času premýšľaním než písaním.',
-      'Každá veľká aplikácia začala jednoduchým nápadom.',
-      'Abstrakcia je kľúč k zvládaniu komplexity.',
-      'Softvér sa nikdy nedokončí, iba sa prestane meniť.',
-      'Najlepší kód je ten, ktorý nikdy nemusíš napísať.',
-    ],
-    facts: ['Toto je zaujímavé!', 'Málokto toto vie.', 'Prekvapivé, že?'],
-    real_world: ['Toto sa fakt používa.', 'Tu vidíš prečo sa to oplatí.', 'Celkom cool, nie?'],
-    takeaways: ['Rýchle zhrnutie!', 'Toto si zapamätaj.'],
+    learning: ['Aj ten najzložitejší program je len séria jednoduchých krokov.', 'Kód sa píše raz, ale číta sa stokrát.', 'Programovanie je riešenie problémov, nie písanie kódu.', 'Dobrý programátor trávi viac času premýšľaním než písaním.', 'Každá veľká aplikácia začala jednoduchým nápadom.', 'Abstrakcia je kľúč k zvládaniu komplexity.'],
+    facts: ['Toto je zaujímavé!'], real_world: ['Toto sa fakt používa.'], takeaways: ['Rýchle zhrnutie!'],
   };
   const tipsEn: Record<string, string[]> = {
-    intro: ['This will change how you see technology.', 'Behind every app is code.', 'Programming is all around us.', 'Every big thing started with a small step.'],
-    learning: [
-      'Python is named after the comedy group Monty Python.',
-      'When you write print("Hello"), the computer runs dozens of operations behind the scenes.',
-      'The first bug in history was an actual insect stuck in a computer.',
-      'There are over 700 programming languages in the world.',
-      'Most programmers use only 5-10 commands daily.',
-      'Code is written once but read hundreds of times.',
-      'Even the most complex program is just a series of simple steps.',
-      'Python can do in 1 line what Java takes 5 lines to do.',
-    ],
-    facts: ['This is interesting!', 'Not many people know this.', 'Surprising, right?'],
-    real_world: ['This is actually used.', 'Now you see why it matters.', 'Pretty cool, right?'],
-    takeaways: ['Quick recap!', 'Remember this.'],
+    intro: ['Behind every app is code.', 'Programming is all around us.', 'Every big thing started with a small step.'],
+    learning: ['Even the most complex program is just a series of simple steps.', 'Code is written once but read hundreds of times.', 'Programming is problem solving, not just writing code.'],
+    facts: ['This is interesting!'], real_world: ['This is actually used.'], takeaways: ['Quick recap!'],
   };
   const tips = locale === 'sk' ? tipsSk : tipsEn;
   const pool = tips[phase] || tips.learning;
@@ -1246,11 +1225,25 @@ function ByteTip({ phase, locale, equipment, sectionIndex, customTip }: { phase:
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: `${phase === 'intro' ? 40 : 12}px 0 0` }}>
-      <div style={{
-        background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
-        padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 260, textAlign: 'center',
-      }}>
+      <div
+        onClick={customDetail ? () => setExpanded(!expanded) : undefined}
+        style={{
+          background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
+          padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 280, textAlign: 'center',
+          cursor: customDetail ? 'pointer' : 'default',
+        }}
+      >
         {tip}
+        {customDetail && <span style={{ marginLeft: 6, fontSize: 10, color: '#555' }}>{expanded ? '\u25B2' : '\u25BC'}</span>}
+        <AnimatePresence>
+          {expanded && customDetail && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} style={{ overflow: 'hidden' }}>
+              <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #333', fontSize: 11, color: '#888', lineHeight: 1.6, textAlign: 'left' }}>
+                {customDetail}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <motion.div
         animate={{ y: [0, -5, 0], rotate: [0, 2, -2, 0] }}
@@ -1799,14 +1792,8 @@ function formatContent(text: string, phase: string = '') {
     if (/^#*\s*(Review|Opakovanie|Zhrnutie)\s*$/i.test(trimmed)) continue;
     if (/^(Review|Opakovanie)$/i.test(trimmed)) continue;
 
-    // Fun fact card: 💡 Title\nExplanation
+    // Fun facts (💡) — skip in content, shown in ByteTip bubble instead
     if (trimmed.startsWith('\u{1F4A1}')) {
-      const factLines = trimmed.split('\n');
-      const title = factLines[0].replace(/^\u{1F4A1}\s*/u, '');
-      const detail = factLines.slice(1).join('\n').trim();
-      result.push(
-        <FactCard key={`fact-${keyCounter++}`} title={title} detail={detail} />
-      );
       continue;
     }
 
@@ -1814,7 +1801,7 @@ function formatContent(text: string, phase: string = '') {
     if (/^#{1,3}\s+/.test(trimmed)) {
       const level = trimmed.match(/^(#+)/)?.[1].length || 1;
       const heading = trimmed.replace(/^#+\s*/, '');
-      const fontSize = level === 1 ? 20 : level === 2 ? 17 : 15;
+      const fontSize = level === 1 ? 22 : level === 2 ? 19 : 17;
       result.push(
         <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
           <h3 style={{ fontWeight: 700, fontSize, color: '#EDEDED', margin: 0, marginBottom: level <= 2 ? 10 : 6 }}>

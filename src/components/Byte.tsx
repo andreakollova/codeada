@@ -12,8 +12,8 @@ interface ByteProps {
 }
 
 const eyes: Record<ByteMood, { rx: number; ry: number; dy: number; opacity: number }> = {
-  happy:       { rx: 7,  ry: 9,  dy: 0,  opacity: 1   },
-  celebrating: { rx: 9,  ry: 13, dy: -2, opacity: 1   },
+  happy:       { rx: 5.5, ry: 7,  dy: 0,  opacity: 1   },
+  celebrating: { rx: 7,  ry: 10, dy: -2, opacity: 1   },
   sleepy:      { rx: 11, ry: 2.5,dy: 3,  opacity: 0.7 },
   worried:     { rx: 7,  ry: 8,  dy: 0,  opacity: 1   },
   proud:       { rx: 9,  ry: 12, dy: -1, opacity: 1   },

@@ -44,7 +44,8 @@ export default function Byte({ mood, size = 120, className = '', animate = true,
   const wobbleAnim = animate && mood === 'worried' ? { animate: { rotate: [-2, 2, -2] }, transition: { duration: 0.8, repeat: Infinity } } : {};
   const mainAnim = mood === 'celebrating' ? celebAnim : mood === 'worried' ? wobbleAnim : floatAnim;
 
-  const blinkAnim = animate && mood !== 'sleepy' && mood !== 'low_battery' ? {
+  const hasGlasses = !!equipment.glasses;
+  const blinkAnim = animate && mood !== 'sleepy' && mood !== 'low_battery' && !hasGlasses ? {
     animate: { ry: [eye.ry, eye.ry * 0.1, eye.ry] },
     transition: { duration: 3.5, repeat: Infinity, repeatDelay: 2.5, ease: 'easeInOut' as const },
   } : {};

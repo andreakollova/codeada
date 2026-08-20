@@ -1244,14 +1244,11 @@ function ByteTip({ phase, locale, equipment, sectionIndex, customTip, customDeta
           cursor: customDetail ? 'pointer' : 'default',
         }}
       >
-        {tip}
+        <span>{tip}</span>
         {customDetail && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, color: '#4ade80', fontSize: 11, fontWeight: 600 }}>
-            {expanded ? 'skryť' : 'viac'}
-            <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.15 }}>
-              <ChevronRight size={12} style={{ transform: 'rotate(90deg)' }} />
-            </motion.div>
-          </div>
+          <span style={{ marginLeft: 6, color: '#4ade80', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
+            {expanded ? 'skryť' : 'viac'} <ChevronRight size={10} style={{ display: 'inline', verticalAlign: 'middle', transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+          </span>
         )}
         <AnimatePresence>
           {expanded && customDetail && (

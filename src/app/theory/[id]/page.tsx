@@ -770,7 +770,7 @@ export default function TheoryLessonPage() {
           }}>
             {snippet.split('\n').map((line, li) => (
               <div key={li}>
-                {line.split(/(___|\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|self)\b|"[^"]*"|'[^']*'|\[|\]|\(|\)|\b\d+\b|#.*$)/gm).map((part, pi) => {
+                {line.replace(/"___"/g, '"\u200B___\u200B"').replace(/'___'/g, "'\u200B___\u200B'").split(/(___|\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|self)\b|"[^"]*"|'[^']*'|\[|\]|\(|\)|\b\d+\b|#.*$)/gm).map((part, pi) => {
                   if (!part) return null;
                   if (part === '___') return (
                     <input
@@ -798,11 +798,11 @@ export default function TheoryLessonPage() {
                   if (/^(if|else|elif|for|while|def|return|import|from|class|in|not|and|or|self)$/.test(part)) return <span key={pi} style={{ color: '#ff7b72' }}>{part}</span>;
                   if (/^(print|len|type|int|float|str|input|range|list|dict|set|tuple|sorted|map|filter|open)$/.test(part)) return <span key={pi} style={{ color: '#d2a8ff' }}>{part}</span>;
                   if (/^(True|False|None)$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
-                  if (/^["']/.test(part)) return <span key={pi} style={{ color: '#a5d6ff' }}>{part}</span>;
+                  if (/^["']/.test(part)) return <span key={pi} style={{ color: '#a5d6ff' }}>{part.replace(/\u200B/g, '')}</span>;
                   if (/^\d+$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
                   if (/^[[\]()]$/.test(part)) return <span key={pi} style={{ color: '#8b949e' }}>{part}</span>;
                   if (/^#/.test(part)) return <span key={pi} style={{ color: '#8b949e', fontStyle: 'italic' }}>{part}</span>;
-                  return <span key={pi} style={{ color: '#e6edf3' }}>{part}</span>;
+                  return <span key={pi} style={{ color: '#e6edf3' }}>{part.replace(/\u200B/g, '')}</span>;
                 })}
               </div>
             ))}

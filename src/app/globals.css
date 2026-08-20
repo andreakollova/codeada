@@ -43,10 +43,10 @@
 }
 
 [data-theme="light"] {
-  --bg: #F5F5F7;
+  --bg: #FEFEFE;
   --bg-card: #FFFFFF;
-  --bg-surface: #F0F0F2;
-  --bg-raised: #E8E8EC;
+  --bg-surface: #F5F5F7;
+  --bg-raised: #EDEDF0;
   --bg-input: #FFFFFF;
   --text: #1A1A1A;
   --text-secondary: #444;

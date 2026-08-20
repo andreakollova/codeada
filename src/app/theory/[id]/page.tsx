@@ -1340,7 +1340,7 @@ function ByteTip({ phase, locale, equipment, sectionIndex, customTip, customDeta
           cursor: customDetail ? 'pointer' : 'default',
         }}
       >
-        <span>{tip}</span>
+        <span>{tip}{customDetail ? '.' : ''}</span>
         {customDetail && (
           <span style={{ marginLeft: 6, color: '#4ade80', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
             {expanded ? 'skryť' : 'viac'} <ChevronRight size={10} style={{ display: 'inline', verticalAlign: 'middle', transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />

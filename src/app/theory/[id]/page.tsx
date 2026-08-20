@@ -419,6 +419,14 @@ export default function TheoryLessonPage() {
             >
               {locale === 'sk' ? 'Pokračovať' : 'Continue'} <ArrowRight size={16} />
             </motion.button>
+            {subsectionIndex > 0 && (
+              <button
+                onClick={() => { scrollTop(); setSubsectionIndex(i => i - 1); setPhase('learning'); }}
+                style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 4, fontWeight: 500, alignSelf: 'center', width: '100%', textAlign: 'center' }}
+              >
+                {locale === 'sk' ? 'Späť' : 'Back'}
+              </button>
+            )}
           </div>
         ) : sec.phase === 'learning' ? (
           <PaginatedContent text={String(content)} locale={locale} equipment={equipment} onComplete={handleNextSection} />

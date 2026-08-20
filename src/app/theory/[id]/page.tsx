@@ -80,7 +80,7 @@ export default function TheoryLessonPage() {
         if (l) {
           setLesson(l);
           // Quiz — keep in order (question_number) for subsection distribution
-          const allQ = (q || []).filter(x => x.question_type === 'multiple_choice');
+          const allQ = (q || []).filter(x => x.question_type === 'multiple_choice' || x.question_type === 'fill_code');
           allQ.sort((a, b) => (a.question_number || 0) - (b.question_number || 0));
           setQuiz(allQ);
 
@@ -755,8 +755,8 @@ export default function TheoryLessonPage() {
           {safe(t(q, 'question_text', locale))}
         </h2>
 
-        {/* Code preview with highlighted blanks */}
-        <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>
+        {/* Terminal-style code with inline input */}
+        <div style={{ borderRadius: 12, overflow: 'hidden', border: `1px solid ${fillCodeState === 'correct' ? 'rgba(74,222,128,0.3)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.2)' : '#1a1a1a'}` }}>
           <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
@@ -764,60 +764,49 @@ export default function TheoryLessonPage() {
           </div>
           <pre style={{
             background: '#0a0a0a', margin: 0,
-            padding: '14px 16px', fontSize: 14, color: '#ccc', lineHeight: 1.8,
+            padding: '14px 16px', fontSize: 14, lineHeight: 1.8,
             overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace',
             whiteSpace: 'pre-wrap',
           }}>
-            {parts.map((part, i) => (
-              <span key={i}>
-                {part}
-                {i < parts.length - 1 && (
-                  <span style={{
-                    background: fillCodeState === 'correct' ? 'rgba(74,222,128,0.2)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.2)' : 'rgba(74,222,128,0.1)',
-                    color: fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff8080' : '#4ade80',
-                    padding: '2px 6px', borderRadius: 4,
-                    borderBottom: '2px solid',
-                    borderColor: fillCodeState === 'correct' ? '#4ade80' : fillCodeState === 'wrong' ? '#ff6060' : '#4ade80',
-                  }}>
-                    {fillCodeValues[i] || (correctAnswers.length > 1 ? `#${i + 1}` : '?')}
-                  </span>
-                )}
-              </span>
+            {snippet.split('\n').map((line, li) => (
+              <div key={li}>
+                {line.split(/(___|\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|self)\b|"[^"]*"|'[^']*'|\[|\]|\(|\)|\b\d+\b|#.*$)/gm).map((part, pi) => {
+                  if (!part) return null;
+                  if (part === '___') return (
+                    <input
+                      key={pi}
+                      type="text"
+                      value={fillCodeValues[0] || ''}
+                      onChange={e => setFillCodeValues([e.target.value])}
+                      disabled={fillCodeState !== 'editing'}
+                      autoFocus
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      onKeyDown={e => { if (e.key === 'Enter' && fillCodeState === 'editing') handleFillCheck(); }}
+                      placeholder="..."
+                      style={{
+                        background: fillCodeState === 'correct' ? 'rgba(43,202,101,0.15)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.1)' : 'rgba(43,202,101,0.08)',
+                        border: `1.5px dashed ${fillCodeState === 'correct' ? '#2bca65' : fillCodeState === 'wrong' ? '#ff6060' : '#2bca65'}`,
+                        borderRadius: 6, color: fillCodeState === 'correct' ? '#2bca65' : fillCodeState === 'wrong' ? '#ff8080' : '#fff',
+                        fontFamily: 'inherit', fontSize: 'inherit', padding: '2px 8px',
+                        width: `${Math.max((correctAnswers[0]?.length || 4) + 3, 5)}ch`,
+                        outline: 'none', verticalAlign: 'baseline',
+                      }}
+                    />
+                  );
+                  if (/^(if|else|elif|for|while|def|return|import|from|class|in|not|and|or|self)$/.test(part)) return <span key={pi} style={{ color: '#ff7b72' }}>{part}</span>;
+                  if (/^(print|len|type|int|float|str|input|range|list|dict|set|tuple|sorted|map|filter|open)$/.test(part)) return <span key={pi} style={{ color: '#d2a8ff' }}>{part}</span>;
+                  if (/^(True|False|None)$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
+                  if (/^["']/.test(part)) return <span key={pi} style={{ color: '#a5d6ff' }}>{part}</span>;
+                  if (/^\d+$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
+                  if (/^[[\]()]$/.test(part)) return <span key={pi} style={{ color: '#8b949e' }}>{part}</span>;
+                  if (/^#/.test(part)) return <span key={pi} style={{ color: '#8b949e', fontStyle: 'italic' }}>{part}</span>;
+                  return <span key={pi} style={{ color: '#e6edf3' }}>{part}</span>;
+                })}
+              </div>
             ))}
           </pre>
-        </div>
-
-        {/* Separate input fields below code */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {correctAnswers.map((_, i) => (
-            <input
-              key={i}
-              type="text"
-              value={fillCodeValues[i] || ''}
-              onChange={e => {
-                const v = [...fillCodeValues];
-                v[i] = e.target.value;
-                setFillCodeValues(v);
-              }}
-              disabled={fillCodeState !== 'editing'}
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
-              autoFocus={i === 0}
-              placeholder={correctAnswers.length > 1
-                ? (locale === 'sk' ? `Odpoveď #${i + 1}...` : `Answer #${i + 1}...`)
-                : (locale === 'sk' ? 'Napíš odpoveď...' : 'Type your answer...')}
-              onKeyDown={e => { if (e.key === 'Enter' && fillCodeState === 'editing') handleFillCheck(); }}
-              style={{
-                width: '100%', padding: '14px 16px', borderRadius: 12,
-                background: fillCodeState === 'correct' ? 'rgba(74,222,128,0.08)' : '#0a0a0a',
-                border: `1.5px solid ${fillCodeState === 'correct' ? 'rgba(74,222,128,0.4)' : fillCodeState === 'wrong' ? 'rgba(255,80,80,0.3)' : '#222'}`,
-                color: fillCodeState === 'correct' ? '#4ade80' : '#fff',
-                fontSize: 16, fontFamily: 'JetBrains Mono, Fira Code, monospace',
-                outline: 'none', boxSizing: 'border-box',
-              }}
-            />
-          ))}
         </div>
 
         {/* Action buttons */}

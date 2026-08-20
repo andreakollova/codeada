@@ -1102,15 +1102,9 @@ export default function TheoryLessonPage() {
         <p style={{ color: '#888', fontSize: 15, marginTop: 8, textAlign: 'center' }}>
           {safe(t(lesson, 'title', locale))}
         </p>
-        <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score}/{quiz.length}</p>
-            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{s('quizScore', locale)}</p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontWeight: 800, fontSize: 24, color: '#fff', margin: 0 }}>{score * 10 + sections.length * 5}</p>
-            <p style={{ fontSize: 12, color: '#888', margin: 0 }}>{s('xpEarned', locale)}</p>
-          </div>
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <p style={{ fontWeight: 800, fontSize: 28, color: '#4ade80', margin: 0 }}>+{score * 10 + sections.length * 5} XP</p>
+          <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>{s('xpEarned', locale)}</p>
         </div>
         {reward && (() => {
           const item = cosmeticItems.find(c => c.id === reward);

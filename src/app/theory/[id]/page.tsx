@@ -473,7 +473,7 @@ export default function TheoryLessonPage() {
               : s('finish', locale)}
           <ArrowRight size={16} />
         </motion.button>}
-        {sectionIndex > 0 && (
+        {sectionIndex > 0 && subsections.length <= 1 && (
           <button
             onClick={() => {
               scrollTop();

@@ -1225,6 +1225,9 @@ function ByteTip({ phase, locale, equipment, sectionIndex, customTip, customDeta
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: `${phase === 'intro' ? 40 : 12}px 0 0` }}>
+      {customTip && <div style={{ fontSize: 9, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
+        {locale === 'sk' ? 'Zaujímavosť' : 'Fun fact'}
+      </div>}
       <div
         onClick={customDetail ? () => setExpanded(!expanded) : undefined}
         style={{

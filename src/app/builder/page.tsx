@@ -720,9 +720,37 @@ export default function BuilderPage() {
   // ── Save lesson ──
   const saveLesson = async () => {
     if (!lesson) return;
-    if (!lesson.title_sk?.trim()) {
-      alert('Názov SK je prázdny.');
-      return;
+
+    // Validation warnings
+    const warnings: string[] = [];
+    if (!lesson.title_sk?.trim()) warnings.push('Názov SK je prázdny');
+    if (!lesson.title?.trim()) warnings.push('Názov EN je prázdny');
+    if (!lesson.introduction_sk?.trim()) warnings.push('Úvod SK je prázdny');
+    if (!lesson.introduction?.trim()) warnings.push('Úvod EN je prázdny');
+
+    miniLessons.forEach((ml, i) => {
+      const num = i + 1;
+      if (!ml.title.trim() || ml.title === 'Nova sekcia') warnings.push(`Sekcia #${num}: nadpis SK chýba alebo je "Nova sekcia"`);
+      if (!ml.title_en.trim()) warnings.push(`Sekcia #${num}: nadpis EN chýba`);
+      if (!ml.content.trim()) warnings.push(`Sekcia #${num}: SK obsah je prázdny`);
+      if (!ml.content_en.trim()) warnings.push(`Sekcia #${num}: EN obsah je prázdny`);
+    });
+
+    const allQs = sectionQuestions.flat();
+    allQs.forEach((q, i) => {
+      const num = q.question_number;
+      if (!q.question_text_sk?.trim()) warnings.push(`Otázka #${num}: SK text chýba`);
+      if (!q.question_text?.trim()) warnings.push(`Otázka #${num}: EN text chýba`);
+      if (q.question_type === 'multiple_choice' && q.options) {
+        q.options.forEach(o => {
+          if (o.option_text_sk?.trim() && !o.option_text?.trim()) warnings.push(`Otázka #${num}, ${o.option_label}: EN text chýba`);
+        });
+      }
+    });
+
+    if (warnings.length > 0) {
+      const proceed = confirm(`Upozornenia (${warnings.length}):\n\n${warnings.join('\n')}\n\nChceš napriek tomu uložiť?`);
+      if (!proceed) return;
     }
 
     setLoading(true);
@@ -1162,6 +1190,11 @@ export default function BuilderPage() {
                         onSaveQuestion={(q, opts) => saveQuestionInSection(idx, q, opts)}
                         onDeleteQuestion={(qId) => deleteQuestionInSection(idx, qId)}
                         onStartNewQuestion={() => startNewQuestionInSection(idx)}
+                        onUpdateQuestions={(qs) => {
+                          const copy = [...sectionQuestions];
+                          copy[idx] = qs;
+                          setSectionQuestions(copy);
+                        }}
                       />
                     ))}
 
@@ -1299,6 +1332,7 @@ function MiniLessonCard({
   onSaveQuestion,
   onDeleteQuestion,
   onStartNewQuestion,
+  onUpdateQuestions,
 }: {
   mini: MiniLesson;
   index: number;
@@ -1307,6 +1341,7 @@ function MiniLessonCard({
   lessonId?: number;
   onUpdate: (field: 'title' | 'title_en' | 'content' | 'content_en', value: string) => void;
   onUpdateFacts: (facts: Fact[]) => void;
+  onUpdateQuestions: (qs: QuizQuestion[]) => void;
   onDelete: () => void;
   onMove: (dir: -1 | 1) => void;
   onSaveQuestion: (q: QuizQuestion, opts: QuizOption[]) => void;
@@ -1648,12 +1683,24 @@ function MiniLessonCard({
               </div>
             )}
 
-            {questions.map((q) => (
+            {questions.map((q, qi) => (
               <QuestionCard
-                key={q.id}
+                key={q.id || qi}
                 question={q}
                 onEdit={() => setEditingQuestion({ ...q })}
                 onDelete={() => q.id && onDeleteQuestion(q.id)}
+                onQuickUpdate={(updates, optUpdates) => {
+                  const copy = [...questions];
+                  const updatedQ = { ...q, ...updates };
+                  if (optUpdates && updatedQ.options) {
+                    updatedQ.options = updatedQ.options.map(o => {
+                      const upd = optUpdates.find(u => u.label === o.option_label);
+                      return upd ? { ...o, option_text: upd.text_en } : o;
+                    });
+                  }
+                  copy[qi] = updatedQ;
+                  onUpdateQuestions(copy);
+                }}
               />
             ))}
 
@@ -1679,10 +1726,12 @@ function QuestionCard({
   question,
   onEdit,
   onDelete,
+  onQuickUpdate,
 }: {
   question: QuizQuestion;
   onEdit: () => void;
   onDelete: () => void;
+  onQuickUpdate: (updates: Partial<QuizQuestion>, optUpdates?: { label: string; text_en: string }[]) => void;
 }) {
   const typeLabel =
     question.question_type === 'fill_code'
@@ -1706,7 +1755,15 @@ function QuestionCard({
           X
         </button>
       </div>
-      <div style={{ fontSize: 13, marginBottom: 6 }}>{question.question_text_sk || question.question_text}</div>
+      {/* SK question */}
+      <div style={{ fontSize: 13, marginBottom: 4 }}>{question.question_text_sk || question.question_text}</div>
+      {/* EN question - inline editable */}
+      <input
+        style={{ ...s.input, fontSize: 12, color: '#aaa', marginBottom: 6 }}
+        placeholder="EN preklad otazky..."
+        value={question.question_text || ''}
+        onChange={(e) => onQuickUpdate({ question_text: e.target.value })}
+      />
       {question.code_snippet && (
         <pre
           style={{
@@ -1724,29 +1781,37 @@ function QuestionCard({
         </pre>
       )}
       {question.question_type === 'multiple_choice' && question.options && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        <div style={{ marginBottom: 6 }}>
           {question.options.map((o) => (
-            <span
-              key={o.option_label}
-              style={{
-                padding: '3px 8px',
-                borderRadius: 4,
-                fontSize: 12,
-                background: o.is_correct ? '#1a2e1a' : '#1a1a1a',
-                border: o.is_correct ? '1px solid #4ade80' : '1px solid #333',
-                color: o.is_correct ? '#4ade80' : '#aaa',
-              }}
-            >
-              {o.option_label}: {o.option_text_sk || o.option_text}
-            </span>
+            <div key={o.option_label} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+              <span style={{
+                width: 20, fontSize: 12, fontWeight: 600,
+                color: o.is_correct ? '#4ade80' : '#666',
+              }}>{o.option_label}</span>
+              <span style={{ fontSize: 12, color: '#ccc', minWidth: 120 }}>{o.option_text_sk || ''}</span>
+              <input
+                style={{ ...s.input, flex: 1, fontSize: 11, color: '#aaa', padding: '4px 8px' }}
+                placeholder="EN..."
+                value={o.option_text || ''}
+                onChange={(e) => onQuickUpdate({}, [{ label: o.option_label, text_en: e.target.value }])}
+              />
+            </div>
           ))}
         </div>
       )}
       {question.question_type === 'fill_code' && question.correct_answer && (
-        <div style={{ fontSize: 12, color: '#4ade80' }}>
+        <div style={{ fontSize: 12, color: '#4ade80', marginBottom: 6 }}>
           Odpoved: {question.correct_answer}
         </div>
       )}
+      {/* EN explanation */}
+      <div style={{ fontSize: 11, color: '#666', marginBottom: 2 }}>SK vysvetlenie: {question.explanation_sk || '-'}</div>
+      <input
+        style={{ ...s.input, fontSize: 11, color: '#aaa', padding: '4px 8px' }}
+        placeholder="EN vysvetlenie..."
+        value={question.explanation || ''}
+        onChange={(e) => onQuickUpdate({ explanation: e.target.value })}
+      />
     </div>
   );
 }

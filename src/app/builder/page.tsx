@@ -179,8 +179,9 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
   let qNum = startNum;
 
   for (const block of blocks) {
-    // Skip section headers
-    if (/^(Select correct code|Fill in the code|Otázky|Questions|Kvízové otázky|Quiz|Vyber správny kód|Doplň kód)\s*$/im.test(block.split('\n')[0])) {
+    // Skip section headers (strip leading "01. " etc.)
+    const firstLine = block.split('\n')[0].replace(/^\d+\.\s*/, '').trim();
+    if (/^(Select correct|Fill in the code|Otázky|Questions|Kvízové otázky|Quiz|Vyber správny|Doplň kód|Select the correct)\s*$/im.test(firstLine)) {
       continue;
     }
 

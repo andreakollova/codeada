@@ -1697,7 +1697,7 @@ function MiniLessonCard({
                 Otázky ({questions.length})
               </span>
               {lessonId && (
-                <button style={s.btnSmall('#4ade80')} onClick={() => setShowImport(!showImport)}>
+                <button style={s.btnSmall('#3b82f6')} onClick={() => setShowImport(!showImport)}>
                   {showImport ? 'Zavrieť' : '+ Pridať otázky'}
                 </button>
               )}

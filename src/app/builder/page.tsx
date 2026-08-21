@@ -1436,7 +1436,6 @@ function MiniLessonCard({
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
-  const [importTextEn, setImportTextEn] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const textareaEnRef = useRef<HTMLTextAreaElement>(null);
 
@@ -1724,34 +1723,19 @@ function MiniLessonCard({
             )}
 
             {showImport && (
-              <div style={{ ...s.card, border: '1px solid #818cf8', marginBottom: 12 }}>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#818cf8', marginBottom: 8, fontWeight: 600 }}>
-                      SK otázky
-                    </div>
-                    <textarea
-                      style={{ ...s.textarea, minHeight: 150 }}
-                      placeholder={'1. Otázka text...\nA) odpoveď ✅\nB) odpoveď\nC) odpoveď\nD) odpoveď\nSprávna odpoveď: A\nVysvetlenie...'}
-                      value={importText}
-                      onChange={(e) => setImportText(e.target.value)}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#aaa', marginBottom: 8, fontWeight: 600 }}>
-                      EN otázky (rovnaké poradie)
-                    </div>
-                    <textarea
-                      style={{ ...s.textarea, minHeight: 150 }}
-                      placeholder={'1. Question text...\nA) answer ✅\nB) answer\nC) answer\nD) answer\nCorrect answer: A\nExplanation...'}
-                      value={importTextEn}
-                      onChange={(e) => setImportTextEn(e.target.value)}
-                    />
-                  </div>
+              <div style={{ ...s.card, border: '1px solid #3b82f6', marginBottom: 12 }}>
+                <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 8, fontWeight: 600 }}>
+                  Pastni SK otázky (EN pridáš potom cez "Pastni EN" na každej otázke)
                 </div>
+                <textarea
+                  style={{ ...s.textarea, minHeight: 150 }}
+                  placeholder={'Otázka 1\nText otázky...\nA) odpoveď\nB) odpoveď\nC) odpoveď\nD) odpoveď\nSprávna odpoveď: A\nVysvetlenie...\n\nOtázka 2\n...'}
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                />
                 <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                   <button
-                    style={s.btn('#818cf8')}
+                    style={s.btn('#3b82f6')}
                     onClick={() => {
                       if (!importText.trim()) return;
                       const startNum = questions.length > 0
@@ -1761,19 +1745,6 @@ function MiniLessonCard({
                       if (parsed.length === 0) {
                         alert('Nepodarilo sa nájsť žiadne otázky v texte.');
                         return;
-                      }
-                      // Parse EN and merge
-                      if (importTextEn.trim()) {
-                        const { questions: parsedEn } = parseQuestionsFromText(importTextEn, lessonId || 0, startNum);
-                        for (let i = 0; i < parsed.length && i < parsedEn.length; i++) {
-                          parsed[i].question_text = parsedEn[i].question_text_sk; // EN parser puts text in _sk
-                          parsed[i].explanation = parsedEn[i].explanation_sk;
-                          if (parsed[i].options && parsedEn[i].options) {
-                            for (let j = 0; j < parsed[i].options.length && j < parsedEn[i].options.length; j++) {
-                              parsed[i].options[j].option_text = parsedEn[i].options[j].option_text_sk;
-                            }
-                          }
-                        }
                       }
                       (async () => {
                         for (const q of parsed) {
@@ -1787,7 +1758,7 @@ function MiniLessonCard({
                   >
                     Importovať {importText.trim() ? `(${parseQuestionsFromText(importText, lessonId || 0, 1).questions.length} otázok)` : ''}
                   </button>
-                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setImportTextEn(''); setShowImport(false); }}>
+                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setShowImport(false); }}>
                     Zrušiť
                   </button>
                 </div>

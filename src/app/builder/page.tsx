@@ -1313,6 +1313,33 @@ function MiniLessonCard({
     }
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/builder/upload', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      const md = `\n\n![${file.name}](${json.url})\n\n`;
+      const ta = textareaRef.current;
+      if (ta) {
+        insertAtCursor(ta, md, (v) => onUpdate('content', v));
+      } else {
+        onUpdate('content', mini.content + md);
+      }
+    } catch (err: any) {
+      alert('Upload error: ' + err.message);
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleAddQuestion = () => {
     const newQ = onStartNewQuestion();
     if (newQ) setEditingQuestion(newQ);
@@ -1369,6 +1396,21 @@ function MiniLessonCard({
             <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold', 'sk')} title="Tucne (**B**)">
               B
             </button>
+            <button
+              style={{ ...s.toolbarBtn, color: uploading ? '#4ade80' : '#aaa' }}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              title="Nahrat obrazok"
+            >
+              {uploading ? '...' : 'IMG'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleImageUpload}
+            />
           </div>
           <textarea
             ref={textareaRef}

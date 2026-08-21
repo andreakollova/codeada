@@ -86,11 +86,11 @@ export async function POST(request: Request) {
         const { lesson } = body;
         const isNew = !lesson.id;
 
-        // Ensure array columns are proper postgres arrays
-        if (lesson.key_takeaways === undefined || lesson.key_takeaways === null) {
+        // Ensure array columns are proper postgres arrays (only when present)
+        if ('key_takeaways' in lesson && (lesson.key_takeaways === undefined || lesson.key_takeaways === null)) {
           lesson.key_takeaways = '{}';
         }
-        if (lesson.key_takeaways_sk === undefined || lesson.key_takeaways_sk === null) {
+        if ('key_takeaways_sk' in lesson && (lesson.key_takeaways_sk === undefined || lesson.key_takeaways_sk === null)) {
           lesson.key_takeaways_sk = '{}';
         }
 

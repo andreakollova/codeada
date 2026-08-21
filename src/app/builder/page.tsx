@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // ── API helper ──────────────────────────────────────────────
 async function api(body: any) {
@@ -94,6 +94,31 @@ function parseMiniLessons(raw: string): MiniLesson[] {
 
 function serializeMiniLessons(minis: MiniLesson[]): string {
   return minis.map((m) => `## ${m.title}\n${m.content}`).join('\n\n');
+}
+
+// ── Distribute questions across sections ────────────────────
+function distributeQuestions(questions: QuizQuestion[], sectionCount: number): QuizQuestion[][] {
+  const sorted = [...questions].sort((a, b) => a.question_number - b.question_number);
+  if (sectionCount <= 0) return [sorted];
+  const result: QuizQuestion[][] = Array.from({ length: sectionCount }, () => []);
+  if (sorted.length === 0) return result;
+  const perSection = Math.ceil(sorted.length / sectionCount);
+  sorted.forEach((q, i) => {
+    const sectionIdx = Math.min(Math.floor(i / perSection), sectionCount - 1);
+    result[sectionIdx].push(q);
+  });
+  return result;
+}
+
+function flattenAndRenumber(sectionQuestions: QuizQuestion[][]): QuizQuestion[] {
+  const flat: QuizQuestion[] = [];
+  let num = 1;
+  for (const section of sectionQuestions) {
+    for (const q of section) {
+      flat.push({ ...q, question_number: num++ });
+    }
+  }
+  return flat;
 }
 
 // ── Styles ──────────────────────────────────────────────────
@@ -282,7 +307,64 @@ const s = {
     pointerEvents: 'none' as const,
     zIndex: 9999,
   }),
+  toolbarBtn: {
+    padding: '3px 8px',
+    borderRadius: 3,
+    border: '1px solid #333',
+    background: '#222',
+    color: '#aaa',
+    cursor: 'pointer',
+    fontSize: 11,
+    fontFamily: '"SF Mono", "Fira Code", "Consolas", monospace',
+    lineHeight: '16px',
+  },
 };
+
+// ── Toolbar insert helpers ──────────────────────────────────
+function insertAtLineStart(
+  textarea: HTMLTextAreaElement,
+  prefix: string,
+  setValue: (v: string) => void
+) {
+  const { selectionStart, value } = textarea;
+  const lineStart = value.lastIndexOf('\n', selectionStart - 1) + 1;
+  const newValue = value.slice(0, lineStart) + prefix + value.slice(lineStart);
+  setValue(newValue);
+  requestAnimationFrame(() => {
+    textarea.selectionStart = textarea.selectionEnd = selectionStart + prefix.length;
+    textarea.focus();
+  });
+}
+
+function insertAtCursor(
+  textarea: HTMLTextAreaElement,
+  text: string,
+  setValue: (v: string) => void
+) {
+  const { selectionStart, selectionEnd, value } = textarea;
+  const newValue = value.slice(0, selectionStart) + text + value.slice(selectionEnd);
+  setValue(newValue);
+  requestAnimationFrame(() => {
+    textarea.selectionStart = textarea.selectionEnd = selectionStart + text.length;
+    textarea.focus();
+  });
+}
+
+function wrapSelection(
+  textarea: HTMLTextAreaElement,
+  wrapper: string,
+  setValue: (v: string) => void
+) {
+  const { selectionStart, selectionEnd, value } = textarea;
+  const selected = value.slice(selectionStart, selectionEnd);
+  const newValue = value.slice(0, selectionStart) + wrapper + selected + wrapper + value.slice(selectionEnd);
+  setValue(newValue);
+  requestAnimationFrame(() => {
+    textarea.selectionStart = selectionStart + wrapper.length;
+    textarea.selectionEnd = selectionEnd + wrapper.length;
+    textarea.focus();
+  });
+}
 
 // ── Main Component ──────────────────────────────────────────
 export default function BuilderPage() {
@@ -301,10 +383,9 @@ export default function BuilderPage() {
   const [selectedLessonId, setSelectedLessonId] = useState<number | null>(null);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [miniLessons, setMiniLessons] = useState<MiniLesson[]>([]);
-  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [sectionQuestions, setSectionQuestions] = useState<QuizQuestion[][]>([]);
   const [contentTab, setContentTab] = useState<'obsah' | 'otazky' | 'info'>('obsah');
   const [toast, setToast] = useState('');
-  const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Toast helper
@@ -336,9 +417,11 @@ export default function BuilderPage() {
     try {
       const data = await api({ action: 'getLesson', lessonId: id });
       setLesson(data);
-      setMiniLessons(parseMiniLessons(data.learning_content_sk || ''));
+      const minis = parseMiniLessons(data.learning_content_sk || '');
+      setMiniLessons(minis);
       const qs = await api({ action: 'getQuestions', lessonId: id });
-      setQuestions(qs || []);
+      const questions = qs || [];
+      setSectionQuestions(distributeQuestions(questions, minis.length));
     } catch (e) {
       console.error(e);
     }
@@ -357,11 +440,36 @@ export default function BuilderPage() {
       };
       const saved = await api({ action: 'saveLesson', lesson: payload });
       setLesson(saved);
-      showToast('Uložené!');
+
+      // Save all questions with renumbered question_numbers
+      const allQuestions = flattenAndRenumber(sectionQuestions);
+      for (const q of allQuestions) {
+        const questionPayload: any = {
+          lesson_id: q.lesson_id,
+          question_number: q.question_number,
+          question_text: q.question_text,
+          question_text_sk: q.question_text_sk,
+          question_type: q.question_type,
+          correct_answer: q.correct_answer || '',
+          code_snippet: q.code_snippet || '',
+          explanation: q.explanation || '',
+          explanation_sk: q.explanation_sk || '',
+        };
+        if (q.id) questionPayload.id = q.id;
+        const optionsPayload = q.question_type === 'multiple_choice' ? q.options : [];
+        await api({ action: 'saveQuestion', question: questionPayload, options: optionsPayload });
+      }
+
+      showToast('Ulozene!');
       // Refresh sidebar
       if (selectedModuleId) {
         const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
         setLessons(ls);
+      }
+      // Refresh questions from DB
+      if (saved.id) {
+        const qs = await api({ action: 'getQuestions', lessonId: saved.id });
+        setSectionQuestions(distributeQuestions(qs || [], miniLessons.length));
       }
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
@@ -372,15 +480,15 @@ export default function BuilderPage() {
   // ── Delete lesson ──
   const deleteLesson = async () => {
     if (!lesson?.id) return;
-    if (!confirm('Naozaj vymazať túto lekciu a všetky jej otázky?')) return;
+    if (!confirm('Naozaj vymazat tuto lekciu a vsetky jej otazky?')) return;
     setLoading(true);
     try {
       await api({ action: 'deleteLesson', lessonId: lesson.id });
       setLesson(null);
       setSelectedLessonId(null);
       setMiniLessons([]);
-      setQuestions([]);
-      showToast('Vymazané!');
+      setSectionQuestions([]);
+      showToast('Vymazane!');
       if (selectedModuleId) {
         const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
         setLessons(ls);
@@ -399,7 +507,7 @@ export default function BuilderPage() {
       module_id: selectedModuleId,
       lesson_number: maxNum + 1,
       title: '',
-      title_sk: 'Nová lekcia',
+      title_sk: 'Nova lekcia',
       lesson_type: 'theory',
       introduction: '',
       introduction_sk: '',
@@ -418,24 +526,37 @@ export default function BuilderPage() {
     };
     setLesson(newLesson);
     setMiniLessons([]);
-    setQuestions([]);
+    setSectionQuestions([]);
     setSelectedLessonId(null);
     setContentTab('obsah');
   };
 
   // ── Mini lesson operations ──
   const addMiniLesson = () => {
-    setMiniLessons([...miniLessons, { title: 'Nová sekcia', content: '' }]);
+    setMiniLessons([...miniLessons, { title: 'Nova sekcia', content: '' }]);
+    setSectionQuestions([...sectionQuestions, []]);
   };
   const deleteMiniLesson = (idx: number) => {
-    setMiniLessons(miniLessons.filter((_, i) => i !== idx));
+    // Move questions from deleted section to previous section (or discard if first)
+    const deletedQs = sectionQuestions[idx] || [];
+    const newMinis = miniLessons.filter((_, i) => i !== idx);
+    const newSQ = sectionQuestions.filter((_, i) => i !== idx);
+    if (deletedQs.length > 0 && newSQ.length > 0) {
+      const targetIdx = Math.max(0, idx - 1);
+      newSQ[targetIdx] = [...newSQ[targetIdx], ...deletedQs];
+    }
+    setMiniLessons(newMinis);
+    setSectionQuestions(newSQ);
   };
   const moveMiniLesson = (idx: number, dir: -1 | 1) => {
     const newIdx = idx + dir;
     if (newIdx < 0 || newIdx >= miniLessons.length) return;
-    const copy = [...miniLessons];
-    [copy[idx], copy[newIdx]] = [copy[newIdx], copy[idx]];
-    setMiniLessons(copy);
+    const copyMinis = [...miniLessons];
+    [copyMinis[idx], copyMinis[newIdx]] = [copyMinis[newIdx], copyMinis[idx]];
+    setMiniLessons(copyMinis);
+    const copySQ = [...sectionQuestions];
+    [copySQ[idx], copySQ[newIdx]] = [copySQ[newIdx], copySQ[idx]];
+    setSectionQuestions(copySQ);
   };
   const updateMiniLesson = (idx: number, field: 'title' | 'content', value: string) => {
     const copy = [...miniLessons];
@@ -443,8 +564,8 @@ export default function BuilderPage() {
     setMiniLessons(copy);
   };
 
-  // ── Question operations ──
-  const saveQuestion = async (q: QuizQuestion, opts: QuizOption[]) => {
+  // ── Question operations (per section) ──
+  const saveQuestionInSection = async (sectionIdx: number, q: QuizQuestion, opts: QuizOption[]) => {
     setLoading(true);
     try {
       const questionPayload: any = {
@@ -462,37 +583,37 @@ export default function BuilderPage() {
 
       const optionsPayload = q.question_type === 'multiple_choice' ? opts : [];
       await api({ action: 'saveQuestion', question: questionPayload, options: optionsPayload });
-      showToast('Otázka uložená!');
-      // Refresh questions
+      showToast('Otazka ulozena!');
+      // Refresh all questions and redistribute
       if (selectedLessonId || lesson?.id) {
         const qs = await api({ action: 'getQuestions', lessonId: selectedLessonId || lesson?.id });
-        setQuestions(qs || []);
+        setSectionQuestions(distributeQuestions(qs || [], miniLessons.length));
       }
-      setEditingQuestion(null);
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
     }
     setLoading(false);
   };
 
-  const deleteQuestion = async (qId: number) => {
-    if (!confirm('Vymazať otázku?')) return;
+  const deleteQuestionInSection = async (sectionIdx: number, qId: number) => {
+    if (!confirm('Vymazat otazku?')) return;
     try {
       await api({ action: 'deleteQuestion', questionId: qId });
-      showToast('Vymazané!');
+      showToast('Vymazane!');
       if (selectedLessonId || lesson?.id) {
         const qs = await api({ action: 'getQuestions', lessonId: selectedLessonId || lesson?.id });
-        setQuestions(qs || []);
+        setSectionQuestions(distributeQuestions(qs || [], miniLessons.length));
       }
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
     }
   };
 
-  const startNewQuestion = () => {
+  const startNewQuestionInSection = (sectionIdx: number) => {
     if (!lesson) return;
-    const maxNum = questions.reduce((m, q) => Math.max(m, q.question_number), 0);
-    setEditingQuestion({
+    const allQs = sectionQuestions.flat();
+    const maxNum = allQs.reduce((m, q) => Math.max(m, q.question_number), 0);
+    return {
       lesson_id: lesson.id || 0,
       question_number: maxNum + 1,
       question_text: '',
@@ -508,7 +629,7 @@ export default function BuilderPage() {
         { option_label: 'C', option_text: '', option_text_sk: '', is_correct: false },
         { option_label: 'D', option_text: '', option_text_sk: '', is_correct: false },
       ],
-    });
+    } as QuizQuestion;
   };
 
   // ── Lesson field updater ──
@@ -524,7 +645,7 @@ export default function BuilderPage() {
       <div style={s.topBar}>
         <span style={s.topTitle}>Builder</span>
         <button style={s.tab(topTab === 'citanie')} onClick={() => setTopTab('citanie')}>
-          Čítanie
+          Citanie
         </button>
         <button style={s.tab(topTab === 'paths')} onClick={() => setTopTab('paths')}>
           Paths
@@ -551,7 +672,7 @@ export default function BuilderPage() {
                     setSelectedLessonId(null);
                     setLesson(null);
                     setMiniLessons([]);
-                    setQuestions([]);
+                    setSectionQuestions([]);
                   }}
                 >
                   <option value="">-- Vyber modul --</option>
@@ -563,11 +684,11 @@ export default function BuilderPage() {
                 </select>
                 <button
                   style={{ ...s.btn('#4ade80'), padding: '6px 10px', fontSize: 16, flexShrink: 0 }}
-                  title="Nový modul"
+                  title="Novy modul"
                   onClick={async () => {
-                    const name = prompt('Názov nového modulu (SK):');
+                    const name = prompt('Nazov noveho modulu (SK):');
                     if (!name) return;
-                    const nameEn = prompt('Názov modulu (EN):', name) || name;
+                    const nameEn = prompt('Nazov modulu (EN):', name) || name;
                     const maxNum = modules.reduce((max, m) => Math.max(max, m.module_number), 0);
                     try {
                       await api({ action: 'saveModule', module: { module_number: maxNum + 1, title: nameEn, title_sk: name } });
@@ -587,7 +708,7 @@ export default function BuilderPage() {
                   onClick={() => loadLesson(l.id)}
                 >
                   <div style={s.lessonNum}>#{l.lesson_number}</div>
-                  <div style={s.lessonTitle}>{l.title_sk || l.title || '(bez názvu)'}</div>
+                  <div style={s.lessonTitle}>{l.title_sk || l.title || '(bez nazvu)'}</div>
                 </div>
               ))}
               {selectedModuleId && (
@@ -595,7 +716,7 @@ export default function BuilderPage() {
                   style={{ ...s.btn('#4ade80'), width: '100%', marginTop: 8 }}
                   onClick={addNewLesson}
                 >
-                  + Nová lekcia
+                  + Nova lekcia
                 </button>
               )}
             </div>
@@ -605,12 +726,12 @@ export default function BuilderPage() {
           <div style={s.main as any}>
             {!lesson && !loading && (
               <div style={{ color: '#666', textAlign: 'center', marginTop: 100 }}>
-                Vyber lekciu z ľavého panelu
+                Vyber lekciu z laveho panelu
               </div>
             )}
             {loading && (
               <div style={{ color: '#666', textAlign: 'center', marginTop: 100 }}>
-                Načítavam...
+                Nacitavam...
               </div>
             )}
 
@@ -618,23 +739,23 @@ export default function BuilderPage() {
               <>
                 {/* Content tabs */}
                 <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-                  {(['obsah', 'otazky', 'info'] as const).map((t) => (
+                  {(['obsah', 'info'] as const).map((t) => (
                     <button
                       key={t}
                       style={s.tab(contentTab === t)}
                       onClick={() => setContentTab(t)}
                     >
-                      {t === 'obsah' ? 'Obsah' : t === 'otazky' ? 'Otázky' : 'Info'}
+                      {t === 'obsah' ? 'Obsah & Otazky' : 'Info'}
                     </button>
                   ))}
                 </div>
 
-                {/* ═══ OBSAH TAB ═══ */}
+                {/* ═══ OBSAH & OTAZKY TAB ═══ */}
                 {contentTab === 'obsah' && (
                   <div>
                     <div style={s.row}>
                       <div style={{ flex: 1 }}>
-                        <label style={s.label}>Názov SK</label>
+                        <label style={s.label}>Nazov SK</label>
                         <input
                           style={s.input}
                           value={lesson.title_sk || ''}
@@ -642,7 +763,7 @@ export default function BuilderPage() {
                         />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <label style={s.label}>Názov EN</label>
+                        <label style={s.label}>Nazov EN</label>
                         <input
                           style={s.input}
                           value={lesson.title || ''}
@@ -652,7 +773,7 @@ export default function BuilderPage() {
                     </div>
 
                     <div style={s.fieldGroup}>
-                      <label style={s.label}>Úvod SK (introduction_sk)</label>
+                      <label style={s.label}>Uvod SK (introduction_sk)</label>
                       <textarea
                         style={s.textarea}
                         rows={4}
@@ -666,7 +787,7 @@ export default function BuilderPage() {
                         Mini lekcie ({miniLessons.length})
                       </h3>
                       <button style={s.btnSmall('#4ade80')} onClick={addMiniLesson}>
-                        + Pridať sekciu
+                        + Pridat sekciu
                       </button>
                     </div>
 
@@ -676,51 +797,22 @@ export default function BuilderPage() {
                         mini={ml}
                         index={idx}
                         total={miniLessons.length}
+                        questions={sectionQuestions[idx] || []}
+                        lessonId={lesson.id}
                         onUpdate={(f, v) => updateMiniLesson(idx, f, v)}
                         onDelete={() => deleteMiniLesson(idx)}
                         onMove={(dir) => moveMiniLesson(idx, dir)}
+                        onSaveQuestion={(q, opts) => saveQuestionInSection(idx, q, opts)}
+                        onDeleteQuestion={(qId) => deleteQuestionInSection(idx, qId)}
+                        onStartNewQuestion={() => startNewQuestionInSection(idx)}
                       />
                     ))}
 
                     <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
                       <button style={s.btn('#4ade80')} onClick={saveLesson}>
-                        Uložiť lekciu
+                        Ulozit lekciu
                       </button>
                     </div>
-                  </div>
-                )}
-
-                {/* ═══ OTÁZKY TAB ═══ */}
-                {contentTab === 'otazky' && (
-                  <div>
-                    {questions.map((q) => (
-                      <QuestionCard
-                        key={q.id}
-                        question={q}
-                        onEdit={() => setEditingQuestion({ ...q })}
-                        onDelete={() => q.id && deleteQuestion(q.id)}
-                      />
-                    ))}
-
-                    {!lesson.id && (
-                      <div style={{ color: '#666', marginBottom: 12 }}>
-                        Najprv ulož lekciu, potom môžeš pridať otázky.
-                      </div>
-                    )}
-
-                    {lesson.id && !editingQuestion && (
-                      <button style={s.btn('#4ade80')} onClick={startNewQuestion}>
-                        + Pridať otázku
-                      </button>
-                    )}
-
-                    {editingQuestion && (
-                      <QuestionEditor
-                        question={editingQuestion}
-                        onSave={saveQuestion}
-                        onCancel={() => setEditingQuestion(null)}
-                      />
-                    )}
                   </div>
                 )}
 
@@ -730,7 +822,7 @@ export default function BuilderPage() {
                     <div style={s.card}>
                       <div style={s.row}>
                         <div style={{ flex: 1 }}>
-                          <label style={s.label}>Číslo lekcie</label>
+                          <label style={s.label}>Cislo lekcie</label>
                           <input
                             style={s.input}
                             type="number"
@@ -764,7 +856,7 @@ export default function BuilderPage() {
                     </div>
 
                     <div style={s.card}>
-                      <h4 style={{ margin: '0 0 12px', color: '#888', fontSize: 13 }}>Doplnkový obsah</h4>
+                      <h4 style={{ margin: '0 0 12px', color: '#888', fontSize: 13 }}>Doplnkovy obsah</h4>
                       <div style={s.fieldGroup}>
                         <label style={s.label}>Interesting facts SK</label>
                         <textarea
@@ -814,11 +906,11 @@ export default function BuilderPage() {
 
                     <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
                       <button style={s.btn('#4ade80')} onClick={saveLesson}>
-                        Uložiť
+                        Ulozit
                       </button>
                       {lesson.id && (
                         <button style={s.btn('#ef4444')} onClick={deleteLesson}>
-                          Vymazať lekciu
+                          Vymazat lekciu
                         </button>
                       )}
                     </div>
@@ -841,18 +933,56 @@ function MiniLessonCard({
   mini,
   index,
   total,
+  questions,
+  lessonId,
   onUpdate,
   onDelete,
   onMove,
+  onSaveQuestion,
+  onDeleteQuestion,
+  onStartNewQuestion,
 }: {
   mini: MiniLesson;
   index: number;
   total: number;
+  questions: QuizQuestion[];
+  lessonId?: number;
   onUpdate: (field: 'title' | 'content', value: string) => void;
   onDelete: () => void;
   onMove: (dir: -1 | 1) => void;
+  onSaveQuestion: (q: QuizQuestion, opts: QuizOption[]) => void;
+  onDeleteQuestion: (qId: number) => void;
+  onStartNewQuestion: () => QuizQuestion | undefined;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleToolbar = (action: 'heading' | 'bullet' | 'blank' | 'bold') => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    const setValue = (v: string) => onUpdate('content', v);
+
+    switch (action) {
+      case 'heading':
+        insertAtLineStart(ta, '### ', setValue);
+        break;
+      case 'bullet':
+        insertAtLineStart(ta, '- ', setValue);
+        break;
+      case 'blank':
+        insertAtCursor(ta, '___', setValue);
+        break;
+      case 'bold':
+        wrapSelection(ta, '**', setValue);
+        break;
+    }
+  };
+
+  const handleAddQuestion = () => {
+    const newQ = onStartNewQuestion();
+    if (newQ) setEditingQuestion(newQ);
+  };
 
   return (
     <div style={s.card}>
@@ -889,11 +1019,69 @@ function MiniLessonCard({
         </button>
       </div>
       {!collapsed && (
-        <textarea
-          style={{ ...s.textarea, minHeight: 120 }}
-          value={mini.content}
-          onChange={(e) => onUpdate('content', e.target.value)}
-        />
+        <>
+          {/* Formatting toolbar */}
+          <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('heading')} title="Podnadpis (### )">
+              ###
+            </button>
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('bullet')} title="Odrazka (- )">
+              -
+            </button>
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('blank')} title="Prazdne miesto (___)">
+              ___
+            </button>
+            <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold')} title="Tucne (**B**)">
+              B
+            </button>
+          </div>
+          <textarea
+            ref={textareaRef}
+            style={{ ...s.textarea, minHeight: 120 }}
+            value={mini.content}
+            onChange={(e) => onUpdate('content', e.target.value)}
+          />
+
+          {/* Questions for this section */}
+          <div style={{ marginTop: 12, paddingTop: 8, borderTop: '1px solid #2a2a2a' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, color: '#888' }}>
+                Otazky ({questions.length})
+              </span>
+              {lessonId && !editingQuestion && (
+                <button style={s.btnSmall('#4ade80')} onClick={handleAddQuestion}>
+                  + Pridat otazku
+                </button>
+              )}
+            </div>
+
+            {!lessonId && questions.length === 0 && (
+              <div style={{ color: '#555', fontSize: 12, marginBottom: 8 }}>
+                Najprv uloz lekciu, potom mozes pridat otazky.
+              </div>
+            )}
+
+            {questions.map((q) => (
+              <QuestionCard
+                key={q.id}
+                question={q}
+                onEdit={() => setEditingQuestion({ ...q })}
+                onDelete={() => q.id && onDeleteQuestion(q.id)}
+              />
+            ))}
+
+            {editingQuestion && (
+              <QuestionEditor
+                question={editingQuestion}
+                onSave={(q, opts) => {
+                  onSaveQuestion(q, opts);
+                  setEditingQuestion(null);
+                }}
+                onCancel={() => setEditingQuestion(null)}
+              />
+            )}
+          </div>
+        </>
       )}
     </div>
   );
@@ -911,10 +1099,10 @@ function QuestionCard({
 }) {
   const typeLabel =
     question.question_type === 'fill_code'
-      ? 'Doplň kód'
+      ? 'Dopln kod'
       : question.code_snippet
-        ? 'Vyber kód'
-        : 'Otázka';
+        ? 'Vyber kod'
+        : 'Otazka';
   const typeColor =
     question.question_type === 'fill_code' ? '#f59e0b' : question.code_snippet ? '#818cf8' : '#4ade80';
 
@@ -925,7 +1113,7 @@ function QuestionCard({
         <span style={{ fontSize: 11, color: '#666' }}>#{question.question_number}</span>
         <div style={{ flex: 1 }} />
         <button style={s.btnSmall('#333')} onClick={onEdit}>
-          Upraviť
+          Upravit
         </button>
         <button style={s.btnSmall('#ef4444')} onClick={onDelete}>
           X
@@ -969,7 +1157,7 @@ function QuestionCard({
       )}
       {question.question_type === 'fill_code' && question.correct_answer && (
         <div style={{ fontSize: 12, color: '#4ade80' }}>
-          Odpoveď: {question.correct_answer}
+          Odpoved: {question.correct_answer}
         </div>
       )}
     </div>
@@ -997,11 +1185,12 @@ function QuestionEditor({
           { option_label: 'D', option_text: '', option_text_sk: '', is_correct: false },
         ],
   );
+  const codeSnippetRef = useRef<HTMLTextAreaElement>(null);
 
   const typeOptions = [
-    { value: 'mcq', label: 'Otázka (MCQ)' },
-    { value: 'mcq_code', label: 'Vyber kód (MCQ + kód)' },
-    { value: 'fill_code', label: 'Doplň kód' },
+    { value: 'mcq', label: 'Otazka (MCQ)' },
+    { value: 'mcq_code', label: 'Vyber kod (MCQ + kod)' },
+    { value: 'fill_code', label: 'Dopln kod' },
   ];
 
   const currentType =
@@ -1021,13 +1210,19 @@ function QuestionEditor({
     setOpts(opts.map((o) => ({ ...o, is_correct: o.option_label === label })));
   };
 
+  const handleInsertBlank = () => {
+    const ta = codeSnippetRef.current;
+    if (!ta) return;
+    insertAtCursor(ta, '___', (v) => setQ({ ...q, code_snippet: v }));
+  };
+
   const showCode = currentType === 'mcq_code' || currentType === 'fill_code';
   const showOptions = currentType === 'mcq' || currentType === 'mcq_code';
 
   return (
     <div style={{ ...s.card, border: '1px solid #4ade80' }}>
       <h4 style={{ margin: '0 0 12px', color: '#4ade80', fontSize: 14 }}>
-        {q.id ? 'Upraviť otázku' : 'Nová otázka'}
+        {q.id ? 'Upravit otazku' : 'Nova otazka'}
       </h4>
 
       <div style={s.row}>
@@ -1042,7 +1237,7 @@ function QuestionEditor({
           </select>
         </div>
         <div style={{ width: 100 }}>
-          <label style={s.label}>Číslo</label>
+          <label style={s.label}>Cislo</label>
           <input
             style={s.input}
             type="number"
@@ -1053,7 +1248,7 @@ function QuestionEditor({
       </div>
 
       <div style={s.fieldGroup}>
-        <label style={s.label}>Otázka SK</label>
+        <label style={s.label}>Otazka SK</label>
         <textarea
           style={s.textarea}
           rows={2}
@@ -1062,7 +1257,7 @@ function QuestionEditor({
         />
       </div>
       <div style={s.fieldGroup}>
-        <label style={s.label}>Otázka EN</label>
+        <label style={s.label}>Otazka EN</label>
         <textarea
           style={s.textarea}
           rows={2}
@@ -1073,8 +1268,18 @@ function QuestionEditor({
 
       {showCode && (
         <div style={s.fieldGroup}>
-          <label style={s.label}>Code snippet</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <label style={{ ...s.label, marginBottom: 0 }}>Code snippet</label>
+            <button
+              style={s.toolbarBtn}
+              onClick={handleInsertBlank}
+              title="Vloz ___ na poziciu kurzora"
+            >
+              Vloz ___
+            </button>
+          </div>
           <textarea
+            ref={codeSnippetRef}
             style={s.codebox}
             rows={4}
             value={q.code_snippet || ''}
@@ -1085,7 +1290,7 @@ function QuestionEditor({
 
       {showOptions && (
         <div style={s.fieldGroup}>
-          <label style={s.label}>Možnosti</label>
+          <label style={s.label}>Moznosti</label>
           {opts.map((o, i) => (
             <div key={o.option_label} style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
               <input
@@ -1123,7 +1328,7 @@ function QuestionEditor({
 
       {currentType === 'fill_code' && (
         <div style={s.fieldGroup}>
-          <label style={s.label}>Správna odpoveď</label>
+          <label style={s.label}>Spravna odpoved</label>
           <input
             style={s.input}
             value={q.correct_answer || ''}
@@ -1144,10 +1349,10 @@ function QuestionEditor({
 
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
         <button style={s.btn('#4ade80')} onClick={() => onSave(q, opts)}>
-          Uložiť otázku
+          Ulozit otazku
         </button>
         <button style={s.btn('#333')} onClick={onCancel}>
-          Zrušiť
+          Zrusit
         </button>
       </div>
     </div>

@@ -1321,6 +1321,36 @@ function MiniLessonCard({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const textareaEnRef = useRef<HTMLTextAreaElement>(null);
 
+  // Undo/redo history per field
+  const historyRef = useRef<{ sk: string[]; en: string[] }>({ sk: [], en: [] });
+  const redoRef = useRef<{ sk: string[]; en: string[] }>({ sk: [], en: [] });
+  const pushHistory = (lang: 'sk' | 'en', value: string) => {
+    const h = historyRef.current[lang];
+    if (h[h.length - 1] !== value) {
+      h.push(value);
+      if (h.length > 50) h.shift();
+      redoRef.current[lang] = []; // clear redo on new change
+    }
+  };
+  const handleUndo = () => {
+    const lang = activeLang;
+    const h = historyRef.current[lang];
+    if (h.length === 0) return;
+    const current = lang === 'en' ? mini.content_en : mini.content;
+    redoRef.current[lang].push(current);
+    const prev = h.pop()!;
+    onUpdate(lang === 'en' ? 'content_en' : 'content', prev);
+  };
+  const handleRedo = () => {
+    const lang = activeLang;
+    const r = redoRef.current[lang];
+    if (r.length === 0) return;
+    const current = lang === 'en' ? mini.content_en : mini.content;
+    historyRef.current[lang].push(current);
+    const next = r.pop()!;
+    onUpdate(lang === 'en' ? 'content_en' : 'content', next);
+  };
+
   const handleToolbar = (action: 'heading' | 'bullet' | 'blank' | 'bold' | 'code', lang: 'sk' | 'en' = 'sk') => {
     const ta = lang === 'en' ? textareaEnRef.current : textareaRef.current;
     if (!ta) return;
@@ -1478,6 +1508,13 @@ function MiniLessonCard({
               style={{ display: 'none' }}
               onChange={handleImageUpload}
             />
+            <span style={{ width: 1, height: 16, background: '#333', margin: '0 2px' }} />
+            <button style={{ ...s.toolbarBtn, fontSize: 14 }} onClick={handleUndo} title="Undo">
+              ↩
+            </button>
+            <button style={{ ...s.toolbarBtn, fontSize: 14 }} onClick={handleRedo} title="Redo">
+              ↪
+            </button>
           </div>
 
           <label style={s.label}>SK</label>
@@ -1485,9 +1522,9 @@ function MiniLessonCard({
             ref={textareaRef}
             style={{ ...s.textarea, minHeight: 120 }}
             value={mini.content}
-            onChange={(e) => onUpdate('content', e.target.value)}
-            onFocus={() => setActiveLang('sk')}
-            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content', v), mini.content, true)}
+            onChange={(e) => { pushHistory('sk', mini.content); onUpdate('content', e.target.value); }}
+            onFocus={() => { setActiveLang('sk'); if (historyRef.current.sk.length === 0) pushHistory('sk', mini.content); }}
+            onPaste={(e) => { pushHistory('sk', mini.content); handleSmartPaste(e, (v) => onUpdate('content', v), mini.content, true); }}
           />
 
           <label style={{ ...s.label, marginTop: 8 }}>EN</label>
@@ -1495,9 +1532,9 @@ function MiniLessonCard({
             ref={textareaEnRef}
             style={{ ...s.textarea, minHeight: 120 }}
             value={mini.content_en}
-            onChange={(e) => onUpdate('content_en', e.target.value)}
-            onFocus={() => setActiveLang('en')}
-            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content_en', v), mini.content_en, true)}
+            onChange={(e) => { pushHistory('en', mini.content_en); onUpdate('content_en', e.target.value); }}
+            onFocus={() => { setActiveLang('en'); if (historyRef.current.en.length === 0) pushHistory('en', mini.content_en); }}
+            onPaste={(e) => { pushHistory('en', mini.content_en); handleSmartPaste(e, (v) => onUpdate('content_en', v), mini.content_en, true); }}
           />
 
           {/* Facts */}

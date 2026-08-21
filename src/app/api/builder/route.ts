@@ -12,9 +12,12 @@ export async function POST(request: Request) {
 
     switch (action) {
       case 'getModules': {
+        // Only show "Programovanie" (id=51) and any newly created modules
+        // Hide old Python course modules (id <= 48)
         const { data, error } = await sb
           .from('cb_modules')
           .select('*')
+          .gt('id', 48)
           .order('module_number', { ascending: true });
         if (error) throw error;
         return Response.json({ data });

@@ -1863,6 +1863,26 @@ function FactCard({ title, detail }: { title: string; detail: string }) {
   );
 }
 
+function highlightCode(code: string, keyPrefix: string) {
+  const regex = /(\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|self|True|False|None|len|type|int|float|str|input|range|list|dict|set|tuple|sorted|map|filter|open)\b|"[^"]*"|'[^']*'|\[|\]|\(|\)|\b\d+\b|#.*$)/gm;
+  return code.split('\n').map((line, li) => (
+    <div key={`${keyPrefix}-${li}`}>
+      {line.split(regex).map((part, pi) => {
+        if (!part) return null;
+        if (/^(if|else|elif|for|while|def|return|import|from|class|in|not|and|or|self)$/.test(part)) return <span key={pi} style={{ color: '#ff7b72' }}>{part}</span>;
+        if (/^(print|len|type|int|float|str|input|range|list|dict|set|tuple|sorted|map|filter|open)$/.test(part)) return <span key={pi} style={{ color: '#d2a8ff' }}>{part}</span>;
+        if (/^(True|False|None)$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
+        if (/^["']/.test(part)) return <span key={pi} style={{ color: '#a5d6ff' }}>{part}</span>;
+        if (/^\d+$/.test(part)) return <span key={pi} style={{ color: '#79c0ff' }}>{part}</span>;
+        if (/^[[\]()]$/.test(part)) return <span key={pi} style={{ color: '#8b949e' }}>{part}</span>;
+        if (/^#/.test(part)) return <span key={pi} style={{ color: '#8b949e' }}>{part}</span>;
+        return <span key={pi}>{part}</span>;
+      })}
+      {'\n'}
+    </div>
+  ));
+}
+
 function formatContent(text: string, phase: string = '') {
   if (!text) return null;
 
@@ -1890,7 +1910,7 @@ function formatContent(text: string, phase: string = '') {
               overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace',
               whiteSpace: 'pre-wrap',
             }}>
-              {code}
+              {highlightCode(code, `hl-${keyCounter}`)}
             </pre>
           </div>
         );

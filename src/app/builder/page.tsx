@@ -1299,7 +1299,7 @@ function MiniLessonCard({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const textareaEnRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleToolbar = (action: 'heading' | 'bullet' | 'blank' | 'bold', lang: 'sk' | 'en' = 'sk') => {
+  const handleToolbar = (action: 'heading' | 'bullet' | 'blank' | 'bold' | 'code', lang: 'sk' | 'en' = 'sk') => {
     const ta = lang === 'en' ? textareaEnRef.current : textareaRef.current;
     if (!ta) return;
     const field = lang === 'en' ? 'content_en' : 'content';
@@ -1318,6 +1318,23 @@ function MiniLessonCard({
       case 'bold':
         wrapSelection(ta, '**', setValue);
         break;
+      case 'code': {
+        const { selectionStart, selectionEnd, value } = ta;
+        const selected = value.slice(selectionStart, selectionEnd);
+        const codeBlock = selected
+          ? `\n\`\`\`\n${selected}\n\`\`\`\n`
+          : '\n```\n\n```\n';
+        const newValue = value.slice(0, selectionStart) + codeBlock + value.slice(selectionEnd);
+        setValue(newValue);
+        requestAnimationFrame(() => {
+          const cursorPos = selected
+            ? selectionStart + codeBlock.length
+            : selectionStart + 5; // after opening ```\n
+          ta.selectionStart = ta.selectionEnd = cursorPos;
+          ta.focus();
+        });
+        break;
+      }
     }
   };
 
@@ -1411,6 +1428,9 @@ function MiniLessonCard({
             </button>
             <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold', 'sk')} title="Tucne (**B**)">
               B
+            </button>
+            <button style={{ ...s.toolbarBtn, color: '#818cf8' }} onClick={() => handleToolbar('code', 'sk')} title="Blok kodu (```)">
+              {'</>'}
             </button>
             <button
               style={{ ...s.toolbarBtn, color: uploading ? '#4ade80' : '#aaa' }}

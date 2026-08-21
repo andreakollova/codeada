@@ -657,11 +657,15 @@ function wrapSelection(
 
 // ── Main Component ──────────────────────────────────────────
 export default function BuilderPage() {
-  // Hide main nav on builder page
+  // Hide main nav and force dark theme on builder page
   useEffect(() => {
     document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => (el as HTMLElement).style.display = 'none');
+    const prev = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', 'dark');
     return () => {
       document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => (el as HTMLElement).style.display = '');
+      if (prev) document.documentElement.setAttribute('data-theme', prev);
+      else document.documentElement.removeAttribute('data-theme');
     };
   }, []);
 

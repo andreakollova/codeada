@@ -726,7 +726,7 @@ export default function BuilderPage() {
   // ── Delete lesson ──
   const deleteLesson = async () => {
     if (!lesson?.id) return;
-    if (!confirm('Naozaj vymazat tuto lekciu a vsetky jej otazky?')) return;
+    if (!confirm('Naozaj vymazať túto lekciu a všetky jej otázky?')) return;
     setLoading(true);
     try {
       await api({ action: 'deleteLesson', lessonId: lesson.id });
@@ -734,7 +734,7 @@ export default function BuilderPage() {
       setSelectedLessonId(null);
       setMiniLessons([]);
       setSectionQuestions([]);
-      showToast('Vymazane!');
+      showToast('Vymazané!');
       if (selectedModuleId) {
         const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
         setLessons(ls);
@@ -753,7 +753,7 @@ export default function BuilderPage() {
       module_id: selectedModuleId,
       lesson_number: maxNum + 1,
       title: '',
-      title_sk: 'Nova lekcia',
+      title_sk: 'Nová lekcia',
       lesson_type: 'theory',
       introduction: '',
       introduction_sk: '',
@@ -842,10 +842,10 @@ export default function BuilderPage() {
   };
 
   const deleteQuestionInSection = async (sectionIdx: number, qId: number) => {
-    if (!confirm('Vymazat otazku?')) return;
+    if (!confirm('Vymazať otázku?')) return;
     try {
       await api({ action: 'deleteQuestion', questionId: qId });
-      showToast('Vymazane!');
+      showToast('Vymazané!');
       if (selectedLessonId || lesson?.id) {
         const qs = await api({ action: 'getQuestions', lessonId: selectedLessonId || lesson?.id });
         setSectionQuestions(distributeQuestions(qs || [], miniLessons.length));
@@ -891,7 +891,7 @@ export default function BuilderPage() {
       <div style={s.topBar}>
         <span style={s.topTitle}>Builder</span>
         <button style={s.tab(topTab === 'citanie')} onClick={() => setTopTab('citanie')}>
-          Citanie
+          Čítanie
         </button>
         <button style={s.tab(topTab === 'paths')} onClick={() => setTopTab('paths')}>
           Paths
@@ -969,7 +969,7 @@ export default function BuilderPage() {
                   style={{ ...s.btn('#4ade80'), width: '100%', marginTop: 8 }}
                   onClick={addNewLesson}
                 >
-                  + Nova lekcia
+                  + Nová lekcia
                 </button>
               )}
             </div>
@@ -979,12 +979,12 @@ export default function BuilderPage() {
           <div style={s.main as any}>
             {!lesson && !loading && (
               <div style={{ color: '#666', textAlign: 'center', marginTop: 100 }}>
-                Vyber lekciu z laveho panelu
+                Vyber lekciu z ľavého panelu
               </div>
             )}
             {loading && (
               <div style={{ color: '#666', textAlign: 'center', marginTop: 100 }}>
-                Nacitavam...
+                Načítavam...
               </div>
             )}
 
@@ -998,7 +998,7 @@ export default function BuilderPage() {
                       style={s.tab(contentTab === t)}
                       onClick={() => setContentTab(t)}
                     >
-                      {t === 'obsah' ? 'Obsah & Otazky' : 'Info'}
+                      {t === 'obsah' ? 'Obsah & Otázky' : 'Info'}
                     </button>
                   ))}
                 </div>
@@ -1051,7 +1051,7 @@ export default function BuilderPage() {
                         Mini lekcie ({miniLessons.length})
                       </h3>
                       <button style={s.btnSmall('#4ade80')} onClick={addMiniLesson}>
-                        + Pridat sekciu
+                        + Pridať sekciu
                       </button>
                     </div>
 
@@ -1074,7 +1074,7 @@ export default function BuilderPage() {
 
                     <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
                       <button style={s.btn('#4ade80')} onClick={saveLesson}>
-                        Ulozit lekciu
+                        Uložiť lekciu
                       </button>
                     </div>
                   </div>
@@ -1170,11 +1170,11 @@ export default function BuilderPage() {
 
                     <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
                       <button style={s.btn('#4ade80')} onClick={saveLesson}>
-                        Ulozit
+                        Uložiť
                       </button>
                       {lesson.id && (
                         <button style={s.btn('#ef4444')} onClick={deleteLesson}>
-                          Vymazat lekciu
+                          Vymazať lekciu
                         </button>
                       )}
                     </div>
@@ -1396,7 +1396,7 @@ function MiniLessonCard({
                         }
                         setImportText('');
                         setShowImport(false);
-                        alert('Importovane ' + parsed.length + ' otazok.\n\nImportovane otazky nemaju anglicky preklad. Uprav ich pred ulozenim lekcie.');
+                        alert('Importované ' + parsed.length + 'otázok.\n\nImportované otazky nemaju anglicky preklad. Uprav ich pred ulozenim lekcie.');
                       })();
                     }}
                   >
@@ -1570,7 +1570,7 @@ function QuestionEditor({
   return (
     <div style={{ ...s.card, border: '1px solid #4ade80' }}>
       <h4 style={{ margin: '0 0 12px', color: '#4ade80', fontSize: 14 }}>
-        {q.id ? 'Upravit otazku' : 'Nova otazka'}
+        {q.id ? 'Upraviť otázku' : 'Nová otázka'}
       </h4>
 
       <div style={s.row}>
@@ -1719,15 +1719,15 @@ function QuestionEditor({
             }
           }
           if (errs.length > 0) {
-            alert('Validacia otazky zlyhala:\n\n' + errs.join('\n'));
+            alert('Validácia otázky zlyhala:\n\n' + errs.join('\n'));
             return;
           }
           onSave(q, opts);
         }}>
-          Ulozit otazku
+          Uložiť otázku
         </button>
         <button style={s.btn('#333')} onClick={onCancel}>
-          Zrusit
+          Zrušiť
         </button>
       </div>
     </div>

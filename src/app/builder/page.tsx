@@ -853,9 +853,11 @@ export default function BuilderPage() {
     setSectionQuestions(copySQ);
   };
   const updateMiniLesson = (idx: number, field: 'title' | 'title_en' | 'content' | 'content_en', value: string) => {
-    // Strip leading ## heading from content (title is separate)
     if (field === 'content' || field === 'content_en') {
+      // Strip leading ## heading from content (title is separate)
       value = value.replace(/^## .+\n\n?/, '');
+      // Convert **>** or **>** or > at line starts to bullet points
+      value = value.replace(/^(\*\*>?\*\*\s?|>\s?)/gm, '- ');
     }
     const copy = [...miniLessons];
     copy[idx] = { ...copy[idx], [field]: value };

@@ -535,25 +535,42 @@ export default function BuilderPage() {
           <div style={s.sidebar}>
             <div style={s.sideSection}>
               <label style={s.label}>Modul</label>
-              <select
-                style={s.select}
-                value={selectedModuleId || ''}
-                onChange={(e) => {
-                  const v = e.target.value ? Number(e.target.value) : null;
-                  setSelectedModuleId(v);
-                  setSelectedLessonId(null);
-                  setLesson(null);
-                  setMiniLessons([]);
-                  setQuestions([]);
-                }}
-              >
-                <option value="">-- Vyber modul --</option>
-                {modules.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.module_number}. {m.title_sk || m.title}
-                  </option>
-                ))}
-              </select>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <select
+                  style={{ ...s.select, flex: 1 }}
+                  value={selectedModuleId || ''}
+                  onChange={(e) => {
+                    const v = e.target.value ? Number(e.target.value) : null;
+                    setSelectedModuleId(v);
+                    setSelectedLessonId(null);
+                    setLesson(null);
+                    setMiniLessons([]);
+                    setQuestions([]);
+                  }}
+                >
+                  <option value="">-- Vyber modul --</option>
+                  {modules.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.module_number}. {m.title_sk || m.title}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  style={{ ...s.btn('#4ade80'), padding: '6px 10px', fontSize: 16, flexShrink: 0 }}
+                  title="Nový modul"
+                  onClick={async () => {
+                    const name = prompt('Názov nového modulu (SK):');
+                    if (!name) return;
+                    const nameEn = prompt('Názov modulu (EN):', name) || name;
+                    const maxNum = modules.reduce((max, m) => Math.max(max, m.module_number), 0);
+                    try {
+                      await api({ action: 'saveModule', module: { module_number: maxNum + 1, title: nameEn, title_sk: name } });
+                      const mods = await api({ action: 'getModules' });
+                      setModules(mods);
+                    } catch (e: any) { alert(e.message); }
+                  }}
+                >+</button>
+              </div>
             </div>
 
             <div style={s.lessonList}>

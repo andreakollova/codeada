@@ -276,22 +276,30 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
 interface MiniLesson {
   title: string;
   content: string;
+  content_en: string;
 }
 
-function parseMiniLessons(raw: string): MiniLesson[] {
-  if (!raw || !raw.trim()) return [];
-  const parts = raw.split(/\n\n(?=## )/);
-  return parts
-    .map((part) => {
+function parseMiniLessons(rawSk: string, rawEn?: string): MiniLesson[] {
+  if (!rawSk || !rawSk.trim()) return [];
+  const partsSk = rawSk.split(/\n\n(?=## )/);
+  const partsEn = rawEn ? rawEn.split(/\n\n(?=## )/) : [];
+  return partsSk
+    .map((part, idx) => {
       const match = part.match(/^## (.+)\n?([\s\S]*)$/);
       if (!match) return null;
-      return { title: match[1].trim(), content: match[2].trim() };
+      // Try to extract EN content for matching index
+      let contentEn = '';
+      if (partsEn[idx]) {
+        const matchEn = partsEn[idx].match(/^## (.+)\n?([\s\S]*)$/);
+        if (matchEn) contentEn = matchEn[2].trim();
+      }
+      return { title: match[1].trim(), content: match[2].trim(), content_en: contentEn };
     })
     .filter(Boolean) as MiniLesson[];
 }
 
-function serializeMiniLessons(minis: MiniLesson[]): string {
-  return minis.map((m) => `## ${m.title}\n${m.content}`).join('\n\n');
+function serializeMiniLessons(minis: MiniLesson[], lang: 'sk' | 'en' = 'sk'): string {
+  return minis.map((m) => `## ${m.title}\n${lang === 'en' ? m.content_en : m.content}`).join('\n\n');
 }
 
 // ── Distribute questions across sections ────────────────────
@@ -615,7 +623,7 @@ export default function BuilderPage() {
     try {
       const data = await api({ action: 'getLesson', lessonId: id });
       setLesson(data);
-      const minis = parseMiniLessons(data.learning_content_sk || '');
+      const minis = parseMiniLessons(data.learning_content_sk || '', data.learning_content || '');
       setMiniLessons(minis);
       const qs = await api({ action: 'getQuestions', lessonId: id });
       const questions = qs || [];
@@ -629,12 +637,51 @@ export default function BuilderPage() {
   // ── Save lesson ──
   const saveLesson = async () => {
     if (!lesson) return;
+
+    // Validation
+    const errors: string[] = [];
+    if (!lesson.title?.trim()) errors.push('Nazov EN je prazdny.');
+    if (!lesson.title_sk?.trim()) errors.push('Nazov SK je prazdny.');
+    if (lesson.introduction_sk?.trim() && !lesson.introduction?.trim()) {
+      errors.push('Uvod EN je prazdny (SK uz ma obsah).');
+    }
+    for (let i = 0; i < miniLessons.length; i++) {
+      const ml = miniLessons[i];
+      if (ml.content.trim() && !ml.content_en.trim()) {
+        errors.push(`Sekcia #${i + 1} "${ml.title}" nema EN obsah.`);
+      }
+    }
+    // Validate questions EN fields
+    const allQs = sectionQuestions.flat();
+    for (const q of allQs) {
+      if (!q.question_text?.trim()) {
+        errors.push(`Otazka #${q.question_number} nema EN text.`);
+      }
+      if (!q.explanation?.trim() && q.explanation_sk?.trim()) {
+        errors.push(`Otazka #${q.question_number} nema EN vysvetlenie.`);
+      }
+      if (q.question_type === 'multiple_choice' && q.options) {
+        for (const o of q.options) {
+          if (!o.option_text?.trim() && o.option_text_sk?.trim()) {
+            errors.push(`Otazka #${q.question_number} moznost ${o.option_label} nema EN text.`);
+            break;
+          }
+        }
+      }
+    }
+    if (errors.length > 0) {
+      alert('Validacia zlyhala:\n\n' + errors.join('\n'));
+      return;
+    }
+
     setLoading(true);
     try {
-      const contentSk = serializeMiniLessons(miniLessons);
+      const contentSk = serializeMiniLessons(miniLessons, 'sk');
+      const contentEn = serializeMiniLessons(miniLessons, 'en');
       const payload = {
         ...lesson,
         learning_content_sk: contentSk,
+        learning_content: contentEn,
       };
       const saved = await api({ action: 'saveLesson', lesson: payload });
       setLesson(saved);
@@ -731,7 +778,7 @@ export default function BuilderPage() {
 
   // ── Mini lesson operations ──
   const addMiniLesson = () => {
-    setMiniLessons([...miniLessons, { title: 'Nova sekcia', content: '' }]);
+    setMiniLessons([...miniLessons, { title: 'Nova sekcia', content: '', content_en: '' }]);
     setSectionQuestions([...sectionQuestions, []]);
   };
   const deleteMiniLesson = (idx: number) => {
@@ -756,7 +803,7 @@ export default function BuilderPage() {
     [copySQ[idx], copySQ[newIdx]] = [copySQ[newIdx], copySQ[idx]];
     setSectionQuestions(copySQ);
   };
-  const updateMiniLesson = (idx: number, field: 'title' | 'content', value: string) => {
+  const updateMiniLesson = (idx: number, field: 'title' | 'content' | 'content_en', value: string) => {
     const copy = [...miniLessons];
     copy[idx] = { ...copy[idx], [field]: value };
     setMiniLessons(copy);
@@ -980,6 +1027,16 @@ export default function BuilderPage() {
                         onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction_sk', v), lesson.introduction_sk || '')}
                       />
                     </div>
+                    <div style={s.fieldGroup}>
+                      <label style={s.label}>Uvod EN (introduction)</label>
+                      <textarea
+                        style={s.textarea}
+                        rows={4}
+                        value={lesson.introduction || ''}
+                        onChange={(e) => updateField('introduction', e.target.value)}
+                        onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction', v), lesson.introduction || '')}
+                      />
+                    </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                       <h3 style={{ margin: 0, fontSize: 15, color: '#4ade80' }}>
@@ -1146,7 +1203,7 @@ function MiniLessonCard({
   total: number;
   questions: QuizQuestion[];
   lessonId?: number;
-  onUpdate: (field: 'title' | 'content', value: string) => void;
+  onUpdate: (field: 'title' | 'content' | 'content_en', value: string) => void;
   onDelete: () => void;
   onMove: (dir: -1 | 1) => void;
   onSaveQuestion: (q: QuizQuestion, opts: QuizOption[]) => void;
@@ -1158,11 +1215,13 @@ function MiniLessonCard({
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaEnRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleToolbar = (action: 'heading' | 'bullet' | 'blank' | 'bold') => {
-    const ta = textareaRef.current;
+  const handleToolbar = (action: 'heading' | 'bullet' | 'blank' | 'bold', lang: 'sk' | 'en' = 'sk') => {
+    const ta = lang === 'en' ? textareaEnRef.current : textareaRef.current;
     if (!ta) return;
-    const setValue = (v: string) => onUpdate('content', v);
+    const field = lang === 'en' ? 'content_en' : 'content';
+    const setValue = (v: string) => onUpdate(field, v);
 
     switch (action) {
       case 'heading':
@@ -1221,18 +1280,19 @@ function MiniLessonCard({
       </div>
       {!collapsed && (
         <>
-          {/* Formatting toolbar */}
+          {/* SK content */}
+          <label style={{ ...s.label, marginTop: 4 }}>SK</label>
           <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('heading')} title="Podnadpis (### )">
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('heading', 'sk')} title="Podnadpis (### )">
               ###
             </button>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('bullet')} title="Odrazka (- )">
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('bullet', 'sk')} title="Odrazka (- )">
               -
             </button>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('blank')} title="Prazdne miesto (___)">
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('blank', 'sk')} title="Prazdne miesto (___)">
               ___
             </button>
-            <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold')} title="Tucne (**B**)">
+            <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold', 'sk')} title="Tucne (**B**)">
               B
             </button>
           </div>
@@ -1242,6 +1302,30 @@ function MiniLessonCard({
             value={mini.content}
             onChange={(e) => onUpdate('content', e.target.value)}
             onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content', v), mini.content)}
+          />
+
+          {/* EN content */}
+          <label style={{ ...s.label, marginTop: 8 }}>EN</label>
+          <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('heading', 'en')} title="Subheading (### )">
+              ###
+            </button>
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('bullet', 'en')} title="Bullet (- )">
+              -
+            </button>
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('blank', 'en')} title="Blank (___)">
+              ___
+            </button>
+            <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold', 'en')} title="Bold (**B**)">
+              B
+            </button>
+          </div>
+          <textarea
+            ref={textareaEnRef}
+            style={{ ...s.textarea, minHeight: 120 }}
+            value={mini.content_en}
+            onChange={(e) => onUpdate('content_en', e.target.value)}
+            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content_en', v), mini.content_en)}
           />
 
           {/* Questions for this section */}
@@ -1304,6 +1388,7 @@ function MiniLessonCard({
                         }
                         setImportText('');
                         setShowImport(false);
+                        alert('Importovane ' + parsed.length + ' otazok.\n\nImportovane otazky nemaju anglicky preklad. Uprav ich pred ulozenim lekcie.');
                       })();
                     }}
                   >
@@ -1601,9 +1686,36 @@ function QuestionEditor({
           onChange={(e) => setQ({ ...q, explanation_sk: e.target.value })}
         />
       </div>
+      <div style={s.fieldGroup}>
+        <label style={s.label}>Vysvetlenie EN</label>
+        <textarea
+          style={s.textarea}
+          rows={2}
+          value={q.explanation || ''}
+          onChange={(e) => setQ({ ...q, explanation: e.target.value })}
+        />
+      </div>
 
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-        <button style={s.btn('#4ade80')} onClick={() => onSave(q, opts)}>
+        <button style={s.btn('#4ade80')} onClick={() => {
+          // Validate EN fields
+          const errs: string[] = [];
+          if (!q.question_text?.trim()) errs.push('Otazka EN je prazdna.');
+          if (!q.question_text_sk?.trim()) errs.push('Otazka SK je prazdna.');
+          if (q.explanation_sk?.trim() && !q.explanation?.trim()) errs.push('Vysvetlenie EN je prazdne.');
+          if (q.question_type === 'multiple_choice') {
+            for (const o of opts) {
+              if (o.option_text_sk?.trim() && !o.option_text?.trim()) {
+                errs.push(`Moznost ${o.option_label} nema EN text.`);
+              }
+            }
+          }
+          if (errs.length > 0) {
+            alert('Validacia otazky zlyhala:\n\n' + errs.join('\n'));
+            return;
+          }
+          onSave(q, opts);
+        }}>
           Ulozit otazku
         </button>
         <button style={s.btn('#333')} onClick={onCancel}>

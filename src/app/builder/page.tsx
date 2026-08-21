@@ -673,6 +673,7 @@ export default function BuilderPage() {
   const [miniLessons, setMiniLessons] = useState<MiniLesson[]>([]);
   const [sectionQuestions, setSectionQuestions] = useState<QuizQuestion[][]>([]);
   const [contentTab, setContentTab] = useState<'obsah' | 'otazky' | 'info'>('obsah');
+  const [introFacts, setIntroFacts] = useState<Fact[]>([]);
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -705,6 +706,10 @@ export default function BuilderPage() {
     setLoading(true);
     try {
       const data = await api({ action: 'getLesson', lessonId: id });
+      // Parse intro facts
+      const { cleaned: introClean, facts: iFacts } = extractFacts(data.introduction_sk || '');
+      data.introduction_sk = introClean;
+      setIntroFacts(iFacts);
       setLesson(data);
       const minis = parseMiniLessons(data.learning_content_sk || '', data.learning_content || '');
       setMiniLessons(minis);
@@ -758,8 +763,12 @@ export default function BuilderPage() {
     try {
       const contentSk = serializeMiniLessons(miniLessons, 'sk');
       const contentEn = serializeMiniLessons(miniLessons, 'en');
+      // Serialize intro facts back into introduction_sk
+      const introFactsStr = serializeFacts(introFacts);
+      const introSk = [lesson.introduction_sk || '', introFactsStr].filter(s => s).join('\n\n');
       const payload = {
         ...lesson,
+        introduction_sk: introSk,
         learning_content_sk: contentSk,
         learning_content: contentEn,
       };
@@ -826,6 +835,7 @@ export default function BuilderPage() {
       setLesson(null);
       setSelectedLessonId(null);
       setMiniLessons([]);
+      setIntroFacts([]);
       setSectionQuestions([]);
       showToast('Vymazané!');
       if (selectedModuleId) {
@@ -865,6 +875,7 @@ export default function BuilderPage() {
     };
     setLesson(newLesson);
     setMiniLessons([]);
+    setIntroFacts([]);
     setSectionQuestions([]);
     setSelectedLessonId(null);
     setContentTab('obsah');
@@ -1030,6 +1041,7 @@ export default function BuilderPage() {
                     setSelectedLessonId(null);
                     setLesson(null);
                     setMiniLessons([]);
+                    setIntroFacts([]);
                     setSectionQuestions([]);
                   }}
                 >
@@ -1171,6 +1183,48 @@ export default function BuilderPage() {
                           onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction', v), lesson.introduction || '')}
                         />
                       </div>
+                    </div>
+
+                    {/* Intro facts */}
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: 12, color: '#888' }}>Fakty v úvode ({introFacts.length})</span>
+                        <button
+                          style={s.btnSmall('#f59e0b')}
+                          onClick={() => setIntroFacts([...introFacts, { title: '', detail: '' }])}
+                        >+ Fakt</button>
+                      </div>
+                      {introFacts.map((fact, fi) => (
+                        <div key={fi} style={{ background: '#111', border: '1px solid #333', borderRadius: 6, padding: 10, marginBottom: 8 }}>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+                            <span style={{ fontSize: 16 }}>💡</span>
+                            <input
+                              style={{ ...s.input, flex: 1, fontWeight: 600 }}
+                              placeholder="Nadpis faktu"
+                              value={fact.title}
+                              onChange={(e) => {
+                                const copy = [...introFacts];
+                                copy[fi] = { ...copy[fi], title: e.target.value };
+                                setIntroFacts(copy);
+                              }}
+                            />
+                            <button
+                              style={s.btnSmall('#ef4444')}
+                              onClick={() => setIntroFacts(introFacts.filter((_, i) => i !== fi))}
+                            >X</button>
+                          </div>
+                          <textarea
+                            style={{ ...s.textarea, minHeight: 50 }}
+                            placeholder="Detail faktu..."
+                            value={fact.detail}
+                            onChange={(e) => {
+                              const copy = [...introFacts];
+                              copy[fi] = { ...copy[fi], detail: e.target.value };
+                              setIntroFacts(copy);
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>

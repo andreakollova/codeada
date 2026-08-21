@@ -864,6 +864,25 @@ export default function BuilderPage() {
     setContentTab('obsah');
   };
 
+  // ── Move lesson up/down (swap lesson_numbers) ──
+  const moveLessonOrder = async (lessonIdx: number, dir: -1 | 1) => {
+    const targetIdx = lessonIdx + dir;
+    if (targetIdx < 0 || targetIdx >= lessons.length) return;
+    const a = lessons[lessonIdx];
+    const b = lessons[targetIdx];
+    setLoading(true);
+    try {
+      await api({ action: 'saveLesson', lesson: { id: a.id, lesson_number: b.lesson_number } });
+      await api({ action: 'saveLesson', lesson: { id: b.id, lesson_number: a.lesson_number } });
+      const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
+      setLessons(ls);
+      showToast('Poradie zmenené');
+    } catch (e: any) {
+      showToast('Chyba: ' + e.message);
+    }
+    setLoading(false);
+  };
+
   // ── Mini lesson operations ──
   const addMiniLesson = () => {
     setMiniLessons([...miniLessons, { title: 'Nova sekcia', content: '', content_en: '', facts: [] }]);
@@ -1034,21 +1053,34 @@ export default function BuilderPage() {
             </div>
 
             <div style={s.lessonList}>
-              {lessons.map((l) => (
+              {lessons.map((l, idx) => (
                 <div
                   key={l.id}
-                  style={{ ...s.lessonItem(selectedLessonId === l.id), flexDirection: 'column' as const, alignItems: 'flex-start' }}
-                  onClick={() => loadLesson(l.id)}
+                  style={{ ...s.lessonItem(selectedLessonId === l.id), flexDirection: 'row' as const, alignItems: 'center', gap: 6 }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={s.lessonNum}>#{l.lesson_number}</div>
-                    <div style={s.lessonTitle}>{l.title_sk || l.title || '(bez názvu)'}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 2, flexShrink: 0 }}>
+                    <button
+                      style={{ background: 'none', border: 'none', color: idx === 0 ? '#333' : '#666', cursor: idx === 0 ? 'default' : 'pointer', fontSize: 10, padding: 0, lineHeight: 1 }}
+                      onClick={(e) => { e.stopPropagation(); moveLessonOrder(idx, -1); }}
+                      disabled={idx === 0}
+                    >▲</button>
+                    <button
+                      style={{ background: 'none', border: 'none', color: idx === lessons.length - 1 ? '#333' : '#666', cursor: idx === lessons.length - 1 ? 'default' : 'pointer', fontSize: 10, padding: 0, lineHeight: 1 }}
+                      onClick={(e) => { e.stopPropagation(); moveLessonOrder(idx, 1); }}
+                      disabled={idx === lessons.length - 1}
+                    >▼</button>
                   </div>
-                  {l.miniTitles && l.miniTitles.length > 0 && (
-                    <div style={{ fontSize: 10, color: '#555', marginTop: 4, lineHeight: 1.5, paddingLeft: 2 }}>
-                      {l.miniTitles.join(' · ')}
+                  <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => loadLesson(l.id)}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={s.lessonNum}>#{l.lesson_number}</div>
+                      <div style={s.lessonTitle}>{l.title_sk || l.title || '(bez názvu)'}</div>
                     </div>
-                  )}
+                    {l.miniTitles && l.miniTitles.length > 0 && (
+                      <div style={{ fontSize: 10, color: '#555', marginTop: 4, lineHeight: 1.5, paddingLeft: 2 }}>
+                        {l.miniTitles.join(' · ')}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
               {selectedModuleId && (

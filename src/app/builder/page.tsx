@@ -767,11 +767,22 @@ export default function BuilderPage() {
       const saved = await api({ action: 'saveLesson', lesson: payload });
       setLesson(saved);
 
+      // Delete questions from DB that are no longer in builder
+      if (saved.id) {
+        const dbQuestions = await api({ action: 'getQuestions', lessonId: saved.id });
+        const localIds = new Set(sectionQuestions.flat().filter(q => q.id).map(q => q.id));
+        for (const dbQ of (dbQuestions || [])) {
+          if (!localIds.has(dbQ.id)) {
+            await api({ action: 'deleteQuestion', questionId: dbQ.id });
+          }
+        }
+      }
+
       // Save all questions with renumbered question_numbers
       const allQuestions = flattenAndRenumber(sectionQuestions);
       for (const q of allQuestions) {
         const questionPayload: any = {
-          lesson_id: q.lesson_id,
+          lesson_id: q.lesson_id || saved.id,
           question_number: q.question_number,
           question_text: q.question_text,
           question_text_sk: q.question_text_sk,

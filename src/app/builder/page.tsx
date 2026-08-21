@@ -1425,7 +1425,7 @@ function MiniLessonCard({
                       })();
                     }}
                   >
-                    Importovať {importText.trim() ? `(${parseQuestionsFromText(importText, lessonId, 1).questions.length} otázok)` : ''}
+                    Importovať {importText.trim() ? `(${parseQuestionsFromText(importText, lessonId || 0, 1).questions.length} otázok)` : ''}
                   </button>
                   <button style={s.btn('#333')} onClick={() => { setImportText(''); setShowImport(false); }}>
                     Zrušiť

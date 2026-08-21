@@ -281,6 +281,7 @@ interface Fact {
 
 interface MiniLesson {
   title: string;
+  title_en: string;
   content: string;
   content_en: string;
   facts: Fact[];
@@ -333,23 +334,26 @@ function parseMiniLessons(rawSk: string, rawEn?: string): MiniLesson[] {
       const { cleaned, facts } = extractFacts(match[2].trim());
       // Try to extract EN content for matching index
       let contentEn = '';
+      let titleEn = '';
       if (partsEn[idx]) {
         const matchEn = partsEn[idx].match(/^## (.+)\n?([\s\S]*)$/);
         if (matchEn) {
+          titleEn = matchEn[1].trim();
           const enExtracted = extractFacts(matchEn[2].trim());
           contentEn = enExtracted.cleaned;
         }
       }
-      return { title: match[1].trim(), content: cleaned, content_en: contentEn, facts };
+      return { title: match[1].trim(), title_en: titleEn, content: cleaned, content_en: contentEn, facts };
     })
     .filter(Boolean) as MiniLesson[];
 }
 
 function serializeMiniLessons(minis: MiniLesson[], lang: 'sk' | 'en' = 'sk'): string {
   return minis.map((m) => {
+    const title = lang === 'en' ? (m.title_en || m.title) : m.title;
     const content = lang === 'en' ? m.content_en : m.content;
     const factsStr = serializeFacts(m.facts);
-    const parts = [`## ${m.title}`, content];
+    const parts = [`## ${title}`, content];
     if (factsStr) parts.push(factsStr);
     return parts.filter(p => p).join('\n\n');
   }).join('\n\n');
@@ -823,7 +827,7 @@ export default function BuilderPage() {
 
   // ── Mini lesson operations ──
   const addMiniLesson = () => {
-    setMiniLessons([...miniLessons, { title: 'Nova sekcia', content: '', content_en: '', facts: [] }]);
+    setMiniLessons([...miniLessons, { title: 'Nova sekcia', title_en: '', content: '', content_en: '', facts: [] }]);
     setSectionQuestions([...sectionQuestions, []]);
   };
   const deleteMiniLesson = (idx: number) => {
@@ -848,7 +852,11 @@ export default function BuilderPage() {
     [copySQ[idx], copySQ[newIdx]] = [copySQ[newIdx], copySQ[idx]];
     setSectionQuestions(copySQ);
   };
-  const updateMiniLesson = (idx: number, field: 'title' | 'content' | 'content_en', value: string) => {
+  const updateMiniLesson = (idx: number, field: 'title' | 'title_en' | 'content' | 'content_en', value: string) => {
+    // Strip leading ## heading from content (title is separate)
+    if (field === 'content' || field === 'content_en') {
+      value = value.replace(/^## .+\n\n?/, '');
+    }
     const copy = [...miniLessons];
     copy[idx] = { ...copy[idx], [field]: value };
     setMiniLessons(copy);
@@ -1276,7 +1284,7 @@ function MiniLessonCard({
   total: number;
   questions: QuizQuestion[];
   lessonId?: number;
-  onUpdate: (field: 'title' | 'content' | 'content_en', value: string) => void;
+  onUpdate: (field: 'title' | 'title_en' | 'content' | 'content_en', value: string) => void;
   onUpdateFacts: (facts: Fact[]) => void;
   onDelete: () => void;
   onMove: (dir: -1 | 1) => void;
@@ -1357,8 +1365,16 @@ function MiniLessonCard({
         <span style={{ fontSize: 11, color: '#666' }}>#{index + 1}</span>
         <input
           style={{ ...s.input, flex: 1, fontWeight: 600 }}
+          placeholder="Nadpis SK"
           value={mini.title}
           onChange={(e) => onUpdate('title', e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+        />
+        <input
+          style={{ ...s.input, flex: 1, fontWeight: 500, color: '#aaa' }}
+          placeholder="Nadpis EN"
+          value={mini.title_en}
+          onChange={(e) => onUpdate('title_en', e.target.value)}
           onClick={(e) => e.stopPropagation()}
         />
         <button

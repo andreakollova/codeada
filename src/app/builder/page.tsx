@@ -26,6 +26,7 @@ interface LessonSummary {
   module_id: number;
   lesson_number: number;
   title: string;
+  miniTitles?: string[];
   title_sk: string;
   lesson_type: string;
 }
@@ -949,11 +950,18 @@ export default function BuilderPage() {
               {lessons.map((l) => (
                 <div
                   key={l.id}
-                  style={s.lessonItem(selectedLessonId === l.id)}
+                  style={{ ...s.lessonItem(selectedLessonId === l.id), flexDirection: 'column' as const, alignItems: 'flex-start' }}
                   onClick={() => loadLesson(l.id)}
                 >
-                  <div style={s.lessonNum}>#{l.lesson_number}</div>
-                  <div style={s.lessonTitle}>{l.title_sk || l.title || '(bez nazvu)'}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={s.lessonNum}>#{l.lesson_number}</div>
+                    <div style={s.lessonTitle}>{l.title_sk || l.title || '(bez názvu)'}</div>
+                  </div>
+                  {l.miniTitles && l.miniTitles.length > 0 && (
+                    <div style={{ fontSize: 10, color: '#555', marginTop: 4, lineHeight: 1.5, paddingLeft: 2 }}>
+                      {l.miniTitles.join(' · ')}
+                    </div>
+                  )}
                 </div>
               ))}
               {selectedModuleId && (

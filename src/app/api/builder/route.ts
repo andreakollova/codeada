@@ -24,11 +24,17 @@ export async function POST(request: Request) {
         const { moduleId } = body;
         const { data, error } = await sb
           .from('cb_lessons')
-          .select('id, module_id, lesson_number, title, title_sk, lesson_type')
+          .select('id, module_id, lesson_number, title, title_sk, lesson_type, learning_content_sk')
           .eq('module_id', moduleId)
           .order('lesson_number', { ascending: true });
         if (error) throw error;
-        return Response.json({ data });
+        const withMinis = (data || []).map((l: any) => {
+          const content = l.learning_content_sk || '';
+          const titles = (content.match(/^## .+$/gm) || []).map((h: string) => h.replace(/^## /, ''));
+          const { learning_content_sk: _, ...rest } = l;
+          return { ...rest, miniTitles: titles };
+        });
+        return Response.json({ data: withMinis });
       }
 
       case 'getLesson': {

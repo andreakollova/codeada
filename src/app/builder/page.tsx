@@ -280,6 +280,14 @@ const s = {
 
 // ── Main Component ──────────────────────────────────────────
 export default function BuilderPage() {
+  // Hide main nav on builder page
+  useEffect(() => {
+    document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => (el as HTMLElement).style.display = 'none');
+    return () => {
+      document.querySelectorAll('.desktop-nav, .mobile-nav').forEach(el => (el as HTMLElement).style.display = '');
+    };
+  }, []);
+
   const [topTab, setTopTab] = useState<'citanie' | 'paths'>('citanie');
   const [modules, setModules] = useState<Module[]>([]);
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);

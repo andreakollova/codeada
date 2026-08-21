@@ -274,10 +274,51 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
 }
 
 // ── Mini lesson parser ──────────────────────────────────────
+interface Fact {
+  title: string;
+  detail: string;
+}
+
 interface MiniLesson {
   title: string;
   content: string;
   content_en: string;
+  facts: Fact[];
+}
+
+function extractFacts(text: string): { cleaned: string; facts: Fact[] } {
+  const facts: Fact[] = [];
+  const lines = text.split('\n');
+  const cleanedLines: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const factMatch = line.match(/^💡\s*(.+)$/);
+    if (factMatch) {
+      const title = factMatch[1].trim();
+      let detail = '';
+      // Collect detail lines until empty line or next 💡 or next ## or end
+      i++;
+      while (i < lines.length && lines[i].trim() !== '' && !lines[i].startsWith('💡') && !lines[i].startsWith('## ')) {
+        detail += (detail ? '\n' : '') + lines[i];
+        i++;
+      }
+      facts.push({ title, detail: detail.trim() });
+    } else {
+      cleanedLines.push(line);
+      i++;
+    }
+  }
+  // Remove trailing empty lines from cleaned content
+  let cleaned = cleanedLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  return { cleaned, facts };
+}
+
+function serializeFacts(facts: Fact[]): string {
+  return facts
+    .filter(f => f.title.trim())
+    .map(f => `💡 ${f.title}\n${f.detail}`)
+    .join('\n\n');
 }
 
 function parseMiniLessons(rawSk: string, rawEn?: string): MiniLesson[] {
@@ -288,19 +329,30 @@ function parseMiniLessons(rawSk: string, rawEn?: string): MiniLesson[] {
     .map((part, idx) => {
       const match = part.match(/^## (.+)\n?([\s\S]*)$/);
       if (!match) return null;
+      // Extract facts from SK content
+      const { cleaned, facts } = extractFacts(match[2].trim());
       // Try to extract EN content for matching index
       let contentEn = '';
       if (partsEn[idx]) {
         const matchEn = partsEn[idx].match(/^## (.+)\n?([\s\S]*)$/);
-        if (matchEn) contentEn = matchEn[2].trim();
+        if (matchEn) {
+          const enExtracted = extractFacts(matchEn[2].trim());
+          contentEn = enExtracted.cleaned;
+        }
       }
-      return { title: match[1].trim(), content: match[2].trim(), content_en: contentEn };
+      return { title: match[1].trim(), content: cleaned, content_en: contentEn, facts };
     })
     .filter(Boolean) as MiniLesson[];
 }
 
 function serializeMiniLessons(minis: MiniLesson[], lang: 'sk' | 'en' = 'sk'): string {
-  return minis.map((m) => `## ${m.title}\n${lang === 'en' ? m.content_en : m.content}`).join('\n\n');
+  return minis.map((m) => {
+    const content = lang === 'en' ? m.content_en : m.content;
+    const factsStr = serializeFacts(m.facts);
+    const parts = [`## ${m.title}`, content];
+    if (factsStr) parts.push(factsStr);
+    return parts.filter(p => p).join('\n\n');
+  }).join('\n\n');
 }
 
 // ── Distribute questions across sections ────────────────────
@@ -636,7 +688,7 @@ export default function BuilderPage() {
   }, []);
 
   // ── Save lesson ──
-  const saveLesson = async () => {
+  const saveLesson = async (withTranslation = false) => {
     if (!lesson) return;
     if (!lesson.title_sk?.trim()) {
       alert('Názov SK je prázdny.');
@@ -814,7 +866,7 @@ export default function BuilderPage() {
 
   // ── Mini lesson operations ──
   const addMiniLesson = () => {
-    setMiniLessons([...miniLessons, { title: 'Nova sekcia', content: '', content_en: '' }]);
+    setMiniLessons([...miniLessons, { title: 'Nova sekcia', content: '', content_en: '', facts: [] }]);
     setSectionQuestions([...sectionQuestions, []]);
   };
   const deleteMiniLesson = (idx: number) => {
@@ -1041,43 +1093,23 @@ export default function BuilderPage() {
                 {/* ═══ OBSAH & OTAZKY TAB ═══ */}
                 {contentTab === 'obsah' && (
                   <div>
-                    <div style={s.row}>
-                      <div style={{ flex: 1 }}>
-                        <label style={s.label}>Nazov SK</label>
-                        <input
-                          style={s.input}
-                          value={lesson.title_sk || ''}
-                          onChange={(e) => updateField('title_sk', e.target.value)}
-                        />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={s.label}>Nazov EN</label>
-                        <input
-                          style={s.input}
-                          value={lesson.title || ''}
-                          onChange={(e) => updateField('title', e.target.value)}
-                        />
-                      </div>
+                    <div style={s.fieldGroup}>
+                      <label style={s.label}>Názov</label>
+                      <input
+                        style={s.input}
+                        value={lesson.title_sk || ''}
+                        onChange={(e) => updateField('title_sk', e.target.value)}
+                      />
                     </div>
 
                     <div style={s.fieldGroup}>
-                      <label style={s.label}>Uvod SK (introduction_sk)</label>
+                      <label style={s.label}>Úvod</label>
                       <textarea
                         style={s.textarea}
                         rows={4}
                         value={lesson.introduction_sk || ''}
                         onChange={(e) => updateField('introduction_sk', e.target.value)}
                         onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction_sk', v), lesson.introduction_sk || '')}
-                      />
-                    </div>
-                    <div style={s.fieldGroup}>
-                      <label style={s.label}>Uvod EN (introduction)</label>
-                      <textarea
-                        style={s.textarea}
-                        rows={4}
-                        value={lesson.introduction || ''}
-                        onChange={(e) => updateField('introduction', e.target.value)}
-                        onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction', v), lesson.introduction || '')}
                       />
                     </div>
 
@@ -1099,6 +1131,11 @@ export default function BuilderPage() {
                         questions={sectionQuestions[idx] || []}
                         lessonId={lesson.id}
                         onUpdate={(f, v) => updateMiniLesson(idx, f, v)}
+                        onUpdateFacts={(facts) => {
+                          const copy = [...miniLessons];
+                          copy[idx] = { ...copy[idx], facts };
+                          setMiniLessons(copy);
+                        }}
                         onDelete={() => deleteMiniLesson(idx)}
                         onMove={(dir) => moveMiniLesson(idx, dir)}
                         onSaveQuestion={(q, opts) => saveQuestionInSection(idx, q, opts)}
@@ -1108,7 +1145,7 @@ export default function BuilderPage() {
                     ))}
 
                     <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
-                      <button style={s.btn('#4ade80')} onClick={saveLesson}>
+                      <button style={s.btn('#4ade80')} onClick={() => saveLesson()}>
                         Uložiť lekciu
                       </button>
                     </div>
@@ -1204,7 +1241,7 @@ export default function BuilderPage() {
                     </div>
 
                     <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-                      <button style={s.btn('#4ade80')} onClick={saveLesson}>
+                      <button style={s.btn('#4ade80')} onClick={() => saveLesson()}>
                         Uložiť
                       </button>
                       {lesson.id && (
@@ -1235,6 +1272,7 @@ function MiniLessonCard({
   questions,
   lessonId,
   onUpdate,
+  onUpdateFacts,
   onDelete,
   onMove,
   onSaveQuestion,
@@ -1247,6 +1285,7 @@ function MiniLessonCard({
   questions: QuizQuestion[];
   lessonId?: number;
   onUpdate: (field: 'title' | 'content' | 'content_en', value: string) => void;
+  onUpdateFacts: (facts: Fact[]) => void;
   onDelete: () => void;
   onMove: (dir: -1 | 1) => void;
   onSaveQuestion: (q: QuizQuestion, opts: QuizOption[]) => void;
@@ -1347,29 +1386,53 @@ function MiniLessonCard({
             onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content', v), mini.content)}
           />
 
-          {/* EN content */}
-          <label style={{ ...s.label, marginTop: 8 }}>EN</label>
-          <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('heading', 'en')} title="Subheading (### )">
-              ###
-            </button>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('bullet', 'en')} title="Bullet (- )">
-              -
-            </button>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('blank', 'en')} title="Blank (___)">
-              ___
-            </button>
-            <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold', 'en')} title="Bold (**B**)">
-              B
-            </button>
+          {/* Facts */}
+          <div style={{ marginTop: 12, paddingTop: 8, borderTop: '1px solid #2a2a2a' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, color: '#888' }}>
+                Fakty ({mini.facts.length})
+              </span>
+              <button
+                style={s.btnSmall('#f59e0b')}
+                onClick={() => onUpdateFacts([...mini.facts, { title: '', detail: '' }])}
+              >
+                + Fakt
+              </button>
+            </div>
+            {mini.facts.map((fact, fi) => (
+              <div key={fi} style={{ background: '#111', border: '1px solid #333', borderRadius: 6, padding: 10, marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 16 }}>💡</span>
+                  <input
+                    style={{ ...s.input, flex: 1, fontWeight: 600 }}
+                    placeholder="Nadpis faktu"
+                    value={fact.title}
+                    onChange={(e) => {
+                      const copy = [...mini.facts];
+                      copy[fi] = { ...copy[fi], title: e.target.value };
+                      onUpdateFacts(copy);
+                    }}
+                  />
+                  <button
+                    style={s.btnSmall('#ef4444')}
+                    onClick={() => onUpdateFacts(mini.facts.filter((_, i) => i !== fi))}
+                  >
+                    X
+                  </button>
+                </div>
+                <textarea
+                  style={{ ...s.textarea, minHeight: 50 }}
+                  placeholder="Detail faktu..."
+                  value={fact.detail}
+                  onChange={(e) => {
+                    const copy = [...mini.facts];
+                    copy[fi] = { ...copy[fi], detail: e.target.value };
+                    onUpdateFacts(copy);
+                  }}
+                />
+              </div>
+            ))}
           </div>
-          <textarea
-            ref={textareaEnRef}
-            style={{ ...s.textarea, minHeight: 120 }}
-            value={mini.content_en}
-            onChange={(e) => onUpdate('content_en', e.target.value)}
-            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content_en', v), mini.content_en)}
-          />
 
           {/* Questions for this section */}
           <div style={{ marginTop: 12, paddingTop: 8, borderTop: '1px solid #2a2a2a' }}>

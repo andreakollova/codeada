@@ -51,6 +51,7 @@ export interface DbLessonSummary {
   title: string;
   title_sk?: string;
   lesson_type: string;
+  miniTitles?: string[];
 }
 
 export interface ModuleWithLessons extends DbModule {
@@ -68,7 +69,7 @@ export async function fetchModulesWithLessons(): Promise<ModuleWithLessons[]> {
 
   const [modRes, lesRes] = await Promise.all([
     sb.from('cb_modules').select('*').order('module_number'),
-    sb.from('cb_lessons').select('id,module_id,lesson_number,title,title_sk,lesson_type').order('module_id').order('lesson_number'),
+    sb.from('cb_lessons').select('id,module_id,lesson_number,title,title_sk,lesson_type,learning_content_sk').order('module_id').order('lesson_number'),
   ]);
 
   if (modRes.error || lesRes.error) return [];
@@ -78,7 +79,12 @@ export async function fetchModulesWithLessons(): Promise<ModuleWithLessons[]> {
 
   modulesCache = modules.map(m => ({
     ...m,
-    lessons: lessons.filter(l => l.module_id === m.id),
+    lessons: lessons.filter(l => l.module_id === m.id).map(l => {
+      const content = (l as any).learning_content_sk || '';
+      const miniTitles = (content.match(/^## .+$/gm) || []).map((h: string) => h.replace(/^## /, ''));
+      const { learning_content_sk: _, ...rest } = l as any;
+      return { ...rest, miniTitles } as DbLessonSummary;
+    }),
   }));
 
   return modulesCache;

@@ -307,9 +307,16 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
                 }}>
                   {done && <Check size={12} color="#000" strokeWidth={3} />}
                 </div>
-                <span style={{ fontSize: 13, color: done ? 'var(--text-dim, #aaa)' : 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
-                  {t(lesson, 'title', locale)}
-                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: 13, color: done ? 'var(--text-dim, #aaa)' : 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
+                    {t(lesson, 'title', locale)}
+                  </span>
+                  {lesson.miniTitles && lesson.miniTitles.length > 0 && (
+                    <div style={{ fontSize: 10, color: '#555', marginTop: 3, lineHeight: 1.4 }}>
+                      {lesson.miniTitles.join(' · ')}
+                    </div>
+                  )}
+                </div>
               </button>
             );
           })}

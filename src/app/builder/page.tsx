@@ -166,8 +166,8 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
 
   for (const line of lines) {
     const trimmed = line.trim();
-    // New question block starts with: "1.", "2.", "Select correct code", "Fill in the code", or empty line before numbered
-    if (/^\d+\.\s/.test(trimmed) || /^Select correct code/i.test(trimmed) || /^Fill in the code/i.test(trimmed)) {
+    // New question block starts with: "1.", "Otázka N", "Select correct code", "Fill in the code", section headers
+    if (/^\d+\.\s/.test(trimmed) || /^Otázka\s+\d+/i.test(trimmed) || /^Question\s+\d+/i.test(trimmed) || /^Select correct/i.test(trimmed) || /^Fill in the code/i.test(trimmed) || /^Select the correct/i.test(trimmed) || /^Vyber správny/i.test(trimmed) || /^Doplň kód/i.test(trimmed)) {
       if (current.trim()) blocks.push(current.trim());
       current = trimmed + '\n';
     } else {

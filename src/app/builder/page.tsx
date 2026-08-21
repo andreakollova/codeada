@@ -1138,6 +1138,10 @@ export default function BuilderPage() {
                       {t === 'obsah' ? 'Obsah & Otázky' : 'Info'}
                     </button>
                   ))}
+                  <div style={{ flex: 1 }} />
+                  <button style={s.btn('#4ade80')} onClick={() => saveLesson()}>
+                    Uložiť
+                  </button>
                 </div>
 
                 {/* ═══ OBSAH & OTAZKY TAB ═══ */}
@@ -1826,6 +1830,10 @@ function QuestionCard({
   onDelete: () => void;
   onQuickUpdate: (updates: Partial<QuizQuestion>, optUpdates?: { label: string; text_en: string }[]) => void;
 }) {
+  const [enPaste, setEnPaste] = useState('');
+  const [showEnPaste, setShowEnPaste] = useState(false);
+  const hasEn = !!(question.question_text?.trim());
+
   const typeLabel =
     question.question_type === 'fill_code'
       ? 'Dopln kod'
@@ -1833,14 +1841,33 @@ function QuestionCard({
         ? 'Vyber kod'
         : 'Otazka';
   const typeColor =
-    question.question_type === 'fill_code' ? '#f59e0b' : question.code_snippet ? '#818cf8' : '#4ade80';
+    question.question_type === 'fill_code' ? '#f59e0b' : question.code_snippet ? '#818cf8' : '#3b82f6';
+
+  const applyEnPaste = () => {
+    if (!enPaste.trim()) return;
+    const { questions: parsed } = parseQuestionsFromText(enPaste, 0, 1);
+    if (parsed.length === 0) return;
+    const en = parsed[0];
+    const updates: Partial<QuizQuestion> = {
+      question_text: en.question_text_sk,
+      explanation: en.explanation_sk,
+    };
+    const optUpdates = en.options?.map(o => ({ label: o.option_label, text_en: o.option_text_sk }));
+    onQuickUpdate(updates, optUpdates);
+    setEnPaste('');
+    setShowEnPaste(false);
+  };
 
   return (
-    <div style={s.card}>
+    <div style={{ ...s.card, borderColor: '#333' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <span style={s.badge(typeColor)}>{typeLabel}</span>
         <span style={{ fontSize: 11, color: '#666' }}>#{question.question_number}</span>
+        {hasEn && <span style={{ fontSize: 9, color: '#4ade80', fontWeight: 600 }}>EN</span>}
         <div style={{ flex: 1 }} />
+        <button style={s.btnSmall('#3b82f6')} onClick={() => setShowEnPaste(!showEnPaste)}>
+          {showEnPaste ? 'Zavrieť' : 'Pastni EN'}
+        </button>
         <button style={s.btnSmall('#333')} onClick={onEdit}>
           Upravit
         </button>
@@ -1850,44 +1877,18 @@ function QuestionCard({
       </div>
       {/* SK question */}
       <div style={{ fontSize: 13, marginBottom: 4 }}>{question.question_text_sk || question.question_text}</div>
-      {/* EN question - inline editable */}
-      <input
-        style={{ ...s.input, fontSize: 12, color: '#aaa', marginBottom: 6 }}
-        placeholder="EN preklad otazky..."
-        value={question.question_text || ''}
-        onChange={(e) => onQuickUpdate({ question_text: e.target.value })}
-      />
       {question.code_snippet && (
-        <pre
-          style={{
-            background: '#0a0a0a',
-            color: '#4ade80',
-            padding: 10,
-            borderRadius: 6,
-            fontSize: 12,
-            fontFamily: '"SF Mono", "Fira Code", monospace',
-            overflow: 'auto',
-            marginBottom: 6,
-          }}
-        >
+        <pre style={{ background: '#0a0a0a', color: '#4ade80', padding: 10, borderRadius: 6, fontSize: 12, fontFamily: '"SF Mono", "Fira Code", monospace', overflow: 'auto', marginBottom: 6 }}>
           {question.code_snippet}
         </pre>
       )}
       {question.question_type === 'multiple_choice' && question.options && (
         <div style={{ marginBottom: 6 }}>
           {question.options.map((o) => (
-            <div key={o.option_label} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
-              <span style={{
-                width: 20, fontSize: 12, fontWeight: 600,
-                color: o.is_correct ? '#4ade80' : '#666',
-              }}>{o.option_label}</span>
-              <span style={{ fontSize: 12, color: '#ccc', minWidth: 120 }}>{o.option_text_sk || ''}</span>
-              <input
-                style={{ ...s.input, flex: 1, fontSize: 11, color: '#aaa', padding: '4px 8px' }}
-                placeholder="EN..."
-                value={o.option_text || ''}
-                onChange={(e) => onQuickUpdate({}, [{ label: o.option_label, text_en: e.target.value }])}
-              />
+            <div key={o.option_label} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2 }}>
+              <span style={{ width: 20, fontSize: 12, fontWeight: 600, color: o.is_correct ? '#4ade80' : '#666' }}>{o.option_label}</span>
+              <span style={{ fontSize: 12, color: '#ccc' }}>{o.option_text_sk || ''}</span>
+              {o.option_text && <span style={{ fontSize: 11, color: '#666' }}>| {o.option_text}</span>}
             </div>
           ))}
         </div>
@@ -1897,14 +1898,26 @@ function QuestionCard({
           Odpoved: {question.correct_answer}
         </div>
       )}
-      {/* EN explanation */}
-      <div style={{ fontSize: 11, color: '#666', marginBottom: 2 }}>SK vysvetlenie: {question.explanation_sk || '-'}</div>
-      <input
-        style={{ ...s.input, fontSize: 11, color: '#aaa', padding: '4px 8px' }}
-        placeholder="EN vysvetlenie..."
-        value={question.explanation || ''}
-        onChange={(e) => onQuickUpdate({ explanation: e.target.value })}
-      />
+      {/* EN paste area */}
+      {showEnPaste && (
+        <div style={{ marginTop: 8, padding: 10, background: '#111', border: '1px solid #3b82f6', borderRadius: 6 }}>
+          <textarea
+            style={{ ...s.textarea, minHeight: 80, fontSize: 12 }}
+            placeholder="Pastni celú EN otázku (s A/B/C/D, vysvetlením...)..."
+            value={enPaste}
+            onChange={(e) => setEnPaste(e.target.value)}
+          />
+          <button style={{ ...s.btnSmall('#3b82f6'), marginTop: 6 }} onClick={applyEnPaste}>
+            Aplikovať EN
+          </button>
+        </div>
+      )}
+      {/* Show EN preview if filled */}
+      {hasEn && !showEnPaste && (
+        <div style={{ fontSize: 11, color: '#555', marginTop: 4 }}>
+          EN: {question.question_text}
+        </div>
+      )}
     </div>
   );
 }

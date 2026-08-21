@@ -1325,7 +1325,7 @@ function isCodeLine(line: string): boolean {
 }
 
 /** Byte tip bubble at top of sections */
-function ByteTip({ phase, locale, equipment, sectionIndex, customTip, customDetail }: { phase: string; locale: string; equipment: any; sectionIndex: number; customTip?: string; customDetail?: string }) {
+function ByteTip({ phase, locale, equipment, sectionIndex, customTip, customDetail, hideBubble }: { phase: string; locale: string; equipment: any; sectionIndex: number; customTip?: string; customDetail?: string; hideBubble?: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const seed = (typeof window !== 'undefined' ? parseInt(window.location.pathname.split('/').pop() || '0') || 0 : 0) + sectionIndex;
   const tipsSk: Record<string, string[]> = {
@@ -1344,33 +1344,37 @@ function ByteTip({ phase, locale, equipment, sectionIndex, customTip, customDeta
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: `${phase === 'intro' ? 40 : 12}px 0 0` }}>
-      {customTip && <div style={{ fontSize: 9, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
-        {locale === 'sk' ? 'Zaujímavosť' : 'Fun fact'}
-      </div>}
-      <div
-        onClick={customDetail ? () => setExpanded(!expanded) : undefined}
-        style={{
-          background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
-          padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 280, textAlign: 'center',
-          cursor: customDetail ? 'pointer' : 'default',
-        }}
-      >
-        <span>{tip}{customDetail ? '.' : ''}</span>
-        {customDetail && (
-          <span style={{ marginLeft: 6, color: '#4ade80', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
-            {expanded ? 'skryť' : 'viac'} <ChevronRight size={10} style={{ display: 'inline', verticalAlign: 'middle', transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
-          </span>
-        )}
-        <AnimatePresence>
-          {expanded && customDetail && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} style={{ overflow: 'hidden' }}>
-              <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #333', fontSize: 11, color: '#888', lineHeight: 1.6, textAlign: 'left' }}>
-                {customDetail}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {!hideBubble && (
+        <>
+          {customTip && <div style={{ fontSize: 9, fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
+            {locale === 'sk' ? 'Zaujímavosť' : 'Fun fact'}
+          </div>}
+          <div
+            onClick={customDetail ? () => setExpanded(!expanded) : undefined}
+            style={{
+              background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12,
+              padding: '8px 14px', fontSize: 12, color: '#aaa', fontWeight: 500, maxWidth: 280, textAlign: 'center',
+              cursor: customDetail ? 'pointer' : 'default',
+            }}
+          >
+            <span>{tip}{customDetail ? '.' : ''}</span>
+            {customDetail && (
+              <span style={{ marginLeft: 6, color: '#4ade80', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                {expanded ? 'skryť' : 'viac'} <ChevronRight size={10} style={{ display: 'inline', verticalAlign: 'middle', transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+              </span>
+            )}
+            <AnimatePresence>
+              {expanded && customDetail && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} style={{ overflow: 'hidden' }}>
+                  <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #333', fontSize: 11, color: '#888', lineHeight: 1.6, textAlign: 'left' }}>
+                    {customDetail}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </>
+      )}
       <motion.div
         animate={{ y: [0, -5, 0], rotate: [0, 2, -2, 0] }}
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
@@ -1626,7 +1630,12 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
   if (pages.length <= 1) {
     return (
       <div>
-        <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={0} />
+        <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={0}
+          {...(() => {
+            const factMatch = text.match(/\u{1F4A1}\s*(.+)\n([\s\S]*?)(?=\n\n|\u{1F4A1}|$)/u);
+            if (factMatch) return { customTip: factMatch[1].trim(), customDetail: factMatch[2].trim() };
+            return { hideBubble: true };
+          })()} />
         <div style={{ fontSize: 15, color: '#ddd', lineHeight: 1.85 }}>
           {formatContent(text, 'learning')}
         </div>

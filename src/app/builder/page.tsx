@@ -230,7 +230,7 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
         const optText = optMatch[2].replace('✅', '').trim();
         opts.push({
           option_label: optMatch[1],
-          option_text: optText,
+          option_text: '',  // EN empty — fill manually
           option_text_sk: optText,
           is_correct: isCorrect,
         });
@@ -268,9 +268,9 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
 
     if (!questionText.trim()) continue;
 
-    // Determine question type
+    // Determine question type: if has options (A/B/C/D) → always MCQ
     let questionType = 'multiple_choice';
-    if (!hasOptions && (hasCodeSnippet || correctAnswer) && opts.length === 0) {
+    if (opts.length === 0 && (hasCodeSnippet || correctAnswer)) {
       questionType = 'fill_code';
     }
 
@@ -283,12 +283,12 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
     questions.push({
       lesson_id: lessonId,
       question_number: qNum++,
-      question_text: questionText.trim(),
+      question_text: '',  // EN empty — fill manually
       question_text_sk: questionText.trim(),
       question_type: questionType,
       correct_answer: correctAnswer,
       code_snippet: codeSnippet.trim() || '',
-      explanation: explanation.trim(),
+      explanation: '',  // EN empty — fill manually
       explanation_sk: explanation.trim(),
       options: opts,
     });

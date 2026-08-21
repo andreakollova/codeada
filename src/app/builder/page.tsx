@@ -1751,7 +1751,6 @@ function MiniLessonCard({
                           await onSaveQuestion(q, q.options || []);
                         }
                         setImportText('');
-                        setImportTextEn('');
                         setShowImport(false);
                       })();
                     }}

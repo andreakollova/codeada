@@ -1899,7 +1899,21 @@ function formatContent(text: string, phase: string = '') {
     }
 
     // Text block - process paragraphs
-    const blocks = parts[p].split('\n\n');
+    // Pre-process: merge consecutive bullet lines separated by empty lines into one block
+    const rawBlocks = parts[p].split('\n\n');
+    const blocks: string[] = [];
+    for (let bi = 0; bi < rawBlocks.length; bi++) {
+      const block = rawBlocks[bi];
+      const isBulletBlock = block.trim().split('\n').every(l => l.trimStart().startsWith('- ') || !l.trim());
+      if (isBulletBlock && blocks.length > 0) {
+        const prevIsBullet = blocks[blocks.length - 1].trim().split('\n').every(l => l.trimStart().startsWith('- ') || !l.trim());
+        if (prevIsBullet) {
+          blocks[blocks.length - 1] += '\n' + block;
+          continue;
+        }
+      }
+      blocks.push(block);
+    }
 
   for (let i = 0; i < blocks.length; i++) {
     const trimmed = blocks[i].trim();

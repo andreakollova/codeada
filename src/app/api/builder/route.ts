@@ -243,6 +243,53 @@ export async function POST(request: Request) {
         return Response.json({ ok: true });
       }
 
+      case 'translate': {
+        const { texts } = body; // { key: skText, ... }
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+
+        const entries = Object.entries(texts).filter(([, v]) => typeof v === 'string' && (v as string).trim());
+        if (entries.length === 0) return Response.json({ data: {} });
+
+        const prompt = entries.map(([key, val]) => `[${key}]\n${val}`).join('\n\n---\n\n');
+
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            temperature: 0.3,
+            messages: [
+              {
+                role: 'system',
+                content: `You are a professional translator. Translate the following Slovak texts to English. Keep all markdown formatting (##, ###, **, -, code blocks, ___) exactly as-is. Keep variable names, function names, and code unchanged. Only translate the natural language parts. Return ONLY the translations in the same [key] format, nothing else.`
+              },
+              { role: 'user', content: prompt }
+            ]
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(`OpenAI error: ${err}`);
+        }
+
+        const gptData = await res.json();
+        const reply = gptData.choices?.[0]?.message?.content || '';
+
+        // Parse response back into key-value pairs
+        const result: Record<string, string> = {};
+        const parts = reply.split(/\n*---\n*/);
+        for (const part of parts) {
+          const match = part.match(/^\[(\w+)\]\n([\s\S]*)/);
+          if (match) {
+            result[match[1]] = match[2].trim();
+          }
+        }
+
+        return Response.json({ data: result });
+      }
+
       default:
         return Response.json({ error: 'Unknown action' }, { status: 400 });
     }

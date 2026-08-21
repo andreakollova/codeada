@@ -638,57 +638,92 @@ export default function BuilderPage() {
   // ── Save lesson ──
   const saveLesson = async () => {
     if (!lesson) return;
-
-    // Validation
-    const errors: string[] = [];
-    if (!lesson.title?.trim()) errors.push('Nazov EN je prazdny.');
-    if (!lesson.title_sk?.trim()) errors.push('Nazov SK je prazdny.');
-    if (lesson.introduction_sk?.trim() && !lesson.introduction?.trim()) {
-      errors.push('Uvod EN je prazdny (SK uz ma obsah).');
-    }
-    for (let i = 0; i < miniLessons.length; i++) {
-      const ml = miniLessons[i];
-      if (ml.content.trim() && !ml.content_en.trim()) {
-        errors.push(`Sekcia #${i + 1} "${ml.title}" nema EN obsah.`);
-      }
-    }
-    // Validate questions EN fields
-    const allQs = sectionQuestions.flat();
-    for (const q of allQs) {
-      if (!q.question_text?.trim()) {
-        errors.push(`Otazka #${q.question_number} nema EN text.`);
-      }
-      if (!q.explanation?.trim() && q.explanation_sk?.trim()) {
-        errors.push(`Otazka #${q.question_number} nema EN vysvetlenie.`);
-      }
-      if (q.question_type === 'multiple_choice' && q.options) {
-        for (const o of q.options) {
-          if (!o.option_text?.trim() && o.option_text_sk?.trim()) {
-            errors.push(`Otazka #${q.question_number} moznost ${o.option_label} nema EN text.`);
-            break;
-          }
-        }
-      }
-    }
-    if (errors.length > 0) {
-      alert('Validacia zlyhala:\n\n' + errors.join('\n'));
+    if (!lesson.title_sk?.trim()) {
+      alert('Názov SK je prázdny.');
       return;
     }
 
     setLoading(true);
+    showToast('Prekladám do EN...');
     try {
-      const contentSk = serializeMiniLessons(miniLessons, 'sk');
-      const contentEn = serializeMiniLessons(miniLessons, 'en');
+      // Auto-translate SK → EN via GPT
+      const textsToTranslate: Record<string, string> = {};
+      if (lesson.title_sk?.trim()) textsToTranslate.title = lesson.title_sk;
+      if (lesson.introduction_sk?.trim()) textsToTranslate.introduction = lesson.introduction_sk;
+      for (let i = 0; i < miniLessons.length; i++) {
+        if (miniLessons[i].content.trim()) {
+          textsToTranslate[`section_${i}`] = `## ${miniLessons[i].title}\n${miniLessons[i].content}`;
+        }
+      }
+      // Translate questions
+      const allQs = sectionQuestions.flat();
+      for (let i = 0; i < allQs.length; i++) {
+        const q = allQs[i];
+        if (q.question_text_sk?.trim()) textsToTranslate[`q_${i}`] = q.question_text_sk;
+        if (q.explanation_sk?.trim()) textsToTranslate[`qexp_${i}`] = q.explanation_sk;
+        if (q.question_type === 'multiple_choice' && q.options) {
+          for (const o of q.options) {
+            if (o.option_text_sk?.trim()) textsToTranslate[`qopt_${i}_${o.option_label}`] = o.option_text_sk;
+          }
+        }
+      }
+
+      let translations: Record<string, string> = {};
+      if (Object.keys(textsToTranslate).length > 0) {
+        translations = await api({ action: 'translate', texts: textsToTranslate });
+      }
+
+      // Apply translations
+      const updatedLesson = { ...lesson };
+      if (translations.title) updatedLesson.title = translations.title;
+      if (translations.introduction) updatedLesson.introduction = translations.introduction;
+
+      const updatedMinis = miniLessons.map((ml, i) => {
+        const key = `section_${i}`;
+        if (translations[key]) {
+          const translated = translations[key];
+          const match = translated.match(/^## (.+)\n([\s\S]*)$/);
+          return { ...ml, content_en: match ? match[2].trim() : translated };
+        }
+        return ml;
+      });
+
+      // Apply question translations
+      const updatedSectionQs = sectionQuestions.map(section =>
+        section.map(q => {
+          const idx = allQs.indexOf(q);
+          const updated = { ...q };
+          if (translations[`q_${idx}`]) updated.question_text = translations[`q_${idx}`];
+          if (translations[`qexp_${idx}`]) updated.explanation = translations[`qexp_${idx}`];
+          if (updated.question_type === 'multiple_choice' && updated.options) {
+            updated.options = updated.options.map(o => ({
+              ...o,
+              option_text: translations[`qopt_${idx}_${o.option_label}`] || o.option_text || o.option_text_sk,
+            }));
+          }
+          return updated;
+        })
+      );
+
+      showToast('Ukladám...');
+
+      const contentSk = serializeMiniLessons(updatedMinis, 'sk');
+      const contentEn = serializeMiniLessons(updatedMinis, 'en');
       const payload = {
-        ...lesson,
+        ...updatedLesson,
         learning_content_sk: contentSk,
         learning_content: contentEn,
       };
+
+      // Update local state with translations
+      setLesson(updatedLesson);
+      setMiniLessons(updatedMinis);
+      setSectionQuestions(updatedSectionQs);
       const saved = await api({ action: 'saveLesson', lesson: payload });
       setLesson(saved);
 
       // Save all questions with renumbered question_numbers
-      const allQuestions = flattenAndRenumber(sectionQuestions);
+      const allQuestions = flattenAndRenumber(updatedSectionQs);
       for (const q of allQuestions) {
         const questionPayload: any = {
           lesson_id: q.lesson_id,
@@ -1342,21 +1377,11 @@ function MiniLessonCard({
               <span style={{ fontSize: 12, color: '#888' }}>
                 Otázky ({questions.length})
               </span>
-              <div style={{ display: 'flex', gap: 6 }}>
-                {lessonId && (
-                  <button
-                    style={s.btnSmall('#818cf8')}
-                    onClick={() => setShowImport(!showImport)}
-                  >
-                    {showImport ? 'Zavrieť import' : 'Importovať otázky'}
-                  </button>
-                )}
-                {lessonId && !editingQuestion && (
-                  <button style={s.btnSmall('#4ade80')} onClick={handleAddQuestion}>
-                    + Pridať otázku
-                  </button>
-                )}
-              </div>
+              {lessonId && (
+                <button style={s.btnSmall('#4ade80')} onClick={() => setShowImport(!showImport)}>
+                  {showImport ? 'Zavrieť' : '+ Pridať otázky'}
+                </button>
+              )}
             </div>
 
             {!lessonId && questions.length === 0 && (

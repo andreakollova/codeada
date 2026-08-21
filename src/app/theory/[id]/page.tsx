@@ -423,7 +423,7 @@ export default function TheoryLessonPage() {
             <motion.button
               onClick={handleNextSection}
               whileTap={{ scale: 0.98 }}
-              style={{ width: '100%', padding: '16px', borderRadius: 14, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer', marginTop: 24 }}
+              style={{ width: '100%', padding: '16px', borderRadius: 14, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer', marginTop: 24 }}
             >
               {locale === 'sk' ? 'Pokračovať' : 'Continue'} <ArrowRight size={16} />
             </motion.button>
@@ -465,7 +465,7 @@ export default function TheoryLessonPage() {
           onClick={handleNextSection}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, border: 'none', cursor: 'pointer' }}
+          style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, border: 'none', cursor: 'pointer' }}
         >
           {sectionIndex + 1 < sections.length
             ? s('continueBtn', locale)
@@ -601,7 +601,7 @@ export default function TheoryLessonPage() {
             onClick={handleWriteCodeCheck}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
           >
             {locale === 'sk' ? 'Skontrolovať' : 'Check'}
             <Check size={16} />
@@ -673,7 +673,7 @@ export default function TheoryLessonPage() {
               onClick={handleQuizNext}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+              style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
             >
               {quizIndex + 1 < quiz.length
                 ? s('nextQuestion', locale)
@@ -816,7 +816,7 @@ export default function TheoryLessonPage() {
             onClick={handleFillCheck}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
           >
             {locale === 'sk' ? 'Skontrolovať' : 'Check'}
             <Check size={16} />
@@ -882,7 +882,7 @@ export default function TheoryLessonPage() {
               onClick={handleQuizNext}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+              style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
             >
               {quizIndex + 1 < quiz.length ? s('nextQuestion', locale) : s('finish', locale)}
               <ArrowRight size={16} />
@@ -1001,16 +1001,16 @@ export default function TheoryLessonPage() {
                 style={{
                   width: '100%', padding: '13px 16px', borderRadius: 12, textAlign: 'left',
                   display: 'flex', alignItems: 'center', gap: 12,
-                  background: showCorrect ? 'rgba(74,222,128,0.08)' : showWrong ? 'rgba(255,80,80,0.06)' : '#161616',
-                  border: `1px solid ${showCorrect ? 'rgba(74,222,128,0.5)' : showWrong ? 'rgba(255,80,80,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                  color: showCorrect ? '#4ade80' : showWrong ? '#ff9090' : '#A0A0A0',
+                  background: showCorrect ? 'rgba(74,222,128,0.08)' : showWrong ? 'rgba(255,80,80,0.06)' : 'var(--card-bg, #161616)',
+                  border: `1px solid ${showCorrect ? 'rgba(74,222,128,0.5)' : showWrong ? 'rgba(255,80,80,0.3)' : 'var(--border, rgba(255,255,255,0.08))'}`,
+                  color: showCorrect ? '#4ade80' : showWrong ? '#ff9090' : 'var(--text-secondary, #A0A0A0)',
                   fontSize: 14, fontFamily: 'inherit',
                   cursor: answerState !== 'idle' ? 'default' : 'pointer',
                 }}
               >
                 <div style={{
                   width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                  border: `1.5px solid ${showCorrect ? '#4ade80' : showWrong ? '#ff6060' : 'rgba(255,255,255,0.12)'}`,
+                  border: `1.5px solid ${showCorrect ? '#4ade80' : showWrong ? '#ff6060' : 'var(--border, rgba(255,255,255,0.12))'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: showCorrect ? '#4ade80' : showWrong ? 'rgba(255,80,80,0.15)' : 'transparent',
                   fontWeight: 700, fontSize: 11,
@@ -1078,7 +1078,7 @@ export default function TheoryLessonPage() {
                 onClick={handleQuizNext}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                style={{ width: '100%', padding: '14px', borderRadius: 12, background: '#EDEDED', color: '#0F0F0F', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
+                style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer' }}
               >
                 {quizIndex + 1 < quiz.length
                   ? s('nextQuestion', locale)
@@ -1244,7 +1244,7 @@ export default function TheoryLessonPage() {
                       setShowOnboarding(false);
                     }
                   }}
-                  style={{ padding: '14px 40px', borderRadius: 12, background: '#EDEDED', color: '#000', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
+                  style={{ padding: '14px 40px', borderRadius: 12, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #000)', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}
                 >
                   {onboardingStep < steps.length - 1
                     ? (locale === 'sk' ? 'Ďalej' : 'Next')
@@ -1643,7 +1643,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
           onClick={onComplete}
           style={{
             width: '100%', padding: '14px', borderRadius: 12, marginTop: 20,
-            background: '#EDEDED', border: 'none', color: '#0F0F0F',
+            background: 'var(--btn-primary, #EDEDED)', border: 'none', color: 'var(--btn-primary-text, #0F0F0F)',
             fontWeight: 700, fontSize: 15, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           }}

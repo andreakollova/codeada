@@ -111,18 +111,43 @@ function htmlToMarkdown(html: string): string {
   return md;
 }
 
-function handleSmartPaste(e: React.ClipboardEvent<HTMLTextAreaElement>, setValue: (v: string) => void, currentValue: string) {
+function cleanupContent(text: string): string {
+  // Strip leading ## heading (title is separate)
+  text = text.replace(/^## .+\n\n?/, '');
+  // Convert **>** or > at line starts to bullet points
+  text = text.replace(/^(\*\*>?\*\*\s?|>\s?)/gm, '- ');
+  return text;
+}
+
+function handleSmartPaste(e: React.ClipboardEvent<HTMLTextAreaElement>, setValue: (v: string) => void, currentValue: string, isContent = false) {
   const html = e.clipboardData.getData('text/html');
-  if (!html) return; // let default paste handle plain text
+  const plain = e.clipboardData.getData('text/plain');
+
+  // For content fields, also clean up plain text paste
+  if (!html && isContent && plain) {
+    e.preventDefault();
+    const cleaned = cleanupContent(plain);
+    const ta = e.currentTarget;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const newVal = currentValue.substring(0, start) + cleaned + currentValue.substring(end);
+    setValue(newVal);
+    requestAnimationFrame(() => {
+      ta.selectionStart = ta.selectionEnd = start + cleaned.length;
+    });
+    return;
+  }
+
+  if (!html) return;
 
   e.preventDefault();
-  const md = htmlToMarkdown(html);
+  let md = htmlToMarkdown(html);
+  if (isContent) md = cleanupContent(md);
   const ta = e.currentTarget;
   const start = ta.selectionStart;
   const end = ta.selectionEnd;
   const newVal = currentValue.substring(0, start) + md + currentValue.substring(end);
   setValue(newVal);
-  // Restore cursor after paste
   requestAnimationFrame(() => {
     ta.selectionStart = ta.selectionEnd = start + md.length;
   });
@@ -853,12 +878,6 @@ export default function BuilderPage() {
     setSectionQuestions(copySQ);
   };
   const updateMiniLesson = (idx: number, field: 'title' | 'title_en' | 'content' | 'content_en', value: string) => {
-    if (field === 'content' || field === 'content_en') {
-      // Strip leading ## heading from content (title is separate)
-      value = value.replace(/^## .+\n\n?/, '');
-      // Convert **>** or **>** or > at line starts to bullet points
-      value = value.replace(/^(\*\*>?\*\*\s?|>\s?)/gm, '- ');
-    }
     const copy = [...miniLessons];
     copy[idx] = { ...copy[idx], [field]: value };
     setMiniLessons(copy);
@@ -1295,6 +1314,7 @@ function MiniLessonCard({
   onStartNewQuestion: () => QuizQuestion | undefined;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [activeLang, setActiveLang] = useState<'sk' | 'en'>('sk');
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
@@ -1417,21 +1437,30 @@ function MiniLessonCard({
       {!collapsed && (
         <>
           {/* SK content */}
-          <label style={{ ...s.label, marginTop: 4 }}>SK</label>
-          <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('heading', 'sk')} title="Podnadpis (### )">
+          {/* Toolbar — works on whichever textarea is active */}
+          <div style={{ display: 'flex', gap: 4, marginBottom: 4, marginTop: 4, alignItems: 'center' }}>
+            <button
+              style={{ ...s.toolbarBtn, color: activeLang === 'sk' ? '#4ade80' : '#666', fontWeight: 600 }}
+              onClick={() => setActiveLang('sk')}
+            >SK</button>
+            <button
+              style={{ ...s.toolbarBtn, color: activeLang === 'en' ? '#4ade80' : '#666', fontWeight: 600 }}
+              onClick={() => setActiveLang('en')}
+            >EN</button>
+            <span style={{ width: 1, height: 16, background: '#333', margin: '0 2px' }} />
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('heading', activeLang)} title="Podnadpis (### )">
               ###
             </button>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('bullet', 'sk')} title="Odrazka (- )">
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('bullet', activeLang)} title="Odrazka (- )">
               -
             </button>
-            <button style={s.toolbarBtn} onClick={() => handleToolbar('blank', 'sk')} title="Prazdne miesto (___)">
+            <button style={s.toolbarBtn} onClick={() => handleToolbar('blank', activeLang)} title="Prazdne miesto (___)">
               ___
             </button>
-            <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold', 'sk')} title="Tucne (**B**)">
+            <button style={{ ...s.toolbarBtn, fontWeight: 700, fontFamily: 'inherit' }} onClick={() => handleToolbar('bold', activeLang)} title="Tucne (**B**)">
               B
             </button>
-            <button style={{ ...s.toolbarBtn, color: '#818cf8' }} onClick={() => handleToolbar('code', 'sk')} title="Blok kodu (```)">
+            <button style={{ ...s.toolbarBtn, color: '#818cf8' }} onClick={() => handleToolbar('code', activeLang)} title="Blok kodu (```)">
               {'</>'}
             </button>
             <button
@@ -1450,22 +1479,25 @@ function MiniLessonCard({
               onChange={handleImageUpload}
             />
           </div>
+
+          <label style={s.label}>SK</label>
           <textarea
             ref={textareaRef}
             style={{ ...s.textarea, minHeight: 120 }}
             value={mini.content}
             onChange={(e) => onUpdate('content', e.target.value)}
-            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content', v), mini.content)}
+            onFocus={() => setActiveLang('sk')}
+            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content', v), mini.content, true)}
           />
 
-          {/* EN content */}
           <label style={{ ...s.label, marginTop: 8 }}>EN</label>
           <textarea
             ref={textareaEnRef}
             style={{ ...s.textarea, minHeight: 120 }}
             value={mini.content_en}
             onChange={(e) => onUpdate('content_en', e.target.value)}
-            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content_en', v), mini.content_en)}
+            onFocus={() => setActiveLang('en')}
+            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content_en', v), mini.content_en, true)}
           />
 
           {/* Facts */}

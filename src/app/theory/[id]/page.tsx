@@ -437,15 +437,7 @@ export default function TheoryLessonPage() {
             )}
           </div>
         ) : sec.phase === 'learning' ? (
-          <div>
-            <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={0}
-              {...(() => {
-                const factMatch = String(content).match(/\u{1F4A1}\s*(.+)\n([\s\S]*?)(?=\n\n|\u{1F4A1}|$)/u);
-                if (factMatch) return { customTip: factMatch[1].trim(), customDetail: factMatch[2].trim() };
-                return {};
-              })()} />
-            <PaginatedContent text={String(content)} locale={locale} equipment={equipment} onComplete={handleNextSection} />
-          </div>
+          <PaginatedContent text={String(content)} locale={locale} equipment={equipment} onComplete={handleNextSection} />
         ) : sec.phase === 'real_world' ? (
           <div>
             <div style={{ marginTop: 12, marginBottom: 16, borderRadius: 12, overflow: 'hidden', border: '1px solid #1a1a1a' }}>

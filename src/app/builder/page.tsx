@@ -148,12 +148,18 @@ const s = {
   select: {
     width: '100%',
     padding: '8px 10px',
+    paddingRight: '24px',
     background: '#1a1a1a',
     color: '#EDEDED',
     border: '1px solid #333',
     borderRadius: 6,
     fontSize: 13,
     outline: 'none',
+    appearance: 'none' as const,
+    WebkitAppearance: 'none' as const,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 10px center',
   },
   lessonList: {
     flex: 1,

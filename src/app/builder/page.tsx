@@ -647,6 +647,7 @@ export default function BuilderPage() {
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(false);
 
+
   // Toast helper
   const showToast = (msg: string) => {
     setToast(msg);
@@ -688,7 +689,7 @@ export default function BuilderPage() {
   }, []);
 
   // ── Save lesson ──
-  const saveLesson = async (withTranslation = false) => {
+  const saveLesson = async () => {
     if (!lesson) return;
     if (!lesson.title_sk?.trim()) {
       alert('Názov SK je prázdny.');
@@ -696,86 +697,21 @@ export default function BuilderPage() {
     }
 
     setLoading(true);
-    showToast('Prekladám do EN...');
+    showToast('Ukladám...');
     try {
-      // Auto-translate SK → EN via GPT
-      const textsToTranslate: Record<string, string> = {};
-      if (lesson.title_sk?.trim()) textsToTranslate.title = lesson.title_sk;
-      if (lesson.introduction_sk?.trim()) textsToTranslate.introduction = lesson.introduction_sk;
-      for (let i = 0; i < miniLessons.length; i++) {
-        if (miniLessons[i].content.trim()) {
-          textsToTranslate[`section_${i}`] = `## ${miniLessons[i].title}\n${miniLessons[i].content}`;
-        }
-      }
-      // Translate questions
-      const allQs = sectionQuestions.flat();
-      for (let i = 0; i < allQs.length; i++) {
-        const q = allQs[i];
-        if (q.question_text_sk?.trim()) textsToTranslate[`q_${i}`] = q.question_text_sk;
-        if (q.explanation_sk?.trim()) textsToTranslate[`qexp_${i}`] = q.explanation_sk;
-        if (q.question_type === 'multiple_choice' && q.options) {
-          for (const o of q.options) {
-            if (o.option_text_sk?.trim()) textsToTranslate[`qopt_${i}_${o.option_label}`] = o.option_text_sk;
-          }
-        }
-      }
-
-      let translations: Record<string, string> = {};
-      if (Object.keys(textsToTranslate).length > 0) {
-        translations = await api({ action: 'translate', texts: textsToTranslate });
-      }
-
-      // Apply translations
-      const updatedLesson = { ...lesson };
-      if (translations.title) updatedLesson.title = translations.title;
-      if (translations.introduction) updatedLesson.introduction = translations.introduction;
-
-      const updatedMinis = miniLessons.map((ml, i) => {
-        const key = `section_${i}`;
-        if (translations[key]) {
-          const translated = translations[key];
-          const match = translated.match(/^## (.+)\n([\s\S]*)$/);
-          return { ...ml, content_en: match ? match[2].trim() : translated };
-        }
-        return ml;
-      });
-
-      // Apply question translations
-      const updatedSectionQs = sectionQuestions.map(section =>
-        section.map(q => {
-          const idx = allQs.indexOf(q);
-          const updated = { ...q };
-          if (translations[`q_${idx}`]) updated.question_text = translations[`q_${idx}`];
-          if (translations[`qexp_${idx}`]) updated.explanation = translations[`qexp_${idx}`];
-          if (updated.question_type === 'multiple_choice' && updated.options) {
-            updated.options = updated.options.map(o => ({
-              ...o,
-              option_text: translations[`qopt_${idx}_${o.option_label}`] || o.option_text || o.option_text_sk,
-            }));
-          }
-          return updated;
-        })
-      );
-
-      showToast('Ukladám...');
-
-      const contentSk = serializeMiniLessons(updatedMinis, 'sk');
-      const contentEn = serializeMiniLessons(updatedMinis, 'en');
+      const contentSk = serializeMiniLessons(miniLessons, 'sk');
+      const contentEn = serializeMiniLessons(miniLessons, 'en');
       const payload = {
-        ...updatedLesson,
+        ...lesson,
         learning_content_sk: contentSk,
         learning_content: contentEn,
       };
 
-      // Update local state with translations
-      setLesson(updatedLesson);
-      setMiniLessons(updatedMinis);
-      setSectionQuestions(updatedSectionQs);
       const saved = await api({ action: 'saveLesson', lesson: payload });
       setLesson(saved);
 
       // Save all questions with renumbered question_numbers
-      const allQuestions = flattenAndRenumber(updatedSectionQs);
+      const allQuestions = flattenAndRenumber(sectionQuestions);
       for (const q of allQuestions) {
         const questionPayload: any = {
           lesson_id: q.lesson_id,
@@ -793,7 +729,7 @@ export default function BuilderPage() {
         await api({ action: 'saveQuestion', question: questionPayload, options: optionsPayload });
       }
 
-      showToast('Ulozene!');
+      showToast('Uložené!');
       // Refresh sidebar
       if (selectedModuleId) {
         const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
@@ -802,7 +738,9 @@ export default function BuilderPage() {
       // Refresh questions from DB
       if (saved.id) {
         const qs = await api({ action: 'getQuestions', lessonId: saved.id });
-        setSectionQuestions(distributeQuestions(qs || [], miniLessons.length));
+        const newMinis = parseMiniLessons(saved.learning_content_sk || '', saved.learning_content || '');
+        setMiniLessons(newMinis);
+        setSectionQuestions(distributeQuestions(qs || [], newMinis.length));
       }
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
@@ -1125,24 +1063,46 @@ export default function BuilderPage() {
                 {/* ═══ OBSAH & OTAZKY TAB ═══ */}
                 {contentTab === 'obsah' && (
                   <div>
-                    <div style={s.fieldGroup}>
-                      <label style={s.label}>Názov</label>
-                      <input
-                        style={s.input}
-                        value={lesson.title_sk || ''}
-                        onChange={(e) => updateField('title_sk', e.target.value)}
-                      />
+                    <div style={s.row}>
+                      <div style={{ flex: 1 }}>
+                        <label style={s.label}>Názov SK</label>
+                        <input
+                          style={s.input}
+                          value={lesson.title_sk || ''}
+                          onChange={(e) => updateField('title_sk', e.target.value)}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={s.label}>Názov EN</label>
+                        <input
+                          style={s.input}
+                          value={lesson.title || ''}
+                          onChange={(e) => updateField('title', e.target.value)}
+                        />
+                      </div>
                     </div>
 
-                    <div style={s.fieldGroup}>
-                      <label style={s.label}>Úvod</label>
-                      <textarea
-                        style={s.textarea}
-                        rows={4}
-                        value={lesson.introduction_sk || ''}
-                        onChange={(e) => updateField('introduction_sk', e.target.value)}
-                        onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction_sk', v), lesson.introduction_sk || '')}
-                      />
+                    <div style={s.row}>
+                      <div style={{ flex: 1 }}>
+                        <label style={s.label}>Úvod SK</label>
+                        <textarea
+                          style={s.textarea}
+                          rows={4}
+                          value={lesson.introduction_sk || ''}
+                          onChange={(e) => updateField('introduction_sk', e.target.value)}
+                          onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction_sk', v), lesson.introduction_sk || '')}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={s.label}>Úvod EN</label>
+                        <textarea
+                          style={s.textarea}
+                          rows={4}
+                          value={lesson.introduction || ''}
+                          onChange={(e) => updateField('introduction', e.target.value)}
+                          onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction', v), lesson.introduction || '')}
+                        />
+                      </div>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
@@ -1416,6 +1376,16 @@ function MiniLessonCard({
             value={mini.content}
             onChange={(e) => onUpdate('content', e.target.value)}
             onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content', v), mini.content)}
+          />
+
+          {/* EN content */}
+          <label style={{ ...s.label, marginTop: 8 }}>EN</label>
+          <textarea
+            ref={textareaEnRef}
+            style={{ ...s.textarea, minHeight: 120 }}
+            value={mini.content_en}
+            onChange={(e) => onUpdate('content_en', e.target.value)}
+            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content_en', v), mini.content_en)}
           />
 
           {/* Facts */}

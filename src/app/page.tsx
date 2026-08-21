@@ -143,12 +143,12 @@ function CountdownOverlay() {
 }
 
 export default function HomePage() {
-  const { checkStreak, name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems, coffees } = useUserStore();
+  const { name, byteMood, equipment, streak, completedLessons, xp, hearts, maxHearts, gems, coffees } = useUserStore();
   const { locale } = useLocaleStore();
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
-  useEffect(() => { checkStreak(); }, []);
+  // Streak is checked only on real actions (opening lessons, completing quizzes, etc.)
 
   // Fetch real leaderboard from Supabase
   useEffect(() => {

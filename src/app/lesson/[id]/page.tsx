@@ -20,14 +20,14 @@ export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const lesson = getLessonById(id);
-  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment } = useUserStore();
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, checkStreak } = useUserStore();
   const { locale } = useLocaleStore();
   const { needsUpgrade } = useSubscription();
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [showHeartLost, setShowHeartLost] = useState(false);
 
-  useEffect(() => { setByteMood('happy'); }, []);
+  useEffect(() => { checkStreak(); setByteMood('happy'); }, []);
 
   if (needsUpgrade) return <Paywall />;
 

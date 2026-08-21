@@ -28,7 +28,7 @@ const THEORY_SECTIONS: { key: keyof DbLesson; phase: Phase; icon: any; label: st
 export default function TheoryLessonPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees, favDrink, addWrongQuestion } = useUserStore();
+  const { hearts, loseHeart, completeLesson, setByteMood, byteMood, equipment, equip, addCoffee, coffees, favDrink, addWrongQuestion, checkStreak } = useUserStore();
   const { locale } = useLocaleStore();
   const { needsUpgrade } = useSubscription();
 
@@ -71,6 +71,7 @@ export default function TheoryLessonPage() {
   }, [quizIndex, quiz]);
 
   useEffect(() => {
+    checkStreak();
     const idStr = Array.isArray(id) ? id[0] : id;
     if (!idStr) return;
     const numId = parseInt(idStr);

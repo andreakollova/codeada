@@ -188,7 +188,7 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
     const blockLines = block.split('\n');
 
     // Detect question type
-    const hasOptions = /^[A-D]\s/m.test(block) || /^[A-D]\n/m.test(block);
+    const hasOptions = /^[A-D][).\s:]/m.test(block);
     const hasCodeSnippet = block.includes('___');
     const hasCorrectMarker = block.includes('✅') || /Správna odpoveď:\s*[A-D]/i.test(block) || /Správne riešenie:/i.test(block);
 
@@ -222,8 +222,8 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
         continue;
       }
 
-      // Detect options (A/B/C/D lines)
-      const optMatch = ln.match(/^([A-D])\s+(.+)/);
+      // Detect options (A/B/C/D lines) — handles "A text", "A) text", "A. text", "A: text"
+      const optMatch = ln.match(/^([A-D])[).\s:]+(.+)/);
       if (optMatch) {
         phase = 'options';
         const isCorrect = ln.includes('✅');

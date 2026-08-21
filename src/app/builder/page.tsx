@@ -1436,6 +1436,7 @@ function MiniLessonCard({
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
+  const [importTextEn, setImportTextEn] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const textareaEnRef = useRef<HTMLTextAreaElement>(null);
 
@@ -1722,47 +1723,101 @@ function MiniLessonCard({
               </div>
             )}
 
-            {showImport && (
-              <div style={{ ...s.card, border: '1px solid #3b82f6', marginBottom: 12 }}>
-                <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 8, fontWeight: 600 }}>
-                  Pastni SK otázky (EN pridáš potom cez "Pastni EN" na každej otázke)
+            {showImport && (() => {
+              const parsedSk = importText.trim() ? parseQuestionsFromText(importText, lessonId || 0, 1).questions : [];
+              const parsedEn = importTextEn.trim() ? parseQuestionsFromText(importTextEn, lessonId || 0, 1).questions : [];
+              const skCount = parsedSk.length;
+              const enCount = parsedEn.length;
+              const mismatch = !!(importTextEn.trim() && skCount !== enCount);
+
+              return (
+              <div style={{ ...s.card, border: `1px solid ${mismatch ? '#ef4444' : '#3b82f6'}`, marginBottom: 12 }}>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>
+                      SK otázky {skCount > 0 && `(${skCount})`}
+                    </div>
+                    <textarea
+                      style={{ ...s.textarea, minHeight: 120 }}
+                      placeholder={'Otázka 1\nText...\nA) ...\nB) ...\nSprávna odpoveď: A\nVysvetlenie...'}
+                      value={importText}
+                      onChange={(e) => setImportText(e.target.value)}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>
+                      EN otázky {enCount > 0 && `(${enCount})`}
+                    </div>
+                    <textarea
+                      style={{ ...s.textarea, minHeight: 120 }}
+                      placeholder={'Question 1\nText...\nA) ...\nB) ...\nCorrect answer: A\nExplanation...'}
+                      value={importTextEn}
+                      onChange={(e) => setImportTextEn(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <textarea
-                  style={{ ...s.textarea, minHeight: 150 }}
-                  placeholder={'Otázka 1\nText otázky...\nA) odpoveď\nB) odpoveď\nC) odpoveď\nD) odpoveď\nSprávna odpoveď: A\nVysvetlenie...\n\nOtázka 2\n...'}
-                  value={importText}
-                  onChange={(e) => setImportText(e.target.value)}
-                />
+
+                {mismatch && (
+                  <div style={{ color: '#ef4444', fontSize: 12, fontWeight: 600, marginTop: 8 }}>
+                    SK má {skCount} otázok, EN má {enCount} — počet sa nezhoduje! Skontroluj formát.
+                  </div>
+                )}
+
+                {skCount > 0 && enCount > 0 && !mismatch && (
+                  <div style={{ marginTop: 8, fontSize: 11, color: '#666' }}>
+                    {parsedSk.map((q, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 2 }}>
+                        <span style={{ color: '#3b82f6' }}>#{i + 1}</span>
+                        <span style={{ flex: 1, color: '#aaa' }}>{q.question_text_sk?.substring(0, 40)}...</span>
+                        <span style={{ flex: 1, color: '#666' }}>{parsedEn[i]?.question_text_sk?.substring(0, 40)}...</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                   <button
-                    style={s.btn('#3b82f6')}
+                    style={{ ...s.btn('#3b82f6'), opacity: mismatch ? 0.5 : 1 }}
+                    disabled={mismatch}
                     onClick={() => {
                       if (!importText.trim()) return;
                       const startNum = questions.length > 0
                         ? Math.max(...questions.map(q => q.question_number)) + 1
                         : 1;
                       const { questions: parsed } = parseQuestionsFromText(importText, lessonId || 0, startNum);
-                      if (parsed.length === 0) {
-                        alert('Nepodarilo sa nájsť žiadne otázky v texte.');
-                        return;
+                      if (parsed.length === 0) return;
+                      // Merge EN if provided
+                      if (importTextEn.trim()) {
+                        const { questions: pEn } = parseQuestionsFromText(importTextEn, lessonId || 0, startNum);
+                        for (let i = 0; i < parsed.length && i < pEn.length; i++) {
+                          parsed[i].question_text = pEn[i].question_text_sk;
+                          parsed[i].explanation = pEn[i].explanation_sk;
+                          if (parsed[i].options && pEn[i].options) {
+                            for (let j = 0; j < parsed[i].options.length && j < pEn[i].options.length; j++) {
+                              parsed[i].options[j].option_text = pEn[i].options[j].option_text_sk;
+                            }
+                          }
+                        }
                       }
                       (async () => {
                         for (const q of parsed) {
                           await onSaveQuestion(q, q.options || []);
                         }
                         setImportText('');
+                        setImportTextEn('');
                         setShowImport(false);
                       })();
                     }}
                   >
-                    Importovať {importText.trim() ? `(${parseQuestionsFromText(importText, lessonId || 0, 1).questions.length} otázok)` : ''}
+                    Importovať ({skCount} otázok)
                   </button>
-                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setShowImport(false); }}>
+                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setImportTextEn(''); setShowImport(false); }}>
                     Zrušiť
                   </button>
                 </div>
               </div>
-            )}
+              );
+            })()}
 
             {questions.map((q, qi) => (
               <QuestionCard

@@ -1409,7 +1409,7 @@ function MiniLessonCard({
                       const startNum = questions.length > 0
                         ? Math.max(...questions.map(q => q.question_number)) + 1
                         : 1;
-                      const { questions: parsed } = parseQuestionsFromText(importText, lessonId, startNum);
+                      const { questions: parsed } = parseQuestionsFromText(importText, lessonId || 0, startNum);
                       if (parsed.length === 0) {
                         alert('Nepodarilo sa nájsť žiadne otázky v texte.');
                         return;

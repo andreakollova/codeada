@@ -1010,7 +1010,7 @@ export default function TheoryLessonPage() {
               >
                 <div style={{
                   width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                  border: `1.5px solid ${showCorrect ? '#4ade80' : showWrong ? '#ff6060' : 'var(--border, rgba(255,255,255,0.12))'}`,
+                  border: `1.5px solid ${showCorrect ? '#4ade80' : showWrong ? '#ff6060' : 'rgba(255,255,255,0.12)'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: showCorrect ? '#4ade80' : showWrong ? 'rgba(255,80,80,0.15)' : 'transparent',
                   fontWeight: 700, fontSize: 11,

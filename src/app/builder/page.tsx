@@ -887,17 +887,26 @@ export default function BuilderPage() {
     if (targetIdx < 0 || targetIdx >= lessons.length) return;
     const a = lessons[lessonIdx];
     const b = lessons[targetIdx];
-    setLoading(true);
     try {
+      // Swap locally first for instant feedback
+      const copy = [...lessons];
+      const tmpNum = copy[lessonIdx].lesson_number;
+      copy[lessonIdx] = { ...copy[lessonIdx], lesson_number: copy[targetIdx].lesson_number };
+      copy[targetIdx] = { ...copy[targetIdx], lesson_number: tmpNum };
+      copy.sort((x, y) => x.lesson_number - y.lesson_number);
+      setLessons(copy);
+      // Save to DB
       await api({ action: 'saveLesson', lesson: { id: a.id, lesson_number: b.lesson_number } });
       await api({ action: 'saveLesson', lesson: { id: b.id, lesson_number: a.lesson_number } });
-      const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
-      setLessons(ls);
       showToast('Poradie zmenené');
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
+      // Refresh on error
+      if (selectedModuleId) {
+        const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
+        setLessons(ls);
+      }
     }
-    setLoading(false);
   };
 
   // ── Mini lesson operations ──

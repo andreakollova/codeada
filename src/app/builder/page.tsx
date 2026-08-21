@@ -74,6 +74,204 @@ interface QuizQuestion {
   options: QuizOption[];
 }
 
+// ── HTML to Markdown (for paste from ChatGPT etc.) ──────────
+function htmlToMarkdown(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+
+  function walk(node: Node): string {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+    if (node.nodeType !== Node.ELEMENT_NODE) return '';
+    const el = node as HTMLElement;
+    const tag = el.tagName.toLowerCase();
+    const kids = Array.from(el.childNodes).map(walk).join('');
+
+    switch (tag) {
+      case 'h1': case 'h2': return `\n\n## ${kids.trim()}\n`;
+      case 'h3': case 'h4': case 'h5': return `\n\n### ${kids.trim()}\n`;
+      case 'strong': case 'b': return `**${kids}**`;
+      case 'em': case 'i': return `*${kids}*`;
+      case 'code':
+        if (el.parentElement?.tagName.toLowerCase() === 'pre') return kids;
+        return kids; // inline code kept as-is
+      case 'pre': return `\n${kids.trim()}\n`;
+      case 'br': return '\n';
+      case 'p': return `\n${kids.trim()}\n`;
+      case 'li': return `\n- ${kids.trim()}`;
+      case 'ul': case 'ol': return `\n${kids}\n`;
+      case 'div': return `\n${kids}`;
+      case 'span': return kids;
+      default: return kids;
+    }
+  }
+
+  let md = walk(doc.body);
+  // Clean up excessive newlines
+  md = md.replace(/\n{3,}/g, '\n\n').trim();
+  return md;
+}
+
+function handleSmartPaste(e: React.ClipboardEvent<HTMLTextAreaElement>, setValue: (v: string) => void, currentValue: string) {
+  const html = e.clipboardData.getData('text/html');
+  if (!html) return; // let default paste handle plain text
+
+  e.preventDefault();
+  const md = htmlToMarkdown(html);
+  const ta = e.currentTarget;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const newVal = currentValue.substring(0, start) + md + currentValue.substring(end);
+  setValue(newVal);
+  // Restore cursor after paste
+  requestAnimationFrame(() => {
+    ta.selectionStart = ta.selectionEnd = start + md.length;
+  });
+}
+
+// ── Question parser (paste from natural format) ─────────────
+function parseQuestionsFromText(text: string, lessonId: number, startNum: number): { questions: QuizQuestion[]; options: QuizOption[][] } {
+  const questions: QuizQuestion[] = [];
+  const allOptions: QuizOption[][] = [];
+
+  // Split into question blocks by numbered patterns or "Select correct code" / "Fill in the code" markers
+  // Each block starts with a number+dot, "Select correct code", or "Fill in the code"
+  const blocks: string[] = [];
+  const lines = text.split('\n');
+  let current = '';
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // New question block starts with: "1.", "2.", "Select correct code", "Fill in the code", or empty line before numbered
+    if (/^\d+\.\s/.test(trimmed) || /^Select correct code/i.test(trimmed) || /^Fill in the code/i.test(trimmed)) {
+      if (current.trim()) blocks.push(current.trim());
+      current = trimmed + '\n';
+    } else {
+      current += line + '\n';
+    }
+  }
+  if (current.trim()) blocks.push(current.trim());
+
+  let qNum = startNum;
+
+  for (const block of blocks) {
+    // Skip section headers like "Select correct code", "Fill in the code", "Otázky"
+    if (/^(Select correct code|Fill in the code|Otázky|Questions)\s*$/im.test(block.split('\n')[0])) {
+      // This is just a section header, the actual questions follow — merge with next content
+      continue;
+    }
+
+    const blockLines = block.split('\n');
+
+    // Detect question type
+    const hasOptions = /^[A-D]\s/m.test(block) || /^[A-D]\n/m.test(block);
+    const hasCodeSnippet = block.includes('___');
+    const hasCorrectMarker = block.includes('✅') || /Správna odpoveď:\s*[A-D]/i.test(block) || /Správne riešenie:/i.test(block);
+
+    // Extract question text (first line after number, or the numbered line itself)
+    let questionText = '';
+    let codeSnippet = '';
+    let correctAnswer = '';
+    let explanation = '';
+    const opts: QuizOption[] = [];
+
+    let phase: 'question' | 'code' | 'options' | 'explanation' = 'question';
+
+    for (const rawLine of blockLines) {
+      const ln = rawLine.trim();
+      if (!ln) continue;
+
+      // Skip section headers
+      if (/^(Select correct code|Fill in the code)\s*$/i.test(ln)) continue;
+
+      // Detect "Správna odpoveď:" or "Správne riešenie:"
+      if (/^Správna odpoveď:\s*(.+)/i.test(ln)) {
+        const m = ln.match(/^Správna odpoveď:\s*(.+)/i);
+        if (m) correctAnswer = m[1].trim();
+        phase = 'explanation';
+        continue;
+      }
+      if (/^Správne riešenie:\s*(.+)/i.test(ln)) {
+        const m = ln.match(/^Správne riešenie:\s*(.+)/i);
+        if (m) correctAnswer = m[1].trim();
+        phase = 'explanation';
+        continue;
+      }
+
+      // Detect options (A/B/C/D lines)
+      const optMatch = ln.match(/^([A-D])\s+(.+)/);
+      if (optMatch) {
+        phase = 'options';
+        const isCorrect = ln.includes('✅');
+        const optText = optMatch[2].replace('✅', '').trim();
+        opts.push({
+          option_label: optMatch[1],
+          option_text: optText,
+          option_text_sk: optText,
+          is_correct: isCorrect,
+        });
+        if (isCorrect) correctAnswer = optMatch[1];
+        continue;
+      }
+
+      if (phase === 'explanation') {
+        explanation += (explanation ? '\n' : '') + ln;
+        continue;
+      }
+
+      if (phase === 'question') {
+        // Check if this looks like code (has =, indentation, or Python keywords)
+        if (ln.includes('___') || /^[a-z_]+\s*=/.test(ln) || /^\s{2,}/.test(rawLine) || /^(if|for|def|print|return)\s/.test(ln)) {
+          phase = 'code';
+          codeSnippet += (codeSnippet ? '\n' : '') + rawLine;
+        } else {
+          // Remove leading number like "1. "
+          const cleaned = ln.replace(/^\d+\.\s*/, '');
+          questionText += (questionText ? '\n' : '') + cleaned;
+        }
+        continue;
+      }
+
+      if (phase === 'code') {
+        if (optMatch || /^[A-D]\s/.test(ln)) {
+          phase = 'options';
+        } else {
+          codeSnippet += '\n' + rawLine;
+          continue;
+        }
+      }
+    }
+
+    if (!questionText.trim()) continue;
+
+    // Determine question type
+    let questionType = 'multiple_choice';
+    if (!hasOptions && (hasCodeSnippet || correctAnswer) && opts.length === 0) {
+      questionType = 'fill_code';
+    }
+
+    // If correct answer not found from markers, find from ✅
+    if (!correctAnswer && opts.length > 0) {
+      const correct = opts.find(o => o.is_correct);
+      if (correct) correctAnswer = correct.option_label;
+    }
+
+    questions.push({
+      lesson_id: lessonId,
+      question_number: qNum++,
+      question_text: questionText.trim(),
+      question_text_sk: questionText.trim(),
+      question_type: questionType,
+      correct_answer: correctAnswer,
+      code_snippet: codeSnippet.trim() || '',
+      explanation: explanation.trim(),
+      explanation_sk: explanation.trim(),
+      options: opts,
+    });
+    allOptions.push(opts);
+  }
+
+  return { questions, options: allOptions };
+}
+
 // ── Mini lesson parser ──────────────────────────────────────
 interface MiniLesson {
   title: string;
@@ -779,6 +977,7 @@ export default function BuilderPage() {
                         rows={4}
                         value={lesson.introduction_sk || ''}
                         onChange={(e) => updateField('introduction_sk', e.target.value)}
+                        onPaste={(e) => handleSmartPaste(e, (v) => updateField('introduction_sk', v), lesson.introduction_sk || '')}
                       />
                     </div>
 
@@ -956,6 +1155,8 @@ function MiniLessonCard({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleToolbar = (action: 'heading' | 'bullet' | 'blank' | 'bold') => {
@@ -1040,24 +1241,78 @@ function MiniLessonCard({
             style={{ ...s.textarea, minHeight: 120 }}
             value={mini.content}
             onChange={(e) => onUpdate('content', e.target.value)}
+            onPaste={(e) => handleSmartPaste(e, (v) => onUpdate('content', v), mini.content)}
           />
 
           {/* Questions for this section */}
           <div style={{ marginTop: 12, paddingTop: 8, borderTop: '1px solid #2a2a2a' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <span style={{ fontSize: 12, color: '#888' }}>
-                Otazky ({questions.length})
+                Otázky ({questions.length})
               </span>
-              {lessonId && !editingQuestion && (
-                <button style={s.btnSmall('#4ade80')} onClick={handleAddQuestion}>
-                  + Pridat otazku
-                </button>
-              )}
+              <div style={{ display: 'flex', gap: 6 }}>
+                {lessonId && (
+                  <button
+                    style={s.btnSmall('#818cf8')}
+                    onClick={() => setShowImport(!showImport)}
+                  >
+                    {showImport ? 'Zavrieť import' : 'Importovať otázky'}
+                  </button>
+                )}
+                {lessonId && !editingQuestion && (
+                  <button style={s.btnSmall('#4ade80')} onClick={handleAddQuestion}>
+                    + Pridať otázku
+                  </button>
+                )}
+              </div>
             </div>
 
             {!lessonId && questions.length === 0 && (
               <div style={{ color: '#555', fontSize: 12, marginBottom: 8 }}>
-                Najprv uloz lekciu, potom mozes pridat otazky.
+                Najprv ulož lekciu, potom môžeš pridať otázky.
+              </div>
+            )}
+
+            {showImport && (
+              <div style={{ ...s.card, border: '1px solid #818cf8', marginBottom: 12 }}>
+                <div style={{ fontSize: 12, color: '#818cf8', marginBottom: 8, fontWeight: 600 }}>
+                  Pastni otázky v prirodzenom formáte (s A/B/C/D, ✅, Správna odpoveď:, kód atď.)
+                </div>
+                <textarea
+                  style={{ ...s.textarea, minHeight: 150 }}
+                  placeholder={'1. Otázka text...\nA odpoveď ✅\nB odpoveď\nC odpoveď\nD odpoveď\nSprávna odpoveď: A\nVysvetlenie...\n\nFill in the code\n1. Doplň kód...\ncode = ___\nSprávne riešenie: answer'}
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                />
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  <button
+                    style={s.btn('#818cf8')}
+                    onClick={() => {
+                      if (!importText.trim()) return;
+                      const startNum = questions.length > 0
+                        ? Math.max(...questions.map(q => q.question_number)) + 1
+                        : 1;
+                      const { questions: parsed } = parseQuestionsFromText(importText, lessonId, startNum);
+                      if (parsed.length === 0) {
+                        alert('Nepodarilo sa nájsť žiadne otázky v texte.');
+                        return;
+                      }
+                      // Save each parsed question
+                      (async () => {
+                        for (const q of parsed) {
+                          await onSaveQuestion(q, q.options || []);
+                        }
+                        setImportText('');
+                        setShowImport(false);
+                      })();
+                    }}
+                  >
+                    Importovať {importText.trim() ? `(${parseQuestionsFromText(importText, lessonId, 1).questions.length} otázok)` : ''}
+                  </button>
+                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setShowImport(false); }}>
+                    Zrušiť
+                  </button>
+                </div>
               </div>
             )}
 

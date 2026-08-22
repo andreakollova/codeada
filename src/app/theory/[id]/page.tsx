@@ -1055,7 +1055,7 @@ export default function TheoryLessonPage() {
               const q = quiz[quizIndex];
               const correctLabel = q.correct_answer;
               setSelectedAnswer('skip');
-              setAnswerState('wrong');
+              setAnswerState('correct');
               setTimeout(() => {
                 if (feedbackRef.current) feedbackRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }, 100);

@@ -838,7 +838,7 @@ export default function BuilderPage() {
           question_text: q.question_text,
           question_text_sk: q.question_text_sk,
           question_type: q.question_type,
-          correct_answer: q.correct_answer || '',
+          correct_answer: q.correct_answer || q.options?.find((o: any) => o.is_correct)?.option_label || '',
           code_snippet: q.code_snippet || '',
           explanation: q.explanation || '',
           explanation_sk: q.explanation_sk || '',

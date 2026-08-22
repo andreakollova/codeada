@@ -154,68 +154,65 @@ function handleSmartPaste(e: React.ClipboardEvent<HTMLTextAreaElement>, setValue
 }
 
 // ── Question parser (paste from natural format) ─────────────
-// Splits by "Správna odpoveď:" / "Correct answer:" / "Správne riešenie:" markers
-// which every question has exactly once — guarantees correct count.
+// Counts questions by "Správna odpoveď:" / "Correct answer:" markers — guarantees correct count.
 function parseQuestionsFromText(text: string, lessonId: number, startNum: number): { questions: QuizQuestion[]; options: QuizOption[][] } {
   const questions: QuizQuestion[] = [];
   const allOptions: QuizOption[][] = [];
-
-  // Split text into chunks ending with a correct-answer marker
-  const answerPattern = /^(Správna odpoveď|Správne riešenie|Correct answer):\s*(.+)/im;
   const lines = text.split('\n');
+  const answerRe = /^(Správna odpoveď|Správne riešenie|Correct answer):\s*(.+)/i;
 
-  // Collect question blocks: everything between answer markers
-  const blocks: { lines: string[]; correctAnswer: string }[] = [];
-  let currentLines: string[] = [];
+  // Pass 1: find answer marker positions
+  const markers: { idx: number; answer: string }[] = [];
+  lines.forEach((line, i) => {
+    const m = line.trim().match(answerRe);
+    if (m) markers.push({ idx: i, answer: m[2].trim() });
+  });
 
-  for (const line of lines) {
-    const m = line.trim().match(answerPattern);
-    if (m) {
-      blocks.push({ lines: currentLines, correctAnswer: m[2].trim() });
-      currentLines = [];
-    } else {
-      currentLines.push(line);
-    }
-  }
+  if (markers.length === 0) return { questions, options: allOptions };
 
+  // Pass 2: for each marker, collect lines BEFORE it (question+options+code) and AFTER it (explanation)
   let qNum = startNum;
+  for (let mi = 0; mi < markers.length; mi++) {
+    const answerIdx = markers[mi].idx;
+    const prevEnd = mi > 0 ? markers[mi - 1].idx : -1;
 
-  for (const block of blocks) {
+    // Lines before this answer marker (but after previous answer marker)
+    // Find where the question content starts (skip explanation of prev question)
+    let startIdx = prevEnd + 1;
+    // Skip explanation lines of previous question (lines right after prev answer marker)
+    if (mi > 0) {
+      for (let j = prevEnd + 1; j < answerIdx; j++) {
+        const ln = lines[j].trim();
+        // Stop skipping when we hit a new question indicator
+        if (/^(Otázka|Question)\s+\d+/i.test(ln) || /^\d+\.\s/.test(ln) || /^[A-D][).\s:]/.test(ln)) {
+          startIdx = j;
+          break;
+        }
+        // Also stop if it looks like question text (not explanation continuation)
+        if (ln && !/^(Vysvetlenie|Explanation)/i.test(ln) && j > prevEnd + 3) {
+          startIdx = j;
+          break;
+        }
+      }
+    }
+
+    const beforeLines = lines.slice(startIdx, answerIdx);
+    // Explanation = lines after answer marker until next question starts
+    const afterEnd = mi < markers.length - 1 ? markers[mi + 1].idx : lines.length;
+    const afterLines = lines.slice(answerIdx + 1, afterEnd);
+
+    // Parse question content from beforeLines
     let questionText = '';
     let codeSnippet = '';
-    let explanation = '';
     const opts: QuizOption[] = [];
-    let inExplanation = false;
 
-    // Lines after the answer marker (in currentLines of NEXT block) are explanation
-    // But we structured it so explanation comes AFTER the answer marker in the remaining lines
-    // Actually, explanation is in the leftover lines after this block's answer
-    // Let me re-check: the split puts lines BEFORE the answer into block.lines
-    // Lines AFTER the answer but before the next question go into the next block's lines
-    // So explanation is at the START of the next block... that's wrong.
-    //
-    // Better approach: scan block.lines for content, and treat the remaining currentLines as explanation
-
-    for (const rawLine of block.lines) {
+    for (const rawLine of beforeLines) {
       const ln = rawLine.trim();
       if (!ln) continue;
-
       // Skip headers
-      if (/^(Select|Fill in|Otázky|Questions|Kvízové|Quiz|Vyber|Doplň|\d+\.\s*(Select|Fill|Kvíz|Quiz|Vyber|Doplň))/i.test(ln)) continue;
-      if (/^(Otázka|Question)\s+\d+$/i.test(ln)) continue;
+      if (/^(Select|Fill in|Otázky|Questions|Kvízové|Quiz|Vyber|Doplň)/i.test(ln.replace(/^\d+\.\s*/, ''))) continue;
+      if (/^(Otázka|Question)\s+\d+/i.test(ln)) continue;
       if (/^\d+\.\s*(Otázka|Question)/i.test(ln)) continue;
-      // Skip "Vysvetlenie:" / "Explanation:" label
-      if (/^(Vysvetlenie|Explanation)\s*:?\s*$/i.test(ln)) { inExplanation = true; continue; }
-      if (/^(Vysvetlenie|Explanation)\s*:\s*(.+)/i.test(ln)) {
-        inExplanation = true;
-        explanation += ln.replace(/^(Vysvetlenie|Explanation)\s*:\s*/i, '');
-        continue;
-      }
-
-      if (inExplanation) {
-        explanation += (explanation ? '\n' : '') + ln;
-        continue;
-      }
 
       // Options A/B/C/D
       const optMatch = ln.match(/^([A-D])[).\s:]+(.+)/);
@@ -231,35 +228,44 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
       }
 
       // Code detection
-      if (ln.includes('___') || /^[a-z_]+\s*=/.test(ln) || /^\s{2,}/.test(rawLine) || /^(if|for|def|print|return|while|else|elif)\s/.test(ln) || /^(if|for|def|print|return|while|else|elif)$/.test(ln)) {
+      if (ln.includes('___') || /^[a-z_]+\s*=/.test(ln) || /^\s{2,}/.test(rawLine) || /^(if|for|def|print|return|while|else|elif)\b/.test(ln)) {
         codeSnippet += (codeSnippet ? '\n' : '') + rawLine;
         continue;
       }
 
-      // Regular text = question text (strip leading number)
+      // Question text
       const cleaned = ln.replace(/^\d+\.\s*/, '');
       questionText += (questionText ? ' ' : '') + cleaned;
     }
 
+    // Parse explanation from afterLines
+    let explanation = '';
+    for (const line of afterLines) {
+      const ln = line.trim();
+      if (!ln) continue;
+      // Stop at next question indicator
+      if (/^(Otázka|Question)\s+\d+/i.test(ln)) break;
+      if (/^\d+\.\s/.test(ln)) break;
+      // Skip "Vysvetlenie:" / "Explanation:" label
+      if (/^(Vysvetlenie|Explanation)\s*:?\s*$/i.test(ln)) continue;
+      const cleaned = ln.replace(/^(Vysvetlenie|Explanation)\s*:\s*/i, '');
+      explanation += (explanation ? ' ' : '') + cleaned;
+    }
+
     if (!questionText.trim()) continue;
 
-    // Also check for explanation in the NEXT block's early lines (before next question content)
-    // This is handled because explanation lines after "Vysvetlenie:" are captured above
-
-    // Mark correct option from answer
-    const ca = block.correctAnswer;
+    // Set correct option
+    const ca = markers[mi].answer;
     if (opts.length > 0 && /^[A-D]$/.test(ca)) {
       opts.forEach(o => { o.is_correct = o.option_label === ca; });
     }
-
-    const questionType = opts.length > 0 ? 'multiple_choice' : 'fill_code';
 
     questions.push({
       lesson_id: lessonId,
       question_number: qNum++,
       question_text: '',
       question_text_sk: questionText.trim(),
-      question_type: questionType,
+      question_type: opts.length > 0 ? 'multiple_choice' : 'fill_code',
       correct_answer: ca,
       code_snippet: codeSnippet.trim() || '',
       explanation: '',
@@ -267,44 +273,6 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
       options: opts,
     });
     allOptions.push(opts);
-  }
-
-  // Handle explanation: it comes AFTER the answer marker, so it's in the lines
-  // of the NEXT block. Let's fix this by re-parsing with a different strategy.
-  // Actually, let me restructure: split by answer markers but keep explanation too.
-
-  // Re-scan: explanation lines after each answer marker go into previous question
-  let finalLines: string[] = [];
-  const finalBlocks: { before: string[]; answer: string; after: string[] }[] = [];
-
-  for (const line of lines) {
-    const m = line.trim().match(answerPattern);
-    if (m) {
-      finalBlocks.push({ before: finalLines, answer: m[2].trim(), after: [] });
-      finalLines = [];
-    } else {
-      if (finalBlocks.length > 0 && finalLines.length === 0) {
-        // This might be explanation for the previous question
-        const ln = line.trim();
-        if (ln && !(/^(Select|Fill in|Otázky|Questions|Kvízové|Quiz|Vyber|Doplň|\d+\.\s)/i.test(ln)) && !(/^(Otázka|Question)\s+\d+/i.test(ln))) {
-          finalBlocks[finalBlocks.length - 1].after.push(line);
-          continue;
-        }
-      }
-      finalLines.push(line);
-    }
-  }
-
-  // Now update explanations from after-lines
-  for (let i = 0; i < finalBlocks.length && i < questions.length; i++) {
-    if (!questions[i].explanation_sk && finalBlocks[i].after.length > 0) {
-      const expl = finalBlocks[i].after
-        .map(l => l.trim())
-        .filter(l => l && !/^(Vysvetlenie|Explanation)\s*:?\s*$/i.test(l))
-        .map(l => l.replace(/^(Vysvetlenie|Explanation)\s*:\s*/i, ''))
-        .join(' ');
-      questions[i].explanation_sk = expl;
-    }
   }
 
   return { questions, options: allOptions };

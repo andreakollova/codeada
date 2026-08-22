@@ -984,17 +984,20 @@ export default function BuilderPage() {
 
       const optionsPayload = q.question_type === 'multiple_choice' ? opts : [];
       const saved = await api({ action: 'saveQuestion', question: questionPayload, options: optionsPayload });
-      // Add/update in local state
-      const copy = [...sectionQuestions];
-      while (copy.length <= sectionIdx) copy.push([]);
+      // Add/update in local state using functional update to avoid stale closures
       const savedQ = { ...q, id: saved.id, options: opts };
-      const existingIdx = copy[sectionIdx].findIndex(eq => eq.id === saved.id);
-      if (existingIdx >= 0) {
-        copy[sectionIdx][existingIdx] = savedQ;
-      } else {
-        copy[sectionIdx].push(savedQ);
-      }
-      setSectionQuestions(copy);
+      setSectionQuestions(prev => {
+        const copy = [...prev];
+        while (copy.length <= sectionIdx) copy.push([]);
+        const existingIdx = copy[sectionIdx].findIndex(eq => eq.id === saved.id);
+        if (existingIdx >= 0) {
+          copy[sectionIdx] = [...copy[sectionIdx]];
+          copy[sectionIdx][existingIdx] = savedQ;
+        } else {
+          copy[sectionIdx] = [...copy[sectionIdx], savedQ];
+        }
+        return copy;
+      });
       showToast('Otazka ulozena!');
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
@@ -1827,7 +1830,7 @@ function MiniLessonCard({
                           const sk = skParsed[i];
                           const en = enParsed[i];
                           const qPayload: any = {
-                            lesson_id: lessonId || 0,
+                            lesson_id: lessonId,
                             question_number: startNum + i,
                             question_text_sk: sk.question_text || '',
                             question_text: en?.question_text || '',
@@ -1843,7 +1846,7 @@ function MiniLessonCard({
                             return {
                               option_label: o.label,
                               option_text_sk: skText,
-                              option_text: enText || skText, // fallback to SK (code options are same in both languages)
+                              option_text: enText || skText,
                               is_correct: o.label === sk.correct_answer,
                             };
                           });

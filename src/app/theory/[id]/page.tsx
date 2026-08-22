@@ -1346,16 +1346,7 @@ export default function TheoryLessonPage() {
         </AnimatePresence>
       </div>
 
-      {/* Ask Coduy AI */}
-      {!['done', 'loading', 'coffee', 'quiz'].includes(phase) && (
-        <AskByte
-          lessonTitle={safe(t(lesson, 'title', locale))}
-          lessonContent={lesson.learning_content?.slice(0, 2000) || ''}
-          locale={locale}
-          equipment={equipment}
-          userId={useUserStore.getState().userId}
-        />
-      )}
+      {/* Ask Coduy AI — disabled for now */}
     </div>
   );
 }

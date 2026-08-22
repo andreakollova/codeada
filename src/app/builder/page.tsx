@@ -2046,10 +2046,18 @@ function QuestionEditor({
         />
       </div>
 
-      {showCode && (
+      {showCode && (() => {
+        // Split code_snippet by |||EN||| separator
+        const parts = (q.code_snippet || '').split('|||EN|||');
+        const codeSk = parts[0] || '';
+        const codeEn = parts[1] || '';
+        const updateCode = (sk: string, en: string) => {
+          setQ({ ...q, code_snippet: en.trim() ? sk + '|||EN|||' + en : sk });
+        };
+        return (
         <div style={s.fieldGroup}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <label style={{ ...s.label, marginBottom: 0 }}>Code snippet</label>
+            <label style={{ ...s.label, marginBottom: 0 }}>Code SK</label>
             <button
               style={s.toolbarBtn}
               onClick={handleInsertBlank}
@@ -2062,11 +2070,20 @@ function QuestionEditor({
             ref={codeSnippetRef}
             style={s.codebox}
             rows={4}
-            value={q.code_snippet || ''}
-            onChange={(e) => setQ({ ...q, code_snippet: e.target.value })}
+            value={codeSk}
+            onChange={(e) => updateCode(e.target.value, codeEn)}
+          />
+          <label style={{ ...s.label, marginTop: 8, marginBottom: 4 }}>Code EN</label>
+          <textarea
+            style={s.codebox}
+            rows={4}
+            value={codeEn}
+            placeholder="EN verzia kódu (ak sa líši od SK)"
+            onChange={(e) => updateCode(codeSk, e.target.value)}
           />
         </div>
-      )}
+        );
+      })()}
 
       {showOptions && (
         <div style={s.fieldGroup}>

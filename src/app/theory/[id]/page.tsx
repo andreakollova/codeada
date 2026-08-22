@@ -46,6 +46,13 @@ export default function TheoryLessonPage() {
   const [score, setScore] = useState(0);
   // Safe string helper - ensures no objects reach React render
   const safe = (v: unknown): string => (v == null ? '' : typeof v === 'string' ? v : String(v));
+  // Get code snippet for current locale (supports |||EN||| separator)
+  const getSnippet = (snippet: string | null | undefined): string => {
+    if (!snippet) return '';
+    const parts = snippet.split('|||EN|||');
+    if (parts.length > 1 && locale === 'en') return parts[1].trim() || parts[0];
+    return parts[0];
+  };
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
   const [reward, setReward] = useState<string | null>(null);
@@ -60,10 +67,10 @@ export default function TheoryLessonPage() {
   // Initialize write_code editor with starter code when question changes
   useEffect(() => {
     if (quiz.length > 0 && quiz[quizIndex]?.question_type === 'write_code') {
-      setWriteCodeValue(quiz[quizIndex].code_snippet || '');
+      setWriteCodeValue(getSnippet(quiz[quizIndex].code_snippet) || '');
     }
     if (quiz.length > 0 && quiz[quizIndex]?.question_type === 'fill_code') {
-      const snippet = quiz[quizIndex].code_snippet || '';
+      const snippet = getSnippet(quiz[quizIndex].code_snippet) || '';
       const blanks = snippet.split('___').length - 1;
       setFillCodeValues(new Array(Math.max(blanks, 1)).fill(''));
       setFillCodeState('editing');
@@ -570,7 +577,7 @@ export default function TheoryLessonPage() {
 
         {/* Code snippet (readonly) + input for missing line */}
         {(() => {
-          const snippet = q.code_snippet || '';
+          const snippet = getSnippet(q.code_snippet) || '';
           const lines = snippet.split('\n');
           const todoIdx = lines.findIndex((l: string) => l.includes('# TODO') || l.includes('___'));
           const beforeLines = todoIdx >= 0 ? lines.slice(0, todoIdx) : lines;
@@ -713,7 +720,7 @@ export default function TheoryLessonPage() {
   const renderFillCode = () => {
     const q = quiz[quizIndex];
     if (!q) return null;
-    const snippet = q.code_snippet || '';
+    const snippet = getSnippet(q.code_snippet) || '';
     const correctAnswers = q.correct_answer.split('|||').map(a => a.trim());
     const parts = snippet.split('___');
 
@@ -980,7 +987,7 @@ export default function TheoryLessonPage() {
           {safe(t(q, 'question_text', locale))}
         </h2>
 
-        {q.code_snippet && (
+        {getSnippet(q.code_snippet) && (
           <div style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, overflow: 'hidden' }}>
             <div style={{ background: '#111', padding: '4px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
@@ -988,7 +995,7 @@ export default function TheoryLessonPage() {
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#333' }} />
             </div>
             <pre style={{ margin: 0, padding: '14px 16px', fontSize: 14, lineHeight: 1.8, overflow: 'auto', fontFamily: 'JetBrains Mono, Fira Code, monospace', whiteSpace: 'pre-wrap' }}>
-              {safe(q.code_snippet).split('\n').map((line, li) => (
+              {safe(getSnippet(q.code_snippet)).split('\n').map((line, li) => (
                 <div key={li}>
                   {line.split(/(___|\b(?:if|else|elif|for|while|def|return|import|from|print|class|in|not|and|or|True|False|None|self)\b|"[^"]*"|'[^']*'|\[|\]|\(|\)|\b\d+\b|#.*$)/gm).map((part, pi) => {
                     if (!part) return null;
@@ -1093,8 +1100,8 @@ export default function TheoryLessonPage() {
                       explanation = correctLabel === 'T'
                         ? (locale === 'sk' ? 'Toto tvrdenie je pravdivé.' : 'This statement is true.')
                         : (locale === 'sk' ? 'Toto tvrdenie je nepravdivé.' : 'This statement is false.');
-                    } else if (q.question_type === 'fill_code' && q.code_snippet) {
-                      const filled = q.code_snippet.replace('___', correctOpt.text);
+                    } else if (q.question_type === 'fill_code' && getSnippet(q.code_snippet)) {
+                      const filled = getSnippet(q.code_snippet).replace('___', correctOpt.text);
                       explanation = locale === 'sk'
                         ? `Správny kód je: ${filled}`
                         : `The correct code is: ${filled}`;

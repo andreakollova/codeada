@@ -201,10 +201,10 @@ export default function TheoryLessonPage() {
   });
 
   const totalSteps = subsections.length > 1
-    ? 1 + subsections.length + quiz.length // intro + subsections + all quiz at end
+    ? 1 + subsections.length * 2 // intro + (content + quiz) per subsection
     : sections.length + quiz.length;
   const currentStep = subsections.length > 1
-    ? 1 + (phase === 'quiz' ? subsections.length + quizIndex : subsectionIndex)
+    ? 1 + subsectionIndex * 2 + (phase === 'quiz' ? 1 : 0)
     : phase === 'quiz' || phase === 'done' ? sections.length + quizIndex : sectionIndex;
   const progress = totalSteps > 0 ? Math.min((currentStep / totalSteps) * 100, 100) : 0;
 
@@ -233,20 +233,23 @@ export default function TheoryLessonPage() {
   const handleNextSection = () => {
     scrollTop();
 
-    // Subsection mode: learning → next subsection → ... → quiz (all at end) → done
+    // Subsection mode: learning → quiz for this section → next subsection → quiz → ... → done
     if (subsections.length > 1 && phase === 'learning') {
-      // Go to next subsection
-      if (subsectionIndex + 1 < subsections.length) {
-        setSubsectionIndex(i => i + 1);
-        setPhase('learning');
-        return;
-      }
-      // All subsections done — show quiz (all questions)
-      if (quiz.length > 0) {
-        setQuizIndex(0);
+      const qPerSub = Math.max(1, Math.ceil(quiz.length / subsections.length));
+      const startQ = subsectionIndex * qPerSub;
+      const endQ = subsectionIndex === subsections.length - 1 ? quiz.length : Math.min(startQ + qPerSub, quiz.length);
+      if (startQ < quiz.length && startQ < endQ) {
+        // Show quiz for this subsection
+        setQuizIndex(startQ);
         setPhase('quiz');
         setSelectedAnswer(null);
         setAnswerState('idle');
+        return;
+      }
+      // No quiz questions for this sub → go to next subsection
+      if (subsectionIndex + 1 < subsections.length) {
+        setSubsectionIndex(i => i + 1);
+        setPhase('learning');
         return;
       }
       finishLesson();
@@ -308,11 +311,19 @@ export default function TheoryLessonPage() {
 
     // Subsection mode: check if we've finished this subsection's quiz questions
     if (subsections.length > 1) {
-      if (quizIndex + 1 < quiz.length) {
-        // More questions
+      const qPerSub = Math.max(1, Math.ceil(quiz.length / subsections.length));
+      const endQ = subsectionIndex === subsections.length - 1 ? quiz.length : Math.min((subsectionIndex + 1) * qPerSub, quiz.length);
+
+      if (quizIndex + 1 < endQ) {
+        // More questions for this subsection
         setQuizIndex(i => i + 1);
+      } else if (subsectionIndex + 1 < subsections.length) {
+        // Move to next subsection
+        scrollTop();
+        setSubsectionIndex(i => i + 1);
+        setPhase('learning');
       } else {
-        // All questions done
+        // All subsections done
         finishLesson();
       }
       return;

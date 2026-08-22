@@ -439,7 +439,7 @@ export default function TheoryLessonPage() {
           />
         ) : sec.phase === 'learning' && subsections.length > 1 ? (
           /* Subsection mode: show one subsection at a time */
-          <div>
+          <div key={`sub-${subsectionIndex}`}>
             <ByteTip phase="learning" locale={locale} equipment={equipment} sectionIndex={subsectionIndex}
               {...(() => {
                 const sub = subsections[subsectionIndex] || '';

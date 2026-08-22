@@ -1648,12 +1648,27 @@ function MiniLessonCard({
               <span style={{ fontSize: 12, color: '#888' }}>
                 Fakty ({mini.facts.length})
               </span>
-              <button
-                style={s.btnSmall('#f59e0b')}
-                onClick={() => onUpdateFacts([...mini.facts, { title: '', detail: '' }])}
-              >
-                + Fakt
-              </button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  style={s.btnSmall('#818cf8')}
+                  onClick={async () => {
+                    try {
+                      const result = await api({ action: 'generateFact', sectionTitle: mini.title, sectionContent: mini.content });
+                      if (result.title && result.detail) {
+                        onUpdateFacts([...mini.facts, { title: result.title, detail: result.detail }]);
+                      }
+                    } catch (e: any) { alert('Chyba: ' + e.message); }
+                  }}
+                >
+                  Generovať AI
+                </button>
+                <button
+                  style={s.btnSmall('#f59e0b')}
+                  onClick={() => onUpdateFacts([...mini.facts, { title: '', detail: '' }])}
+                >
+                  + Manuálne
+                </button>
+              </div>
             </div>
             {mini.facts.map((fact, fi) => (
               <div key={fi} style={{ background: '#111', border: '1px solid #333', borderRadius: 6, padding: 10, marginBottom: 8 }}>
@@ -1669,6 +1684,22 @@ function MiniLessonCard({
                       onUpdateFacts(copy);
                     }}
                   />
+                  <button
+                    style={s.btnSmall('#818cf8')}
+                    title="Regenerovať"
+                    onClick={async () => {
+                      try {
+                        const result = await api({ action: 'generateFact', sectionTitle: mini.title, sectionContent: mini.content });
+                        if (result.title && result.detail) {
+                          const copy = [...mini.facts];
+                          copy[fi] = { title: result.title, detail: result.detail };
+                          onUpdateFacts(copy);
+                        }
+                      } catch (e: any) { alert('Chyba: ' + e.message); }
+                    }}
+                  >
+                    ↻
+                  </button>
                   <button
                     style={s.btnSmall('#ef4444')}
                     onClick={() => onUpdateFacts(mini.facts.filter((_, i) => i !== fi))}

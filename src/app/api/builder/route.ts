@@ -291,6 +291,48 @@ IMPORTANT: Extract ALL questions. Do not skip any. Do not merge questions. Each 
         return Response.json({ data: parsed.questions || [] });
       }
 
+      case 'generateFact': {
+        const { sectionTitle, sectionContent } = body;
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            temperature: 0.8,
+            response_format: { type: 'json_object' },
+            messages: [
+              {
+                role: 'system',
+                content: `Si autor vzdelávacieho obsahu o programovaní pre začiatočníkov. Vygeneruj jeden zaujímavý fun fact k danej téme/sekcii.
+
+PRAVIDLÁ:
+- Krátky výstižný nadpis (max 10 slov)
+- Detail: 2-3 vety, zaujímavý, pravdivý, overiteľný fakt
+- Môže byť z histórie, zo života, zo sveta technológií, zaujímavá štatistika
+- Nie príliš všeobecný — konkrétny, prekvapivý
+- Správna slovenčina, dobrý slovosled, bez anglicizmov kde nie sú nutné
+- Vhodný pre úplných začiatočníkov v programovaní
+
+PRÍKLAD ŠTÝLU:
+Nadpis: "Prvý program vznikol skôr než moderný počítač"
+Detail: "Ada Lovelace v roku 1843 publikovala algoritmus určený pre Analytical Engine Charlesa Babbagea. Samotný stroj pritom počas jej života nebol dokončený. Myšlienka zapisovať postup, ktorý má stroj automaticky vykonať, tak existovala dávno pred dnešnými elektronickými počítačmi."
+
+Vráť JSON: {"title": "...", "detail": "..."}`
+              },
+              { role: 'user', content: `Sekcia: ${sectionTitle}\n\nObsah:\n${(sectionContent || '').substring(0, 500)}` }
+            ]
+          })
+        });
+
+        if (!res.ok) throw new Error('OpenAI error: ' + await res.text());
+        const gptData = await res.json();
+        const reply = gptData.choices?.[0]?.message?.content || '{}';
+        return Response.json({ data: JSON.parse(reply) });
+      }
+
       case 'translate': {
         const { texts } = body; // { key: skText, ... }
         const apiKey = process.env.OPENAI_API_KEY;

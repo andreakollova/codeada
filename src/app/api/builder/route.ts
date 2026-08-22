@@ -255,7 +255,7 @@ export async function POST(request: Request) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o',
             temperature: 0,
             response_format: { type: 'json_object' },
             messages: [
@@ -266,8 +266,8 @@ export async function POST(request: Request) {
 Each question has:
 - question_text: the question text (without number prefix like "Otázka 1" or "Question 1")
 - question_type: "multiple_choice" if has A/B/C/D options, "fill_code" if has ___ blank to fill and NO A/B/C/D options
-- code_snippet: any code shown with the question (Python code with variables, if/for statements etc.), empty string if none. For "select correct code" questions that have BOTH code AND A/B/C/D options, include the code here AND set type to "multiple_choice".
-- correct_answer: For multiple_choice: the letter A/B/C/D. For fill_code: the ACTUAL VALUE to fill in the blank (e.g. "print", "6", "temperature > 30"), NEVER a letter like A/B/C/D.
+- code_snippet: Python code shown with the question. ALWAYS normalize any sequence of underscores (__________, _____, etc.) to exactly three: ___. Include ALL code lines (variable assignments, if statements, print statements). NEVER leave empty if the question contains code.
+- correct_answer: For multiple_choice: the letter A/B/C/D. For fill_code: the ACTUAL VALUE to fill in the blank (e.g. "print", "6", "temperature > 30"), NEVER a letter.
 - explanation: the explanation text (without "Vysvetlenie:" or "Explanation:" prefix)
 - options: array of {label: "A"/"B"/"C"/"D", text: "option text"} — empty array for fill_code
 

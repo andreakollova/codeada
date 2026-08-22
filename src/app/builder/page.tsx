@@ -1797,12 +1797,16 @@ function MiniLessonCard({
                             explanation_sk: sk.explanation || '',
                             explanation: en?.explanation || '',
                           };
-                          const opts = (sk.options || []).map((o: any, oi: number) => ({
-                            option_label: o.label,
-                            option_text_sk: o.text || '',
-                            option_text: en?.options?.[oi]?.text || '',
-                            is_correct: o.label === sk.correct_answer,
-                          }));
+                          const opts = (sk.options || []).map((o: any, oi: number) => {
+                            const skText = o.text || '';
+                            const enText = en?.options?.[oi]?.text || '';
+                            return {
+                              option_label: o.label,
+                              option_text_sk: skText,
+                              option_text: enText || skText, // fallback to SK (code options are same in both languages)
+                              is_correct: o.label === sk.correct_answer,
+                            };
+                          });
                           await onSaveQuestion(qPayload as QuizQuestion, opts);
                         }
                         setImportText('');

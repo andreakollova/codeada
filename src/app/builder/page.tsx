@@ -709,7 +709,10 @@ export default function BuilderPage() {
       setMiniLessons(minis);
       const qs = await api({ action: 'getQuestions', lessonId: id });
       const questions = qs || [];
-      setSectionQuestions(distributeQuestions(questions, minis.length));
+      // All questions go to first section (no auto-distribution)
+      const sq: QuizQuestion[][] = Array.from({ length: minis.length }, () => []);
+      if (sq.length > 0) sq[0] = questions;
+      setSectionQuestions(sq);
     } catch (e) {
       console.error(e);
     }

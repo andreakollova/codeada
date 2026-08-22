@@ -1481,10 +1481,6 @@ function MiniLessonCard({
   const [collapsed, setCollapsed] = useState(false);
   const [activeLang, setActiveLang] = useState<'sk' | 'en'>('sk');
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
-  const [showImport, setShowImport] = useState(false);
-  const [importText, setImportText] = useState('');
-  const [importTextEn, setImportTextEn] = useState('');
-  const [importStatus, setImportStatus] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const textareaEnRef = useRef<HTMLTextAreaElement>(null);
 
@@ -1790,8 +1786,8 @@ function MiniLessonCard({
                 Otázky ({questions.length})
               </span>
               {lessonId && (
-                <button style={s.btnSmall('#3b82f6')} onClick={() => setShowImport(!showImport)}>
-                  {showImport ? 'Zavrieť' : '+ Pridať otázky'}
+                <button style={s.btnSmall('#4ade80')} onClick={handleAddQuestion}>
+                  + Nová otázka
                 </button>
               )}
             </div>
@@ -1799,96 +1795,6 @@ function MiniLessonCard({
             {!lessonId && questions.length === 0 && (
               <div style={{ color: '#555', fontSize: 12, marginBottom: 8 }}>
                 Najprv ulož lekciu, potom môžeš pridať otázky.
-              </div>
-            )}
-
-            {showImport && (
-              <div style={{ ...s.card, border: '1px solid #3b82f6', marginBottom: 12 }}>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>SK</div>
-                    <textarea
-                      style={{ ...s.textarea, minHeight: 120 }}
-                      placeholder={'Pastni SK otázky...'}
-                      value={importText}
-                      onChange={(e) => setImportText(e.target.value)}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>EN</div>
-                    <textarea
-                      style={{ ...s.textarea, minHeight: 120 }}
-                      placeholder={'Pastni EN otázky...'}
-                      value={importTextEn}
-                      onChange={(e) => setImportTextEn(e.target.value)}
-                    />
-                  </div>
-                </div>
-                {importStatus && (
-                  <div style={{ fontSize: 12, color: '#3b82f6', marginTop: 8 }}>{importStatus}</div>
-                )}
-                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                  <button
-                    style={s.btn('#3b82f6')}
-                    disabled={!!importStatus}
-                    onClick={async () => {
-                      if (!importText.trim()) return;
-                      if (!lessonId) { alert('Najprv ulož lekciu.'); return; }
-                      setImportStatus('Spracovávam SK otázky cez AI...');
-                      try {
-                        const skParsed: any[] = await api({ action: 'parseQuestions', text: importText });
-                        let enParsed: any[] = [];
-                        if (importTextEn.trim()) {
-                          setImportStatus(`SK: ${skParsed.length} otázok. Spracovávam EN...`);
-                          enParsed = await api({ action: 'parseQuestions', text: importTextEn });
-                        }
-                        setImportStatus(`Ukladám ${skParsed.length} otázok...`);
-                        // Get max question_number from DB to avoid duplicates
-                        const existingQs = await api({ action: 'getQuestions', lessonId });
-                        const maxNum = (existingQs || []).reduce((m: number, q: any) => Math.max(m, q.question_number || 0), 0);
-                        const startNum = maxNum + 1;
-                        for (let i = 0; i < skParsed.length; i++) {
-                          const sk = skParsed[i];
-                          const en = enParsed[i];
-                          const qPayload: any = {
-                            lesson_id: lessonId,
-                            question_number: startNum + i,
-                            question_text_sk: sk.question_text || '',
-                            question_text: en?.question_text || '',
-                            question_type: sk.question_type || 'multiple_choice',
-                            correct_answer: sk.correct_answer || '',
-                            code_snippet: sk.code_snippet || '',
-                            explanation_sk: sk.explanation || '',
-                            explanation: en?.explanation || '',
-                          };
-                          const opts = (sk.options || []).map((o: any, oi: number) => {
-                            const skText = o.text || '';
-                            const enText = en?.options?.[oi]?.text || '';
-                            return {
-                              option_label: o.label,
-                              option_text_sk: skText,
-                              option_text: enText || skText,
-                              is_correct: o.label === sk.correct_answer,
-                            };
-                          });
-                          await onSaveQuestion(qPayload as QuizQuestion, opts);
-                        }
-                        setImportText('');
-                        setImportTextEn('');
-                        setImportStatus('');
-                        setShowImport(false);
-                      } catch (e: any) {
-                        setImportStatus('Chyba: ' + e.message);
-                        setTimeout(() => setImportStatus(''), 3000);
-                      }
-                    }}
-                  >
-                    Pridať otázky (AI)
-                  </button>
-                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setImportTextEn(''); setImportStatus(''); setShowImport(false); }}>
-                    Zrušiť
-                  </button>
-                </div>
               </div>
             )}
 

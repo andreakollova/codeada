@@ -1422,6 +1422,7 @@ function MiniLessonCard({
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
   const [importTextEn, setImportTextEn] = useState('');
+  const [importStatus, setImportStatus] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const textareaEnRef = useRef<HTMLTextAreaElement>(null);
 
@@ -1708,19 +1709,11 @@ function MiniLessonCard({
               </div>
             )}
 
-            {showImport && (() => {
-              const parsedSk = importText.trim() ? parseQuestionsFromText(importText, lessonId || 0, 1).questions : [];
-              const parsedEn = importTextEn.trim() ? parseQuestionsFromText(importTextEn, lessonId || 0, 1).questions : [];
-              const skCount = parsedSk.length;
-              const enCount = parsedEn.length;
-
-              return (
+            {showImport && (
               <div style={{ ...s.card, border: '1px solid #3b82f6', marginBottom: 12 }}>
                 <div style={{ display: 'flex', gap: 12 }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>
-                      SK {skCount > 0 && `(${skCount})`}
-                    </div>
+                    <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>SK</div>
                     <textarea
                       style={{ ...s.textarea, minHeight: 120 }}
                       placeholder={'Pastni SK otázky...'}
@@ -1729,9 +1722,7 @@ function MiniLessonCard({
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>
-                      EN {enCount > 0 && `(${enCount})`}
-                    </div>
+                    <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>EN</div>
                     <textarea
                       style={{ ...s.textarea, minHeight: 120 }}
                       placeholder={'Pastni EN otázky...'}
@@ -1740,43 +1731,67 @@ function MiniLessonCard({
                     />
                   </div>
                 </div>
+                {importStatus && (
+                  <div style={{ fontSize: 12, color: '#3b82f6', marginTop: 8 }}>{importStatus}</div>
+                )}
                 <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                   <button
                     style={s.btn('#3b82f6')}
-                    onClick={() => {
-                      if (!importText.trim() || skCount === 0) return;
-                      const startNum = questions.length > 0
-                        ? Math.max(...questions.map(q => q.question_number)) + 1
-                        : 1;
-                      const { questions: parsed } = parseQuestionsFromText(importText, lessonId || 0, startNum);
-                      if (enCount > 0) {
-                        for (let i = 0; i < parsed.length && i < parsedEn.length; i++) {
-                          parsed[i].question_text = parsedEn[i].question_text_sk;
-                          parsed[i].explanation = parsedEn[i].explanation_sk;
-                          if (parsed[i].options && parsedEn[i].options) {
-                            for (let j = 0; j < parsed[i].options.length && j < parsedEn[i].options.length; j++) {
-                              parsed[i].options[j].option_text = parsedEn[i].options[j].option_text_sk;
-                            }
-                          }
+                    disabled={!!importStatus}
+                    onClick={async () => {
+                      if (!importText.trim()) return;
+                      setImportStatus('Spracovávam SK otázky cez AI...');
+                      try {
+                        const skParsed: any[] = await api({ action: 'parseQuestions', text: importText });
+                        let enParsed: any[] = [];
+                        if (importTextEn.trim()) {
+                          setImportStatus(`SK: ${skParsed.length} otázok. Spracovávam EN...`);
+                          enParsed = await api({ action: 'parseQuestions', text: importTextEn });
                         }
-                      }
-                      (async () => {
-                        for (const q of parsed) await onSaveQuestion(q, q.options || []);
+                        setImportStatus(`Ukladám ${skParsed.length} otázok...`);
+                        const startNum = questions.length > 0
+                          ? Math.max(...questions.map(q => q.question_number)) + 1
+                          : 1;
+                        for (let i = 0; i < skParsed.length; i++) {
+                          const sk = skParsed[i];
+                          const en = enParsed[i];
+                          const qPayload: any = {
+                            lesson_id: lessonId || 0,
+                            question_number: startNum + i,
+                            question_text_sk: sk.question_text || '',
+                            question_text: en?.question_text || '',
+                            question_type: sk.question_type || 'multiple_choice',
+                            correct_answer: sk.correct_answer || '',
+                            code_snippet: sk.code_snippet || '',
+                            explanation_sk: sk.explanation || '',
+                            explanation: en?.explanation || '',
+                          };
+                          const opts = (sk.options || []).map((o: any, oi: number) => ({
+                            option_label: o.label,
+                            option_text_sk: o.text || '',
+                            option_text: en?.options?.[oi]?.text || '',
+                            is_correct: o.label === sk.correct_answer,
+                          }));
+                          await onSaveQuestion(qPayload as QuizQuestion, opts);
+                        }
                         setImportText('');
                         setImportTextEn('');
+                        setImportStatus('');
                         setShowImport(false);
-                      })();
+                      } catch (e: any) {
+                        setImportStatus('Chyba: ' + e.message);
+                        setTimeout(() => setImportStatus(''), 3000);
+                      }
                     }}
                   >
-                    Pridať otázky ({skCount})
+                    Pridať otázky (AI)
                   </button>
-                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setImportTextEn(''); setShowImport(false); }}>
+                  <button style={s.btn('#333')} onClick={() => { setImportText(''); setImportTextEn(''); setImportStatus(''); setShowImport(false); }}>
                     Zrušiť
                   </button>
                 </div>
               </div>
-              );
-            })()}
+            )}
 
             {questions.map((q, qi) => (
               <QuestionCard

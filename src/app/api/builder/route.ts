@@ -246,6 +246,51 @@ export async function POST(request: Request) {
         return Response.json({ ok: true });
       }
 
+      case 'parseQuestions': {
+        const { text } = body;
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            temperature: 0,
+            response_format: { type: 'json_object' },
+            messages: [
+              {
+                role: 'system',
+                content: `You parse quiz questions from pasted text into structured JSON. The text may contain section headers (like "Kvízové otázky", "Select the correct answer", "Fill in the code", "01.", "02." etc.) — IGNORE all headers, only extract actual questions.
+
+Each question has:
+- question_text: the question text (without number prefix like "Otázka 1" or "Question 1")
+- question_type: "multiple_choice" if has A/B/C/D options, "fill_code" if has ___ blank to fill
+- code_snippet: any code shown with the question (Python code with variables, if/for statements etc.), empty string if none
+- correct_answer: the letter (A/B/C/D) or value for fill_code
+- explanation: the explanation text (without "Vysvetlenie:" or "Explanation:" prefix)
+- options: array of {label: "A"/"B"/"C"/"D", text: "option text"} — empty array for fill_code
+
+Return JSON: {"questions": [...]}
+
+IMPORTANT: Extract ALL questions. Do not skip any. Do not merge questions. Each "Správna odpoveď:" or "Correct answer:" line marks the end of one question.`
+              },
+              { role: 'user', content: text }
+            ]
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(`OpenAI error: ${err}`);
+        }
+
+        const gptData = await res.json();
+        const reply = gptData.choices?.[0]?.message?.content || '{}';
+        const parsed = JSON.parse(reply);
+        return Response.json({ data: parsed.questions || [] });
+      }
+
       case 'translate': {
         const { texts } = body; // { key: skText, ... }
         const apiKey = process.env.OPENAI_API_KEY;

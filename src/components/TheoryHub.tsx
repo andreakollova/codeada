@@ -289,35 +289,65 @@ function ModuleRow({ mod, completedLessons, router, locale, favDrink }: { mod: M
         <div style={{ borderTop: '1px solid var(--border-light, #111)' }}>
           {mod.lessons.map((lesson) => {
             const done = completedLessons.includes(`theory-${lesson.id}`);
-            return (
-              <button
-                key={lesson.id}
-                onClick={() => router.push(`/theory/${lesson.id}`)}
-                style={{
-                  width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '10px 16px 10px 28px', cursor: 'pointer', textAlign: 'left',
-                  borderTop: '1px solid var(--border-light, #0f0f0f)',
-                }}
-              >
-                <div style={{
-                  width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: done ? '#4ade80' : 'transparent',
-                  border: done ? 'none' : '1px solid var(--border, #2a2a2a)',
-                }}>
-                  {done && <Check size={12} color="#000" strokeWidth={3} />}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
+            const sections = lesson.miniTitles || [];
+            if (sections.length === 0) {
+              // No sections — show lesson as single item
+              return (
+                <button
+                  key={lesson.id}
+                  onClick={() => router.push(`/theory/${lesson.id}`)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 16px 10px 28px', cursor: 'pointer', textAlign: 'left',
+                    borderTop: '1px solid var(--border-light, #0f0f0f)',
+                  }}
+                >
+                  <div style={{
+                    width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: done ? '#4ade80' : 'transparent',
+                    border: done ? 'none' : '1px solid var(--border, #2a2a2a)',
+                  }}>
+                    {done && <Check size={10} color="#000" strokeWidth={3} />}
+                  </div>
                   <span style={{ fontSize: 13, color: done ? 'var(--text-dim, #aaa)' : 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
                     {t(lesson, 'title', locale)}
                   </span>
-                  {lesson.miniTitles && lesson.miniTitles.length > 0 && (
-                    <div style={{ fontSize: 10, color: '#555', marginTop: 3, lineHeight: 1.4 }}>
-                      {lesson.miniTitles.join(' · ')}
-                    </div>
-                  )}
+                </button>
+              );
+            }
+            // Has sections — show lesson title as category header, sections as items
+            return (
+              <div key={lesson.id}>
+                <div style={{ padding: '12px 16px 6px 16px', borderTop: '1px solid var(--border-light, #0f0f0f)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-hint, #666)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    {t(lesson, 'title', locale)}
+                  </div>
                 </div>
-              </button>
+                {sections.map((title, si) => (
+                  <button
+                    key={`${lesson.id}-${si}`}
+                    onClick={() => router.push(`/theory/${lesson.id}?section=${si}`)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '8px 16px 8px 28px', cursor: 'pointer', textAlign: 'left',
+                    }}
+                  >
+                    <div style={{
+                      width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'transparent',
+                      border: '1px solid var(--border, #2a2a2a)',
+                      fontSize: 9, color: '#555', fontWeight: 600,
+                    }}>
+                      {si + 1}
+                    </div>
+                    <span style={{ fontSize: 13, color: 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
+                      {title}
+                    </span>
+                  </button>
+                ))}
+              </div>
             );
           })}
         </div>

@@ -119,8 +119,8 @@ function cleanupContent(text: string): string {
   text = text.replace(/^(\*\*>?\*\*\s?|>\s?)/gm, '- ');
   // # used as bullet (not ## heading)
   text = text.replace(/^#\s+(?!#)/gm, '- ');
-  // // at line starts
-  text = text.replace(/^\/\/\s*/gm, '- ');
+  // // or **///** at line starts
+  text = text.replace(/^(\*\*)?\/\/(\*\*)?\s*/gm, '- ');
   // Inline // separators on a single line → split into bullet lines
   const lines = text.split('\n');
   const result: string[] = [];

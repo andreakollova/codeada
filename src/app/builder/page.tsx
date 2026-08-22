@@ -801,12 +801,14 @@ export default function BuilderPage() {
         const ls = await api({ action: 'getLessons', moduleId: selectedModuleId });
         setLessons(ls);
       }
-      // Refresh questions from DB
+      // Refresh minis from saved data (but keep question distribution as-is)
       if (saved.id) {
-        const qs = await api({ action: 'getQuestions', lessonId: saved.id });
         const newMinis = parseMiniLessons(saved.learning_content_sk || '', saved.learning_content || '');
         setMiniLessons(newMinis);
-        setSectionQuestions(distributeQuestions(qs || [], newMinis.length));
+        // Ensure sectionQuestions has same length as sections
+        const currentSQ = [...sectionQuestions];
+        while (currentSQ.length < newMinis.length) currentSQ.push([]);
+        setSectionQuestions(currentSQ.slice(0, newMinis.length));
       }
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
@@ -952,11 +954,6 @@ export default function BuilderPage() {
       const optionsPayload = q.question_type === 'multiple_choice' ? opts : [];
       await api({ action: 'saveQuestion', question: questionPayload, options: optionsPayload });
       showToast('Otazka ulozena!');
-      // Refresh all questions and redistribute
-      if (selectedLessonId || lesson?.id) {
-        const qs = await api({ action: 'getQuestions', lessonId: selectedLessonId || lesson?.id });
-        setSectionQuestions(distributeQuestions(qs || [], miniLessons.length));
-      }
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
     }
@@ -968,10 +965,10 @@ export default function BuilderPage() {
     try {
       await api({ action: 'deleteQuestion', questionId: qId });
       showToast('Vymazané!');
-      if (selectedLessonId || lesson?.id) {
-        const qs = await api({ action: 'getQuestions', lessonId: selectedLessonId || lesson?.id });
-        setSectionQuestions(distributeQuestions(qs || [], miniLessons.length));
-      }
+      // Remove from local state
+      const copy = [...sectionQuestions];
+      copy[sectionIdx] = copy[sectionIdx].filter(q => q.id !== qId);
+      setSectionQuestions(copy);
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
     }

@@ -242,11 +242,12 @@ function ReadCard({ lesson, index, router, locale }: { lesson: DbLessonSummary &
   );
 }
 
-// Lesson as top-level expandable block (sections as items)
+// Lesson as top-level expandable block — same visual style as old ModuleRow
 function LessonBlock({ lesson, completedLessons, router, locale }: { lesson: any; completedLessons: string[]; router: any; locale: 'en' | 'sk' }) {
   const [open, setOpen] = useState(false);
   const sections = lesson.miniTitles || [];
   const done = completedLessons.includes(`theory-${lesson.id}`);
+  const Icon = MODULE_ICONS[lesson.lesson_number] || BookOpen;
 
   return (
     <div style={{ background: 'var(--bg-card, #0a0a0a)', border: `1px solid ${done ? 'rgba(74,222,128,0.25)' : 'var(--border, #1a1a1a)'}`, borderRadius: 12, overflow: 'hidden' }}>
@@ -262,7 +263,7 @@ function LessonBlock({ lesson, completedLessons, router, locale }: { lesson: any
         }}>
           {done
             ? <Check size={14} color="#4ade80" strokeWidth={3} />
-            : <BookOpen size={14} color="#777" />
+            : <Icon size={14} color="#777" />
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -276,42 +277,50 @@ function LessonBlock({ lesson, completedLessons, router, locale }: { lesson: any
         </motion.div>
       </button>
 
-      {open && sections.length > 0 && (
+      {open && (
         <div style={{ borderTop: '1px solid var(--border-light, #111)' }}>
-          {sections.map((title: string, si: number) => (
+          {sections.length > 0 ? sections.map((title: string, si: number) => (
             <button
               key={si}
               onClick={() => router.push(`/theory/${lesson.id}?section=${si}`)}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                 padding: '10px 16px 10px 28px', cursor: 'pointer', textAlign: 'left',
                 borderTop: si > 0 ? '1px solid var(--border-light, #0f0f0f)' : 'none',
               }}
             >
               <div style={{
-                width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                width: 24, height: 24, borderRadius: 7, flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'transparent',
                 border: '1px solid var(--border, #2a2a2a)',
-                fontSize: 10, color: '#666', fontWeight: 600,
               }}>
-                {si + 1}
+                <span style={{ fontSize: 10, color: '#555', fontWeight: 600 }}>{si + 1}</span>
               </div>
               <span style={{ fontSize: 13, color: 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
                 {title}
               </span>
             </button>
-          ))}
-        </div>
-      )}
-
-      {open && sections.length === 0 && (
-        <div style={{ borderTop: '1px solid var(--border-light, #111)', padding: '10px 16px 10px 28px' }}>
-          <button
-            onClick={() => router.push(`/theory/${lesson.id}`)}
-            style={{ fontSize: 13, color: 'var(--text-secondary, #ccc)', cursor: 'pointer', background: 'none', border: 'none', fontWeight: 500 }}
-          >
-            {locale === 'sk' ? 'Otvoriť lekciu' : 'Open lesson'}
-          </button>
+          )) : (
+            <button
+              onClick={() => router.push(`/theory/${lesson.id}`)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: '10px 16px 10px 28px', cursor: 'pointer', textAlign: 'left',
+              }}
+            >
+              <div style={{
+                width: 24, height: 24, borderRadius: 7, flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '1px solid var(--border, #2a2a2a)',
+              }}>
+                <ArrowRight size={12} color="#555" />
+              </div>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
+                {locale === 'sk' ? 'Otvoriť lekciu' : 'Open lesson'}
+              </span>
+            </button>
+          )}
         </div>
       )}
     </div>

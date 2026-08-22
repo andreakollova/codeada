@@ -731,10 +731,31 @@ export default function BuilderPage() {
       const minis = parseMiniLessons(data.learning_content_sk || '', data.learning_content || '');
       setMiniLessons(minis);
       const qs = await api({ action: 'getQuestions', lessonId: id });
-      const questions = qs || [];
-      // All questions go to first section (no auto-distribution)
+      const questions = (qs || []).sort((a: any, b: any) => a.question_number - b.question_number);
+      // Distribute questions based on <!-- quiz:N --> markers in content
+      const content = data.learning_content_sk || '';
+      const subs = content.split(/(?=^## )/m).filter((s: string) => s.trim());
+      const qCounts = subs.map((sub: string) => {
+        const m = sub.match(/<!-- quiz:(\d+) -->/);
+        return m ? parseInt(m[1]) : 0;
+      });
+      const hasMarkers = qCounts.some((c: number) => c > 0);
       const sq: QuizQuestion[][] = Array.from({ length: minis.length }, () => []);
-      if (sq.length > 0) sq[0] = questions;
+      if (hasMarkers) {
+        let qIdx = 0;
+        for (let i = 0; i < qCounts.length && i < sq.length; i++) {
+          for (let j = 0; j < qCounts[i] && qIdx < questions.length; j++) {
+            sq[i].push(questions[qIdx++]);
+          }
+        }
+        // Any remaining questions go to last section
+        while (qIdx < questions.length) {
+          sq[sq.length - 1].push(questions[qIdx++]);
+        }
+      } else {
+        // No markers — all to first section
+        if (sq.length > 0) sq[0] = questions;
+      }
       setSectionQuestions(sq);
     } catch (e) {
       console.error(e);

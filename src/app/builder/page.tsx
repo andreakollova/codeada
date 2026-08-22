@@ -1274,7 +1274,7 @@ export default function BuilderPage() {
                               }}
                             />
                             <button
-                              style={s.btnSmall('#ef4444')}
+                              style={{ ...s.btnSmall('#333'), color: '#888', fontSize: 11 }}
                               onClick={() => setIntroFacts(introFacts.filter((_, i) => i !== fi))}
                             >X</button>
                           </div>
@@ -1623,7 +1623,7 @@ function MiniLessonCard({
         >
           v
         </button>
-        <button style={s.btnSmall('#ef4444')} onClick={onDelete}>
+        <button style={{ ...s.btnSmall('#333'), color: '#888', fontSize: 11 }} onClick={onDelete}>
           X
         </button>
       </div>
@@ -1759,7 +1759,7 @@ function MiniLessonCard({
                     ↻
                   </button>
                   <button
-                    style={s.btnSmall('#ef4444')}
+                    style={{ ...s.btnSmall('#333'), color: '#888', fontSize: 11 }}
                     onClick={() => onUpdateFacts(mini.facts.filter((_, i) => i !== fi))}
                   >
                     X
@@ -1889,7 +1889,7 @@ function QuestionCard({
         <button style={s.btnSmall('#333')} onClick={onEdit}>
           Upravit
         </button>
-        <button style={s.btnSmall('#ef4444')} onClick={onDelete}>
+        <button style={{ ...s.btnSmall('#333'), color: '#888', fontSize: 11 }} onClick={onDelete}>
           X
         </button>
       </div>

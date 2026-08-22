@@ -1969,16 +1969,20 @@ function QuestionEditor({
     { value: 'fill_code', label: 'Dopln kod' },
   ];
 
+  const [forceCode, setForceCode] = useState(false);
   const currentType =
-    q.question_type === 'fill_code' ? 'fill_code' : q.code_snippet ? 'mcq_code' : 'mcq';
+    q.question_type === 'fill_code' ? 'fill_code' : (q.code_snippet || forceCode) ? 'mcq_code' : 'mcq';
 
   const handleTypeChange = (val: string) => {
     if (val === 'fill_code') {
-      setQ({ ...q, question_type: 'fill_code', code_snippet: q.code_snippet || '' });
+      setQ({ ...q, question_type: 'fill_code' });
+      setForceCode(true);
     } else if (val === 'mcq_code') {
-      setQ({ ...q, question_type: 'multiple_choice', code_snippet: q.code_snippet || '' });
+      setQ({ ...q, question_type: 'multiple_choice' });
+      setForceCode(true);
     } else {
       setQ({ ...q, question_type: 'multiple_choice', code_snippet: '' });
+      setForceCode(false);
     }
   };
 

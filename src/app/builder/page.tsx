@@ -1737,18 +1737,18 @@ function MiniLessonCard({
                 </div>
 
                 {mismatch && (
-                  <div style={{ color: '#ef4444', fontSize: 12, fontWeight: 600, marginTop: 8 }}>
-                    SK má {skCount} otázok, EN má {enCount} — počet sa nezhoduje! Skontroluj formát.
+                  <div style={{ color: '#f59e0b', fontSize: 12, fontWeight: 600, marginTop: 8 }}>
+                    SK má {skCount}, EN má {enCount} — EN sa napáruje na prvých {Math.min(skCount, enCount)} otázok.
                   </div>
                 )}
 
-                {skCount > 0 && enCount > 0 && !mismatch && (
+                {skCount > 0 && enCount > 0 && (
                   <div style={{ marginTop: 8, fontSize: 11, color: '#666' }}>
                     {parsedSk.map((q, i) => (
                       <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 2 }}>
                         <span style={{ color: '#3b82f6' }}>#{i + 1}</span>
                         <span style={{ flex: 1, color: '#aaa' }}>{q.question_text_sk?.substring(0, 40)}...</span>
-                        <span style={{ flex: 1, color: '#666' }}>{parsedEn[i]?.question_text_sk?.substring(0, 40)}...</span>
+                        <span style={{ flex: 1, color: parsedEn[i] ? '#666' : '#555' }}>{parsedEn[i]?.question_text_sk?.substring(0, 40) || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -1756,8 +1756,7 @@ function MiniLessonCard({
 
                 <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                   <button
-                    style={{ ...s.btn('#3b82f6'), opacity: mismatch ? 0.5 : 1 }}
-                    disabled={mismatch}
+                    style={s.btn('#3b82f6')}
                     onClick={() => {
                       if (!importText.trim()) return;
                       const startNum = questions.length > 0

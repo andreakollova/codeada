@@ -1047,6 +1047,25 @@ export default function TheoryLessonPage() {
           })}
         </div>
 
+        {/* Skip question */}
+        {answerState === 'idle' && (
+          <button
+            onClick={() => {
+              // Show correct answer and auto-advance
+              const q = quiz[quizIndex];
+              const correctLabel = q.correct_answer;
+              setSelectedAnswer('skip');
+              setAnswerState('wrong');
+              setTimeout(() => {
+                if (feedbackRef.current) feedbackRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 100);
+            }}
+            style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 8, fontWeight: 500, width: '100%', textAlign: 'center' }}
+          >
+            {locale === 'sk' ? 'Nechceš odpovedať? Preskočiť →' : "Don't want to answer? Skip →"}
+          </button>
+        )}
+
         {/* Continue after answer */}
         <AnimatePresence>
           {answerState !== 'idle' && (

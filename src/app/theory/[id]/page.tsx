@@ -1062,7 +1062,7 @@ export default function TheoryLessonPage() {
             }}
             style={{ background: 'none', border: 'none', color: '#555', fontSize: 12, cursor: 'pointer', marginTop: 8, fontWeight: 500, width: '100%', textAlign: 'center' }}
           >
-            {locale === 'sk' ? 'Nechceš odpovedať? Preskočiť →' : "Don't want to answer? Skip →"}
+            {locale === 'sk' ? 'Nie si si istý/istá odpoveďou? Preskočiť →' : 'Not ready to answer? Skip →'}
           </button>
         )}
 

@@ -941,7 +941,7 @@ export default function TheoryLessonPage() {
 
     const correctLabel = q.question_type === 'true_false'
       ? (q.correct_answer === 'True' ? 'T' : 'F')
-      : q.correct_answer;
+      : q.correct_answer || q.options?.find((o: any) => o.is_correct)?.option_label || '';
 
     return (
       <motion.div

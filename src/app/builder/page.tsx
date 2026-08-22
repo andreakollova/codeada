@@ -117,11 +117,30 @@ function cleanupContent(text: string): string {
   // Convert various bullet markers to standard "- " format
   // **>** or > at line starts
   text = text.replace(/^(\*\*>?\*\*\s?|>\s?)/gm, '- ');
-  // // comment-style bullets
-  text = text.replace(/^\/\/\s*/gm, '- ');
   // # used as bullet (not ## heading)
   text = text.replace(/^#\s+(?!#)/gm, '- ');
-  return text;
+  // // at line starts
+  text = text.replace(/^\/\/\s*/gm, '- ');
+  // Inline // separators on a single line → split into bullet lines
+  const lines = text.split('\n');
+  const result: string[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // Detect lines with multiple // items: "// a // b // c" or "text // a // b"
+    if ((trimmed.match(/\/\//g) || []).length >= 2) {
+      const parts = trimmed.split(/\s*\/\/\s*/).filter(p => p.trim());
+      // If first part looks like intro text (before first //), keep it separate
+      if (!trimmed.startsWith('//') && parts.length > 0) {
+        result.push(parts[0]);
+        for (let i = 1; i < parts.length; i++) result.push('- ' + parts[i]);
+      } else {
+        for (const p of parts) result.push('- ' + p);
+      }
+    } else {
+      result.push(line);
+    }
+  }
+  return result.join('\n');
 }
 
 function handleSmartPaste(e: React.ClipboardEvent<HTMLTextAreaElement>, setValue: (v: string) => void, currentValue: string, isContent = false) {

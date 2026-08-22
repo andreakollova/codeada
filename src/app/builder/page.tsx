@@ -1776,6 +1776,7 @@ function MiniLessonCard({
                     disabled={!!importStatus}
                     onClick={async () => {
                       if (!importText.trim()) return;
+                      if (!lessonId) { alert('Najprv ulož lekciu.'); return; }
                       setImportStatus('Spracovávam SK otázky cez AI...');
                       try {
                         const skParsed: any[] = await api({ action: 'parseQuestions', text: importText });

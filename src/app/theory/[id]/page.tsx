@@ -446,7 +446,7 @@ export default function TheoryLessonPage() {
             <motion.button
               onClick={handleNextSection}
               whileTap={{ scale: 0.98 }}
-              style={{ width: '100%', padding: '16px', borderRadius: 14, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer', marginTop: 24 }}
+              style={{ width: '100%', padding: '16px', borderRadius: 14, background: 'var(--btn-primary, #EDEDED)', color: 'var(--btn-primary-text, #0F0F0F)', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: 'none', cursor: 'pointer', marginTop: 34 }}
             >
               {locale === 'sk' ? 'Pokračovať' : 'Continue'} <ArrowRight size={16} />
             </motion.button>

@@ -300,9 +300,10 @@ export default function TheoryLessonPage() {
     const q = quiz[quizIndex];
     // For true_false: answer is "T"/"F", correct_answer is "True"/"False"
     // For mcq: answer is "A"/"B"/"C"/"D", correct_answer is the same
+    const correctAns = q.correct_answer || q.options?.find((o: any) => o.is_correct)?.option_label || '';
     const isCorrect = q.question_type === 'true_false'
       ? (answer === 'T' && q.correct_answer === 'True') || (answer === 'F' && q.correct_answer === 'False')
-      : answer === q.correct_answer;
+      : answer === correctAns;
     if (isCorrect) {
       setAnswerState('correct');
       setScore(s => s + 1);

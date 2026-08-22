@@ -151,8 +151,10 @@ export default function TheoryHub() {
             const done = m.lessons.filter(l => completedLessons.includes(`theory-${l.id}`)).length;
             return done === m.lessons.length;
           });
-          return [...notDone.slice(0, 4), ...allDone].map(mod => (
-            <ModuleRow key={mod.id} mod={mod} completedLessons={completedLessons} router={router} locale={locale} favDrink={favDrink} />
+          // Flatten: show each lesson as a top-level expandable block
+          const allLessons = sorted.flatMap(mod => mod.lessons.map(l => ({ ...l, moduleTitle: mod.title, moduleTitle_sk: mod.title_sk })));
+          return allLessons.map(lesson => (
+            <LessonBlock key={lesson.id} lesson={lesson} completedLessons={completedLessons} router={router} locale={locale} />
           ));
         })()}
       </div>
@@ -237,6 +239,82 @@ function ReadCard({ lesson, index, router, locale }: { lesson: DbLessonSummary &
       </div>
       <ChevronRight size={16} color="#555" />
     </motion.button>
+  );
+}
+
+// Lesson as top-level expandable block (sections as items)
+function LessonBlock({ lesson, completedLessons, router, locale }: { lesson: any; completedLessons: string[]; router: any; locale: 'en' | 'sk' }) {
+  const [open, setOpen] = useState(false);
+  const sections = lesson.miniTitles || [];
+  const done = completedLessons.includes(`theory-${lesson.id}`);
+
+  return (
+    <div style={{ background: 'var(--bg-card, #0a0a0a)', border: `1px solid ${done ? 'rgba(74,222,128,0.25)' : 'var(--border, #1a1a1a)'}`, borderRadius: 12, overflow: 'hidden' }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left' }}
+      >
+        <div style={{
+          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: done ? 'rgba(74,222,128,0.1)' : 'var(--bg-surface, #111)',
+          border: done ? '1px solid rgba(74,222,128,0.3)' : '1px solid var(--border, #222)',
+        }}>
+          {done
+            ? <Check size={14} color="#4ade80" strokeWidth={3} />
+            : <BookOpen size={14} color="#777" />
+          }
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontWeight: 600, fontSize: 14, color: done ? '#4ade80' : 'var(--text, #ddd)' }}>{t(lesson, 'title', locale)}</div>
+          <div style={{ fontSize: 11, color: done ? '#16a34a' : '#777', marginTop: 2 }}>
+            {sections.length > 0 ? `${sections.length} ${locale === 'sk' ? 'sekcií' : 'sections'}` : ''}
+          </div>
+        </div>
+        <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.15 }}>
+          <ChevronRight size={16} color="#555" />
+        </motion.div>
+      </button>
+
+      {open && sections.length > 0 && (
+        <div style={{ borderTop: '1px solid var(--border-light, #111)' }}>
+          {sections.map((title: string, si: number) => (
+            <button
+              key={si}
+              onClick={() => router.push(`/theory/${lesson.id}?section=${si}`)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 16px 10px 28px', cursor: 'pointer', textAlign: 'left',
+                borderTop: si > 0 ? '1px solid var(--border-light, #0f0f0f)' : 'none',
+              }}
+            >
+              <div style={{
+                width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '1px solid var(--border, #2a2a2a)',
+                fontSize: 10, color: '#666', fontWeight: 600,
+              }}>
+                {si + 1}
+              </div>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary, #ccc)', fontWeight: 500 }}>
+                {title}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {open && sections.length === 0 && (
+        <div style={{ borderTop: '1px solid var(--border-light, #111)', padding: '10px 16px 10px 28px' }}>
+          <button
+            onClick={() => router.push(`/theory/${lesson.id}`)}
+            style={{ fontSize: 13, color: 'var(--text-secondary, #ccc)', cursor: 'pointer', background: 'none', border: 'none', fontWeight: 500 }}
+          >
+            {locale === 'sk' ? 'Otvoriť lekciu' : 'Open lesson'}
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -2017,7 +2017,7 @@ function formatContent(text: string, phase: string = '') {
       const fontSize = level === 1 ? 22 : level === 2 ? 19 : 17;
       result.push(
         <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12, display: 'flex', alignItems: 'flex-start', gap: level === 3 ? 10 : 0 }}>
-          {level === 3 && <div style={{ width: 4, minHeight: 24, borderRadius: 3, background: '#4ade80', flexShrink: 0, marginTop: 2 }} />}
+          {level === 3 && <div style={{ width: 4, alignSelf: 'stretch', borderRadius: 3, background: '#4ade80', flexShrink: 0 }} />}
           <div>
             <h3 style={{ fontWeight: 700, fontSize, color: 'var(--text, #EDEDED)', margin: 0, marginBottom: level <= 2 ? 10 : 6 }}>
               {renderInline(heading, `mh-${keyCounter}`)}

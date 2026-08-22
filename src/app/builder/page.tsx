@@ -176,20 +176,27 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
     const answerIdx = markers[mi].idx;
     const prevEnd = mi > 0 ? markers[mi - 1].idx : -1;
 
-    // Lines before this answer marker (but after previous answer marker)
-    // Find where the question content starts (skip explanation of prev question)
+    // Find where this question's content starts
+    // Scan backwards from answer marker to find the question start
     let startIdx = prevEnd + 1;
-    // Skip explanation lines of previous question (lines right after prev answer marker)
-    if (mi > 0) {
+    for (let j = answerIdx - 1; j > prevEnd; j--) {
+      const ln = lines[j].trim();
+      // Found a question header — this is where the question block starts
+      if (/^(Otázka|Question)\s+\d+/i.test(ln) || /^\d+\.\s*(Otázka|Question)/i.test(ln)) {
+        startIdx = j;
+        break;
+      }
+      // Found a section header — question starts after it
+      if (/^\d+\.\s/.test(ln) && /^(Select|Fill|Kvíz|Quiz|Vyber|Doplň)/i.test(ln.replace(/^\d+\.\s*/, ''))) {
+        startIdx = j + 1;
+        break;
+      }
+    }
+    // If no header found, find first non-empty line after prev explanation
+    if (startIdx === prevEnd + 1 && mi > 0) {
       for (let j = prevEnd + 1; j < answerIdx; j++) {
         const ln = lines[j].trim();
-        // Stop skipping when we hit a new question indicator
-        if (/^(Otázka|Question)\s+\d+/i.test(ln) || /^\d+\.\s/.test(ln) || /^[A-D][).\s:]/.test(ln)) {
-          startIdx = j;
-          break;
-        }
-        // Also stop if it looks like question text (not explanation continuation)
-        if (ln && !/^(Vysvetlenie|Explanation)/i.test(ln) && j > prevEnd + 3) {
+        if (/^(Otázka|Question)\s+\d+/i.test(ln) || /^\d+\.\s/.test(ln)) {
           startIdx = j;
           break;
         }
@@ -197,9 +204,7 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
     }
 
     const beforeLines = lines.slice(startIdx, answerIdx);
-    // Explanation = lines after answer marker until next question starts
-    const afterEnd = mi < markers.length - 1 ? markers[mi + 1].idx : lines.length;
-    const afterLines = lines.slice(answerIdx + 1, afterEnd);
+    const afterLines = lines.slice(answerIdx + 1, mi < markers.length - 1 ? markers[mi + 1].idx : lines.length);
 
     // Parse question content from beforeLines
     let questionText = '';
@@ -214,8 +219,8 @@ function parseQuestionsFromText(text: string, lessonId: number, startNum: number
       if (/^(Otázka|Question)\s+\d+/i.test(ln)) continue;
       if (/^\d+\.\s*(Otázka|Question)/i.test(ln)) continue;
 
-      // Options A/B/C/D
-      const optMatch = ln.match(/^([A-D])[).\s:]+(.+)/);
+      // Options A/B/C/D — require ) or . or : after letter
+      const optMatch = ln.match(/^([A-D])[).:][\s]*(.+)/);
       if (optMatch) {
         const isCorrect = ln.includes('✅');
         opts.push({

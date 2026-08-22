@@ -1786,9 +1786,10 @@ function MiniLessonCard({
                           enParsed = await api({ action: 'parseQuestions', text: importTextEn });
                         }
                         setImportStatus(`Ukladám ${skParsed.length} otázok...`);
-                        const startNum = questions.length > 0
-                          ? Math.max(...questions.map(q => q.question_number)) + 1
-                          : 1;
+                        // Get max question_number from DB to avoid duplicates
+                        const existingQs = await api({ action: 'getQuestions', lessonId });
+                        const maxNum = (existingQs || []).reduce((m: number, q: any) => Math.max(m, q.question_number || 0), 0);
+                        const startNum = maxNum + 1;
                         for (let i = 0; i < skParsed.length; i++) {
                           const sk = skParsed[i];
                           const en = enParsed[i];

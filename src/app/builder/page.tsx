@@ -1746,7 +1746,7 @@ function MiniLessonCard({
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>
-                      EN otázky {enCount > 0 && `(${enCount})`}
+                      EN ({enCount || '-'})
                     </div>
                     <textarea
                       style={{ ...s.textarea, minHeight: 120 }}

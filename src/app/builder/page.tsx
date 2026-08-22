@@ -114,8 +114,13 @@ function htmlToMarkdown(html: string): string {
 function cleanupContent(text: string): string {
   // Strip leading ## heading (title is separate)
   text = text.replace(/^## .+\n\n?/, '');
-  // Convert **>** or > at line starts to bullet points
+  // Convert various bullet markers to standard "- " format
+  // **>** or > at line starts
   text = text.replace(/^(\*\*>?\*\*\s?|>\s?)/gm, '- ');
+  // // comment-style bullets
+  text = text.replace(/^\/\/\s*/gm, '- ');
+  // # used as bullet (not ## heading)
+  text = text.replace(/^#\s+(?!#)/gm, '- ');
   return text;
 }
 

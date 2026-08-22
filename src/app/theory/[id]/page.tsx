@@ -2016,11 +2016,14 @@ function formatContent(text: string, phase: string = '') {
       const heading = trimmed.replace(/^#+\s*/, '');
       const fontSize = level === 1 ? 22 : level === 2 ? 19 : 17;
       result.push(
-        <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12 }}>
-          <h3 style={{ fontWeight: 700, fontSize, color: '#EDEDED', margin: 0, marginBottom: level <= 2 ? 10 : 6 }}>
-            {renderInline(heading, `mh-${keyCounter}`)}
-          </h3>
-          {level <= 2 && <div style={{ width: 36, height: 4, borderRadius: 2, background: '#444' }} />}
+        <div key={`h-${keyCounter++}`} style={{ marginTop: i > 0 ? 28 : 0, marginBottom: 12, display: 'flex', alignItems: 'flex-start', gap: level === 3 ? 10 : 0 }}>
+          {level === 3 && <div style={{ width: 4, minHeight: 24, borderRadius: 3, background: '#4ade80', flexShrink: 0, marginTop: 2 }} />}
+          <div>
+            <h3 style={{ fontWeight: 700, fontSize, color: 'var(--text, #EDEDED)', margin: 0, marginBottom: level <= 2 ? 10 : 6 }}>
+              {renderInline(heading, `mh-${keyCounter}`)}
+            </h3>
+            {level <= 2 && <div style={{ width: 36, height: 4, borderRadius: 2, background: '#444' }} />}
+          </div>
         </div>
       );
       continue;

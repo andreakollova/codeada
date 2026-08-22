@@ -879,9 +879,10 @@ export default function BuilderPage() {
       copy[targetIdx] = { ...copy[targetIdx], lesson_number: tmpNum };
       copy.sort((x, y) => x.lesson_number - y.lesson_number);
       setLessons(copy);
-      // Save to DB
-      await api({ action: 'saveLesson', lesson: { id: a.id, lesson_number: b.lesson_number } });
+      // Save to DB — use temp number to avoid unique constraint
+      await api({ action: 'saveLesson', lesson: { id: a.id, lesson_number: 99999 } });
       await api({ action: 'saveLesson', lesson: { id: b.id, lesson_number: a.lesson_number } });
+      await api({ action: 'saveLesson', lesson: { id: a.id, lesson_number: b.lesson_number } });
       showToast('Poradie zmenené');
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
@@ -1705,81 +1706,67 @@ function MiniLessonCard({
             {showImport && (() => {
               const parsedSk = importText.trim() ? parseQuestionsFromText(importText, lessonId || 0, 1).questions : [];
               const parsedEn = importTextEn.trim() ? parseQuestionsFromText(importTextEn, lessonId || 0, 1).questions : [];
+              const skCount = parsedSk.length;
+              const enCount = parsedEn.length;
 
               return (
               <div style={{ ...s.card, border: '1px solid #3b82f6', marginBottom: 12 }}>
-                {/* SK import */}
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>
-                    SK otázky {parsedSk.length > 0 && `(${parsedSk.length})`}
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>
+                      SK {skCount > 0 && `(${skCount})`}
+                    </div>
+                    <textarea
+                      style={{ ...s.textarea, minHeight: 120 }}
+                      placeholder={'Pastni SK otázky...'}
+                      value={importText}
+                      onChange={(e) => setImportText(e.target.value)}
+                    />
                   </div>
-                  <textarea
-                    style={{ ...s.textarea, minHeight: 100 }}
-                    placeholder={'Pastni SK otázky...\nSprávna odpoveď: A\nVysvetlenie...'}
-                    value={importText}
-                    onChange={(e) => setImportText(e.target.value)}
-                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>
+                      EN {enCount > 0 && `(${enCount})`}
+                    </div>
+                    <textarea
+                      style={{ ...s.textarea, minHeight: 120 }}
+                      placeholder={'Pastni EN otázky...'}
+                      value={importTextEn}
+                      onChange={(e) => setImportTextEn(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                   <button
-                    style={{ ...s.btn('#3b82f6'), marginTop: 6 }}
+                    style={s.btn('#3b82f6')}
                     onClick={() => {
-                      if (!importText.trim() || parsedSk.length === 0) return;
+                      if (!importText.trim() || skCount === 0) return;
                       const startNum = questions.length > 0
                         ? Math.max(...questions.map(q => q.question_number)) + 1
                         : 1;
                       const { questions: parsed } = parseQuestionsFromText(importText, lessonId || 0, startNum);
+                      if (enCount > 0) {
+                        for (let i = 0; i < parsed.length && i < parsedEn.length; i++) {
+                          parsed[i].question_text = parsedEn[i].question_text_sk;
+                          parsed[i].explanation = parsedEn[i].explanation_sk;
+                          if (parsed[i].options && parsedEn[i].options) {
+                            for (let j = 0; j < parsed[i].options.length && j < parsedEn[i].options.length; j++) {
+                              parsed[i].options[j].option_text = parsedEn[i].options[j].option_text_sk;
+                            }
+                          }
+                        }
+                      }
                       (async () => {
                         for (const q of parsed) await onSaveQuestion(q, q.options || []);
                         setImportText('');
+                        setImportTextEn('');
+                        setShowImport(false);
                       })();
                     }}
                   >
-                    Importovať SK ({parsedSk.length})
+                    Pridať otázky ({skCount})
                   </button>
-                </div>
-
-                {/* EN import — fills into existing questions */}
-                <div style={{ borderTop: '1px solid #333', paddingTop: 12 }}>
-                  <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>
-                    EN preklady {parsedEn.length > 0 && `(${parsedEn.length})`}
-                    {questions.length > 0 && <span style={{ color: '#666', fontWeight: 400 }}> — vyplní do {questions.length} existujúcich otázok</span>}
-                  </div>
-                  <textarea
-                    style={{ ...s.textarea, minHeight: 100 }}
-                    placeholder={'Pastni EN otázky...\nCorrect answer: A\nExplanation...'}
-                    value={importTextEn}
-                    onChange={(e) => setImportTextEn(e.target.value)}
-                  />
-                  <button
-                    style={{ ...s.btn('#aaa'), marginTop: 6 }}
-                    onClick={() => {
-                      if (!importTextEn.trim() || parsedEn.length === 0) return;
-                      if (questions.length === 0) { alert('Najprv importuj SK otázky.'); return; }
-                      const sorted = [...questions].sort((a, b) => a.question_number - b.question_number);
-                      const updated = [...questions];
-                      for (let i = 0; i < sorted.length && i < parsedEn.length; i++) {
-                        const qi = questions.indexOf(sorted[i]);
-                        if (qi === -1) continue;
-                        updated[qi] = {
-                          ...updated[qi],
-                          question_text: parsedEn[i].question_text_sk,
-                          explanation: parsedEn[i].explanation_sk,
-                          options: updated[qi].options?.map((o, oi) => ({
-                            ...o,
-                            option_text: parsedEn[i].options?.[oi]?.option_text_sk || o.option_text,
-                          })) || [],
-                        };
-                      }
-                      onUpdateQuestions(updated);
-                      setImportTextEn('');
-                    }}
-                  >
-                    Vyplniť EN ({Math.min(parsedEn.length, questions.length)})
-                  </button>
-                </div>
-
-                <div style={{ marginTop: 12 }}>
                   <button style={s.btn('#333')} onClick={() => { setImportText(''); setImportTextEn(''); setShowImport(false); }}>
-                    Zavrieť
+                    Zrušiť
                   </button>
                 </div>
               </div>

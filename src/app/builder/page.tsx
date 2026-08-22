@@ -1705,92 +1705,81 @@ function MiniLessonCard({
             {showImport && (() => {
               const parsedSk = importText.trim() ? parseQuestionsFromText(importText, lessonId || 0, 1).questions : [];
               const parsedEn = importTextEn.trim() ? parseQuestionsFromText(importTextEn, lessonId || 0, 1).questions : [];
-              const skCount = parsedSk.length;
-              const enCount = parsedEn.length;
-              const mismatch = !!(importTextEn.trim() && skCount !== enCount);
 
               return (
-              <div style={{ ...s.card, border: `1px solid ${mismatch ? '#ef4444' : '#3b82f6'}`, marginBottom: 12 }}>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>
-                      SK otázky {skCount > 0 && `(${skCount})`}
-                    </div>
-                    <textarea
-                      style={{ ...s.textarea, minHeight: 120 }}
-                      placeholder={'Otázka 1\nText...\nA) ...\nB) ...\nSprávna odpoveď: A\nVysvetlenie...'}
-                      value={importText}
-                      onChange={(e) => setImportText(e.target.value)}
-                    />
+              <div style={{ ...s.card, border: '1px solid #3b82f6', marginBottom: 12 }}>
+                {/* SK import */}
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, color: '#3b82f6', marginBottom: 4, fontWeight: 600 }}>
+                    SK otázky {parsedSk.length > 0 && `(${parsedSk.length})`}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>
-                      EN ({enCount || '-'})
-                    </div>
-                    <textarea
-                      style={{ ...s.textarea, minHeight: 120 }}
-                      placeholder={'Question 1\nText...\nA) ...\nB) ...\nCorrect answer: A\nExplanation...'}
-                      value={importTextEn}
-                      onChange={(e) => setImportTextEn(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {mismatch && (
-                  <div style={{ color: '#f59e0b', fontSize: 12, fontWeight: 600, marginTop: 8 }}>
-                    SK má {skCount}, EN má {enCount} — EN sa napáruje na prvých {Math.min(skCount, enCount)} otázok.
-                  </div>
-                )}
-
-                {skCount > 0 && enCount > 0 && (
-                  <div style={{ marginTop: 8, fontSize: 11, color: '#666' }}>
-                    {parsedSk.map((q, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 2 }}>
-                        <span style={{ color: '#3b82f6' }}>#{i + 1}</span>
-                        <span style={{ flex: 1, color: '#aaa' }}>{q.question_text_sk?.substring(0, 40)}...</span>
-                        <span style={{ flex: 1, color: parsedEn[i] ? '#666' : '#555' }}>{parsedEn[i]?.question_text_sk?.substring(0, 40) || '—'}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  <textarea
+                    style={{ ...s.textarea, minHeight: 100 }}
+                    placeholder={'Pastni SK otázky...\nSprávna odpoveď: A\nVysvetlenie...'}
+                    value={importText}
+                    onChange={(e) => setImportText(e.target.value)}
+                  />
                   <button
-                    style={s.btn('#3b82f6')}
+                    style={{ ...s.btn('#3b82f6'), marginTop: 6 }}
                     onClick={() => {
-                      if (!importText.trim()) return;
+                      if (!importText.trim() || parsedSk.length === 0) return;
                       const startNum = questions.length > 0
                         ? Math.max(...questions.map(q => q.question_number)) + 1
                         : 1;
                       const { questions: parsed } = parseQuestionsFromText(importText, lessonId || 0, startNum);
-                      if (parsed.length === 0) return;
-                      // Merge EN if provided
-                      if (importTextEn.trim()) {
-                        const { questions: pEn } = parseQuestionsFromText(importTextEn, lessonId || 0, startNum);
-                        for (let i = 0; i < parsed.length && i < pEn.length; i++) {
-                          parsed[i].question_text = pEn[i].question_text_sk;
-                          parsed[i].explanation = pEn[i].explanation_sk;
-                          if (parsed[i].options && pEn[i].options) {
-                            for (let j = 0; j < parsed[i].options.length && j < pEn[i].options.length; j++) {
-                              parsed[i].options[j].option_text = pEn[i].options[j].option_text_sk;
-                            }
-                          }
-                        }
-                      }
                       (async () => {
-                        for (const q of parsed) {
-                          await onSaveQuestion(q, q.options || []);
-                        }
+                        for (const q of parsed) await onSaveQuestion(q, q.options || []);
                         setImportText('');
-                        setImportTextEn('');
-                        setShowImport(false);
                       })();
                     }}
                   >
-                    Importovať ({skCount} otázok)
+                    Importovať SK ({parsedSk.length})
                   </button>
+                </div>
+
+                {/* EN import — fills into existing questions */}
+                <div style={{ borderTop: '1px solid #333', paddingTop: 12 }}>
+                  <div style={{ fontSize: 12, color: '#aaa', marginBottom: 4, fontWeight: 600 }}>
+                    EN preklady {parsedEn.length > 0 && `(${parsedEn.length})`}
+                    {questions.length > 0 && <span style={{ color: '#666', fontWeight: 400 }}> — vyplní do {questions.length} existujúcich otázok</span>}
+                  </div>
+                  <textarea
+                    style={{ ...s.textarea, minHeight: 100 }}
+                    placeholder={'Pastni EN otázky...\nCorrect answer: A\nExplanation...'}
+                    value={importTextEn}
+                    onChange={(e) => setImportTextEn(e.target.value)}
+                  />
+                  <button
+                    style={{ ...s.btn('#aaa'), marginTop: 6 }}
+                    onClick={() => {
+                      if (!importTextEn.trim() || parsedEn.length === 0) return;
+                      if (questions.length === 0) { alert('Najprv importuj SK otázky.'); return; }
+                      const sorted = [...questions].sort((a, b) => a.question_number - b.question_number);
+                      const updated = [...questions];
+                      for (let i = 0; i < sorted.length && i < parsedEn.length; i++) {
+                        const qi = questions.indexOf(sorted[i]);
+                        if (qi === -1) continue;
+                        updated[qi] = {
+                          ...updated[qi],
+                          question_text: parsedEn[i].question_text_sk,
+                          explanation: parsedEn[i].explanation_sk,
+                          options: updated[qi].options?.map((o, oi) => ({
+                            ...o,
+                            option_text: parsedEn[i].options?.[oi]?.option_text_sk || o.option_text,
+                          })) || [],
+                        };
+                      }
+                      onUpdateQuestions(updated);
+                      setImportTextEn('');
+                    }}
+                  >
+                    Vyplniť EN ({Math.min(parsedEn.length, questions.length)})
+                  </button>
+                </div>
+
+                <div style={{ marginTop: 12 }}>
                   <button style={s.btn('#333')} onClick={() => { setImportText(''); setImportTextEn(''); setShowImport(false); }}>
-                    Zrušiť
+                    Zavrieť
                   </button>
                 </div>
               </div>

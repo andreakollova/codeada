@@ -1786,7 +1786,7 @@ function MiniLessonCard({
                 Otázky ({questions.length})
               </span>
               {lessonId && (
-                <button style={s.btnSmall('#4ade80')} onClick={handleAddQuestion}>
+                <button style={s.btnSmall('#3b82f6')} onClick={handleAddQuestion}>
                   + Nová otázka
                 </button>
               )}

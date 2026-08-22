@@ -968,7 +968,6 @@ export default function BuilderPage() {
 
   // ── Question operations (per section) ──
   const saveQuestionInSection = async (sectionIdx: number, q: QuizQuestion, opts: QuizOption[]) => {
-    setLoading(true);
     try {
       const questionPayload: any = {
         lesson_id: q.lesson_id,
@@ -1000,7 +999,6 @@ export default function BuilderPage() {
     } catch (e: any) {
       showToast('Chyba: ' + e.message);
     }
-    setLoading(false);
   };
 
   const deleteQuestionInSection = async (sectionIdx: number, qId: number) => {

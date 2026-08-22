@@ -235,9 +235,22 @@ export default function TheoryLessonPage() {
 
     // Subsection mode: learning → quiz for this section → next subsection → quiz → ... → done
     if (subsections.length > 1 && phase === 'learning') {
-      const qPerSub = Math.max(1, Math.ceil(quiz.length / subsections.length));
-      const startQ = subsectionIndex * qPerSub;
-      const endQ = subsectionIndex === subsections.length - 1 ? quiz.length : Math.min(startQ + qPerSub, quiz.length);
+      // Parse quiz counts from <!-- quiz:N --> markers in subsections
+      const qCounts = subsections.map(sub => {
+        const m = sub.match(/<!-- quiz:(\d+) -->/);
+        return m ? parseInt(m[1]) : 0;
+      });
+      const hasMarkers = qCounts.some(c => c > 0);
+      // Calculate start/end question index for this subsection
+      let startQ: number, endQ: number;
+      if (hasMarkers) {
+        startQ = qCounts.slice(0, subsectionIndex).reduce((a, b) => a + b, 0);
+        endQ = startQ + qCounts[subsectionIndex];
+      } else {
+        const qPerSub = Math.max(1, Math.ceil(quiz.length / subsections.length));
+        startQ = subsectionIndex * qPerSub;
+        endQ = subsectionIndex === subsections.length - 1 ? quiz.length : Math.min(startQ + qPerSub, quiz.length);
+      }
       if (startQ < quiz.length && startQ < endQ) {
         // Show quiz for this subsection
         setQuizIndex(startQ);
@@ -311,8 +324,18 @@ export default function TheoryLessonPage() {
 
     // Subsection mode: check if we've finished this subsection's quiz questions
     if (subsections.length > 1) {
-      const qPerSub = Math.max(1, Math.ceil(quiz.length / subsections.length));
-      const endQ = subsectionIndex === subsections.length - 1 ? quiz.length : Math.min((subsectionIndex + 1) * qPerSub, quiz.length);
+      const qCounts = subsections.map(sub => {
+        const m = sub.match(/<!-- quiz:(\d+) -->/);
+        return m ? parseInt(m[1]) : 0;
+      });
+      const hasMarkers = qCounts.some(c => c > 0);
+      let endQ: number;
+      if (hasMarkers) {
+        endQ = qCounts.slice(0, subsectionIndex + 1).reduce((a, b) => a + b, 0);
+      } else {
+        const qPerSub = Math.max(1, Math.ceil(quiz.length / subsections.length));
+        endQ = subsectionIndex === subsections.length - 1 ? quiz.length : Math.min((subsectionIndex + 1) * qPerSub, quiz.length);
+      }
 
       if (quizIndex + 1 < endQ) {
         // More questions for this subsection
@@ -1894,6 +1917,8 @@ function highlightCode(code: string, keyPrefix: string) {
 
 function formatContent(text: string, phase: string = '') {
   if (!text) return null;
+  // Strip quiz count markers
+  text = text.replace(/<!-- quiz:\d+ -->/g, '');
 
   // First pass: handle markdown ``` code blocks
   // Split by ``` and alternate between text and code

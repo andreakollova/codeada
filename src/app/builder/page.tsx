@@ -382,13 +382,17 @@ function parseMiniLessons(rawSk: string, rawEn?: string): MiniLesson[] {
     .filter(Boolean) as MiniLesson[];
 }
 
-function serializeMiniLessons(minis: MiniLesson[], lang: 'sk' | 'en' = 'sk'): string {
-  return minis.map((m) => {
+function serializeMiniLessons(minis: MiniLesson[], lang: 'sk' | 'en' = 'sk', questionCounts?: number[]): string {
+  return minis.map((m, i) => {
     const title = lang === 'en' ? (m.title_en || m.title) : m.title;
     const content = lang === 'en' ? m.content_en : m.content;
     const factsStr = serializeFacts(m.facts);
     const parts = [`## ${title}`, content];
     if (factsStr) parts.push(factsStr);
+    // Add quiz count marker (only in SK, hidden from display)
+    if (lang === 'sk' && questionCounts && questionCounts[i] > 0) {
+      parts.push(`<!-- quiz:${questionCounts[i]} -->`);
+    }
     return parts.filter(p => p).join('\n\n');
   }).join('\n\n');
 }
@@ -777,7 +781,8 @@ export default function BuilderPage() {
     setLoading(true);
     showToast('Ukladám...');
     try {
-      const contentSk = serializeMiniLessons(miniLessons, 'sk');
+      const questionCounts = sectionQuestions.map(sq => sq.length);
+      const contentSk = serializeMiniLessons(miniLessons, 'sk', questionCounts);
       const contentEn = serializeMiniLessons(miniLessons, 'en');
       // Serialize intro facts back into introduction_sk
       const introFactsStr = serializeFacts(introFacts);

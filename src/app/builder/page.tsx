@@ -154,146 +154,157 @@ function handleSmartPaste(e: React.ClipboardEvent<HTMLTextAreaElement>, setValue
 }
 
 // ── Question parser (paste from natural format) ─────────────
+// Splits by "Správna odpoveď:" / "Correct answer:" / "Správne riešenie:" markers
+// which every question has exactly once — guarantees correct count.
 function parseQuestionsFromText(text: string, lessonId: number, startNum: number): { questions: QuizQuestion[]; options: QuizOption[][] } {
   const questions: QuizQuestion[] = [];
   const allOptions: QuizOption[][] = [];
 
-  // Split into question blocks by numbered patterns or "Select correct code" / "Fill in the code" markers
-  // Each block starts with a number+dot, "Select correct code", or "Fill in the code"
-  const blocks: string[] = [];
+  // Split text into chunks ending with a correct-answer marker
+  const answerPattern = /^(Správna odpoveď|Správne riešenie|Correct answer):\s*(.+)/im;
   const lines = text.split('\n');
-  let current = '';
+
+  // Collect question blocks: everything between answer markers
+  const blocks: { lines: string[]; correctAnswer: string }[] = [];
+  let currentLines: string[] = [];
 
   for (const line of lines) {
-    const trimmed = line.trim();
-    // New question block starts with: "1.", "Otázka N", "Select correct code", "Fill in the code", section headers
-    if (/^\d+\.\s/.test(trimmed) || /^Otázka\s+\d+/i.test(trimmed) || /^Question\s+\d+/i.test(trimmed) || /^Select correct/i.test(trimmed) || /^Fill in the code/i.test(trimmed) || /^Select the correct/i.test(trimmed) || /^Vyber správny/i.test(trimmed) || /^Doplň kód/i.test(trimmed)) {
-      if (current.trim()) blocks.push(current.trim());
-      current = trimmed + '\n';
+    const m = line.trim().match(answerPattern);
+    if (m) {
+      blocks.push({ lines: currentLines, correctAnswer: m[2].trim() });
+      currentLines = [];
     } else {
-      current += line + '\n';
+      currentLines.push(line);
     }
   }
-  if (current.trim()) blocks.push(current.trim());
 
   let qNum = startNum;
 
   for (const block of blocks) {
-    // Skip section headers (strip leading "01. " etc.)
-    const firstLine = block.split('\n')[0].replace(/^\d+\.\s*/, '').trim();
-    if (/^(Select( the)? correct|Fill in the code|Otázky|Questions|Kvízové otázky|Quiz|Vyber správny|Doplň kód)/im.test(firstLine)) {
-      continue;
-    }
-
-    const blockLines = block.split('\n');
-
-    // Detect question type
-    const hasOptions = /^[A-D][).\s:]/m.test(block);
-    const hasCodeSnippet = block.includes('___');
-    const hasCorrectMarker = block.includes('✅') || /Správna odpoveď:\s*[A-D]/i.test(block) || /Správne riešenie:/i.test(block);
-
-    // Extract question text (first line after number, or the numbered line itself)
     let questionText = '';
     let codeSnippet = '';
-    let correctAnswer = '';
     let explanation = '';
     const opts: QuizOption[] = [];
+    let inExplanation = false;
 
-    let phase: 'question' | 'code' | 'options' | 'explanation' = 'question';
+    // Lines after the answer marker (in currentLines of NEXT block) are explanation
+    // But we structured it so explanation comes AFTER the answer marker in the remaining lines
+    // Actually, explanation is in the leftover lines after this block's answer
+    // Let me re-check: the split puts lines BEFORE the answer into block.lines
+    // Lines AFTER the answer but before the next question go into the next block's lines
+    // So explanation is at the START of the next block... that's wrong.
+    //
+    // Better approach: scan block.lines for content, and treat the remaining currentLines as explanation
 
-    for (const rawLine of blockLines) {
+    for (const rawLine of block.lines) {
       const ln = rawLine.trim();
       if (!ln) continue;
 
-      // Skip section headers
-      if (/^(Select correct code|Fill in the code)\s*$/i.test(ln)) continue;
-
-      // Detect "Správna odpoveď:" or "Správne riešenie:"
-      if (/^Správna odpoveď:\s*(.+)/i.test(ln)) {
-        const m = ln.match(/^Správna odpoveď:\s*(.+)/i);
-        if (m) correctAnswer = m[1].trim();
-        phase = 'explanation';
-        continue;
-      }
-      if (/^Správne riešenie:\s*(.+)/i.test(ln)) {
-        const m = ln.match(/^Správne riešenie:\s*(.+)/i);
-        if (m) correctAnswer = m[1].trim();
-        phase = 'explanation';
+      // Skip headers
+      if (/^(Select|Fill in|Otázky|Questions|Kvízové|Quiz|Vyber|Doplň|\d+\.\s*(Select|Fill|Kvíz|Quiz|Vyber|Doplň))/i.test(ln)) continue;
+      if (/^(Otázka|Question)\s+\d+$/i.test(ln)) continue;
+      if (/^\d+\.\s*(Otázka|Question)/i.test(ln)) continue;
+      // Skip "Vysvetlenie:" / "Explanation:" label
+      if (/^(Vysvetlenie|Explanation)\s*:?\s*$/i.test(ln)) { inExplanation = true; continue; }
+      if (/^(Vysvetlenie|Explanation)\s*:\s*(.+)/i.test(ln)) {
+        inExplanation = true;
+        explanation += ln.replace(/^(Vysvetlenie|Explanation)\s*:\s*/i, '');
         continue;
       }
 
-      // Detect options (A/B/C/D lines) — handles "A text", "A) text", "A. text", "A: text"
-      const optMatch = ln.match(/^([A-D])[).\s:]+(.+)/);
-      if (optMatch) {
-        phase = 'options';
-        const isCorrect = ln.includes('✅');
-        const optText = optMatch[2].replace('✅', '').trim();
-        opts.push({
-          option_label: optMatch[1],
-          option_text: '',  // EN empty — fill manually
-          option_text_sk: optText,
-          is_correct: isCorrect,
-        });
-        if (isCorrect) correctAnswer = optMatch[1];
-        continue;
-      }
-
-      if (phase === 'explanation') {
+      if (inExplanation) {
         explanation += (explanation ? '\n' : '') + ln;
         continue;
       }
 
-      if (phase === 'question') {
-        // Check if this looks like code (has =, indentation, or Python keywords)
-        if (ln.includes('___') || /^[a-z_]+\s*=/.test(ln) || /^\s{2,}/.test(rawLine) || /^(if|for|def|print|return)\s/.test(ln)) {
-          phase = 'code';
-          codeSnippet += (codeSnippet ? '\n' : '') + rawLine;
-        } else {
-          // Remove leading number like "1. " and skip "Otázka N" lines
-          const cleaned = ln.replace(/^\d+\.\s*/, '');
-          if (/^Otázka\s+\d+$/i.test(cleaned) || /^Question\s+\d+$/i.test(cleaned)) continue;
-          questionText += (questionText ? '\n' : '') + cleaned;
-        }
+      // Options A/B/C/D
+      const optMatch = ln.match(/^([A-D])[).\s:]+(.+)/);
+      if (optMatch) {
+        const isCorrect = ln.includes('✅');
+        opts.push({
+          option_label: optMatch[1],
+          option_text: '',
+          option_text_sk: optMatch[2].replace('✅', '').trim(),
+          is_correct: isCorrect,
+        });
         continue;
       }
 
-      if (phase === 'code') {
-        if (optMatch || /^[A-D]\s/.test(ln)) {
-          phase = 'options';
-        } else {
-          codeSnippet += '\n' + rawLine;
-          continue;
-        }
+      // Code detection
+      if (ln.includes('___') || /^[a-z_]+\s*=/.test(ln) || /^\s{2,}/.test(rawLine) || /^(if|for|def|print|return|while|else|elif)\s/.test(ln) || /^(if|for|def|print|return|while|else|elif)$/.test(ln)) {
+        codeSnippet += (codeSnippet ? '\n' : '') + rawLine;
+        continue;
       }
+
+      // Regular text = question text (strip leading number)
+      const cleaned = ln.replace(/^\d+\.\s*/, '');
+      questionText += (questionText ? ' ' : '') + cleaned;
     }
 
     if (!questionText.trim()) continue;
 
-    // Determine question type: if has options (A/B/C/D) → always MCQ
-    let questionType = 'multiple_choice';
-    if (opts.length === 0 && (hasCodeSnippet || correctAnswer)) {
-      questionType = 'fill_code';
+    // Also check for explanation in the NEXT block's early lines (before next question content)
+    // This is handled because explanation lines after "Vysvetlenie:" are captured above
+
+    // Mark correct option from answer
+    const ca = block.correctAnswer;
+    if (opts.length > 0 && /^[A-D]$/.test(ca)) {
+      opts.forEach(o => { o.is_correct = o.option_label === ca; });
     }
 
-    // If correct answer not found from markers, find from ✅
-    if (!correctAnswer && opts.length > 0) {
-      const correct = opts.find(o => o.is_correct);
-      if (correct) correctAnswer = correct.option_label;
-    }
+    const questionType = opts.length > 0 ? 'multiple_choice' : 'fill_code';
 
     questions.push({
       lesson_id: lessonId,
       question_number: qNum++,
-      question_text: '',  // EN empty — fill manually
+      question_text: '',
       question_text_sk: questionText.trim(),
       question_type: questionType,
-      correct_answer: correctAnswer,
+      correct_answer: ca,
       code_snippet: codeSnippet.trim() || '',
-      explanation: '',  // EN empty — fill manually
+      explanation: '',
       explanation_sk: explanation.trim(),
       options: opts,
     });
     allOptions.push(opts);
+  }
+
+  // Handle explanation: it comes AFTER the answer marker, so it's in the lines
+  // of the NEXT block. Let's fix this by re-parsing with a different strategy.
+  // Actually, let me restructure: split by answer markers but keep explanation too.
+
+  // Re-scan: explanation lines after each answer marker go into previous question
+  let finalLines: string[] = [];
+  const finalBlocks: { before: string[]; answer: string; after: string[] }[] = [];
+
+  for (const line of lines) {
+    const m = line.trim().match(answerPattern);
+    if (m) {
+      finalBlocks.push({ before: finalLines, answer: m[2].trim(), after: [] });
+      finalLines = [];
+    } else {
+      if (finalBlocks.length > 0 && finalLines.length === 0) {
+        // This might be explanation for the previous question
+        const ln = line.trim();
+        if (ln && !(/^(Select|Fill in|Otázky|Questions|Kvízové|Quiz|Vyber|Doplň|\d+\.\s)/i.test(ln)) && !(/^(Otázka|Question)\s+\d+/i.test(ln))) {
+          finalBlocks[finalBlocks.length - 1].after.push(line);
+          continue;
+        }
+      }
+      finalLines.push(line);
+    }
+  }
+
+  // Now update explanations from after-lines
+  for (let i = 0; i < finalBlocks.length && i < questions.length; i++) {
+    if (!questions[i].explanation_sk && finalBlocks[i].after.length > 0) {
+      const expl = finalBlocks[i].after
+        .map(l => l.trim())
+        .filter(l => l && !/^(Vysvetlenie|Explanation)\s*:?\s*$/i.test(l))
+        .map(l => l.replace(/^(Vysvetlenie|Explanation)\s*:\s*/i, ''))
+        .join(' ');
+      questions[i].explanation_sk = expl;
+    }
   }
 
   return { questions, options: allOptions };

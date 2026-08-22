@@ -2000,8 +2000,8 @@ function QuestionEditor({
   const showOptions = currentType === 'mcq' || currentType === 'mcq_code';
 
   return (
-    <div style={{ ...s.card, border: '1px solid #4ade80' }}>
-      <h4 style={{ margin: '0 0 12px', color: '#4ade80', fontSize: 14 }}>
+    <div style={{ ...s.card, border: '1px solid #3b82f6' }}>
+      <h4 style={{ margin: '0 0 12px', color: '#3b82f6', fontSize: 14 }}>
         {q.id ? 'Upraviť otázku' : 'Nová otázka'}
       </h4>
 
@@ -2137,7 +2137,7 @@ function QuestionEditor({
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-        <button style={s.btn('#4ade80')} onClick={() => {
+        <button style={s.btn('#3b82f6')} onClick={() => {
           // Validate EN fields
           const errs: string[] = [];
           if (!q.question_text?.trim()) errs.push('Otazka EN je prazdna.');

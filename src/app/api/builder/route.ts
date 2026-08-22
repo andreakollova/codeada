@@ -265,15 +265,18 @@ export async function POST(request: Request) {
 
 Each question has:
 - question_text: the question text (without number prefix like "Otázka 1" or "Question 1")
-- question_type: "multiple_choice" if has A/B/C/D options, "fill_code" if has ___ blank to fill
-- code_snippet: any code shown with the question (Python code with variables, if/for statements etc.), empty string if none
-- correct_answer: the letter (A/B/C/D) or value for fill_code
+- question_type: "multiple_choice" if has A/B/C/D options, "fill_code" if has ___ blank to fill and NO A/B/C/D options
+- code_snippet: any code shown with the question (Python code with variables, if/for statements etc.), empty string if none. For "select correct code" questions that have BOTH code AND A/B/C/D options, include the code here AND set type to "multiple_choice".
+- correct_answer: For multiple_choice: the letter A/B/C/D. For fill_code: the ACTUAL VALUE to fill in the blank (e.g. "print", "6", "temperature > 30"), NEVER a letter like A/B/C/D.
 - explanation: the explanation text (without "Vysvetlenie:" or "Explanation:" prefix)
 - options: array of {label: "A"/"B"/"C"/"D", text: "option text"} — empty array for fill_code
 
 Return JSON: {"questions": [...]}
 
-IMPORTANT: Extract ALL questions. Do not skip any. Do not merge questions. Each "Správna odpoveď:" or "Correct answer:" line marks the end of one question.`
+CRITICAL RULES:
+- Extract ALL questions. Do not skip any. Each "Správna odpoveď:" or "Correct answer:" marks one question.
+- For fill_code: correct_answer must be the actual code/value (like "print", "6", "len"), NEVER a letter.
+- If a question has code AND A/B/C/D options → it's "multiple_choice" with code_snippet, NOT fill_code.`
               },
               { role: 'user', content: text }
             ]

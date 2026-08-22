@@ -1815,7 +1815,7 @@ function renderInline(text: string, keyBase: string = 'il'): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={`${keyBase}-${i}`} style={{ color: '#EDEDED', fontWeight: 600 }}>{part.slice(2, -2)}</strong>;
+      return <strong key={`${keyBase}-${i}`} style={{ color: 'var(--text, #EDEDED)', fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith('`') && part.endsWith('`')) {
       return <code key={`${keyBase}-${i}`} style={{ background: '#1a1a1a', padding: '2px 6px', borderRadius: 4, fontSize: 13, fontFamily: 'JetBrains Mono, monospace', color: '#4ade80' }}>{part.slice(1, -1)}</code>;

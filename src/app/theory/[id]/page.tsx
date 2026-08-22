@@ -1684,7 +1684,7 @@ function PaginatedContent({ text, locale, equipment, onComplete }: { text: strin
         <button
           onClick={onComplete}
           style={{
-            width: '100%', padding: '14px', borderRadius: 12, marginTop: 20,
+            width: '100%', padding: '14px', borderRadius: 12, marginTop: 34,
             background: 'var(--btn-primary, #EDEDED)', border: 'none', color: 'var(--btn-primary-text, #0F0F0F)',
             fontWeight: 700, fontSize: 15, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
